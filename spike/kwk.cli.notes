@@ -1,0 +1,31 @@
+# LIST COLOURS
+#for C in {0..255}; do
+#    tput setab $C
+#    echo -n "$C "
+#done
+#tput sgr0
+#echo
+
+# OS DISCOVERY
+#if uname == 'Linux'
+  # cat /etc/*release | grep "PRETTY_NAME"
+#else uname == 'Darwin'
+  # sw_vers -productVersion
+
+  #    > kwk encode /usr/local/bin
+
+
+  #    printf "SUGGESTIONS:\n\n"
+#    printf "1) mac-exec-path\n"
+#    printf "2) bin-path\n"
+#    printf "3) Give me a kwk code e.g. (dfj234)\n"
+#    read SUGGESTION
+#        if [ "$SUGGESTION" == "1" ]; then
+#            printf "Use this bad boy: mac-exec-path"
+#        elif [ "$SUGGESTION" == "2" ]; then
+#             printf "Use this bad boy: bin-path"
+#        else
+#             local KEY=$(curl -s -H "Content-Type: application/json" -XPOST -d '{"url":"'$1'"}' "https://kwk.co/api/v1/hash" | jq .key | tr -d '"')
+#             printf "\nYour kwk code: ${KEY}\n\n"
+#             echo ${KEY} | tr -d '\n' | pbcopy
+#        fi
