@@ -29,3 +29,22 @@
 #             printf "\nYour kwk code: ${KEY}\n\n"
 #             echo ${KEY} | tr -d '\n' | pbcopy
 #        fi
+
+var dir = []string{"kwk","dick"}
+{
+			Name:    "cd",
+			Usage:   "add a task to the list",
+			Action:  func(c *cli.Context) error {
+				a := c.Args().First()
+				if a == ".." {
+					dir = dir[:len(dir)-1]
+				} else {
+					dir = append(dir, a);
+				}
+				for _, frag := range dir {
+					fmt.Printf("%s/", frag)
+				}
+				fmt.Print("> ")
+				return nil
+			},
+		},
