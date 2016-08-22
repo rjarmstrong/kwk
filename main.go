@@ -7,20 +7,22 @@ import (
 	"fmt"
 	"io"
 	"github.com/fatih/color"
-	"github.com/kwk-links/cli/openers"
-	"github.com/kwk-links/cli/api"
+	"github.com/kwk-links/kwk-cli/openers"
+	"github.com/kwk-links/kwk-cli/api"
 	"github.com/atotto/clipboard"
+	"github.com/kwk-links/kwk-cli/system"
 )
 
 func main() {
 	app := cli.NewApp()
+	os.Setenv("version", "v0.0.1")
 	//app.EnableBashCompletion = true
 
 	c := color.New(color.FgCyan).Add(color.Bold)
 	cli.HelpPrinter = func(w io.Writer, template string, data interface{}) {
 		c.Printf("\n ===================================================================== ")
 		c.Printf("\n ~~~~~~~~~~~~~~~~~~~~~~~~   KWK Power Links.  ~~~~~~~~~~~~~~~~~~~~~~~~ \n\n")
-		c.Printf(" Manage any kind of link. \n\n")
+		c.Printf(" Manage any kind of link.                                      %s \n\n", os.Getenv("version"))
 		c.Printf(" Usage: kwk [cmd/kwklink] [subcmd] ... [args]\n")
 
 		c.Printf("\n Commands:\n")
@@ -90,6 +92,21 @@ func main() {
 				a := &api.ApiClient{}
 				uri := a.Decode(c.Args().First())
 				openers.OpenCovert(uri)
+				return nil
+			},
+		},
+		{
+			Name:	"upgrade",
+			Action: func(c *cli.Context) error {
+				system.Upgrade()
+				return nil
+			},
+		},
+		{
+			Name:    "version",
+			Aliases: []string{"v"},
+			Action:  func(c *cli.Context) error {
+				fmt.Println(os.Getenv("version"))
 				return nil
 			},
 		},
