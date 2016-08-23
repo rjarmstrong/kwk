@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --incognito ${1}

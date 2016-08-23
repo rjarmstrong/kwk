@@ -22,31 +22,42 @@ func main() {
 	cli.HelpPrinter = func(w io.Writer, template string, data interface{}) {
 		c.Printf("\n ===================================================================== ")
 		c.Printf("\n ~~~~~~~~~~~~~~~~~~~~~~~~   KWK Power Links.  ~~~~~~~~~~~~~~~~~~~~~~~~ \n\n")
-		c.Printf(" Manage any kind of link.                                      %s \n\n", os.Getenv("version"))
-		c.Printf(" Usage: kwk [cmd/kwklink] [subcmd] ... [args]\n")
+		c.Printf(" The ultimate uri manager for power users. Create short and memorable\n")
+		c.Printf(" codes called `kwklinks` to find URLs, computer paths and everything\n")
+		c.Printf(" important to you, collegues and friends.\n\n")
+		c.Printf(" Usage: kwk [kwklink|cmd] [subcmd] [args]\n")
+		fmt.Print("\n e.g.: `kwk open got-spoilers` to open all G.O.T. spoiler websites.\n")
 
 		c.Printf("\n Commands:\n")
-		fmt.Print("	<kwklink,..>               	- Open and navigate.\n")
-		fmt.Print("  	create 	   <uri> [kwklink]     	- Create a kwklink and optionally provide a preferred kwklink.\n")
-		fmt.Print("	suggest    <uri>              	- Returns a list of suggested kwklinks for the given uri.\n")
-		fmt.Print("  	open-tag   [page_number]     	- Open links for given tag, 5 links per page.\n")
-		fmt.Print("	tag        <kwklink> [tag1,..]  - Add tags to a kwklink.\n")
-		fmt.Print("	untag      <kwklink> [tag1,..] 	- Remove tags from a kwklink.\n")
-		fmt.Print("	lock       <kwklink> <pin>      - Lock a kwklink with a pin.\n")
-		fmt.Print("	update     <kwklink> <new kwklink> - Made a mistake? Update a kwklink.\n")
-		fmt.Print("	detail     <kwklink>            - Get details and info.\n")
-		fmt.Print("	covert     <kwklink>            - Open in covert (incognito mode).\n")
-		fmt.Print("	get        <kwklink>            - Get the URI without navigating and copies it.\n")
-		fmt.Print("	search     <term> 	 	- Search kwklinks.\n")
+		fmt.Print("    <kwklink,..>                      - Open and navigate to uris in default browser etc.\n")
+		fmt.Print("    new        <uri> [name]           - Create a new kwklink, optionally provide a memorable name\n")
+		fmt.Print("    list       [tag,..] [and|or|not]  - List kwklinks, filter by tags\n")
+		fmt.Print("    search     [term] [tag]           - Search kwklinks and their metadata by keyword, filter by tags\n")
+		fmt.Print("    suggest    <uri>                  - List suggested kwklinks or tags for the given uri\n")
+		fmt.Print("    tag        <kwklink> [tag,..]     - Add tags to a kwklink\n")
+		fmt.Print("    open       <tag>,.. [page]        - Open links for given tags, 5 links per page\n")
+		fmt.Print("    untag      <kwklink> [tag,..]     - Remove tags from a kwklink\n")
+
+		fmt.Print("    update     <kwklink> <new>        - Made a mistake? Update a kwklink\n")
+		fmt.Print("    detail     <kwklink>              - Get details and info\n")
+		fmt.Print("    covert     <kwklink>              - Open in covert (incognito mode)\n")
+		fmt.Print("    get        <kwklink>              - Get the URI without navigating. (Copies it too)\n")
 
 		c.Printf("\n Analytics:\n")
-		fmt.Print("	stats      [kwklink][range]   	- Get stats summary for all keys\n")
-		fmt.Print("	stats      <kwklink>            - Get stats for a key plus sub keys.\n")
+		fmt.Print("    stats      [kwklink][tag]         - Get statistics and filter by kwklink or tag\n")
 
 		c.Printf("\n Account:\n")
-		fmt.Print("	login      <secret_key>  	- Login with secret key.\n")
-		fmt.Print("	logout                     	- Clears locally cached secret key.\n")
-		fmt.Print("	signup     <kwklink> <password> - Sign-up with a personal root kwklink.\n")
+		fmt.Print("    login      <secret_key>           - Login with secret key.\n")
+		fmt.Print("    logout                            - Clears locally cached secret key.\n")
+		fmt.Print("    signup     <username> <password>  - Sign-up with a username.\n")
+
+		fmt.Print("\n\n  * Filter only Tags: today yesterday thisweek lastweek thismonth lastmonth thisyear lastyear")
+		fmt.Print("\n ** kwklinks are case sensitive")
+
+		fmt.Print("\n\n More Commands: `kwk [admin|device] help`")
+
+
+		//Day II: fmt.Print("	lock       <kwklink> <pin>          - Lock a kwklink with a pin\n")
 
 		//fmt.Printf("\n Admin:\n")
 		//fmt.Printf("	cache       ls                  - List locally cached kwklinks.\n")
@@ -54,19 +65,23 @@ func main() {
 		//fmt.Printf("	upgrade                    	- Downloads and upgrades kwk cli client.\n")
 		//fmt.Printf("	config      warn  [on|off]      - Warns if attempting to open dodgy kwklink.\n")
 		//fmt.Printf("	config      quiet [on|off]      - Prevents links from being printed to console.\n")
-		//fmt.Printf("	version                    	- Enough said.\n")
+		//fmt.Printf("	version                    	\n")
 		c.Printf("\n ===================================================================== \n\n")
 	}
 
-	app.CommandNotFound = func(context *cli.Context, kwklink string) {
+	app.CommandNotFound = func(context *cli.Context, kwklinkString string) {
 		c := &api.ApiClient{}
-		uri := c.Decode(kwklink)
-		openers.Open(uri)
+		if k := c.Decode(kwklinkString); k != nil {
+			openers.Open(k.Uri)
+			return
+		}
+		fmt.Println("Command or kwklink not found.")
+
 	}
 	app.Commands = []cli.Command{
 		{
-			Name:    "create",
-			Aliases: []string{"c"},
+			Name:    "new",
+			Aliases: []string{"create","save"},
 			Action:  func(c *cli.Context) error {
 				a := api.ApiClient{}
 				kwklink := a.Create(c.Args().Get(0), c.Args().Get(1))
@@ -90,8 +105,8 @@ func main() {
 			Aliases: []string{"c"},
 			Action:  func(c *cli.Context) error {
 				a := &api.ApiClient{}
-				uri := a.Decode(c.Args().First())
-				openers.OpenCovert(uri)
+				k := a.Decode(c.Args().First())
+				openers.OpenCovert(k.Uri)
 				return nil
 			},
 		},
