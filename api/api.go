@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"bytes"
 	"io/ioutil"
+	"github.com/kwk-links/kwk-cli/system"
 )
 
 const (
@@ -27,8 +28,21 @@ type KwkLink struct {
 	Message string `json:"message"`
 }
 
+type User struct {
+	Id      int64 `json:"id"`
+	Username string `json:"username"`
+	Email 	string `json:"email"`
+	Host    string `json:"host"`
+	Token    string `json:"token"`
+}
+
 func (k *KwkLink) Err() string {
 	return k.Error
+}
+
+func (u *User) Err() string {
+	if len(u.Token) < 1 { return "Failed to authenticate, bad username or password."}
+	return ""
 }
 
 func (a *ApiClient) Decode(key string) *KwkLink {
@@ -44,6 +58,16 @@ func (a *ApiClient) Create(uri string, path string) *KwkLink {
 	return k
 }
 
+func (a *ApiClient) Login(username string, password string) *User {
+	body := fmt.Sprintf(`{"username":"%s", "password":"%s"}`, username, password)
+	u := &User{}
+	Request("POST", "users/login", body, u)
+	if len(u.Token) > 0 {
+		return u
+	}
+	return nil
+}
+
 func Request(method string, path string, body string, response interface{}) {
 	url := fmt.Sprintf("%s%s", apiRoot, path)
 	var req *http.Request
@@ -54,7 +78,8 @@ func Request(method string, path string, body string, response interface{}) {
 	} else {
 		req, _ = http.NewRequest(method, url, nil)
 	}
-	req.Header.Set("x-kwk-key", "d50ce4ec-97dc-46f2-a247-5d2a834caedf")
+	t := system.GetSetting("token")
+	req.Header.Set("x-kwk-key", t)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}

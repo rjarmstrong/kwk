@@ -22,9 +22,8 @@ func main() {
 	cli.HelpPrinter = func(w io.Writer, template string, data interface{}) {
 		c.Printf("\n ===================================================================== ")
 		c.Printf("\n ~~~~~~~~~~~~~~~~~~~~~~~~   KWK Power Links.  ~~~~~~~~~~~~~~~~~~~~~~~~ \n\n")
-		c.Printf(" The ultimate URI manager. Create short and memorable\n")
-		c.Printf(" codes called `kwklinks` to store URLs, computer paths, AppLinks and everything\n")
-		c.Printf(" important to you, your collegues and friends.\n\n")
+		c.Printf(" The ultimate URI manager. Create short and memorable codes called\n")
+		c.Printf(" `kwklinks` to store URLs, computer paths, AppLinks etc.\n\n")
 		c.Printf(" Usage: kwk [kwklink|cmd] [subcmd] [args]\n")
 		fmt.Print("\n e.g.: `kwk open got-spoilers` to open all G.O.T. spoiler websites.\n")
 
@@ -128,6 +127,18 @@ func main() {
 			Aliases: []string{"v"},
 			Action:  func(c *cli.Context) error {
 				fmt.Println(os.Getenv("version"))
+				return nil
+			},
+		},
+		{
+			Name:    "login",
+			Aliases: []string{"signin"},
+			Action:  func(c *cli.Context) error {
+				a := api.ApiClient{}
+				if u := a.Login(c.Args().Get(0), c.Args().Get(1)); u != nil {
+					fmt.Printf("%v signed in!", u.Username)
+					system.SaveSetting("token", u.Token)
+				}
 				return nil
 			},
 		},

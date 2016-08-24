@@ -7,7 +7,8 @@ INPUT2="$3"
 #API_ROOT="http://localhost:8080/api/v1/"
 API_ROOT="http://kwk.loc/api/v1/"
 #API_ROOT="http://192.168.99.100/api/v1/"
-CACHE=/Users/$USER/Library/Caches/kwk
+CACHE=/Users/$USER/Library/Caches/kwk.cache
+PREFERENCES=/Users/$USER/Preferences/kwk.preferences
 
 orange=`tput setaf 9`
 white=`tput setaf 15`
