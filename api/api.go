@@ -2,11 +2,17 @@ package api
 
 import (
 	"fmt"
-	"github.com/parnurzeal/gorequest"
 	"net/http"
+	"time"
+	"encoding/json"
+	"bytes"
+	"io/ioutil"
 )
 
-const (apiRoot = "http://kwk.loc/api/v1/")
+const (
+	//apiRoot = "http://kwk.loc/api/v1/"
+	apiRoot = "http://localhost:8080/api/v1/"
+)
 
 type ApiClient struct {
 }
@@ -21,37 +27,65 @@ type KwkLink struct {
 	Message string `json:"message"`
 }
 
+func (k *KwkLink) Err() string {
+	return k.Error
+}
+
 func (a *ApiClient) Decode(key string) *KwkLink {
 	k := &KwkLink{}
-	r, _, errs := gorequest.New().Get(fmt.Sprintf("%shash/%s", apiRoot, key)).EndStruct(k)
-	if errs != nil {
-		fmt.Println(errs)
-	}
-	if r.StatusCode == http.StatusOK { return k }
-	if r.StatusCode == http.StatusNotFound { return nil }
-	if r.StatusCode != http.StatusBadRequest {
-		fmt.Println(k.Message)
-		return nil
-	} else {
-		panic(r.Status)
-	}
+	Request("GET", fmt.Sprintf("hash/%s", key), "", k)
+	return k
 }
 
 func (a *ApiClient) Create(uri string, path string) *KwkLink {
+	body := fmt.Sprintf(`{"url":"%s", "key":"%s"}`, uri, path)
 	k := &KwkLink{}
-	message := fmt.Sprintf(`{"url":"%s", "key":"%s"}`, uri, path)
-	r, _, _ := gorequest.New().Post(fmt.Sprintf("%shash", apiRoot)).
-		//SetDebug(true).
-		Set("x-kwk-key", "59364212-aeb2-4100-bf0e-c418ef230529").
-		Send(message).
-		EndStruct(k)
-
-	if r.StatusCode == http.StatusBadRequest {
-		fmt.Println(k.Error)
-	} else if r.StatusCode != http.StatusOK {
-		fmt.Println(r)
-		fmt.Println(r.Status)
-	}
+	Request("POST", "hash", body, k)
 	return k
+}
+
+func Request(method string, path string, body string, response interface{}) {
+	url := fmt.Sprintf("%s%s", apiRoot, path)
+	var req *http.Request
+	if body != "" {
+		b := []byte(body)
+		buffer := bytes.NewBuffer(b)
+		req, _ = http.NewRequest(method, url, buffer)
+	} else {
+		req, _ = http.NewRequest(method, url, nil)
+	}
+	req.Header.Set("x-kwk-key", "d50ce4ec-97dc-46f2-a247-5d2a834caedf")
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	client.Timeout = time.Second * 10
+	r, e := client.Do(req)
+	if e != nil {
+		fmt.Print("kwk server is unavailable, please try again later or tweet us @kwklinks.")
+		return
+	}
+	defer r.Body.Close()
+	responseBytes, _ := ioutil.ReadAll(r.Body)
+	if e := json.Unmarshal(responseBytes, response); e != nil {
+		handleResponse(response, r)
+		return
+	}
+	handleResponse(response, r)
+}
+
+func handleResponse(i interface{}, r *http.Response) {
+	switch {
+	case r.StatusCode == http.StatusBadRequest :
+		fmt.Println(i.(ErrorResponse).Err())
+	case r.StatusCode == http.StatusForbidden :
+		fmt.Println("Sign in please: 'kwk signin <username> <password>'")
+	case r.StatusCode != http.StatusOK :
+		fmt.Println(r)
+		fmt.Println(r.StatusCode)
+	}
+}
+
+type ErrorResponse interface{
+	Err() string
 }
 
