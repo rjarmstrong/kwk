@@ -13,9 +13,15 @@ import (
 const (
 	//apiRoot = "http://kwk.loc/api/v1/"
 	apiRoot = "http://localhost:8080/api/v1/"
+	userDbKey = "user"
 )
 
 type ApiClient struct {
+  Settings *system.Settings
+}
+
+func New(s *system.Settings) *ApiClient{
+	return &ApiClient{Settings:s}
 }
 
 type KwkLink struct {
@@ -28,47 +34,49 @@ type KwkLink struct {
 	Message string `json:"message"`
 }
 
-type User struct {
-	Id      int64 `json:"id"`
-	Username string `json:"username"`
-	Email 	string `json:"email"`
-	Host    string `json:"host"`
-	Token    string `json:"token"`
-}
+
 
 func (k *KwkLink) Err() string {
 	return k.Error
 }
 
-func (u *User) Err() string {
-	if len(u.Token) < 1 { return "Failed to authenticate, bad username or password."}
-	return ""
-}
-
 func (a *ApiClient) Decode(key string) *KwkLink {
 	k := &KwkLink{}
-	Request("GET", fmt.Sprintf("hash/%s", key), "", k)
+	a.Request("GET", fmt.Sprintf("hash/%s", key), "", k)
 	return k
 }
 
 func (a *ApiClient) Create(uri string, path string) *KwkLink {
 	body := fmt.Sprintf(`{"url":"%s", "key":"%s"}`, uri, path)
 	k := &KwkLink{}
-	Request("POST", "hash", body, k)
+	a.Request("POST", "hash", body, k)
 	return k
 }
 
-func (a *ApiClient) Login(username string, password string) *User {
+func (a *ApiClient) Login(username string, password string) *system.User {
 	body := fmt.Sprintf(`{"username":"%s", "password":"%s"}`, username, password)
-	u := &User{}
-	Request("POST", "users/login", body, u)
-	if len(u.Token) > 0 {
+	u := &system.User{}
+	a.Request("POST", "users/login", body, u)
+	if len(u.Token) > 50 {
+		a.Settings.Upsert(userDbKey, u.Token)
+		fmt.Printf("%v signed in!", u.Username)
 		return u
 	}
 	return nil
 }
 
-func Request(method string, path string, body string, response interface{}) {
+func (a *ApiClient) Logout(){
+	a.Settings.Delete(userDbKey)
+	fmt.Println("Logged out.")
+}
+
+func (a *ApiClient) PrintProfile(){
+	u := &system.User{}
+	a.Settings.Get(userDbKey, u)
+	fmt.Println(u)
+}
+
+func (a *ApiClient) Request(method string, path string, body string, response interface{}) {
 	url := fmt.Sprintf("%s%s", apiRoot, path)
 	var req *http.Request
 	if body != "" {
@@ -78,8 +86,9 @@ func Request(method string, path string, body string, response interface{}) {
 	} else {
 		req, _ = http.NewRequest(method, url, nil)
 	}
-	t := system.GetSetting("token")
-	req.Header.Set("x-kwk-key", t)
+	u := &system.User{}
+	a.Settings.Get(userDbKey, u)
+	req.Header.Set("x-kwk-key", u.Token)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}

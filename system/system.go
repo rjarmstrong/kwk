@@ -1,23 +1,12 @@
 package system
 
 import (
-	"github.com/boltdb/bolt"
 	"os/exec"
 	"fmt"
 	"bytes"
 	"os"
 	"io"
 )
-
-var db, dbErr = bolt.Open("kwk.bolt.db", 0600, nil)
-
-const (settingsBucketName="Settings")
-
-func init(){
-	if dbErr != nil {
-		fmt.Print(dbErr)
-	}
-}
 
 func ExecSafe(name string, arg ...string) {
 	cmd := exec.Command(name, arg...)
@@ -30,31 +19,6 @@ func ExecSafe(name string, arg ...string) {
 		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
 		return
 	}
-}
-
-func SaveSetting(key string, value string) {
-	db.Update(func(tx *bolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists([]byte(settingsBucketName))
-		if err != nil {
-			return fmt.Errorf("create bucket: %s", err)
-		}
-		err = b.Put([]byte(key), []byte(value))
-		if err != nil {
-			return fmt.Errorf("put key failed: %s", err)
-		}
-		return nil
-	})
-}
-
-func GetSetting(key string) string {
-	var result string
-	db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(settingsBucketName))
-		v := b.Get([]byte(key))
-		result = fmt.Sprintf("%s", v)
-		return nil
-	})
-	return result
 }
 
 func Upgrade(){

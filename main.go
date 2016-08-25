@@ -16,6 +16,8 @@ import (
 func main() {
 	app := cli.NewApp()
 	os.Setenv("version", "v0.0.1")
+	settings := system.NewSettings("kwk.bolt.db")
+	apiClient := api.New(settings)
 	//app.EnableBashCompletion = true
 
 	c := color.New(color.FgCyan).Add(color.Bold)
@@ -87,8 +89,7 @@ func main() {
 			Name:    "new",
 			Aliases: []string{"create","save"},
 			Action:  func(c *cli.Context) error {
-				a := api.ApiClient{}
-				if k := a.Create(c.Args().Get(0), c.Args().Get(1)); k != nil {
+				if k := apiClient.Create(c.Args().Get(0), c.Args().Get(1)); k != nil {
 					clipboard.WriteAll(k.Key)
 					fmt.Println(k.Key)
 				}
@@ -99,8 +100,7 @@ func main() {
 			Name:    "get",
 			Aliases: []string{"g"},
 			Action:  func(c *cli.Context) error {
-				a := &api.ApiClient{}
-				uri := a.Decode(c.Args().First())
+				uri := apiClient.Decode(c.Args().First())
 				fmt.Println(uri)
 				return nil
 			},
@@ -109,8 +109,7 @@ func main() {
 			Name:    "covert",
 			Aliases: []string{"c"},
 			Action:  func(c *cli.Context) error {
-				a := &api.ApiClient{}
-				k := a.Decode(c.Args().First())
+				k := apiClient.Decode(c.Args().First())
 				openers.OpenCovert(k.Uri)
 				return nil
 			},
@@ -134,14 +133,27 @@ func main() {
 			Name:    "login",
 			Aliases: []string{"signin"},
 			Action:  func(c *cli.Context) error {
-				a := api.ApiClient{}
-				if u := a.Login(c.Args().Get(0), c.Args().Get(1)); u != nil {
-					fmt.Printf("%v signed in!", u.Username)
-					system.SaveSetting("token", u.Token)
-				}
+				apiClient.Login(c.Args().Get(0), c.Args().Get(1));
 				return nil
 			},
 		},
+		{
+			Name:    "logout",
+			Aliases: []string{"signout"},
+			Action:  func(c *cli.Context) error {
+				apiClient.Logout();
+				return nil
+			},
+		},
+		{
+			Name:    "profile",
+			Aliases: []string{"me"},
+			Action:  func(c *cli.Context) error {
+				apiClient.PrintProfile();
+				return nil
+			},
+		},
+
 		{
 			Name:        "template",
 			Aliases:     []string{"t"},
