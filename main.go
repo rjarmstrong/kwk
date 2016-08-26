@@ -11,8 +11,6 @@ import (
 	"github.com/kwk-links/kwk-cli/api"
 	"github.com/atotto/clipboard"
 	"github.com/kwk-links/kwk-cli/system"
-	tm "github.com/buger/goterm"
-	"math"
 )
 
 func main() {
@@ -27,7 +25,6 @@ func main() {
 	cli.HelpPrinter = func(w io.Writer, template string, data interface{}) {
 		c.Printf("\n ===================================================================== ")
 		c.Printf("\n ~~~~~~~~~~~~~~~~~~~~~~~~   KWK Power Links.  ~~~~~~~~~~~~~~~~~~~~~~~~ \n\n")
-		printSine()
 		c.Printf(" The ultimate URI manager. Create short and memorable codes called\n")
 		c.Printf(" `kwklinks` to store URLs, computer paths, AppLinks etc.\n\n")
 		c.Printf(" Usage: kwk [kwklink|cmd] [subcmd] [args]\n")
@@ -193,17 +190,4 @@ func main() {
 	}
 
 	app.Run(os.Args)
-}
-
-func printSine(){
-	chart := tm.NewLineChart(70, 10)
-	d := &tm.DataTable{}
-	d.AddColumn("")
-	d.AddColumn("Sin(x)")
-	d.AddColumn("Cos(x+1)")
-
-	for i := 0.0; i < 20.0; i += 1.0 {
-		d.AddRow(i, math.Sin(i), math.Cos(i+1))
-	}
-	fmt.Println(chart.Draw(d))
 }
