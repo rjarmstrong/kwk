@@ -58,9 +58,23 @@ func (a *ApiClient) Login(username string, password string) *system.User {
 	u := &system.User{}
 	a.Request("POST", "users/login", body, u)
 	if len(u.Token) > 50 {
-		a.Settings.Upsert(userDbKey, u.Token)
+		a.Settings.Upsert(userDbKey, u)
 		fmt.Printf("%v signed in!", u.Username)
 		return u
+	}
+	return nil
+}
+
+func (a *ApiClient) SignUp(email string, username string, password string) *system.User {
+	body := fmt.Sprintf(`{"email":"%s", "username":"%s", "password":"%s"}`, email, username, password)
+	u := &system.User{}
+	a.Request("POST", "users", body, u)
+	if len(u.Token) > 50 {
+		a.Settings.Upsert(userDbKey, u)
+		fmt.Printf("Welcome to kwk %s! You're signed in already.", u.Username)
+		return u
+	} else {
+		fmt.Printf("%s", u.Err())
 	}
 	return nil
 }
@@ -72,8 +86,16 @@ func (a *ApiClient) Logout(){
 
 func (a *ApiClient) PrintProfile(){
 	u := &system.User{}
-	a.Settings.Get(userDbKey, u)
-	fmt.Println(u)
+	err := a.Settings.Get(userDbKey, u)
+	if err != nil {
+		fmt.Println("You are not logged in please log in: kwk login <username> <password>")
+	} else {
+		fmt.Println("~~~~~~ Your Profile ~~~~~~~~~")
+		fmt.Printf("Email:      %v\n", u.Email)
+		fmt.Printf("Username:   %v\n", u.Username)
+		fmt.Printf("Host:       %v\n", u.Host)
+		fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	}
 }
 
 func (a *ApiClient) Request(method string, path string, body string, response interface{}) {
