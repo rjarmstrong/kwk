@@ -32,12 +32,23 @@ type KwkLink struct {
 	AfToken string `json:"afToken"`
 	Error   string `json:"error"`
 	Message string `json:"message"`
+	Created time.Time `json:"created"`
+}
+
+type KwkLinkList struct {
+	Items []KwkLink `json:"items"`
 }
 
 
 
 func (k *KwkLink) Err() string {
 	return k.Error
+}
+
+func (a *ApiClient) List(pageSize int) *KwkLinkList {
+	list := &KwkLinkList{}
+	a.Request("GET", "hash", "", list)
+	return list
 }
 
 func (a *ApiClient) Decode(key string) *KwkLink {
@@ -73,8 +84,6 @@ func (a *ApiClient) SignUp(email string, username string, password string) *syst
 		a.Settings.Upsert(userDbKey, u)
 		fmt.Printf("Welcome to kwk %s! You're signed in already.", u.Username)
 		return u
-	} else {
-		fmt.Printf("%s", u.Err())
 	}
 	return nil
 }
@@ -123,6 +132,7 @@ func (a *ApiClient) Request(method string, path string, body string, response in
 	defer r.Body.Close()
 	responseBytes, _ := ioutil.ReadAll(r.Body)
 	if e := json.Unmarshal(responseBytes, response); e != nil {
+		fmt.Println(e)
 		handleResponse(response, r)
 		return
 	}
@@ -132,7 +142,7 @@ func (a *ApiClient) Request(method string, path string, body string, response in
 func handleResponse(i interface{}, r *http.Response) {
 	switch {
 	case r.StatusCode == http.StatusBadRequest :
-		fmt.Println(i.(ErrorResponse).Err())
+		system.PrettyPrint(i)
 	case r.StatusCode == http.StatusForbidden :
 		fmt.Println("Sign in please: 'kwk signin <username> <password>'")
 	case r.StatusCode != http.StatusOK :

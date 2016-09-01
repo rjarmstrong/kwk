@@ -7,6 +7,7 @@ type User struct {
 	Host    string `json:"host"`
 	Token    string `json:"token"`
 	Message    string `json:"message"`
+	Messages   map[string]map[string]string `json:"messages"`
 	Error    string `json:"error"`
 }
 

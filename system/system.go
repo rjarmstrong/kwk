@@ -6,19 +6,26 @@ import (
 	"bytes"
 	"os"
 	"io"
+	"encoding/json"
 )
 
 func ExecSafe(name string, arg ...string) {
 	cmd := exec.Command(name, arg...)
-	var out bytes.Buffer
 	var stderr bytes.Buffer
-	cmd.Stdout = &out
+	cmd.Stdout = os.Stdout
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err != nil {
 		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
 		return
 	}
+}
+
+func PrettyPrint(obj interface{}) {
+	fmt.Println("")
+	p, _ := json.MarshalIndent(obj, "", "  ")
+	fmt.Print(string(p))
+	fmt.Print("\n\n")
 }
 
 func Upgrade(){
