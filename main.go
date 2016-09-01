@@ -57,11 +57,10 @@ func main() {
 			Name:    "list",
 			Aliases: []string{"ls"},
 			Action:  func(c *cli.Context) error {
-				//c.Args().First()
-				list := apiClient.List(1)
-				fmt.Println()
+
+				list := apiClient.List(c.Args().First(), c.Args().Get(1))
+				fmt.Print("\n")
 				table := tablewriter.NewWriter(os.Stdout)
-				//table.SetHeader([]string{Colour(subdued, "Kwklink"), Colour(subdued, "Type"), Colour(subdued, "URI"), Colour(subdued, "Tags"), ""})
 				table.SetAutoWrapText(false)
 				table.SetBorder(false)
 				table.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
@@ -72,7 +71,6 @@ func main() {
 				table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
 
 				for _, v := range list.Items {
-					fmt.Printf("\n%+q %s", v.Uri, v.Uri)
 					v.Uri = strings.Replace(v.Uri, "https://", "", 1)
 					v.Uri = strings.Replace(v.Uri, "http://", "", 1)
 					v.Uri = strings.Replace(v.Uri, "www.", "", 1)

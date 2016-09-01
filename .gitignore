@@ -24,3 +24,6 @@ _testmain.go
 *.test
 *.prof
 cli
+report.xml
+kwk-cli
+kwk.bolt.db

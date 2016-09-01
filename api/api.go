@@ -8,6 +8,9 @@ import (
 	"bytes"
 	"io/ioutil"
 	"github.com/kwk-links/kwk-cli/system"
+	"github.com/kwk-links/kwk-cli/gui"
+	"bufio"
+	"os"
 )
 
 const (
@@ -45,9 +48,9 @@ func (k *KwkLink) Err() string {
 	return k.Error
 }
 
-func (a *ApiClient) List(pageSize int) *KwkLinkList {
+func (a *ApiClient) List(page string, size string) *KwkLinkList {
 	list := &KwkLinkList{}
-	a.Request("GET", "hash", "", list)
+	a.Request("GET", fmt.Sprintf("hash?p=%s&s=%s", page, size), "", list)
 	return list
 }
 
@@ -65,6 +68,19 @@ func (a *ApiClient) Create(uri string, path string) *KwkLink {
 }
 
 func (a *ApiClient) Login(username string, password string) *system.User {
+	if username == "" {
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print(gui.Colour(gui.LightBlue, "Your Kwk Username: "))
+		usernameBytes, _, _ := reader.ReadLine()
+		username = string(usernameBytes)
+	}
+	if password == "" {
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print(gui.Colour(gui.LightBlue, "Your Password: "))
+		passwordBytes, _, _ := reader.ReadLine()
+		password = string(passwordBytes)
+	}
+
 	body := fmt.Sprintf(`{"username":"%s", "password":"%s"}`, username, password)
 	u := &system.User{}
 	a.Request("POST", "users/login", body, u)
