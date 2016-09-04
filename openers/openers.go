@@ -3,15 +3,17 @@ package openers
 import (
 	"github.com/kwk-links/kwk-cli/system"
 	"strings"
-	"fmt"
-	"github.com/kwk-links/kwk-cli/gui"
 )
 
 func Open(uri string) {
 	tokens := strings.Split(uri, " ")
 	if tokens[0] == "sudo"{
-		fmt.Println(gui.Colour(gui.LightBlue, "kwk > ", uri))
-		system.ExecSafe(tokens[1], tokens[2:]...)
+		system.ExecSafe("/bin/bash", "-c", uri)
+		return
+	}
+	if tokens[0] == "node"{
+		i := strings.Join(tokens[1:], " ")
+		system.ExecSafe("node", "-e", i)
 		return
 	}
 	system.ExecSafe("open", uri)

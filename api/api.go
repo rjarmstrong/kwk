@@ -11,6 +11,9 @@ import (
 	"github.com/kwk-links/kwk-cli/gui"
 	"bufio"
 	"os"
+	"strconv"
+	"strings"
+	"net/url"
 )
 
 const (
@@ -32,29 +35,49 @@ type KwkLink struct {
 	Key     string `json:"key"`
 	Root    string `json:"root"`
 	Uri     string `json:"url"`
+	Tags    []string `json:"tags"`
 	AfToken string `json:"afToken"`
-	Error   string `json:"error"`
-	Message string `json:"message"`
 	Created time.Time `json:"created"`
+	DefaultModel
 }
 
 type KwkLinkList struct {
 	Items []KwkLink `json:"items"`
 }
 
-
+type DefaultModel struct {
+	Error   string `json:"error"`
+	Message string `json:"message"`
+}
 
 func (k *KwkLink) Err() string {
 	return k.Error
 }
 
-func (a *ApiClient) List(page string, size string) *KwkLinkList {
+func (a *ApiClient) List(args []string) *KwkLinkList {
+	var page, size int
+	var tags = []string{}
+	for _, v := range args {
+		if num, err := strconv.Atoi(v); err == nil {
+			if page == 0 {
+				page = num
+			} else {
+				size = num
+			}
+		} else {
+			tags = append(tags, v)
+		}
+	}
 	list := &KwkLinkList{}
-	a.Request("GET", fmt.Sprintf("hash?p=%s&s=%s", page, size), "", list)
+	var tagTokens []string
+	for _, v := range tags {
+		tagTokens = append(tagTokens, fmt.Sprintf("&tags=%s", v))
+	}
+	a.Request("GET", fmt.Sprintf("hash?p=%d&s=%d%s", page, size, strings.Join(tagTokens, "")), "", list)
 	return list
 }
 
-func (a *ApiClient) Decode(key string) *KwkLink {
+func (a *ApiClient) Get(key string) *KwkLink {
 	k := &KwkLink{}
 	a.Request("GET", fmt.Sprintf("hash/%s", key), "", k)
 	return k
@@ -64,6 +87,13 @@ func (a *ApiClient) Create(uri string, path string) *KwkLink {
 	body := fmt.Sprintf(`{"url":"%s", "key":"%s"}`, uri, path)
 	k := &KwkLink{}
 	a.Request("POST", "hash", body, k)
+	return k
+}
+
+func (a *ApiClient) Update(key string, newKey string) *KwkLink {
+	body := fmt.Sprintf(`{"newKey":"%s"}`, newKey)
+	k := &KwkLink{}
+	a.Request("PUT", fmt.Sprintf("hash/%s", key), body, k)
 	return k
 }
 
@@ -104,6 +134,18 @@ func (a *ApiClient) SignUp(email string, username string, password string) *syst
 	return nil
 }
 
+func (a *ApiClient) Tag(kwkLink string, tags ...string) {
+	json, _ := json.Marshal(tags)
+	body := fmt.Sprintf(`{"tags":%s}`, json)
+	a.Request("POST", fmt.Sprintf("hash/%s/tag", url.QueryEscape(kwkLink)), body, nil)
+}
+
+func (a *ApiClient) UnTag(kwkLink string, tags ...string) {
+	json, _ := json.Marshal(tags)
+	body := fmt.Sprintf(`{"tags":%s}`, json)
+	a.Request("DELETE", fmt.Sprintf("hash/%s/tag", url.QueryEscape(kwkLink)), body, nil)
+}
+
 func (a *ApiClient) Logout(){
 	a.Settings.Delete(userDbKey)
 	fmt.Println("Logged out.")
@@ -116,6 +158,15 @@ func (a *ApiClient) PrintProfile(){
 		fmt.Println("You are not logged in please log in: kwk login <username> <password>")
 	} else {
 		fmt.Println("~~~~~~ Your Profile ~~~~~~~~~")
+		fmt.Println(gui.Build(2, gui.Space) + gui.Build(11, "~") + gui.Build(2, gui.Space))
+		fmt.Println(gui.Build(6, gui.Space) + gui.Build(3, gui.UBlock) + gui.Build(6, gui.Space))
+		fmt.Println(gui.Build(5, gui.Space) + gui.Build(5, gui.UBlock) + gui.Build(5, gui.Space))
+		fmt.Println(gui.Build(6, gui.Space) + gui.Build(3, gui.UBlock) + gui.Build(6, gui.Space))
+		fmt.Println(gui.Build(3, gui.Space) + gui.Build(9, gui.UBlock) + gui.Build(3, gui.Space))
+		fmt.Println(gui.Build(3, gui.Space) + gui.Build(9, gui.UBlock) + gui.Build(3, gui.Space))
+		fmt.Println(gui.Build(3, gui.Space) + gui.Build(9, gui.UBlock) + gui.Build(3, gui.Space))
+		fmt.Println(gui.Build(2, gui.Space) + gui.Build(11, "~") + gui.Build(2, gui.Space))
+
 		fmt.Printf("Email:      %v\n", u.Email)
 		fmt.Printf("Username:   %v\n", u.Username)
 		fmt.Printf("Host:       %v\n", u.Host)
@@ -123,7 +174,7 @@ func (a *ApiClient) PrintProfile(){
 	}
 }
 
-func (a *ApiClient) Request(method string, path string, body string, response interface{}) {
+func (a *ApiClient) Request(method string, path string, body string, model interface{}) {
 	url := fmt.Sprintf("%s%s", apiRoot, path)
 	var req *http.Request
 	if body != "" {
@@ -134,7 +185,11 @@ func (a *ApiClient) Request(method string, path string, body string, response in
 		req, _ = http.NewRequest(method, url, nil)
 	}
 	u := &system.User{}
-	a.Settings.Get(userDbKey, u)
+	if a.Settings.Get(userDbKey, u); u == nil {
+		fmt.Println("You are not logged in.")
+		return
+	}
+
 	req.Header.Set("x-kwk-key", u.Token)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -147,18 +202,25 @@ func (a *ApiClient) Request(method string, path string, body string, response in
 	}
 	defer r.Body.Close()
 	responseBytes, _ := ioutil.ReadAll(r.Body)
-	if e := json.Unmarshal(responseBytes, response); e != nil {
+	if model == nil {
+		model = &DefaultModel{}
+	}
+	if e := json.Unmarshal(responseBytes, model); e != nil {
 		fmt.Println(e)
-		handleResponse(response, r)
+		handleResponse(model, r)
 		return
 	}
-	handleResponse(response, r)
+	handleResponse(model, r)
 }
 
 func handleResponse(i interface{}, r *http.Response) {
 	switch {
 	case r.StatusCode == http.StatusBadRequest :
-		system.PrettyPrint(i)
+		if i != nil {
+			system.PrettyPrint(i)
+		} else {
+			fmt.Println(r.StatusCode)
+		}
 	case r.StatusCode == http.StatusForbidden :
 		fmt.Println("Sign in please: 'kwk signin <username> <password>'")
 	case r.StatusCode != http.StatusOK :
