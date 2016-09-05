@@ -29,10 +29,9 @@ func Help(w io.Writer, template string, data interface{}) {
 	fmt.Print("    note       <kwklink> [text]       - Add a description to a link\n")
 	fmt.Print("    version    <kwklink> [text]       - \n")
 
-	fmt.Print("    update\n")
-	fmt.Print("      kwklink  <kwklink> <kwklink>    - Update kwklink name <old> <new>\n")
-	fmt.Print("      uri      <kwklink> <uri>        - * Update uri, auto increments the version\n")
-	fmt.Print("    delete     <kwklink>              - * Deletes kwklink with warning prompt. Will give 404.\n")
+	fmt.Print("    rename  	  <kwklink> <kwklink>    - Update kwklink name <old> <new>\n")
+	fmt.Print("    bump       <kwklink> <uri>        - Update uri, auto increments the version\n")
+	fmt.Print("    delete     <kwklink>              - Deletes kwklink with warning prompt. Will give 404.\n")
 	fmt.Print("    detail     <kwklink>              - Get details and info\n")
 	fmt.Print("    covert     <kwklink>              - Open in covert (incognito mode)\n")
 	fmt.Print("    get        <kwklink> [page]       - Gets URIs without navigating. (Copies first to clipboard)\n")

@@ -23,10 +23,10 @@ const (
 )
 
 type ApiClient struct {
-  Settings *system.Settings
+	Settings *system.Settings
 }
 
-func New(s *system.Settings) *ApiClient{
+func New(s *system.Settings) *ApiClient {
 	return &ApiClient{Settings:s}
 }
 
@@ -35,6 +35,9 @@ type KwkLink struct {
 	Key     string `json:"key"`
 	Root    string `json:"root"`
 	Uri     string `json:"url"`
+	Version int `json:"version"`
+	Media   string `json:"media"`
+	Type    string `json:"type"`
 	Tags    []string `json:"tags"`
 	AfToken string `json:"afToken"`
 	Created time.Time `json:"created"`
@@ -44,8 +47,8 @@ type KwkLink struct {
 type KwkLinkList struct {
 	Items []KwkLink `json:"items"`
 	Total int `json:"total"`
-	Page int `json:"page"`
-	Size int `json:"size"`
+	Page  int `json:"page"`
+	Size  int `json:"size"`
 }
 
 type DefaultModel struct {
@@ -97,10 +100,17 @@ func (a *ApiClient) Create(uri string, path string) *KwkLink {
 	return k
 }
 
-func (a *ApiClient) Update(key string, newKey string) *KwkLink {
+func (a *ApiClient) Rename(key string, newKey string) *KwkLink {
 	body := fmt.Sprintf(`{"newKey":"%s"}`, newKey)
 	k := &KwkLink{}
-	a.Request("PUT", fmt.Sprintf("hash/%s", url.QueryEscape(key)), body, k)
+	a.Request("PUT", fmt.Sprintf("hash/%s/rename", url.QueryEscape(key)), body, k)
+	return k
+}
+
+func (a *ApiClient) Bump(key string, uri string) *KwkLink {
+	body := fmt.Sprintf(`{"uri":"%s"}`, uri)
+	k := &KwkLink{}
+	a.Request("PUT", fmt.Sprintf("hash/%s/bump", url.QueryEscape(key)), body, k)
 	return k
 }
 
@@ -153,12 +163,12 @@ func (a *ApiClient) UnTag(kwkLink string, tags ...string) {
 	a.Request("DELETE", fmt.Sprintf("hash/%s/tag", url.QueryEscape(kwkLink)), body, nil)
 }
 
-func (a *ApiClient) Logout(){
+func (a *ApiClient) Logout() {
 	a.Settings.Delete(userDbKey)
 	fmt.Println("Logged out.")
 }
 
-func (a *ApiClient) PrintProfile(){
+func (a *ApiClient) PrintProfile() {
 	u := &system.User{}
 	err := a.Settings.Get(userDbKey, u)
 	if err != nil {
@@ -238,7 +248,7 @@ func handleResponse(path string, i interface{}, r *http.Response) {
 	}
 }
 
-type ErrorResponse interface{
+type ErrorResponse interface {
 	Err() string
 }
 

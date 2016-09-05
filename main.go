@@ -171,7 +171,7 @@ func main() {
 				fmt.Printf(gui.Build(102, " ") + "%d of %d records\n\n", len(list.Items), list.Total)
 
 				tbl := tablewriter.NewWriter(os.Stdout)
-				tbl.SetHeader([]string{"Kwklink", "Project", "Media", "URI", "Tags", ""})
+				tbl.SetHeader([]string{"Kwklink", "Version", "Media", "Type", "URI", "Tags", ""})
 				tbl.SetAutoWrapText(false)
 				tbl.SetBorder(false)
 				tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
@@ -200,8 +200,9 @@ func main() {
 					}
 					tbl.Append([]string{
 						gui.Colour(gui.LightBlue, v.Key),
-						"general",
-						"web",
+						fmt.Sprintf("%d", v.Version),
+						v.Media,
+						v.Type,
 						v.Uri,
 						strings.Join(tags, ", "),
 						humanize.Time(v.Created),
@@ -216,7 +217,9 @@ func main() {
 					//gui.Colour(gui.Subdued, nextcmd)
 					//nextcmd := fmt.Sprintf("For next page run: kwk list %v", 2)
 				}
-				fmt.Printf("\n %d of %d pages", list.Page, (list.Total / list.Size) + 1)
+				if list.Size != 0 {
+					fmt.Printf("\n %d of %d pages", list.Page, (list.Total / list.Size) + 1)
+				}
 				fmt.Print("\n\n")
 				return nil
 			},
@@ -246,12 +249,22 @@ func main() {
 			},
 		},
 		{
-			Name:    "update",
-			Aliases: []string{},
+			Name:    "rename",
+			Aliases: []string{"mv"},
 			Action:  func(c *cli.Context) error {
 				//TODO: When updating a pinned kwklink, must force to give a new name
 				// (since it is technically no longer the original)
-				apiClient.Update(c.Args().Get(0), c.Args().Get(1));
+				apiClient.Rename(c.Args().Get(0), c.Args().Get(1));
+				return nil
+			},
+		},
+		{
+			Name:    "bump",
+			Aliases: []string{"version"},
+			Action:  func(c *cli.Context) error {
+				//TODO: When updating a pinned kwklink, must force to give a new name
+				// (since it is technically no longer the original)
+				apiClient.Bump(c.Args().Get(0), c.Args().Get(1));
 				return nil
 			},
 		},
