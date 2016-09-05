@@ -33,7 +33,9 @@ func Upgrade(){
 	installPath := "/usr/local/bin/kwk"
 	//download in future
 	CopyFile(distributionUri, installPath)
-	fmt.Println("Successful upgraded!")
+	fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	fmt.Println("      Successfully upgraded!")
+	fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 }
 
 // CopyFile copies a file from src to dst. If src and dst files exist, and are
