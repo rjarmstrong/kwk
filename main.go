@@ -15,6 +15,7 @@ import (
 	"github.com/kwk-links/kwk-cli/gui"
 	"bufio"
 	"time"
+	"github.com/kwk-links/kwk-cli/charting"
 )
 
 func main() {
@@ -281,7 +282,8 @@ func main() {
 			Name:    "stats",
 			Aliases: []string{"analytics"},
 			Action:  func(c *cli.Context) error {
-				gui.PrintSine()
+				list := apiClient.List(c.Args())
+				charting.PrintTags(list)
 				return nil
 			},
 		},

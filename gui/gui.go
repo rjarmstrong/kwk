@@ -17,7 +17,7 @@ const (
 	LightBlue = 36
 	ClearLine = "\033[1K"
 	MoveBack = "\033[9D"
-	Block = 2588
+	Block = "2588"
 	Start = "\033["
 	End = "\033[0m"
 	Space = " "
