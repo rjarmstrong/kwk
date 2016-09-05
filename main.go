@@ -277,6 +277,14 @@ func main() {
 				return nil
 			},
 		},
+		{
+			Name:    "stats",
+			Aliases: []string{"analytics"},
+			Action:  func(c *cli.Context) error {
+				gui.PrintSine()
+				return nil
+			},
+		},
 	}
 
 	app.Run(os.Args)
