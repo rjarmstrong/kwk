@@ -43,6 +43,9 @@ type KwkLink struct {
 
 type KwkLinkList struct {
 	Items []KwkLink `json:"items"`
+	Total int `json:"total"`
+	Page int `json:"page"`
+	Size int `json:"size"`
 }
 
 type DefaultModel struct {
@@ -79,8 +82,12 @@ func (a *ApiClient) List(args []string) *KwkLinkList {
 
 func (a *ApiClient) Get(key string) *KwkLink {
 	k := &KwkLink{}
-	a.Request("GET", fmt.Sprintf("hash/%s", key), "", k)
+	a.Request("GET", fmt.Sprintf("hash/%s", url.QueryEscape(key)), "", k)
 	return k
+}
+
+func (a *ApiClient) Delete(key string) {
+	a.Request("DELETE", fmt.Sprintf("hash/%s", url.QueryEscape(key)), "", nil)
 }
 
 func (a *ApiClient) Create(uri string, path string) *KwkLink {
@@ -93,7 +100,7 @@ func (a *ApiClient) Create(uri string, path string) *KwkLink {
 func (a *ApiClient) Update(key string, newKey string) *KwkLink {
 	body := fmt.Sprintf(`{"newKey":"%s"}`, newKey)
 	k := &KwkLink{}
-	a.Request("PUT", fmt.Sprintf("hash/%s", key), body, k)
+	a.Request("PUT", fmt.Sprintf("hash/%s", url.QueryEscape(key)), body, k)
 	return k
 }
 
@@ -207,13 +214,13 @@ func (a *ApiClient) Request(method string, path string, body string, model inter
 	}
 	if e := json.Unmarshal(responseBytes, model); e != nil {
 		fmt.Println(e)
-		handleResponse(model, r)
+		handleResponse(path, model, r)
 		return
 	}
-	handleResponse(model, r)
+	handleResponse(path, model, r)
 }
 
-func handleResponse(i interface{}, r *http.Response) {
+func handleResponse(path string, i interface{}, r *http.Response) {
 	switch {
 	case r.StatusCode == http.StatusBadRequest :
 		if i != nil {
@@ -223,6 +230,8 @@ func handleResponse(i interface{}, r *http.Response) {
 		}
 	case r.StatusCode == http.StatusForbidden :
 		fmt.Println("Sign in please: 'kwk signin <username> <password>'")
+	case r.StatusCode == http.StatusNotFound :
+		fmt.Println(path + " not found.")
 	case r.StatusCode != http.StatusOK :
 		fmt.Println(r)
 		fmt.Println(r.StatusCode)

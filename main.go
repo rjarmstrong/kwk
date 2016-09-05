@@ -13,20 +13,23 @@ import (
 	"github.com/dustin/go-humanize"
 	"strings"
 	"github.com/kwk-links/kwk-cli/gui"
+	"bufio"
+	"time"
 )
 
 func main() {
 
 	app := cli.NewApp()
+
 	os.Setenv("version", "v0.0.1")
 	settings := system.NewSettings("kwk.bolt.db")
 	apiClient := api.New(settings)
 	cli.HelpPrinter = system.Help
+	opener := openers.NewOpener(apiClient)
 
 	app.CommandNotFound = func(context *cli.Context, kwklinkString string) {
 		if k := apiClient.Get(kwklinkString); k != nil {
-			//fmt.Println(k)
-			openers.Open(k.Uri)
+			opener.Open(k.Uri)
 			return
 		}
 		fmt.Println("Command or kwklink not found.")
@@ -36,12 +39,12 @@ func main() {
 		{
 			Name:    "open",
 			Aliases: []string{"o"},
-			Action:  func(c *cli.Context) error {
+			Action: func(c *cli.Context) error {
 				args := c.Args()
 				list := apiClient.List([]string(args))
 				for _, v := range list.Items {
 					fmt.Println(gui.Colour(gui.LightBlue, v.Key))
-					openers.Open(v.Uri)
+					opener.Open(v.Uri)
 				}
 				return nil
 			},
@@ -53,7 +56,7 @@ func main() {
 				args := c.Args()
 				list := apiClient.List([]string(args))
 				for _, v := range list.Items {
-					openers.OpenCovert(v.Uri)
+					opener.OpenCovert(v.Uri)
 				}
 				return nil
 			},
@@ -94,6 +97,24 @@ func main() {
 			},
 		},
 		{
+			Name:    "delete",
+			Aliases: []string{"rm"},
+			Action:  func(c *cli.Context) error {
+				reader := bufio.NewReader(os.Stdin)
+				fmt.Printf(gui.Colour(gui.LightBlue, "Are you sure you want to delete %s y/n? "), c.Args().First())
+				yesNo, _, _ := reader.ReadRune()
+				if string(yesNo) == "y" {
+					apiClient.Delete(c.Args().First())
+					fmt.Println("Deleted")
+				} else {
+					messages := []string{"without a scratch","uninjured", "intact","unaffected","unharmed","unscathed","out of danger","safe and sound","unblemished", "alive and well"}
+					rnd := time.Now().Nanosecond()%(len(messages)-1)
+					fmt.Printf("'%s' is %s.\n", c.Args().First(), messages[rnd])
+				}
+				return nil
+			},
+		},
+		{
 			Name:    "tag",
 			Aliases: []string{"t"},
 			Action:  func(c *cli.Context) error {
@@ -110,6 +131,15 @@ func main() {
 				args := []string(c.Args())
 				apiClient.UnTag(args[0], args[1:]...)
 				fmt.Println("UnTagged")
+				return nil
+			},
+		},
+		{
+			Name:    "cd",
+			Aliases: []string{},
+			Action:  func(c *cli.Context) error {
+				args := []string(c.Args())
+				fmt.Println(gui.Colour(gui.LightBlue, "Switched to kwk:" + args[0] + "/"))
 				return nil
 			},
 		},
@@ -136,17 +166,19 @@ func main() {
 
 				args := c.Args()
 				list := apiClient.List([]string(args))
-				fmt.Print("\n")
-				table := tablewriter.NewWriter(os.Stdout)
-				table.SetHeader([]string{"Kwklink", "Project", "Media", "URI", "Tags", ""})
-				table.SetAutoWrapText(false)
-				table.SetBorder(false)
-				table.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
-				table.SetCenterSeparator("")
-				table.SetColumnSeparator("")
-				table.SetAutoFormatHeaders(false)
-				table.SetHeaderLine(true)
-				table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
+				fmt.Print(gui.Colour(gui.LightBlue, "\nkwk:" + "rjarmstrong/"))
+				fmt.Printf(gui.Build(102, " ") + "%d of %d records\n\n", len(list.Items), list.Total)
+
+				tbl := tablewriter.NewWriter(os.Stdout)
+				tbl.SetHeader([]string{"Kwklink", "Project", "Media", "URI", "Tags", ""})
+				tbl.SetAutoWrapText(false)
+				tbl.SetBorder(false)
+				tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
+				tbl.SetCenterSeparator("")
+				tbl.SetColumnSeparator("")
+				tbl.SetAutoFormatHeaders(false)
+				tbl.SetHeaderLine(true)
+				tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
 
 				for _, v := range list.Items {
 					v.Uri = strings.Replace(v.Uri, "https://", "", 1)
@@ -156,7 +188,7 @@ func main() {
 						v.Uri = v.Uri[0:10] + gui.Colour(gui.Subdued, "...") + v.Uri[len(v.Uri)-30:len(v.Uri)]
 					}
 
-					table.Append([]string{
+					tbl.Append([]string{
 						gui.Colour(gui.LightBlue, v.Key),
 						"general",
 						"web",
@@ -166,10 +198,15 @@ func main() {
 					})
 
 				}
-				table.Render()
+				tbl.Render()
 
-				nextcmd := fmt.Sprintf("For next page run: kwk list %v", 2)
-				fmt.Printf("\n %v of %v pages \t #tip %s", 1, 11, gui.Colour(gui.Subdued, nextcmd))
+				if len(list.Items) == 0 {
+					fmt.Println(gui.Colour(gui.Yellow, "No records on this page! Use a lower page number.\n"))
+				} else {
+					//gui.Colour(gui.Subdued, nextcmd)
+					//nextcmd := fmt.Sprintf("For next page run: kwk list %v", 2)
+				}
+				fmt.Printf("\n %d of %d pages", list.Page, (list.Total / list.Size) + 1)
 				fmt.Print("\n\n")
 				return nil
 			},
@@ -179,7 +216,7 @@ func main() {
 			Aliases: []string{"c"},
 			Action:  func(c *cli.Context) error {
 				k := apiClient.Get(c.Args().First())
-				openers.OpenCovert(k.Uri)
+				opener.OpenCovert(k.Uri)
 				return nil
 			},
 		},

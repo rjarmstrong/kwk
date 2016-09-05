@@ -30,17 +30,18 @@ func Help(w io.Writer, template string, data interface{}) {
 	fmt.Print("    version    <kwklink> [text]       - \n")
 
 	fmt.Print("    update\n")
-	fmt.Print("      kwklink  <kwklink> <kwklink>    - Update kwklink <old> <new>\n")
-	fmt.Print("      uri      <kwklink> <uri>        - * Update uri\n")
+	fmt.Print("      kwklink  <kwklink> <kwklink>    - Update kwklink name <old> <new>\n")
+	fmt.Print("      uri      <kwklink> <uri>        - * Update uri, auto increments the version\n")
 	fmt.Print("    delete     <kwklink>              - * Deletes kwklink with warning prompt. Will give 404.\n")
 	fmt.Print("    detail     <kwklink>              - Get details and info\n")
 	fmt.Print("    covert     <kwklink>              - Open in covert (incognito mode)\n")
 	fmt.Print("    get        <kwklink> [page]       - Gets URIs without navigating. (Copies first to clipboard)\n")
 
 	c.Printf("\n Community:\n")
-	fmt.Print("    pin    	  [name][kwklink][tag]   - *Pin current version of someone elses kwklink to \n")
-	fmt.Print("    comment    [tag][kwklink][text]          - *Comment on tag or kwklink\n")
-	fmt.Print("    view       [username]             - *View a profile ??:\n")
+	fmt.Print("    cd    	  [username]             - *Navigate to another users kwklinks. Used when searching or listing \n")
+	fmt.Print("    pin    	  [name][kwklink][tag]   - *Pin current version of someone elses kwklink to your own list \n")
+	fmt.Print("    comment    [tag][kwklink][text]   - *Comment on tag or kwklink\n")
+	fmt.Print("    profile    [username]             - *View a profile ??:\n")
 	fmt.Print("    share      [kwklink|tag] [handle] - *Share with someone with a given handle:\n")
 	fmt.Print("                                        twitter, email, kwk username\n")
 
