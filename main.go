@@ -189,12 +189,21 @@ func main() {
 						v.Uri = v.Uri[0:10] + gui.Colour(gui.Subdued, "...") + v.Uri[len(v.Uri)-30:len(v.Uri)]
 					}
 
+					var tags = []string{}
+					for _, v := range v.Tags {
+						if v == "error" {
+							tags = append(tags, gui.Colour(gui.Pink, v))
+						} else {
+							tags = append(tags, v)
+						}
+
+					}
 					tbl.Append([]string{
 						gui.Colour(gui.LightBlue, v.Key),
 						"general",
 						"web",
 						v.Uri,
-						strings.Join(v.Tags,","),
+						strings.Join(tags, ", "),
 						humanize.Time(v.Created),
 					})
 
