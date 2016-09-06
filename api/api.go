@@ -94,9 +94,17 @@ func (a *ApiClient) Delete(key string) {
 }
 
 func (a *ApiClient) Create(uri string, path string) *KwkLink {
-	body := fmt.Sprintf(`{"url":"%s", "key":"%s"}`, uri, path)
+	body := struct {
+		Url string `json:"url"`
+		Key string `json:"key"`
+	}{
+		Url: uri,
+		Key: path,
+	}
+
 	k := &KwkLink{}
-	a.Request("POST", "hash", body, k)
+	j, _ := json.Marshal(body)
+	a.Request("POST", "hash", string(j), k)
 	return k
 }
 

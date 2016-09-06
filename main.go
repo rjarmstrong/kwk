@@ -30,7 +30,11 @@ func main() {
 
 	app.CommandNotFound = func(context *cli.Context, kwklinkString string) {
 		if k := apiClient.Get(kwklinkString); k != nil {
-			opener.Open(k.Uri)
+			if k.Uri != "" {
+				opener.Open(k.Uri)
+			} else {
+				fmt.Printf(gui.Colour(gui.Yellow, "kwklink: '%s' not found\n"), kwklinkString)
+			}
 			return
 		}
 		fmt.Println("Command or kwklink not found.")
@@ -83,6 +87,25 @@ func main() {
 				if k := apiClient.Create(c.Args().Get(0), c.Args().Get(1)); k != nil {
 					clipboard.WriteAll(k.Key)
 					fmt.Println(k.Key)
+				}
+				return nil
+			},
+		},
+		{
+			Name:    "clone",
+			Aliases: []string{"copy"},
+			Action:  func(c *cli.Context) error {
+				if k := apiClient.Get(c.Args().Get(0)); k != nil {
+					originalKey := k.Key
+					uri := k.Uri
+					if c.Args().Get(1) != "" && c.Args().Get(2) != "" {
+						uri = strings.Replace(uri, c.Args().Get(1), c.Args().Get(2), -1)
+					}
+					k = apiClient.Create(uri, "")
+					clipboard.WriteAll(k.Key)
+					fmt.Printf(gui.Colour(gui.LightBlue, "Cloned %s -> %s"), originalKey, k.Key)
+				} else {
+					fmt.Println("Invalid kwklink")
 				}
 				return nil
 			},
@@ -259,12 +282,25 @@ func main() {
 			},
 		},
 		{
-			Name:    "bump",
-			Aliases: []string{"version"},
+			Name:    "patch",
+			Aliases: []string{"patch"},
 			Action:  func(c *cli.Context) error {
 				//TODO: When updating a pinned kwklink, must force to give a new name
 				// (since it is technically no longer the original)
-				apiClient.Bump(c.Args().Get(0), c.Args().Get(1));
+
+				if k := apiClient.Get(c.Args().Get(0)); k != nil {
+					uri := k.Uri
+					if len(c.Args()) == 3 {
+						uri = strings.Replace(uri, c.Args().Get(1), c.Args().Get(2), -1)
+					} else {
+						uri = c.Args().Get(1)
+					}
+					apiClient.Bump(c.Args().Get(0), uri);
+					clipboard.WriteAll(k.Key)
+					fmt.Printf(gui.Colour(gui.LightBlue, "Patched %s"), k.Key)
+				} else {
+					fmt.Println("Invalid kwklink")
+				}
 				return nil
 			},
 		},
