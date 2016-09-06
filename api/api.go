@@ -115,10 +115,15 @@ func (a *ApiClient) Rename(key string, newKey string) *KwkLink {
 	return k
 }
 
-func (a *ApiClient) Bump(key string, uri string) *KwkLink {
-	body := fmt.Sprintf(`{"uri":"%s"}`, uri)
+func (a *ApiClient) Patch(key string, uri string) *KwkLink {
+	body := struct {
+		Uri string `json:"uri"`
+	}{
+		Uri: uri,
+	}
+	j, _ := json.Marshal(body)
 	k := &KwkLink{}
-	a.Request("PUT", fmt.Sprintf("hash/%s/bump", url.QueryEscape(key)), body, k)
+	a.Request("PUT", fmt.Sprintf("hash/%s/bump", url.QueryEscape(key)), string(j), k)
 	return k
 }
 

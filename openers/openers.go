@@ -22,7 +22,7 @@ func printUri(uri string){
 	fmt.Printf(gui.Colour(gui.LightBlue, " %d - %s\n"), iterationCount, uri)
 }
 
-func (o *Opener) Open(uri string) {
+func (o *Opener) Open(uri string, param string) {
 	iterationCount += 1
 	if iterationCount > 3 {
 		fmt.Println("Max recursion reached.")
@@ -43,12 +43,15 @@ func (o *Opener) Open(uri string) {
 				}
 				link := o.apiClient.Get(firstArg)
 				if link.Uri != "" {
-					o.Open(link.Uri)
+					o.Open(link.Uri, args[2])
 				} else {
 					fmt.Printf(gui.Colour(gui.Yellow, "Can't run sub-command: '%s' - has it been deleted?\n"), v)
 				}
 
 			} else {
+				if param != "" {
+					v = strings.Replace(v, "[param1]", param, -1)
+				}
 				system.ExecSafe("/bin/bash", "-c", v)
 			}
 		}

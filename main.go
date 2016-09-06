@@ -28,12 +28,13 @@ func main() {
 	cli.HelpPrinter = system.Help
 	opener := openers.NewOpener(apiClient)
 
-	app.CommandNotFound = func(context *cli.Context, kwklinkString string) {
-		if k := apiClient.Get(kwklinkString); k != nil {
+	app.CommandNotFound = func(c *cli.Context, kwklink string) {
+		if k := apiClient.Get(kwklink); k != nil {
 			if k.Uri != "" {
-				opener.Open(k.Uri)
+				param1 := c.Args().Get(1)
+				opener.Open(k.Uri, param1)
 			} else {
-				fmt.Printf(gui.Colour(gui.Yellow, "kwklink: '%s' not found\n"), kwklinkString)
+				fmt.Printf(gui.Colour(gui.Yellow, "kwklink: '%s' not found\n"), kwklink)
 			}
 			return
 		}
@@ -49,7 +50,7 @@ func main() {
 				list := apiClient.List([]string(args))
 				for _, v := range list.Items {
 					fmt.Println(gui.Colour(gui.LightBlue, v.Key))
-					opener.Open(v.Uri)
+					opener.Open(v.Uri, "")
 				}
 				return nil
 			},
@@ -101,7 +102,11 @@ func main() {
 					if c.Args().Get(1) != "" && c.Args().Get(2) != "" {
 						uri = strings.Replace(uri, c.Args().Get(1), c.Args().Get(2), -1)
 					}
-					k = apiClient.Create(uri, "")
+					kwklink := ""
+					if c.Args().Get(3) != "" {
+						kwklink = c.Args().Get(3)
+					}
+					k = apiClient.Create(uri, kwklink)
 					clipboard.WriteAll(k.Key)
 					fmt.Printf(gui.Colour(gui.LightBlue, "Cloned %s -> %s"), originalKey, k.Key)
 				} else {
@@ -295,7 +300,7 @@ func main() {
 					} else {
 						uri = c.Args().Get(1)
 					}
-					apiClient.Bump(c.Args().Get(0), uri);
+					apiClient.Patch(c.Args().Get(0), uri);
 					clipboard.WriteAll(k.Key)
 					fmt.Printf(gui.Colour(gui.LightBlue, "Patched %s"), k.Key)
 				} else {
