@@ -21,7 +21,6 @@ import (
 func main() {
 
 	app := cli.NewApp()
-
 	os.Setenv("version", "v0.0.1")
 	settings := system.NewSettings("kwk.bolt.db")
 	apiClient := api.New(settings)
@@ -32,7 +31,7 @@ func main() {
 		if k := apiClient.Get(kwklink); k != nil {
 			if k.Uri != "" {
 				param1 := c.Args().Get(1)
-				opener.Open(k.Uri, param1)
+				opener.Open(k, param1)
 			} else {
 				fmt.Printf(gui.Colour(gui.Yellow, "kwklink: '%s' not found\n"), kwklink)
 			}
@@ -50,7 +49,7 @@ func main() {
 				list := apiClient.List([]string(args))
 				for _, v := range list.Items {
 					fmt.Println(gui.Colour(gui.LightBlue, v.Key))
-					opener.Open(v.Uri, "")
+					opener.Open(&v, "")
 				}
 				return nil
 			},
@@ -213,6 +212,7 @@ func main() {
 					v.Uri = strings.Replace(v.Uri, "https://", "", 1)
 					v.Uri = strings.Replace(v.Uri, "http://", "", 1)
 					v.Uri = strings.Replace(v.Uri, "www.", "", 1)
+					v.Uri = strings.Replace(v.Uri, "\n", " ", -1)
 					if len(v.Uri) >= 40 {
 						v.Uri = v.Uri[0:10] + gui.Colour(gui.Subdued, "...") + v.Uri[len(v.Uri)-30:len(v.Uri)]
 					}
@@ -231,7 +231,7 @@ func main() {
 						fmt.Sprintf("%d", v.Version),
 						v.Media,
 						v.Type,
-						v.Uri,
+						fmt.Sprintf("%s", v.Uri),
 						strings.Join(tags, ", "),
 						humanize.Time(v.Created),
 					})

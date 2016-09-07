@@ -9,7 +9,7 @@ import (
 func Test_UserService(t *testing.T) {
 	Convey("Manage settings", t, func() {
 		Convey(`Should create, update, delete and get a setting`, func() {
-			s := NewSettings("test2.kwk.bolt.db")
+			s := NewSettings("test.kwk.bolt.db")
 			defer s.Close()
 			key := "user"
 			expected := User{

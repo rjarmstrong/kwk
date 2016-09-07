@@ -22,16 +22,39 @@ func printUri(uri string){
 	fmt.Printf(gui.Colour(gui.LightBlue, " %d - %s\n"), iterationCount, uri)
 }
 
-func (o *Opener) Open(uri string, param string) {
+func (o *Opener) Open(link *api.KwkLink, param string) {
 	iterationCount += 1
 	if iterationCount > 3 {
 		fmt.Println("Max recursion reached.")
 		return
 	}
-	printUri(uri)
-	tokens := strings.Split(uri, " ")
+	printUri(link.Uri)
+	if link.Media == "script" {
+		uri := link.Uri
+		if strings.Contains(uri, "[param1]") && param == "" {
+			fmt.Println(gui.Colour(gui.Yellow, "A [param1] is required."))
+			return
+		}
+		if param != "" {
+			uri = strings.Replace(uri, "[param1]", param, -1)
+		}
+		if link.Type == "bash" {
+			system.ExecSafe("/bin/bash", "-c", uri)
+			return
+		}
+		if link.Type == "nodejs" {
+			system.ExecSafe("node", "-e", uri)
+			return
+		}
+		if link.Type == "python" {
+			system.ExecSafe("python", "-c", uri)
+			return
+		}
+
+	}
+	tokens := strings.Split(link.Uri, " ")
 	if tokens[0] == "sudo"{
-		script := strings.Replace(uri, "sudo ", "", -1)
+		script := strings.Replace(link.Uri, "sudo ", "", -1)
 		independants := strings.Split(script, " && ")
 		for _, v := range independants {
 			if len(v) > 3 && v[0:4] == "kwk " {
@@ -43,7 +66,7 @@ func (o *Opener) Open(uri string, param string) {
 				}
 				link := o.apiClient.Get(firstArg)
 				if link.Uri != "" {
-					o.Open(link.Uri, args[2])
+					o.Open(link, args[2])
 				} else {
 					fmt.Printf(gui.Colour(gui.Yellow, "Can't run sub-command: '%s' - has it been deleted?\n"), v)
 				}
@@ -57,12 +80,7 @@ func (o *Opener) Open(uri string, param string) {
 		}
 		return
 	}
-	if tokens[0] == "node"{
-		i := strings.Join(tokens[1:], " ")
-		system.ExecSafe("node", "-e", i)
-		return
-	}
-	system.ExecSafe("open", uri)
+	system.ExecSafe("open", link.Uri)
 }
 
 func (o *Opener) OpenCovert(uri string){

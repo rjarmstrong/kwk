@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/boltdb/bolt"
 	"encoding/json"
+	"os"
 )
 
 const (
@@ -15,8 +16,9 @@ type Settings struct {
 	Db   *bolt.DB
 }
 
-func NewSettings(filePath string) *Settings {
-	db, err := bolt.Open(filePath, 0600, nil)
+func NewSettings(dbName string) *Settings {
+	path := fmt.Sprintf("/Users/%s/Library/Caches/%s", os.Getenv("USER"), dbName)
+	db, err := bolt.Open(path, 0600, nil)
 	if err != nil {
 		panic("DB couldn't be opened :" + err.Error())
 	}
