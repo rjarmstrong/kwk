@@ -6,6 +6,7 @@ import (
 	"github.com/kwk-links/kwk-cli/api"
 	"fmt"
 	"github.com/kwk-links/kwk-cli/gui"
+	"github.com/kennygrant/sanitize"
 	"io/ioutil"
 	"os"
 	"time"
@@ -27,7 +28,7 @@ func printUri(uri string) {
 
 func (o *Opener) Edit(key string) {
 	kwklink := o.apiClient.Get(key)
-	path := system.GetCachePath() + "/" + kwklink.Key + ".go"
+	path := system.GetCachePath() + "/" + sanitize.Name(kwklink.Key) + ".js"
 	if err := ioutil.WriteFile(path, []byte(kwklink.Uri), 0666); err != nil {
 		panic(err)
 	}
@@ -80,6 +81,10 @@ func (o *Opener) Open(link *api.KwkLink, param string) {
 		}
 		if link.Type == "python" {
 			system.ExecSafe("python", "-c", uri)
+			return
+		}
+		if link.Type == "php" {
+			system.ExecSafe("php", "-r", uri)
 			return
 		}
 		if link.Type == "ruby" {
