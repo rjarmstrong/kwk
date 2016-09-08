@@ -87,8 +87,20 @@ func (o *Opener) Open(link *api.KwkLink, param string) {
 			system.ExecSafe("php", "-r", uri)
 			return
 		}
-		if link.Type == "ruby" {
-			system.ExecSafe("ruby", "-e", uri)
+		if link.Type == "csharp" {
+			//system.ExecSafe("php", "-r", uri)
+			//return
+			return
+		}
+		if link.Type == "rust" {
+			// check if file exists
+			// if not
+			// write file to disk in cache
+			// compile it
+			//system.ExecSafe("rustc", uri .rs)
+			// java file name
+			// run it
+			//system.ExecSafe(file)
 			return
 		}
 		if link.Type == "java" {
@@ -96,8 +108,10 @@ func (o *Opener) Open(link *api.KwkLink, param string) {
 			// if not
 			// write file to disk in cache
 			// compile it
+			//system.ExecSafe("javac", uri .class)
 			// java file name
-			system.ExecSafe("javac", "-e", uri)
+			// run it
+			//system.ExecSafe("java", uri .java)
 			return
 		}
 
