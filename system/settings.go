@@ -16,8 +16,19 @@ type Settings struct {
 	Db   *bolt.DB
 }
 
+func GetCachePath() string {
+	path := fmt.Sprintf("/Users/%s/Library/Caches/kwk", os.Getenv("USER"))
+	if err := os.Mkdir(path, os.ModeDir); err != nil {
+		if os.IsExist(err) {
+			return path
+		}
+		panic(err)
+	}
+	return path
+}
+
 func NewSettings(dbName string) *Settings {
-	path := fmt.Sprintf("/Users/%s/Library/Caches/%s", os.Getenv("USER"), dbName)
+	path := fmt.Sprintf("%s/%s", GetCachePath(), dbName)
 	db, err := bolt.Open(path, 0600, nil)
 	if err != nil {
 		panic("DB couldn't be opened :" + err.Error())
