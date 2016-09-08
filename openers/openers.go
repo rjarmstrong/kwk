@@ -92,12 +92,22 @@ func (o *Opener) Open(link *api.KwkLink, param string) {
 			//return
 			return
 		}
+		if link.Type == "golang" {
+			// check if file exists
+			// if not
+			// write file to disk in cache
+			// compile it
+			//system.ExecSafe("go", "build", key .go)
+			// java file name
+			// run it
+			//system.ExecSafe(key)
+		}
 		if link.Type == "rust" {
 			// check if file exists
 			// if not
 			// write file to disk in cache
 			// compile it
-			//system.ExecSafe("rustc", uri .rs)
+			//system.ExecSafe("rustc", key .rs)
 			// java file name
 			// run it
 			//system.ExecSafe(file)
@@ -108,10 +118,10 @@ func (o *Opener) Open(link *api.KwkLink, param string) {
 			// if not
 			// write file to disk in cache
 			// compile it
-			//system.ExecSafe("javac", uri .class)
+			//system.ExecSafe("javac", key .class)
 			// java file name
 			// run it
-			//system.ExecSafe("java", uri .java)
+			//system.ExecSafe("java", key .java)
 			return
 		}
 
