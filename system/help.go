@@ -30,6 +30,7 @@ func Help(w io.Writer, template string, data interface{}) {
 	fmt.Println()
 	fmt.Print("    rename     <kwklink> <kwklink>    - Update kwklink name <old> <new>\n")
 	fmt.Print("    patch      <kwklink> <uri>|<oldstr> <newstr> - Patch a uri completely or partially. Auto increments the version\n")
+	fmt.Print("    edit       <kwklink>              - Edit a kwklink in default editor\n")
 	fmt.Print("    clone      <kwklink> <uri> [oldstr] [newstr] - Clone a kwklink and optionally replace a string. \n")
 	fmt.Print("    delete     <kwklink>              - Deletes kwklink with warning prompt. Will give 404.\n")
 	fmt.Print("    detail     <kwklink>              - Get details and info\n")

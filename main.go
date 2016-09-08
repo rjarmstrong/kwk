@@ -1,9 +1,8 @@
 package main
 
-
 import (
-"os"
-"gopkg.in/urfave/cli.v1"
+	"os"
+	"gopkg.in/urfave/cli.v1"
 	"fmt"
 	"github.com/kwk-links/kwk-cli/openers"
 	"github.com/kwk-links/kwk-cli/api"
@@ -66,6 +65,7 @@ func main() {
 				return nil
 			},
 		},
+
 		{
 			Name:    "inspect",
 			Aliases: []string{"i"},
@@ -82,7 +82,7 @@ func main() {
 		},
 		{
 			Name:    "new",
-			Aliases: []string{"create","save"},
+			Aliases: []string{"create", "save"},
 			Action:  func(c *cli.Context) error {
 				if k := apiClient.Create(c.Args().Get(0), c.Args().Get(1)); k != nil {
 					clipboard.WriteAll(k.Key)
@@ -115,6 +115,15 @@ func main() {
 			},
 		},
 		{
+			Name:    "edit",
+			Aliases: []string{"e"},
+			Action:  func(c *cli.Context) error {
+				key := c.Args().First()
+				opener.Edit(key)
+				return nil
+			},
+		},
+		{
 			Name:    "get",
 			Aliases: []string{"g"},
 			Action:  func(c *cli.Context) error {
@@ -135,8 +144,8 @@ func main() {
 					apiClient.Delete(c.Args().First())
 					fmt.Println("Deleted")
 				} else {
-					messages := []string{"without a scratch","uninjured", "intact","unaffected","unharmed","unscathed","out of danger","safe and sound","unblemished", "alive and well"}
-					rnd := time.Now().Nanosecond()%(len(messages)-1)
+					messages := []string{"without a scratch", "uninjured", "intact", "unaffected", "unharmed", "unscathed", "out of danger", "safe and sound", "unblemished", "alive and well"}
+					rnd := time.Now().Nanosecond() % (len(messages) - 1)
 					fmt.Printf("'%s' is %s.\n", c.Args().First(), messages[rnd])
 				}
 				return nil
@@ -214,7 +223,7 @@ func main() {
 					v.Uri = strings.Replace(v.Uri, "www.", "", 1)
 					v.Uri = strings.Replace(v.Uri, "\n", " ", -1)
 					if len(v.Uri) >= 40 {
-						v.Uri = v.Uri[0:10] + gui.Colour(gui.Subdued, "...") + v.Uri[len(v.Uri)-30:len(v.Uri)]
+						v.Uri = v.Uri[0:10] + gui.Colour(gui.Subdued, "...") + v.Uri[len(v.Uri) - 30:len(v.Uri)]
 					}
 
 					var tags = []string{}
@@ -262,7 +271,7 @@ func main() {
 			},
 		},
 		{
-			Name:	"upgrade",
+			Name:        "upgrade",
 			Action: func(c *cli.Context) error {
 				system.Upgrade()
 				return nil
