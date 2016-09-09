@@ -26,6 +26,8 @@ func main() {
 	cli.HelpPrinter = system.Help
 	opener := openers.NewOpener(apiClient)
 
+	// run opener version checker
+
 	app.CommandNotFound = func(c *cli.Context, kwklink string) {
 		if k := apiClient.Get(kwklink); k != nil {
 			if k.Uri != "" {
@@ -124,8 +126,8 @@ func main() {
 			},
 		},
 		{
-			Name:    "get",
-			Aliases: []string{"g"},
+			Name:    "cat",
+			Aliases: []string{"raw", "read", "print", "get"},
 			Action:  func(c *cli.Context) error {
 				uri := apiClient.Get(c.Args().First())
 				clipboard.WriteAll(uri.Uri)
@@ -176,7 +178,7 @@ func main() {
 			Aliases: []string{},
 			Action:  func(c *cli.Context) error {
 				args := []string(c.Args())
-				fmt.Println(gui.Colour(gui.LightBlue, "Switched to kwk:" + args[0] + "/"))
+				fmt.Println(gui.Colour(gui.LightBlue, "Switched to kwk.co/" + args[0] + "/"))
 				return nil
 			},
 		},
@@ -203,11 +205,11 @@ func main() {
 
 				args := c.Args()
 				list := apiClient.List([]string(args))
-				fmt.Print(gui.Colour(gui.LightBlue, "\nkwk:" + "rjarmstrong/"))
+				fmt.Print(gui.Colour(gui.LightBlue, "\nkwk.co/" + "rjarmstrong/"))
 				fmt.Printf(gui.Build(102, " ") + "%d of %d records\n\n", len(list.Items), list.Total)
 
 				tbl := tablewriter.NewWriter(os.Stdout)
-				tbl.SetHeader([]string{"Kwklink", "Version", "Media", "Type", "URI", "Tags", ""})
+				tbl.SetHeader([]string{"Kwklink", "Version", "URI", "Tags", ""})
 				tbl.SetAutoWrapText(false)
 				tbl.SetBorder(false)
 				tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
@@ -235,11 +237,18 @@ func main() {
 						}
 
 					}
+					keyTokens := strings.Split(v.Key, ".")
+					for i, v := range keyTokens {
+						if i == 0 {
+							keyTokens[i] = gui.Colour(gui.LightBlue, v)
+						} else {
+							keyTokens[i] = gui.Colour(gui.Subdued, v)
+						}
+					}
+					key := strings.Join(keyTokens, gui.Colour(gui.Subdued,"."))
 					tbl.Append([]string{
-						gui.Colour(gui.LightBlue, v.Key),
+						key,
 						fmt.Sprintf("%d", v.Version),
-						v.Media,
-						v.Type,
 						fmt.Sprintf("%s", v.Uri),
 						strings.Join(tags, ", "),
 						humanize.Time(v.Created),
