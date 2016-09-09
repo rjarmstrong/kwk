@@ -54,16 +54,8 @@ func (o *Opener) Edit(key string) {
 	}
 }
 
-func (o *Opener) Open(link *api.KwkLink, param string) {
+func (o *Opener) Open(link *api.KwkLink, args []string) {
 	uri := link.Uri
-	if strings.Contains(uri, "[param1]") {
-		if param == "" {
-			fmt.Println(gui.Colour(gui.Yellow, "A [param1] is required."))
-			return
-		} else {
-			uri = strings.Replace(uri, "[param1]", param, -1)
-		}
-	}
 	iterationCount += 1
 	if iterationCount > 3 {
 		fmt.Println("Max recursion reached.")
@@ -76,20 +68,22 @@ func (o *Opener) Open(link *api.KwkLink, param string) {
 			return
 		}
 		if link.Type == "nodejs" {
+			// -r (require flag)
+			// node -e "script" args
 			system.ExecSafe("node", "-e", uri)
 			return
 		}
 		if link.Type == "python" {
+			// -c "" args
 			system.ExecSafe("python", "-c", uri)
 			return
 		}
 		if link.Type == "php" {
+			// -r "" -- args
 			system.ExecSafe("php", "-r", uri)
 			return
 		}
 		if link.Type == "csharp" {
-			//system.ExecSafe("php", "-r", uri)
-			//return
 			return
 		}
 		if link.Type == "golang" {
@@ -100,6 +94,7 @@ func (o *Opener) Open(link *api.KwkLink, param string) {
 			//system.ExecSafe("go", "build", key .go)
 			// java file name
 			// run it
+			// args
 			//system.ExecSafe(key)
 		}
 		if link.Type == "rust" {
@@ -110,50 +105,54 @@ func (o *Opener) Open(link *api.KwkLink, param string) {
 			//system.ExecSafe("rustc", key .rs)
 			// java file name
 			// run it
+			// args
 			//system.ExecSafe(file)
 			return
+		}
+		if link.Type == "scala" {
+			// scalac HelloWorld.scala
+			// args
+			// scala HelloWorld
 		}
 		if link.Type == "java" {
 			// check if file exists
 			// if not
 			// write file to disk in cache
 			// compile it
-			//system.ExecSafe("javac", key .class)
+			//system.ExecSafe("javac", key .java)
 			// java file name
 			// run it
-			//system.ExecSafe("java", key .java)
+			// args
+			//system.ExecSafe("java", key .class)
 			return
 		}
 
 	}
-	tokens := strings.Split(link.Uri, " ")
-	if tokens[0] == "sudo" {
-		script := strings.Replace(link.Uri, "sudo ", "", -1)
-		independants := strings.Split(script, " && ")
-		for _, v := range independants {
-			if len(v) > 3 && v[0:4] == "kwk " {
-				args := strings.Split(v, " ")
-				firstArg := args[1]
-				if firstArg == "upgrade" {
-					system.Upgrade()
-					return
-				}
-				link := o.apiClient.Get(firstArg)
-				if link.Uri != "" {
-					o.Open(link, args[2])
-				} else {
-					fmt.Printf(gui.Colour(gui.Yellow, "Can't run sub-command: '%s' - has it been deleted?\n"), v)
-				}
-
-			} else {
-				if param != "" {
-					v = strings.Replace(v, "[param1]", param, -1)
-				}
-				system.ExecSafe("/bin/bash", "-c", v)
+	independants := strings.Split(link.Uri, " && ")
+	// This model is a bit odd but necessary to get around the locking issue, will have to redirect stdin and out to make piping work.
+	for _, v := range independants {
+		if len(v) > 3 && v[0:4] == "kwk " {
+			args := strings.Split(v, " ")
+			firstArg := args[1]
+			if firstArg == "upgrade" {
+				system.Upgrade()
+				return
 			}
+			link := o.apiClient.Get(firstArg)
+			if link.Uri != "" {
+				o.Open(link, args[2])
+			} else {
+				fmt.Printf(gui.Colour(gui.Yellow, "Can't run sub-command: '%s' - has it been deleted?\n"), v)
+			}
+
+		} else {
+			if args != "" {
+				v = strings.Replace(v, "[param1]", args, -1)
+			}
+			system.ExecSafe("/bin/bash", "-c", v)
 		}
-		return
 	}
+	return
 	system.ExecSafe("open", uri)
 }
 
