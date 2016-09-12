@@ -21,7 +21,7 @@ func main() {
 
 	app := cli.NewApp()
 	os.Setenv("version", "v0.0.1")
-	settings := system.NewSettings("kwk.bolt.db")
+	settings := system.NewSettings("leveldb")
 	apiClient := api.New(settings)
 	cli.HelpPrinter = system.Help
 	opener := openers.NewOpener(apiClient)

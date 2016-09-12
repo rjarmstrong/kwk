@@ -9,7 +9,7 @@ import (
 func Test_UserService(t *testing.T) {
 	Convey("Manage settings", t, func() {
 		Convey(`Should create, update, delete and get a setting`, func() {
-			s := NewSettings("test.kwk.bolt.db")
+			s := NewSettings("test_leveldb")
 			defer s.Close()
 			key := "user"
 			expected := User{
@@ -29,10 +29,12 @@ func Test_UserService(t *testing.T) {
 			s.Get(key, actual)
 			So(*actual, should.Resemble, expectedUpdate)
 
-			s.Delete(key)
+			err := s.Delete(key)
+			So(err, ShouldBeNil)
+
 			actual = &User{}
-			err := s.Get(key, actual)
-			So(err.Error(), should.Equal, "Key 'user' does not exist.")
+			err = s.Get(key, actual)
+			So(err.Error(), should.Equal, "Not found.")
 		})
 	})
 }

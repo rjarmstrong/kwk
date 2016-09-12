@@ -54,7 +54,7 @@ func (o *Opener) Edit(key string) {
 	}
 }
 
-func (o *Opener) Open(link *api.KwkLink, args []string) {
+func (o *Opener) Open(link *api.KwkLink, args string) {
 	uri := link.Uri
 	iterationCount += 1
 	if iterationCount > 3 {
