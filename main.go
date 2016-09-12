@@ -22,6 +22,7 @@ func main() {
 	app := cli.NewApp()
 	os.Setenv("version", "v0.0.1")
 	settings := system.NewSettings("leveldb")
+	defer settings.Close()
 	apiClient := api.New(settings)
 	cli.HelpPrinter = system.Help
 	opener := openers.NewOpener(apiClient)

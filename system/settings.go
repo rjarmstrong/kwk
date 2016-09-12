@@ -30,14 +30,20 @@ func GetCachePath() string {
 
 func NewSettings(dbName string) *Settings {
 	path := fmt.Sprintf("%s/%s", GetCachePath(), dbName)
-	db, err := leveldb.OpenFile(path, nil)
+	return &Settings{Path:path}
+}
+
+func (s *Settings) open(){
+	db, err := leveldb.OpenFile(s.Path, nil)
 	if err != nil {
 		panic("DB couldn't be opened :" + err.Error())
 	}
-	return &Settings{Db:db}
+	s.Db = db
 }
 
 func (s *Settings) Upsert(key string, value interface{}) {
+	s.open()
+	defer s.Close()
 	str, _ := json.Marshal(value)
 	if err := s.Db.Put([]byte(settingsBucketName + key), []byte(str), nil); err != nil {
 		panic(err)
@@ -45,6 +51,8 @@ func (s *Settings) Upsert(key string, value interface{}) {
 }
 
 func (s *Settings) Get(key string, value interface{}) error {
+	s.open()
+	defer s.Close()
 	if v, err := s.Db.Get([]byte(settingsBucketName + key), nil); err != nil {
 		if err.Error() == "leveldb: not found" {
 			return errors.New("Not found.")
@@ -60,6 +68,8 @@ func (s *Settings) Get(key string, value interface{}) error {
 }
 
 func (s *Settings) Delete(key string) error {
+	s.open()
+	defer s.Close()
 	return s.Db.Delete([]byte(settingsBucketName + key), nil);
 }
 
