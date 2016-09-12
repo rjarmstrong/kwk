@@ -6,10 +6,12 @@ import (
 	"github.com/kwk-links/kwk-cli/api"
 	"fmt"
 	"github.com/kwk-links/kwk-cli/gui"
-	"github.com/kennygrant/sanitize"
-	"io/ioutil"
 	"os"
 	"time"
+)
+
+const (
+	filecache = "filecache"
 )
 
 type Opener struct {
@@ -26,31 +28,29 @@ func printUri(uri string) {
 	fmt.Printf(gui.Colour(gui.LightBlue, " %d - %s\n"), iterationCount, uri)
 }
 
-func (o *Opener) Edit(key string) {
+func (o *Opener) Edit(key string) error {
 	kwklink := o.apiClient.Get(key)
-	path := system.GetCachePath() + "/" + sanitize.Name(kwklink.Key) + ".js"
-	if err := ioutil.WriteFile(path, []byte(kwklink.Uri), 0666); err != nil {
-		panic(err)
+	filePath, err := system.WriteToFile(filecache, kwklink.FullKey(), kwklink.Uri)
+	if err != nil {
+		return err
 	}
-	fi, _ := os.Stat(path);
-
-	system.ExecSafe("open", path)
+	fi, _ := os.Stat(filePath);
+	system.ExecSafe("open", filePath)
 	fmt.Println(gui.Colour(gui.LightBlue, "Editing file in default editor. Please save and close to continue. Or Ctrl+C to abort."))
-
 	edited := false
 	for edited == false {
-		if fi2, _ := os.Stat(path); fi2.ModTime().UnixNano() > fi.ModTime().UnixNano() {
+		if fi2, _ := os.Stat(filePath); fi2.ModTime().UnixNano() > fi.ModTime().UnixNano() {
 			edited = true
 		} else {
 			time.Sleep(time.Millisecond * 100)
 		}
 	}
-
-	if bts, err := ioutil.ReadFile(path); err != nil {
-		panic(err)
+	if text, err := system.ReadFromFile(filecache, kwklink.Key); err != nil {
+		return err
 	} else {
-		kwklink = o.apiClient.Patch(kwklink.Key, string(bts))
-		fmt.Println(gui.Colour(gui.LightBlue, "Successfully updated " + kwklink.Key))
+		kwklink = o.apiClient.Patch(kwklink.Key, text)
+		fmt.Println(gui.Colour(gui.LightBlue, "Successfully updated " + kwklink.FullKey()))
+		return nil
 	}
 }
 

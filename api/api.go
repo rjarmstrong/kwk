@@ -40,8 +40,13 @@ type KwkLink struct {
 	Type    string `json:"type"`
 	Tags    []string `json:"tags"`
 	AfToken string `json:"afToken"`
+	Extension string `json:"extension"`
 	Created time.Time `json:"created"`
 	DefaultModel
+}
+
+func (k *KwkLink) FullKey() string {
+	return k.Key + "." + k.Extension
 }
 
 type KwkLinkList struct {

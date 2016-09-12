@@ -4,9 +4,12 @@ import (
 	"os/exec"
 	"fmt"
 	"bytes"
-	"os"
 	"io"
 	"encoding/json"
+	"github.com/kennygrant/sanitize"
+	"io/ioutil"
+	"path"
+	"os"
 )
 
 func ExecSafe(name string, arg ...string) {
@@ -26,6 +29,52 @@ func PrettyPrint(obj interface{}) {
 	p, _ := json.MarshalIndent(obj, "", "  ")
 	fmt.Print(string(p))
 	fmt.Print("\n\n")
+}
+
+func UpsertDirectory(dir string) error {
+	ok, err := Exists(dir);
+	if ok {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(dir, 0777); err != nil {
+		return err
+	}
+	return nil
+}
+
+func WriteToFile(directoryName string, fullKey string, uri string) (string, error) {
+	dirPath, err := GetDirPath(directoryName)
+	filePath := path.Join(dirPath, sanitize.Name(fullKey))
+	err = ioutil.WriteFile(filePath, []byte(uri), 0666)
+	return filePath, err
+}
+
+func ReadFromFile(directoryName string, fullKey string) (string, error) {
+	dirPath, err := GetDirPath(directoryName)
+	if err != nil { return "", err }
+	fp := path.Join(dirPath, fullKey)
+	bts, err := ioutil.ReadFile(fp)
+	return string(bts), err
+}
+
+func GetDirPath(directoryName string) (string, error) {
+	dir := path.Join(GetCachePath(), directoryName)
+	err:= UpsertDirectory(dir)
+	return dir, err
+}
+
+func GetCachePath() string {
+	p := fmt.Sprintf("/Users/%s/Library/Caches/kwk", os.Getenv("USER"))
+	if err := os.Mkdir(p, os.ModeDir); err != nil {
+		if os.IsExist(err) {
+			return p
+		}
+		panic(err)
+	}
+	return p
 }
 
 func Exists(path string) (bool, error) {
