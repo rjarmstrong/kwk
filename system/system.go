@@ -28,6 +28,13 @@ func PrettyPrint(obj interface{}) {
 	fmt.Print("\n\n")
 }
 
+func Exists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil { return true, nil }
+	if os.IsNotExist(err) { return false, nil }
+	return true, err
+}
+
 func Upgrade(){
 	distributionUri := "/Volumes/development/go/src/github.com/kwk-links/kwk-cli/kwk-cli"
 	installPath := "/usr/local/bin/kwk"
