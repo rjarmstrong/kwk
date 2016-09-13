@@ -62,25 +62,29 @@ func (o *Opener) Open(link *api.KwkLink, args []string) {
 		return
 	}
 	//printUri(link.Uri)
-	args = append([]string{uri}, args...)
+
 	if link.Media == "script" {
 		if link.Type == "bash" {
-			system.ExecSafe("/bin/bash", append([]string{"-c"}, args...)...)
+			// Should we be string replacing??
+			if len(args) == 1 {
+				uri = strings.Replace(uri, "${1}", args[0], 1)
+			}
+			system.ExecSafe("/bin/bash", "-c", uri)
 			return
 		}
 		if link.Type == "nodejs" {
+			args = append([]string{uri}, args...)
 			// -r (require flag)
-			// node -e "script" args
 			system.ExecSafe("node", append([]string{"-e"}, args...)...)
 			return
 		}
 		if link.Type == "python" {
-			// -c "" args
+			args = append([]string{uri}, args...)
 			system.ExecSafe("python", append([]string{"-c"}, args...)...)
 			return
 		}
 		if link.Type == "php" {
-			// -r "" -- args
+			args = append([]string{uri}, args...)
 			system.ExecSafe("php", append([]string{"-r"}, args...)...)
 			return
 		}
