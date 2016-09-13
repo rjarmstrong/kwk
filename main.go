@@ -22,7 +22,6 @@ func main() {
 	app := cli.NewApp()
 	os.Setenv("version", "v0.0.1")
 	settings := system.NewSettings("leveldb")
-	defer settings.Close()
 	apiClient := api.New(settings)
 	cli.HelpPrinter = system.Help
 	opener := openers.NewOpener(apiClient)
@@ -32,8 +31,7 @@ func main() {
 	app.CommandNotFound = func(c *cli.Context, kwklink string) {
 		if k := apiClient.Get(kwklink); k != nil {
 			if k.Uri != "" {
-				param1 := c.Args().Get(1)
-				opener.Open(k, param1)
+				opener.Open(k, c.Args())
 			} else {
 				fmt.Printf(gui.Colour(gui.Yellow, "kwklink: '%s' not found\n"), kwklink)
 			}

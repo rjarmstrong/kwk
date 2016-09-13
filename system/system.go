@@ -12,16 +12,17 @@ import (
 	"os"
 )
 
-func ExecSafe(name string, arg ...string) {
+func ExecSafe(name string, arg ...string) io.ReadCloser {
 	cmd := exec.Command(name, arg...)
+	out, _ := cmd.StdoutPipe()
 	var stderr bytes.Buffer
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err != nil {
 		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
-		return
 	}
+	return out
 }
 
 func PrettyPrint(obj interface{}) {
