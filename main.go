@@ -31,7 +31,7 @@ func main() {
 	app.CommandNotFound = func(c *cli.Context, kwklink string) {
 		if k := apiClient.Get(kwklink); k != nil {
 			if k.Uri != "" {
-				opener.Open(k, c.Args())
+				opener.Open(k, c.Args()[1:])
 			} else {
 				fmt.Printf(gui.Colour(gui.Yellow, "kwklink: '%s' not found\n"), kwklink)
 			}
@@ -49,7 +49,7 @@ func main() {
 				list := apiClient.List([]string(args))
 				for _, v := range list.Items {
 					fmt.Println(gui.Colour(gui.LightBlue, v.Key))
-					opener.Open(&v, "")
+					opener.Open(&v, []string{})
 				}
 				return nil
 			},

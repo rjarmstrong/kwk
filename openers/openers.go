@@ -61,26 +61,27 @@ func (o *Opener) Open(link *api.KwkLink, args []string) {
 		fmt.Println("Max recursion reached.")
 		return
 	}
-	printUri(link.Uri)
+	//printUri(link.Uri)
+	args = append([]string{uri}, args...)
 	if link.Media == "script" {
 		if link.Type == "bash" {
-			system.ExecSafe("/bin/bash", "-c", uri)
+			system.ExecSafe("/bin/bash", append([]string{"-c"}, args...)...)
 			return
 		}
 		if link.Type == "nodejs" {
 			// -r (require flag)
 			// node -e "script" args
-			system.ExecSafe("node", "-e", uri)
+			system.ExecSafe("node", append([]string{"-e"}, args...)...)
 			return
 		}
 		if link.Type == "python" {
 			// -c "" args
-			system.ExecSafe("python", "-c", uri)
+			system.ExecSafe("python", append([]string{"-c"}, args...)...)
 			return
 		}
 		if link.Type == "php" {
 			// -r "" -- args
-			system.ExecSafe("php", "-r", uri)
+			system.ExecSafe("php", append([]string{"-r"}, args...)...)
 			return
 		}
 		if link.Type == "csharp" {
@@ -140,15 +141,12 @@ func (o *Opener) Open(link *api.KwkLink, args []string) {
 			}
 			link := o.apiClient.Get(firstArg)
 			if link.Uri != "" {
-				o.Open(link, args[2])
+				o.Open(link, args)
 			} else {
 				fmt.Printf(gui.Colour(gui.Yellow, "Can't run sub-command: '%s' - has it been deleted?\n"), v)
 			}
 
 		} else {
-			if args != "" {
-				v = strings.Replace(v, "[param1]", args, -1)
-			}
 			system.ExecSafe("/bin/bash", "-c", v)
 		}
 	}

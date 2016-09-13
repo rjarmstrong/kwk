@@ -12,7 +12,6 @@ func Test_System(t *testing.T) {
 	Convey("Manage settings", t, func() {
 		Convey(`Should create, update, delete and get a setting`, func() {
 			s := NewSettings("test_leveldb")
-			defer s.Close()
 			key := "user"
 			expected := User{
 				Email:"richard@kwk.co",

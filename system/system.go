@@ -10,10 +10,12 @@ import (
 	"io/ioutil"
 	"path"
 	"os"
+	"errors"
 )
 
 func ExecSafe(name string, arg ...string) io.ReadCloser {
 	cmd := exec.Command(name, arg...)
+	cmd.Stdin = os.Stdin
 	out, _ := cmd.StdoutPipe()
 	var stderr bytes.Buffer
 	cmd.Stdout = os.Stdout
@@ -57,8 +59,18 @@ func ReadFromFile(directoryName string, fullKey string) (string, error) {
 	dirPath, err := GetDirPath(directoryName)
 	if err != nil { return "", err }
 	fp := path.Join(dirPath, fullKey)
+	if ok, _ := Exists(fp); !ok {
+		return "", errors.New("Not found.")
+	}
 	bts, err := ioutil.ReadFile(fp)
 	return string(bts), err
+}
+
+func Delete(directoryName string, fullKey string) error {
+	dirPath, err := GetDirPath(directoryName)
+	if err != nil { return err }
+	fp := path.Join(dirPath, fullKey)
+	return os.RemoveAll(fp)
 }
 
 func GetDirPath(directoryName string) (string, error) {

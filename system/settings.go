@@ -1,66 +1,32 @@
 package system
 
 import (
-	"fmt"
-	"github.com/syndtr/goleveldb/leveldb"
 	"encoding/json"
-	"errors"
-)
-
-const (
-	settingsBucketName = "Settings"
 )
 
 type Settings struct {
-	Path string
-	Db   *leveldb.DB
+	DirectoryName string
 }
 
-func NewSettings(dbName string) *Settings {
-	p := fmt.Sprintf("%s/%s", GetCachePath(), dbName)
-	return &Settings{Path:p}
+func NewSettings(directoryName string) *Settings {
+	return &Settings{ DirectoryName: directoryName}
 }
 
-func (s *Settings) open(){
-	db, err := leveldb.OpenFile(s.Path, nil)
-	if err != nil {
-		panic("DB couldn't be opened :" + err.Error())
-	}
-	s.Db = db
-}
 
 func (s *Settings) Upsert(key string, value interface{}) {
-	s.open()
-	defer s.Close()
-	str, _ := json.Marshal(value)
-	if err := s.Db.Put([]byte(settingsBucketName + key), []byte(str), nil); err != nil {
-		panic(err)
-	}
+	bytes, _ := json.Marshal(value)
+	WriteToFile(s.DirectoryName, key, string(bytes))
 }
 
 func (s *Settings) Get(key string, value interface{}) error {
-	s.open()
-	defer s.Close()
-	if v, err := s.Db.Get([]byte(settingsBucketName + key), nil); err != nil {
-		if err.Error() == "leveldb: not found" {
-			return errors.New("Not found.")
-		}
+	str, err := ReadFromFile(s.DirectoryName, key)
+	if err != nil {
 		return err
-	} else {
-		err := json.Unmarshal(v, value)
-		if err != nil {
-			return err
-		}
 	}
-	return nil
+	err = json.Unmarshal([]byte(str), value)
+	return err
 }
 
 func (s *Settings) Delete(key string) error {
-	s.open()
-	defer s.Close()
-	return s.Db.Delete([]byte(settingsBucketName + key), nil);
-}
-
-func (s *Settings) Close() {
-	s.Db.Close()
+	return Delete(s.DirectoryName, key)
 }
