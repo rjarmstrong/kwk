@@ -49,6 +49,18 @@ func Test_System(t *testing.T) {
 			So(err, ShouldBeNil)
 		})
 
+		Convey(`Should check file exists and not exists`, func() {
+			path, err := WriteToFile(".", "testfile.js", "some text")
+			So(err, should.BeNil)
+			ok, err := Exists(path)
+			So(ok, should.BeTrue)
+			err = os.RemoveAll(path)
+			So(err, should.BeNil)
+			ok, err = Exists(path)
+			So(ok, should.BeFalse)
+			So(err, should.BeNil)
+		})
+
 
 		Convey(`Should write and read from file`, func() {
 			dir := "test_dir"

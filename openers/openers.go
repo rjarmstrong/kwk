@@ -30,7 +30,7 @@ func printUri(uri string) {
 
 func (o *Opener) Edit(key string) error {
 	kwklink := o.apiClient.Get(key)
-	filePath, err := system.WriteToFile(filecache, kwklink.FullKey(), kwklink.Uri)
+	filePath, err := system.WriteToFile(filecache, kwklink.FullKey, kwklink.Uri)
 	if err != nil {
 		return err
 	}
@@ -45,11 +45,11 @@ func (o *Opener) Edit(key string) error {
 			time.Sleep(time.Millisecond * 100)
 		}
 	}
-	if text, err := system.ReadFromFile(filecache, kwklink.Key); err != nil {
+	if text, err := system.ReadFromFile(filecache, kwklink.FullKey); err != nil {
 		return err
 	} else {
-		kwklink = o.apiClient.Patch(kwklink.Key, text)
-		fmt.Println(gui.Colour(gui.LightBlue, "Successfully updated " + kwklink.FullKey()))
+		kwklink = o.apiClient.Patch(kwklink.FullKey, text)
+		fmt.Println(gui.Colour(gui.LightBlue, "Successfully updated " + kwklink.FullKey))
 		return nil
 	}
 }
@@ -64,34 +64,37 @@ func (o *Opener) Open(link *api.KwkLink, args []string) {
 	//printUri(link.Uri)
 
 	if link.Media == "script" {
-		if link.Type == "bash" {
+		if link.Runtime == "app" {
 			// Should we be string replacing??
 			if len(args) == 1 {
 				uri = strings.Replace(uri, "${1}", args[0], 1)
 			}
 			system.ExecSafe("/bin/bash", "-c", uri)
+		}
+		if link.Runtime == "bash" {
+			system.ExecSafe("/bin/bash", append([]string{"-c", link.Uri}, args...)...)
 			return
 		}
-		if link.Type == "nodejs" {
+		if link.Runtime == "nodejs" {
 			args = append([]string{uri}, args...)
 			// -r (require flag)
 			system.ExecSafe("node", append([]string{"-e"}, args...)...)
 			return
 		}
-		if link.Type == "python" {
+		if link.Runtime == "python" {
 			args = append([]string{uri}, args...)
 			system.ExecSafe("python", append([]string{"-c"}, args...)...)
 			return
 		}
-		if link.Type == "php" {
+		if link.Runtime == "php" {
 			args = append([]string{uri}, args...)
 			system.ExecSafe("php", append([]string{"-r"}, args...)...)
 			return
 		}
-		if link.Type == "csharp" {
+		if link.Runtime == "csharp" {
 			return
 		}
-		if link.Type == "golang" {
+		if link.Runtime == "golang" {
 			// check if file exists
 			// if not
 			// write file to disk in cache
@@ -102,7 +105,7 @@ func (o *Opener) Open(link *api.KwkLink, args []string) {
 			// args
 			//system.ExecSafe(key)
 		}
-		if link.Type == "rust" {
+		if link.Runtime == "rust" {
 			// check if file exists
 			// if not
 			// write file to disk in cache
@@ -114,12 +117,12 @@ func (o *Opener) Open(link *api.KwkLink, args []string) {
 			//system.ExecSafe(file)
 			return
 		}
-		if link.Type == "scala" {
+		if link.Runtime == "scala" {
 			// scalac HelloWorld.scala
 			// args
 			// scala HelloWorld
 		}
-		if link.Type == "java" {
+		if link.Runtime == "java" {
 			// check if file exists
 			// if not
 			// write file to disk in cache
@@ -154,8 +157,6 @@ func (o *Opener) Open(link *api.KwkLink, args []string) {
 			system.ExecSafe("/bin/bash", "-c", v)
 		}
 	}
-	return
-	system.ExecSafe("open", uri)
 }
 
 func (o *Opener) OpenCovert(uri string) {

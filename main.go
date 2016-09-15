@@ -29,6 +29,7 @@ func main() {
 	// run opener version checker
 
 	app.CommandNotFound = func(c *cli.Context, kwklink string) {
+		// if it is a fullKey then else get tag
 		if k := apiClient.Get(kwklink); k != nil {
 			if k.Uri != "" {
 				opener.Open(k, c.Args()[1:])
@@ -48,7 +49,7 @@ func main() {
 				args := c.Args()
 				list := apiClient.List([]string(args))
 				for _, v := range list.Items {
-					fmt.Println(gui.Colour(gui.LightBlue, v.Key))
+					fmt.Println(gui.Colour(gui.LightBlue, v.FullKey))
 					opener.Open(&v, []string{})
 				}
 				return nil
@@ -86,8 +87,8 @@ func main() {
 			Aliases: []string{"create", "save"},
 			Action:  func(c *cli.Context) error {
 				if k := apiClient.Create(c.Args().Get(0), c.Args().Get(1)); k != nil {
-					clipboard.WriteAll(k.Key)
-					fmt.Println(k.Key)
+					clipboard.WriteAll(k.FullKey)
+					fmt.Println(k.FullKey)
 				}
 				return nil
 			},
@@ -97,7 +98,7 @@ func main() {
 			Aliases: []string{"copy"},
 			Action:  func(c *cli.Context) error {
 				if k := apiClient.Get(c.Args().Get(0)); k != nil {
-					originalKey := k.Key
+					originalKey := k.FullKey
 					uri := k.Uri
 					if c.Args().Get(1) != "" && c.Args().Get(2) != "" {
 						uri = strings.Replace(uri, c.Args().Get(1), c.Args().Get(2), -1)
@@ -107,8 +108,8 @@ func main() {
 						kwklink = c.Args().Get(3)
 					}
 					k = apiClient.Create(uri, kwklink)
-					clipboard.WriteAll(k.Key)
-					fmt.Printf(gui.Colour(gui.LightBlue, "Cloned %s -> %s"), originalKey, k.Key)
+					clipboard.WriteAll(k.FullKey)
+					fmt.Printf(gui.Colour(gui.LightBlue, "Cloned %s -> %s"), originalKey, k.FullKey)
 				} else {
 					fmt.Println("Invalid kwklink")
 				}
@@ -120,7 +121,9 @@ func main() {
 			Aliases: []string{"e"},
 			Action:  func(c *cli.Context) error {
 				key := c.Args().First()
-				opener.Edit(key)
+				if err := opener.Edit(key); err != nil {
+					fmt.Println(err)
+				}
 				return nil
 			},
 		},
@@ -208,7 +211,7 @@ func main() {
 				fmt.Printf(gui.Build(102, " ") + "%d of %d records\n\n", len(list.Items), list.Total)
 
 				tbl := tablewriter.NewWriter(os.Stdout)
-				tbl.SetHeader([]string{"Kwklink", "Version", "URI", "Tags", ""})
+				tbl.SetHeader([]string{"Alias", "Version", "URI", "Tags", ""})
 				tbl.SetAutoWrapText(false)
 				tbl.SetBorder(false)
 				tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
@@ -236,17 +239,9 @@ func main() {
 						}
 
 					}
-					keyTokens := strings.Split(v.Key, ".")
-					for i, v := range keyTokens {
-						if i == 0 {
-							keyTokens[i] = gui.Colour(gui.LightBlue, v)
-						} else {
-							keyTokens[i] = gui.Colour(gui.Subdued, v)
-						}
-					}
-					key := strings.Join(keyTokens, gui.Colour(gui.Subdued,"."))
+
 					tbl.Append([]string{
-						key,
+						gui.Colour(gui.LightBlue, v.Key) + gui.Colour(gui.Subdued, "." + v.Extension),
 						fmt.Sprintf("%d", v.Version),
 						fmt.Sprintf("%s", v.Uri),
 						strings.Join(tags, ", "),
@@ -317,9 +312,9 @@ func main() {
 					} else {
 						uri = c.Args().Get(1)
 					}
-					apiClient.Patch(c.Args().Get(0), uri);
-					clipboard.WriteAll(k.Key)
-					fmt.Printf(gui.Colour(gui.LightBlue, "Patched %s"), k.Key)
+					apiClient.Patch(k.FullKey, uri);
+					clipboard.WriteAll(k.FullKey)
+					fmt.Printf(gui.Colour(gui.LightBlue, "Patched %s"), k.FullKey)
 				} else {
 					fmt.Println("Invalid kwklink")
 				}

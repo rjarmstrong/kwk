@@ -31,22 +31,20 @@ func New(s *system.Settings) *ApiClient {
 }
 
 type KwkLink struct {
-	Id      int64 `json:"id"`
-	Key     string `json:"key"`
-	Root    string `json:"root"`
-	Uri     string `json:"url"`
-	Version int `json:"version"`
-	Media   string `json:"media"`
-	Type    string `json:"type"`
-	Tags    []string `json:"tags"`
-	AfToken string `json:"afToken"`
-	Extension string `json:"extension"`
-	Created time.Time `json:"created"`
-	DefaultModel
-}
+	Id        int64 `json:"id"`
 
-func (k *KwkLink) FullKey() string {
-	return k.Key + "." + k.Extension
+	FullKey   string `json:"fullKey"`
+	Username  string `json:"username"`
+	Key       string `json:"key"`
+	Extension string `json:"extension"`
+
+	Uri       string `json:"uri"`
+	Version   int `json:"version"`
+	Runtime   string `json:"runtime"`
+	Media     string `json:"media"`
+	Tags      []string `json:"tags"`
+	Created   time.Time `json:"created"`
+	DefaultModel
 }
 
 type KwkLinkList struct {
@@ -84,18 +82,18 @@ func (a *ApiClient) List(args []string) *KwkLinkList {
 	for _, v := range tags {
 		tagTokens = append(tagTokens, fmt.Sprintf("&tags=%s", v))
 	}
-	a.Request("GET", fmt.Sprintf("hash?p=%d&s=%d%s", page, size, strings.Join(tagTokens, "")), "", list)
+	a.Request("GET", fmt.Sprintf("alias/%s?p=%d&s=%d%s", "richard", page, size, strings.Join(tagTokens, "")), "", list)
 	return list
 }
 
-func (a *ApiClient) Get(key string) *KwkLink {
+func (a *ApiClient) Get(fullKey string) *KwkLink {
 	k := &KwkLink{}
-	a.Request("GET", fmt.Sprintf("hash/%s", url.QueryEscape(key)), "", k)
+	a.Request("GET", fmt.Sprintf("alias/%s/%s", "richard", url.QueryEscape(fullKey)), "", k)
 	return k
 }
 
 func (a *ApiClient) Delete(key string) {
-	a.Request("DELETE", fmt.Sprintf("hash/%s", url.QueryEscape(key)), "", nil)
+	a.Request("DELETE", fmt.Sprintf("alias/%s/%s", "richard", url.QueryEscape(key)), "", nil)
 }
 
 func (a *ApiClient) Create(uri string, path string) *KwkLink {
@@ -116,11 +114,11 @@ func (a *ApiClient) Create(uri string, path string) *KwkLink {
 func (a *ApiClient) Rename(key string, newKey string) *KwkLink {
 	body := fmt.Sprintf(`{"newKey":"%s"}`, newKey)
 	k := &KwkLink{}
-	a.Request("PUT", fmt.Sprintf("hash/%s/rename", url.QueryEscape(key)), body, k)
+	a.Request("PUT", fmt.Sprintf("alias/%s/%s/rename", "richard", url.QueryEscape(key)), body, k)
 	return k
 }
 
-func (a *ApiClient) Patch(key string, uri string) *KwkLink {
+func (a *ApiClient) Patch(fullKey string, uri string) *KwkLink {
 	body := struct {
 		Uri string `json:"uri"`
 	}{
@@ -128,7 +126,7 @@ func (a *ApiClient) Patch(key string, uri string) *KwkLink {
 	}
 	j, _ := json.Marshal(body)
 	k := &KwkLink{}
-	a.Request("PUT", fmt.Sprintf("hash/%s/bump", url.QueryEscape(key)), string(j), k)
+	a.Request("PUT", fmt.Sprintf("alias/%s/%s/patch", "richard", url.QueryEscape(fullKey)), string(j), k)
 	return k
 }
 
@@ -169,16 +167,16 @@ func (a *ApiClient) SignUp(email string, username string, password string) *syst
 	return nil
 }
 
-func (a *ApiClient) Tag(kwkLink string, tags ...string) {
+func (a *ApiClient) Tag(fullKey string, tags ...string) {
 	json, _ := json.Marshal(tags)
 	body := fmt.Sprintf(`{"tags":%s}`, json)
-	a.Request("POST", fmt.Sprintf("hash/%s/tag", url.QueryEscape(kwkLink)), body, nil)
+	a.Request("POST", fmt.Sprintf("alias/%s/%s/tag", "richard", url.QueryEscape(fullKey)), body, nil)
 }
 
-func (a *ApiClient) UnTag(kwkLink string, tags ...string) {
+func (a *ApiClient) UnTag(fullKey string, tags ...string) {
 	json, _ := json.Marshal(tags)
 	body := fmt.Sprintf(`{"tags":%s}`, json)
-	a.Request("DELETE", fmt.Sprintf("hash/%s/tag", url.QueryEscape(kwkLink)), body, nil)
+	a.Request("DELETE", fmt.Sprintf("alias/%s/%s/tag", "richard", url.QueryEscape(fullKey)), body, nil)
 }
 
 func (a *ApiClient) Logout() {
