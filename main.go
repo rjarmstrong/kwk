@@ -2,19 +2,19 @@ package main
 
 import (
 	"os"
+	"github.com/kwk-links/kwk-cli/libs/charting"
 	"gopkg.in/urfave/cli.v1"
 	"fmt"
-	"github.com/kwk-links/kwk-cli/openers"
-	"github.com/kwk-links/kwk-cli/api"
+	"github.com/kwk-links/kwk-cli/libs/openers"
+	"github.com/kwk-links/kwk-cli/libs/api"
 	"github.com/atotto/clipboard"
-	"github.com/kwk-links/kwk-cli/system"
+	"github.com/kwk-links/kwk-cli/libs/system"
 	"github.com/olekukonko/tablewriter"
 	"github.com/dustin/go-humanize"
 	"strings"
-	"github.com/kwk-links/kwk-cli/gui"
+	"github.com/kwk-links/kwk-cli/libs/gui"
 	"bufio"
 	"time"
-	"github.com/kwk-links/kwk-cli/charting"
 )
 
 func main() {
@@ -274,7 +274,7 @@ func main() {
 			},
 		},
 		{
-			Name:        "upgrade",
+			Name:    "upgrade",
 			Action: func(c *cli.Context) error {
 				system.Upgrade()
 				return nil
@@ -318,38 +318,6 @@ func main() {
 				} else {
 					fmt.Println("Invalid kwklink")
 				}
-				return nil
-			},
-		},
-		{
-			Name:    "signin",
-			Aliases: []string{"login"},
-			Action:  func(c *cli.Context) error {
-				apiClient.Login(c.Args().Get(0), c.Args().Get(1));
-				return nil
-			},
-		},
-		{
-			Name:    "logout",
-			Aliases: []string{"signout"},
-			Action:  func(c *cli.Context) error {
-				apiClient.Logout();
-				return nil
-			},
-		},
-		{
-			Name:    "signup",
-			Aliases: []string{"register"},
-			Action:  func(c *cli.Context) error {
-				apiClient.SignUp(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2));
-				return nil
-			},
-		},
-		{
-			Name:    "profile",
-			Aliases: []string{"me"},
-			Action:  func(c *cli.Context) error {
-				apiClient.PrintProfile();
 				return nil
 			},
 		},

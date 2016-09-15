@@ -4,9 +4,9 @@ import (
 	tm "github.com/buger/goterm"
 	"math"
 	"fmt"
-	"github.com/kwk-links/kwk-cli/api"
+	"github.com/kwk-links/kwk-cli/libs/api"
 	//"github.com/kwk-links/kwk-cli/system"
-	"github.com/kwk-links/kwk-cli/gui"
+	"github.com/kwk-links/kwk-cli/libs/gui"
 	"sort"
 )
 

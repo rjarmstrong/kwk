@@ -7,13 +7,13 @@ import (
 	"encoding/json"
 	"bytes"
 	"io/ioutil"
-	"github.com/kwk-links/kwk-cli/system"
-	"github.com/kwk-links/kwk-cli/gui"
 	"bufio"
 	"os"
 	"strconv"
 	"strings"
 	"net/url"
+	"github.com/kwk-links/kwk-cli/libs/gui"
+	"github.com/kwk-links/kwk-cli/libs/system"
 )
 
 const (

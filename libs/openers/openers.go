@@ -1,11 +1,11 @@
 package openers
 
 import (
-	"github.com/kwk-links/kwk-cli/system"
+	"github.com/kwk-links/kwk-cli/libs/system"
 	"strings"
-	"github.com/kwk-links/kwk-cli/api"
+	"github.com/kwk-links/kwk-cli/libs/api"
 	"fmt"
-	"github.com/kwk-links/kwk-cli/gui"
+	"github.com/kwk-links/kwk-cli/libs/gui"
 	"os"
 	"time"
 )
