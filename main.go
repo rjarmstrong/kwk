@@ -322,8 +322,8 @@ func main() {
 			},
 		},
 		{
-			Name:    "login",
-			Aliases: []string{"signin"},
+			Name:    "signin",
+			Aliases: []string{"login"},
 			Action:  func(c *cli.Context) error {
 				apiClient.Login(c.Args().Get(0), c.Args().Get(1));
 				return nil
