@@ -1,25 +1,18 @@
 package system
 
-
-type ISystem interface {
-	Upgrade()
-	GetVersion() string
-	ChangeDirectory(username string)
-}
-
 type SystemMock struct {
-  UpgradeCalled bool
-  VersionCalled bool
-  ChangeDirectoryCalledWith string
+	UpgradeCalled bool
+	VersionCalled bool
+	ChangeDirectoryCalledWith string
 }
 
 func (s *SystemMock) Upgrade(){
-  s.UpgradeCalled = true
+	s.UpgradeCalled = true
 }
 
 func (s *SystemMock) GetVersion() string {
-    s.VersionCalled = true
-   return "0.0.1"
+	s.VersionCalled = true
+	return "0.0.1"
 }
 
 
