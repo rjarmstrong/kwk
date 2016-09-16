@@ -30,7 +30,7 @@ func New(s *system.Settings) *ApiClient {
 	return &ApiClient{Settings:s}
 }
 
-type KwkLink struct {
+type Alias struct {
 	Id        int64 `json:"id"`
 
 	FullKey   string `json:"fullKey"`
@@ -47,8 +47,8 @@ type KwkLink struct {
 	DefaultModel
 }
 
-type KwkLinkList struct {
-	Items []KwkLink `json:"items"`
+type AliasList struct {
+	Items []Alias `json:"items"`
 	Total int `json:"total"`
 	Page  int `json:"page"`
 	Size  int `json:"size"`
@@ -59,11 +59,11 @@ type DefaultModel struct {
 	Message string `json:"message"`
 }
 
-func (k *KwkLink) Err() string {
+func (k *Alias) Err() string {
 	return k.Error
 }
 
-func (a *ApiClient) List(args []string) *KwkLinkList {
+func (a *ApiClient) List(args []string) *AliasList {
 	var page, size int
 	var tags = []string{}
 	for _, v := range args {
@@ -77,7 +77,7 @@ func (a *ApiClient) List(args []string) *KwkLinkList {
 			tags = append(tags, v)
 		}
 	}
-	list := &KwkLinkList{}
+	list := &AliasList{}
 	var tagTokens []string
 	for _, v := range tags {
 		tagTokens = append(tagTokens, fmt.Sprintf("&tags=%s", v))
@@ -86,8 +86,8 @@ func (a *ApiClient) List(args []string) *KwkLinkList {
 	return list
 }
 
-func (a *ApiClient) Get(fullKey string) *KwkLink {
-	k := &KwkLink{}
+func (a *ApiClient) Get(fullKey string) *Alias {
+	k := &Alias{}
 	a.Request("GET", fmt.Sprintf("alias/%s/%s", "richard", url.QueryEscape(fullKey)), "", k)
 	return k
 }
@@ -96,7 +96,7 @@ func (a *ApiClient) Delete(key string) {
 	a.Request("DELETE", fmt.Sprintf("alias/%s/%s", "richard", url.QueryEscape(key)), "", nil)
 }
 
-func (a *ApiClient) Create(uri string, path string) *KwkLink {
+func (a *ApiClient) Create(uri string, path string) *Alias {
 	body := struct {
 		Url string `json:"url"`
 		Key string `json:"key"`
@@ -105,27 +105,27 @@ func (a *ApiClient) Create(uri string, path string) *KwkLink {
 		Key: path,
 	}
 
-	k := &KwkLink{}
+	k := &Alias{}
 	j, _ := json.Marshal(body)
 	a.Request("POST", "hash", string(j), k)
 	return k
 }
 
-func (a *ApiClient) Rename(key string, newKey string) *KwkLink {
+func (a *ApiClient) Rename(key string, newKey string) *Alias {
 	body := fmt.Sprintf(`{"newKey":"%s"}`, newKey)
-	k := &KwkLink{}
+	k := &Alias{}
 	a.Request("PUT", fmt.Sprintf("alias/%s/%s/rename", "richard", url.QueryEscape(key)), body, k)
 	return k
 }
 
-func (a *ApiClient) Patch(fullKey string, uri string) *KwkLink {
+func (a *ApiClient) Patch(fullKey string, uri string) *Alias {
 	body := struct {
 		Uri string `json:"uri"`
 	}{
 		Uri: uri,
 	}
 	j, _ := json.Marshal(body)
-	k := &KwkLink{}
+	k := &Alias{}
 	a.Request("PUT", fmt.Sprintf("alias/%s/%s/patch", "richard", url.QueryEscape(fullKey)), string(j), k)
 	return k
 }

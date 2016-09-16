@@ -43,7 +43,7 @@ func (s GraphItemSorter) Less(i, j int) bool {
 	return s.Items[i].Value > s.Items[j].Value
 }
 
-func PrintTags(list *api.KwkLinkList){
+func PrintTags(list *api.AliasList){
 	tags := map[string]int{}
 	for _, v := range list.Items {
 		for _, t := range v.Tags {

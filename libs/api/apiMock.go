@@ -10,8 +10,10 @@ type ApiMock struct {
 	SignupCalledWith   []string
 	SignoutCalled      bool
 	GetCalledWith      string
+	RenameCalledWith []string
 	CreateCalledWith   []string
-	ReturnItemsForGet  []KwkLink
+	ReturnItemsForGet  []Alias
+	PatchCalledWith []string
 }
 
 func (a *ApiMock) PrintProfile() {
@@ -32,15 +34,25 @@ func (a *ApiMock) Signout() {
 	a.SignoutCalled = true
 }
 
-func (a *ApiMock) Get(fullKey string) *KwkLinkList {
+func (a *ApiMock) Get(fullKey string) *AliasList {
 	a.GetCalledWith = fullKey
-	return &KwkLinkList{Items:a.ReturnItemsForGet, Total:len(a.ReturnItemsForGet)}
+	return &AliasList{Items:a.ReturnItemsForGet, Total:len(a.ReturnItemsForGet)}
 }
 
-func (a *ApiMock) Create(uri string, fullKey string) *KwkLink {
+func (a *ApiMock) Create(uri string, fullKey string) *Alias {
 	a.CreateCalledWith = []string{uri, fullKey}
 	if fullKey == "" {
 		fullKey = "x5hi23"
 	}
-	return &KwkLink{FullKey:fullKey}
+	return &Alias{FullKey:fullKey}
+}
+
+func (a *ApiMock) Rename(fullKey string, newFullKey string) *Alias {
+	a.RenameCalledWith = []string{fullKey, newFullKey}
+	return &Alias{FullKey:newFullKey}
+}
+
+func (a *ApiMock) Patch(fullKey string, uri string) *Alias {
+	a.PatchCalledWith = []string{fullKey, uri}
+	return &Alias{FullKey:fullKey, Uri:uri}
 }

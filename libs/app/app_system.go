@@ -6,7 +6,7 @@ import (
 	"github.com/kwk-links/kwk-cli/libs/system"
 )
 
-func systemCommands(s system.ISystem, w gui.IWriter) []cli.Command {
+func systemCommands(s system.ISystem, w gui.IInteraction) []cli.Command {
 	c := []cli.Command{
 		{
 			Name:    "upgrade",
@@ -19,7 +19,7 @@ func systemCommands(s system.ISystem, w gui.IWriter) []cli.Command {
 			Name:    "version",
 			Aliases: []string{"v"},
 			Action:  func(c *cli.Context) error {
-				w.PrintWithTemplate("version", s.GetVersion())
+				w.Respond("version", s.GetVersion())
 				return nil
 			},
 		},
@@ -28,7 +28,7 @@ func systemCommands(s system.ISystem, w gui.IWriter) []cli.Command {
 			Aliases: []string{},
 			Action:  func(c *cli.Context) error {
 				s.ChangeDirectory(c.Args().Get(0))
-				w.PrintWithTemplate("cd", c.Args().Get(0))
+				w.Respond("cd", c.Args().Get(0))
 				return nil
 			},
 		},

@@ -54,7 +54,13 @@ func (o *Opener) Edit(key string) error {
 	}
 }
 
-func (o *Opener) Open(link *api.KwkLink, args []string) {
+func (o *Opener) Open(link *api.Alias, args []string) {
+
+	if args[0] == "covert" {
+		o.OpenCovert(link.Uri)
+		return
+	}
+
 	uri := link.Uri
 	iterationCount += 1
 	if iterationCount > 3 {

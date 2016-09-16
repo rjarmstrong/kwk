@@ -8,6 +8,8 @@ type IApi interface {
 	SignUp(email string, username string, password string) *system.User
 	Signout()
 	//Given a fullKey will get one or many aliases that match.
-	Get(fullKey string) *KwkLinkList
-	Create(uri string, fullPath string) *KwkLink
+	Get(fullKey string) *AliasList
+	Create(uri string, fullPath string) *Alias
+	Rename(fullKey string, newFullKey string) *Alias
+	Patch(fullKey string, uri string) *Alias
 }

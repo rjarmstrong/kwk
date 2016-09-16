@@ -24,23 +24,9 @@ func main() {
 	settings := system.NewSettings("leveldb")
 	apiClient := api.New(settings)
 	cli.HelpPrinter = system.Help
-	opener := openers.NewOpener(apiClient)
 
 	// run opener version checker
 
-	app.CommandNotFound = func(c *cli.Context, kwklink string) {
-		// if it is a fullKey then else get tag
-		if k := apiClient.Get(kwklink); k != nil {
-			if k.Uri != "" {
-				opener.Open(k, c.Args()[1:])
-			} else {
-				fmt.Printf(gui.Colour(gui.Yellow, "kwklink: '%s' not found\n"), kwklink)
-			}
-			return
-		}
-		fmt.Println("Command or kwklink not found.")
-
-	}
 	app.Commands = []cli.Command{
 		{
 			Name:    "clone",
@@ -61,17 +47,6 @@ func main() {
 					fmt.Printf(gui.Colour(gui.LightBlue, "Cloned %s -> %s"), originalKey, k.FullKey)
 				} else {
 					fmt.Println("Invalid kwklink")
-				}
-				return nil
-			},
-		},
-		{
-			Name:    "edit",
-			Aliases: []string{"e"},
-			Action:  func(c *cli.Context) error {
-				key := c.Args().First()
-				if err := opener.Edit(key); err != nil {
-					fmt.Println(err)
 				}
 				return nil
 			},
@@ -191,48 +166,6 @@ func main() {
 					fmt.Printf("\n %d of %d pages", list.Page, (list.Total / list.Size) + 1)
 				}
 				fmt.Print("\n\n")
-				return nil
-			},
-		},
-		{
-			Name:    "covert",
-			Aliases: []string{"c"},
-			Action:  func(c *cli.Context) error {
-				k := apiClient.Get(c.Args().First())
-				opener.OpenCovert(k.Uri)
-				return nil
-			},
-		},
-		{
-			Name:    "rename",
-			Aliases: []string{"mv"},
-			Action:  func(c *cli.Context) error {
-				//TODO: When updating a pinned kwklink, must force to give a new name
-				// (since it is technically no longer the original)
-				apiClient.Rename(c.Args().Get(0), c.Args().Get(1));
-				return nil
-			},
-		},
-		{
-			Name:    "patch",
-			Aliases: []string{"patch"},
-			Action:  func(c *cli.Context) error {
-				//TODO: When updating a pinned kwklink, must force to give a new name
-				// (since it is technically no longer the original)
-
-				if k := apiClient.Get(c.Args().Get(0)); k != nil {
-					uri := k.Uri
-					if len(c.Args()) == 3 {
-						uri = strings.Replace(uri, c.Args().Get(1), c.Args().Get(2), -1)
-					} else {
-						uri = c.Args().Get(1)
-					}
-					apiClient.Patch(k.FullKey, uri);
-					clipboard.WriteAll(k.FullKey)
-					fmt.Printf(gui.Colour(gui.LightBlue, "Patched %s"), k.FullKey)
-				} else {
-					fmt.Println("Invalid kwklink")
-				}
 				return nil
 			},
 		},

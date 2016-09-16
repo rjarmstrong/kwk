@@ -11,7 +11,7 @@ import (
 func Test_App(t *testing.T) {
 	Convey("ACCOUNT COMMANDS", t, func() {
 		a := &api.ApiMock{}
-		w := &gui.Writer{}
+		w := &gui.Interaction{}
 		app := NewKwkApp(a, nil, w, nil)
 
 		Convey(`Profile`, func() {
