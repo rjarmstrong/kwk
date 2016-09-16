@@ -1,9 +1,9 @@
 package gui
 
 type WriterMock struct {
-	PrintCalledWith interface{}
+	PrintCalledWith []interface{}
 }
 
-func (w *WriterMock) Print(input interface{}){
-	w.PrintCalledWith = input
+func (w *WriterMock) PrintWithTemplate(templateName string, input interface{}){
+	w.PrintCalledWith = []interface{}{templateName, input}
 }

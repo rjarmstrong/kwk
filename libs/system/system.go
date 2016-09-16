@@ -11,6 +11,7 @@ import (
 	"path"
 	"os"
 	"errors"
+	"github.com/atotto/clipboard"
 )
 
 func ExecSafe(name string, arg ...string) io.ReadCloser {
@@ -169,4 +170,8 @@ func copyFileContents(src, dst string) (err error) {
 	}
 	err = out.Sync()
 	return
+}
+
+func CopyToClipboard(input string){
+	clipboard.WriteAll(input)
 }

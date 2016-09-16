@@ -12,7 +12,7 @@ func Test_App(t *testing.T) {
 	Convey("ACCOUNT COMMANDS", t, func() {
 		a := &api.ApiMock{}
 		w := &gui.Writer{}
-		app := NewKwkApp(a, nil, w)
+		app := NewKwkApp(a, nil, w, nil)
 
 		Convey(`Profile`, func() {
 			Convey(`Should run by name`, func() {

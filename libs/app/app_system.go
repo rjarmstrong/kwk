@@ -19,7 +19,7 @@ func systemCommands(s system.ISystem, w gui.IWriter) []cli.Command {
 			Name:    "version",
 			Aliases: []string{"v"},
 			Action:  func(c *cli.Context) error {
-				w.Print(s.GetVersion())
+				w.PrintWithTemplate("version", s.GetVersion())
 				return nil
 			},
 		},
@@ -28,7 +28,7 @@ func systemCommands(s system.ISystem, w gui.IWriter) []cli.Command {
 			Aliases: []string{},
 			Action:  func(c *cli.Context) error {
 				s.ChangeDirectory(c.Args().Get(0))
-				w.Print("Changed to " + c.Args().Get(0))
+				w.PrintWithTemplate("cd", c.Args().Get(0))
 				return nil
 			},
 		},

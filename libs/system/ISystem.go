@@ -4,4 +4,5 @@ type ISystem interface {
 	Upgrade()
 	GetVersion() string
 	ChangeDirectory(username string)
+	CopyToClipboard(input string)
 }

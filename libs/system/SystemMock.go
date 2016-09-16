@@ -1,18 +1,23 @@
 package system
 
 type SystemMock struct {
-	UpgradeCalled bool
-	VersionCalled bool
+	UpgradeCalled             bool
+	VersionCalled             bool
 	ChangeDirectoryCalledWith string
+	CopyToClipboardCalledWith string
 }
 
-func (s *SystemMock) Upgrade(){
+func (s *SystemMock) Upgrade() {
 	s.UpgradeCalled = true
 }
 
 func (s *SystemMock) GetVersion() string {
 	s.VersionCalled = true
 	return "0.0.1"
+}
+
+func (s *SystemMock) CopyToClipboard(input string) {
+	s.CopyToClipboardCalledWith = input
 }
 
 

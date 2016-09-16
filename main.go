@@ -43,57 +43,6 @@ func main() {
 	}
 	app.Commands = []cli.Command{
 		{
-			Name:    "open",
-			Aliases: []string{"o"},
-			Action: func(c *cli.Context) error {
-				args := c.Args()
-				list := apiClient.List([]string(args))
-				for _, v := range list.Items {
-					fmt.Println(gui.Colour(gui.LightBlue, v.FullKey))
-					opener.Open(&v, []string{})
-				}
-				return nil
-			},
-		},
-		{
-			Name:    "openc",
-			Aliases: []string{"oc"},
-			Action:  func(c *cli.Context) error {
-				args := c.Args()
-				list := apiClient.List([]string(args))
-				for _, v := range list.Items {
-					opener.OpenCovert(v.Uri)
-				}
-				return nil
-			},
-		},
-
-		{
-			Name:    "inspect",
-			Aliases: []string{"i"},
-			Action:  func(c *cli.Context) error {
-				args := c.Args()
-				link := apiClient.Get(args.First())
-				if link != nil {
-					system.PrettyPrint(link)
-				} else {
-					fmt.Println("Invalid kwklink")
-				}
-				return nil
-			},
-		},
-		{
-			Name:    "new",
-			Aliases: []string{"create", "save"},
-			Action:  func(c *cli.Context) error {
-				if k := apiClient.Create(c.Args().Get(0), c.Args().Get(1)); k != nil {
-					clipboard.WriteAll(k.FullKey)
-					fmt.Println(k.FullKey)
-				}
-				return nil
-			},
-		},
-		{
 			Name:    "clone",
 			Aliases: []string{"copy"},
 			Action:  func(c *cli.Context) error {
@@ -124,16 +73,6 @@ func main() {
 				if err := opener.Edit(key); err != nil {
 					fmt.Println(err)
 				}
-				return nil
-			},
-		},
-		{
-			Name:    "cat",
-			Aliases: []string{"raw", "read", "print", "get"},
-			Action:  func(c *cli.Context) error {
-				uri := apiClient.Get(c.Args().First())
-				clipboard.WriteAll(uri.Uri)
-				fmt.Println(uri.Uri)
 				return nil
 			},
 		},
@@ -172,15 +111,6 @@ func main() {
 				args := []string(c.Args())
 				apiClient.UnTag(args[0], args[1:]...)
 				fmt.Println("UnTagged")
-				return nil
-			},
-		},
-		{
-			Name:    "cd",
-			Aliases: []string{},
-			Action:  func(c *cli.Context) error {
-				args := []string(c.Args())
-				fmt.Println(gui.Colour(gui.LightBlue, "Switched to kwk.co/" + args[0] + "/"))
 				return nil
 			},
 		},
@@ -270,21 +200,6 @@ func main() {
 			Action:  func(c *cli.Context) error {
 				k := apiClient.Get(c.Args().First())
 				opener.OpenCovert(k.Uri)
-				return nil
-			},
-		},
-		{
-			Name:    "upgrade",
-			Action: func(c *cli.Context) error {
-				system.Upgrade()
-				return nil
-			},
-		},
-		{
-			Name:    "version",
-			Aliases: []string{"v"},
-			Action:  func(c *cli.Context) error {
-				fmt.Println(os.Getenv("version"))
 				return nil
 			},
 		},

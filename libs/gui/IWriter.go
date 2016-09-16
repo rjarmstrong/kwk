@@ -1,5 +1,5 @@
 package gui
 
 type IWriter interface {
-	Print(input interface{})
+	PrintWithTemplate(templateName string, input interface{})
 }
