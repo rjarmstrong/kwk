@@ -10,8 +10,6 @@ import (
 )
 
 func aliasCommands(a api.IApi, s system.ISystem, i gui.IInteraction, o openers.IOpen) []cli.Command {
-	m := NewMultiResultPrompt(o, i)
-
 	c := []cli.Command{
 		{
 			Name:    "new",
@@ -56,15 +54,6 @@ func aliasCommands(a api.IApi, s system.ISystem, i gui.IInteraction, o openers.I
 			Action:  func(c *cli.Context) error {
 				key := c.Args().First()
 				i.Respond("edit", o.Edit(key))
-				return nil
-			},
-		},
-		{
-			Name:    "covert",
-			Aliases: []string{"c"},
-			Action:  func(c *cli.Context) error {
-				fullKey := c.Args().First()
-				m.CheckAndPrompt(fullKey, a.Get(fullKey), c.Args())
 				return nil
 			},
 		},
