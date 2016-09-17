@@ -33,7 +33,7 @@ func Test_System(t *testing.T) {
 			Convey(`Should get version and call writer print`, func() {
 				app.App.Run([]string{"[app]", "version"})
 				So(s.VersionCalled, should.BeTrue)
-				So(w.RespondCalledWith, should.Resemble, []interface{}{"version", "0.0.1"})
+				So(w.LastRespondCalledWith, should.Resemble, []interface{}{"version", "0.0.1"})
 			})
 		})
 
@@ -45,7 +45,7 @@ func Test_System(t *testing.T) {
 			Convey(`Should change directory`, func() {
 				app.App.Run([]string{"[app]", "cd", "dillbuck"})
 				So(s.ChangeDirectoryCalledWith, should.Equal, "dillbuck")
-				So(w.RespondCalledWith, should.Resemble, []interface{}{"cd", "dillbuck"})
+				So(w.LastRespondCalledWith, should.Resemble, []interface{}{"cd", "dillbuck"})
 			})
 		})
 	})

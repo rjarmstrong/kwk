@@ -52,24 +52,6 @@ func main() {
 			},
 		},
 		{
-			Name:    "delete",
-			Aliases: []string{"rm"},
-			Action:  func(c *cli.Context) error {
-				reader := bufio.NewReader(os.Stdin)
-				fmt.Printf(gui.Colour(gui.LightBlue, "Are you sure you want to delete %s y/n? "), c.Args().First())
-				yesNo, _, _ := reader.ReadRune()
-				if string(yesNo) == "y" {
-					apiClient.Delete(c.Args().First())
-					fmt.Println("Deleted")
-				} else {
-					messages := []string{"without a scratch", "uninjured", "intact", "unaffected", "unharmed", "unscathed", "out of danger", "safe and sound", "unblemished", "alive and well"}
-					rnd := time.Now().Nanosecond() % (len(messages) - 1)
-					fmt.Printf("'%s' is %s.\n", c.Args().First(), messages[rnd])
-				}
-				return nil
-			},
-		},
-		{
 			Name:    "tag",
 			Aliases: []string{"t"},
 			Action:  func(c *cli.Context) error {

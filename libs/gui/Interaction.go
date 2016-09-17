@@ -9,10 +9,10 @@ type Interaction struct {
 	templates map[string]Template
 }
 
-type Template func(input interface{})
+type Template func(input interface{}) interface{}
 
 var templates = map[string]Template{}
 
-func (w *Interaction) Respond(templateName string, input interface{}) {
-	templates[templateName](input)
+func (w *Interaction) Respond(templateName string, input interface{}) interface{} {
+	return templates[templateName](input)
 }

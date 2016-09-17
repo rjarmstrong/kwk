@@ -14,10 +14,10 @@ import (
 func Test_Alias(t *testing.T) {
 	Convey("ALIAS COMMANDS", t, func() {
 		a := &api.ApiMock{}
-		w := &gui.InteractionMock{}
+		i := &gui.InteractionMock{}
 		s := &system.SystemMock{}
 		o := &openers.OpenerMock{}
-		app := NewKwkApp(a, s, w, o)
+		app := NewKwkApp(a, s, i, o)
 
 		Convey(`Command not found`, func() {
 			Convey(`Should call get and open if found`, func() {
@@ -39,7 +39,7 @@ func Test_Alias(t *testing.T) {
 				}
 				app.App.Run([]string{"[app]", "hola", "arg1", "arg2"})
 				So(a.GetCalledWith, should.Equal, "hola")
-				So(w.RespondCalledWith, should.Resemble, []interface{}{"chooseBetweenKeys", a.ReturnItemsForGet})
+				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"chooseBetweenKeys", a.ReturnItemsForGet})
 				a.ReturnItemsForGet = nil
 			})
 			Convey(`Should respond if not found`, func() {
@@ -47,7 +47,7 @@ func Test_Alias(t *testing.T) {
 				a.ReturnItemsForGet = []api.Alias{}
 				app.App.Run([]string{"[app]", fullKey, "arg1", "arg2"})
 				So(a.GetCalledWith, should.Equal, fullKey)
-				So(w.RespondCalledWith, should.Resemble, []interface{}{"notfound", fullKey})
+				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"notfound", fullKey})
 				a.ReturnItemsForGet = nil
 			})
 		})
@@ -66,14 +66,14 @@ func Test_Alias(t *testing.T) {
 				app.App.Run([]string{"[app]", "new", "echo hola", fullKey})
 				So(a.CreateCalledWith, should.Resemble, []string{"echo hola", fullKey})
 				So(s.CopyToClipboardCalledWith, should.Equal, fullKey)
-				So(w.RespondCalledWith, should.Resemble, []interface{}{"new", &api.Alias{FullKey:fullKey}})
+				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"new", &api.Alias{FullKey:fullKey}})
 			})
 			Convey(`Should call create, save to clip board and respond with template WITHOUT a fullKey`, func() {
 				app.App.Run([]string{"[app]", "new", "echo hola"})
 				So(a.CreateCalledWith, should.Resemble, []string{"echo hola", ""})
 				mockKey := "x5hi23"
 				So(s.CopyToClipboardCalledWith, should.Equal, mockKey)
-				So(w.RespondCalledWith, should.Resemble, []interface{}{"new", &api.Alias{FullKey:mockKey}})
+				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"new", &api.Alias{FullKey:mockKey}})
 			})
 		})
 
@@ -87,7 +87,31 @@ func Test_Alias(t *testing.T) {
 			Convey(`Should call get and respond with template`, func() {
 				app.App.Run([]string{"[app]", "inspect", "arrows.js"})
 				So(a.GetCalledWith, should.Equal, "arrows.js")
-				So(w.RespondCalledWith, should.Resemble, []interface{}{"inspect", &api.AliasList{}})
+				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"inspect", &api.AliasList{}})
+			})
+		})
+
+		Convey(`Delete`, func() {
+			Convey(`Should run by name`, func() {
+				p := app.App.Command("delete")
+				So(p, should.NotBeNil)
+				p2 := app.App.Command("rm")
+				So(p2.Name, should.Equal, p.Name)
+			})
+			Convey(`Should prompt to delete and then confirm deleted`, func() {
+				i.ReturnItem = true
+				app.App.Run([]string{"[app]", "delete", "arrows.js"})
+				So(a.DeleteCalledWith, should.Equal, "arrows.js")
+				So(i.CallHistory[0], should.Resemble, []interface{}{"delete", "arrows.js"})
+				So(i.CallHistory[1], should.Resemble, []interface{}{"deleted", "arrows.js"})
+				i.ReturnItem = false
+			})
+			Convey(`Should prompt to delete and then confirm not deleted`, func() {
+				i.ReturnItem = false
+				app.App.Run([]string{"[app]", "delete", "arrows.js"})
+				So(i.CallHistory[0], should.Resemble, []interface{}{"delete", "arrows.js"})
+				So(i.CallHistory[1], should.Resemble, []interface{}{"notdeleted", "arrows.js"})
+				i.ReturnItem = false
 			})
 		})
 
@@ -107,7 +131,7 @@ func Test_Alias(t *testing.T) {
 			Convey(`Should call get and respond with template`, func() {
 				app.App.Run([]string{"[app]", "cat", "arrows.js"})
 				So(a.GetCalledWith, should.Equal, "arrows.js")
-				So(w.RespondCalledWith, should.Resemble, []interface{}{"cat", &api.AliasList{}})
+				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"cat", &api.AliasList{}})
 			})
 		})
 
@@ -121,7 +145,7 @@ func Test_Alias(t *testing.T) {
 			Convey(`Should call rename and respond with template`, func() {
 				app.App.Run([]string{"[app]", "rename", "arrows.js", "pointers.js"})
 				So(a.RenameCalledWith, should.Resemble, []string{"arrows.js", "pointers.js"})
-				So(w.RespondCalledWith, should.Resemble, []interface{}{"rename", &api.Alias{}})
+				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"rename", &api.Alias{FullKey:"pointers.js"}})
 			})
 		})
 
@@ -135,13 +159,13 @@ func Test_Alias(t *testing.T) {
 			Convey(`Should call edit and respond with template`, func() {
 				app.App.Run([]string{"[app]", "edit", "arrows.js"})
 				So(o.EditCalledWith, should.Resemble, "arrows.js")
-				So(w.RespondCalledWith, should.Resemble, []interface{}{"edit", nil})
+				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"edit", nil})
 			})
 			Convey(`Should call edit and respond with error if not exists`, func() {
 				o.EditError = errors.New("Not found.")
 				app.App.Run([]string{"[app]", "edit", "arrows.js"})
 				So(o.EditCalledWith, should.Resemble, "arrows.js")
-				So(w.RespondCalledWith, should.Resemble, []interface{}{"edit", o.EditError})
+				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"edit", o.EditError})
 				o.EditError = nil
 			})
 		})
@@ -157,7 +181,7 @@ func Test_Alias(t *testing.T) {
 			Convey(`Should call patch and respond with patch`, func() {
 				app.App.Run([]string{"[app]", "patch", "arrows.js", "console.log('patched')"})
 				So(a.PatchCalledWith, should.Resemble, []string{"arrows.js", "console.log('patched')"})
-				So(w.RespondCalledWith, should.Resemble, []interface{}{"patch", &api.Alias{FullKey:"arrows.js", Uri:"console.log('patched')"}})
+				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"patch", &api.Alias{FullKey:"arrows.js", Uri:"console.log('patched')"}})
 			})
 		})
 	})
