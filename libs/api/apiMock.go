@@ -16,6 +16,8 @@ type ApiMock struct {
 	PatchCalledWith []string
 	DeleteCalledWith string
 	CloneCalledWith []string
+	TagCalledWith map[string][]string
+	UnTagCalledWith map[string][]string
 }
 
 func (a *ApiMock) PrintProfile() {
@@ -65,5 +67,19 @@ func (a *ApiMock) Delete(fullKey string) {
 
 func (a *ApiMock) Clone(fullKey string, newKey string) *Alias {
 	a.CloneCalledWith = []string{fullKey,newKey}
+	return &Alias{}
+}
+
+func (a *ApiMock) Tag(fullKey string, tag ...string) *Alias {
+	m := map[string][]string{}
+	m[fullKey] = tag
+	a.TagCalledWith = m
+	return &Alias{}
+}
+
+func (a *ApiMock) UnTag(fullKey string, tag ...string) *Alias {
+	m := map[string][]string{}
+	m[fullKey] = tag
+	a.UnTagCalledWith = m
 	return &Alias{}
 }

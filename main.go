@@ -25,26 +25,6 @@ func main() {
 
 	app.Commands = []cli.Command{
 		{
-			Name:    "tag",
-			Aliases: []string{"t"},
-			Action:  func(c *cli.Context) error {
-				args := []string(c.Args())
-				apiClient.Tag(args[0], args[1:]...)
-				fmt.Println("Tagged")
-				return nil
-			},
-		},
-		{
-			Name:    "untag",
-			Aliases: []string{"ut"},
-			Action:  func(c *cli.Context) error {
-				args := []string(c.Args())
-				apiClient.UnTag(args[0], args[1:]...)
-				fmt.Println("UnTagged")
-				return nil
-			},
-		},
-		{
 			Name:    "back",
 			Aliases: []string{"b"},
 			Action:  func(c *cli.Context) error {

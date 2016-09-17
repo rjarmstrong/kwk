@@ -14,4 +14,6 @@ type IApi interface {
 	Patch(fullKey string, uri string) *Alias
 	Delete(fullKey string)
 	Clone(fullKey string, newKey string) *Alias
+	Tag(fullKey string, tag ...string) *Alias
+	UnTag(fullKey string, tag ...string) *Alias
 }

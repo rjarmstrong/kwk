@@ -84,6 +84,24 @@ func aliasCommands(a api.IApi, s system.ISystem, i gui.IInteraction, o openers.I
 				return nil
 			},
 		},
+		{
+			Name:    "tag",
+			Aliases: []string{"t"},
+			Action:  func(c *cli.Context) error {
+				args := []string(c.Args())
+				i.Respond("tag", a.Tag(args[0], args[1:]...))
+				return nil
+			},
+		},
+		{
+			Name:    "untag",
+			Aliases: []string{"ut"},
+			Action:  func(c *cli.Context) error {
+				args := []string(c.Args())
+				i.Respond("untag", a.UnTag(args[0], args[1:]...))
+				return nil
+			},
+		},
 
 	}
 	return c

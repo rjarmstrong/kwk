@@ -83,4 +83,12 @@ var aliasResponses = map[string]gui.Template{
 		}
 		return nil
 	},
+	"tag": func(input interface{}) interface{}{
+		fmt.Println("Tagged")
+		return nil
+	},
+	"untag": func(input interface{}) interface{}{
+		fmt.Println("UnTagged")
+		return nil
+	},
 }
