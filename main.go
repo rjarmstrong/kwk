@@ -5,16 +5,12 @@ import (
 	"github.com/kwk-links/kwk-cli/libs/charting"
 	"gopkg.in/urfave/cli.v1"
 	"fmt"
-	"github.com/kwk-links/kwk-cli/libs/openers"
 	"github.com/kwk-links/kwk-cli/libs/api"
-	"github.com/atotto/clipboard"
 	"github.com/kwk-links/kwk-cli/libs/system"
 	"github.com/olekukonko/tablewriter"
 	"github.com/dustin/go-humanize"
 	"strings"
 	"github.com/kwk-links/kwk-cli/libs/gui"
-	"bufio"
-	"time"
 )
 
 func main() {
