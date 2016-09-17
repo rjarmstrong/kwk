@@ -149,6 +149,18 @@ func Test_Alias(t *testing.T) {
 			})
 		})
 
+		Convey(`Clone`, func() {
+			Convey(`Should run by name`, func() {
+				p := app.App.Command("clone")
+				So(p, should.NotBeNil)
+			})
+			Convey(`Should call rename and respond with template`, func() {
+				app.App.Run([]string{"[app]", "clone", "unicode/arrows.js", "myarrows.js"})
+				So(a.CloneCalledWith, should.Resemble, []string{"unicode/arrows.js", "myarrows.js"})
+				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"clone", &api.Alias{}})
+			})
+		})
+
 		Convey(`Edit`, func() {
 			Convey(`Should run by name`, func() {
 				p := app.App.Command("edit")

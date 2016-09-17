@@ -29,29 +29,6 @@ func main() {
 
 	app.Commands = []cli.Command{
 		{
-			Name:    "clone",
-			Aliases: []string{"copy"},
-			Action:  func(c *cli.Context) error {
-				if k := apiClient.Get(c.Args().Get(0)); k != nil {
-					originalKey := k.FullKey
-					uri := k.Uri
-					if c.Args().Get(1) != "" && c.Args().Get(2) != "" {
-						uri = strings.Replace(uri, c.Args().Get(1), c.Args().Get(2), -1)
-					}
-					kwklink := ""
-					if c.Args().Get(3) != "" {
-						kwklink = c.Args().Get(3)
-					}
-					k = apiClient.Create(uri, kwklink)
-					clipboard.WriteAll(k.FullKey)
-					fmt.Printf(gui.Colour(gui.LightBlue, "Cloned %s -> %s"), originalKey, k.FullKey)
-				} else {
-					fmt.Println("Invalid kwklink")
-				}
-				return nil
-			},
-		},
-		{
 			Name:    "tag",
 			Aliases: []string{"t"},
 			Action:  func(c *cli.Context) error {

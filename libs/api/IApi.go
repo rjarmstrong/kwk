@@ -13,4 +13,5 @@ type IApi interface {
 	Rename(fullKey string, newFullKey string) *Alias
 	Patch(fullKey string, uri string) *Alias
 	Delete(fullKey string)
+	Clone(fullKey string, newKey string) *Alias
 }

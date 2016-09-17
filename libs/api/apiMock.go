@@ -15,6 +15,7 @@ type ApiMock struct {
 	ReturnItemsForGet  []Alias
 	PatchCalledWith []string
 	DeleteCalledWith string
+	CloneCalledWith []string
 }
 
 func (a *ApiMock) PrintProfile() {
@@ -60,4 +61,9 @@ func (a *ApiMock) Patch(fullKey string, uri string) *Alias {
 
 func (a *ApiMock) Delete(fullKey string) {
 	a.DeleteCalledWith = fullKey
+}
+
+func (a *ApiMock) Clone(fullKey string, newKey string) *Alias {
+	a.CloneCalledWith = []string{fullKey,newKey}
+	return &Alias{}
 }

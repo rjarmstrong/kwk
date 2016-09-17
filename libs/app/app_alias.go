@@ -50,6 +50,14 @@ func aliasCommands(a api.IApi, s system.ISystem, i gui.IInteraction, o openers.I
 			},
 		},
 		{
+			Name:    "clone",
+			Aliases: []string{},
+			Action:  func(c *cli.Context) error {
+				i.Respond("clone", a.Clone(c.Args().First(), c.Args().Get(1)))
+				return nil
+			},
+		},
+		{
 			Name:    "edit",
 			Aliases: []string{"e"},
 			Action:  func(c *cli.Context) error {
@@ -117,6 +125,7 @@ var aliasTemplates = map[string]gui.Template{
 		}
 		return nil
 	},
+	// delete returns a boolean indicating whether the user agreed to delete or not.
 	"delete" : func(input interface{}) interface{} {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Printf(gui.Colour(gui.LightBlue, "Are you sure you want to delete %s y/n? "), input)
@@ -134,5 +143,27 @@ var aliasTemplates = map[string]gui.Template{
 		fmt.Printf("'%s' is %s.\n", input, messages[rnd])
 		return nil
 	},
+	/*
+	Move to serverside
+		originalKey := k.FullKey
+			uri := k.Uri
+			if c.Args().Get(1) != "" && c.Args().Get(2) != "" {
+				uri = strings.Replace(uri, c.Args().Get(1), c.Args().Get(2), -1)
+			}
+			kwklink := ""
+			if c.Args().Get(3) != "" {
+				kwklink = c.Args().Get(3)
+			}
+			k = apiClient.Create(uri, kwklink)
+	 */
 
+	"clone": func(input interface{}) interface{}{
+		k := input.(*api.Alias)
+		if input != nil {
+			fmt.Printf(gui.Colour(gui.LightBlue, "Cloned as %s"), k.FullKey)
+		} else {
+			fmt.Println("Invalid kwklink")
+		}
+		return nil
+	},
 }
