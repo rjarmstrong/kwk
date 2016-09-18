@@ -91,6 +91,35 @@ func Test_Alias(t *testing.T) {
 			})
 		})
 
+		Convey(`Tag`, func() {
+			Convey(`Should run by name`, func() {
+				p := app.App.Command("tag")
+				So(p, should.NotBeNil)
+				p2 := app.App.Command("t")
+				So(p2.Name, should.Equal, p.Name)
+			})
+			Convey(`Should run by name (untag)`, func() {
+				p := app.App.Command("untag")
+				So(p, should.NotBeNil)
+				p2 := app.App.Command("ut")
+				So(p2.Name, should.Equal, p.Name)
+			})
+			Convey(`Should call tag and respond with template`, func() {
+				app.App.Run([]string{"[app]", "tag", "arrows.js", "tag1", "tag2"})
+				So(a.TagCalledWith, should.Resemble, map[string][]string {
+					"arrows.js" : []string{"tag1", "tag2"},
+				})
+				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"tag", &api.Alias{}})
+			})
+			Convey(`Should call untag and respond with template`, func() {
+				app.App.Run([]string{"[app]", "untag", "arrows.js", "tag1", "tag2"})
+				So(a.UnTagCalledWith, should.Resemble, map[string][]string {
+					"arrows.js" : []string{"tag1", "tag2"},
+				})
+				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"untag", &api.Alias{}})
+			})
+		})
+
 		Convey(`Delete`, func() {
 			Convey(`Should run by name`, func() {
 				p := app.App.Command("delete")
