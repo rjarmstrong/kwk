@@ -225,6 +225,20 @@ func Test_Alias(t *testing.T) {
 				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"patch", &api.Alias{FullKey:"arrows.js", Uri:"console.log('patched')"}})
 			})
 		})
+
+		Convey(`List`, func() {
+			Convey(`Should run by name`, func() {
+				p := app.App.Command("list")
+				So(p, should.NotBeNil)
+				p2 := app.App.Command("ls")
+				So(p2.Name, should.Equal, p.Name)
+			})
+			Convey(`Should call list and respond with template`, func() {
+				app.App.Run([]string{"[app]", "list", "3", "5"})
+				So(a.ListCalledWith, should.Resemble, []string{"3", "5"})
+				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"list", &api.AliasList{}})
+			})
+		})
 	})
 }
 

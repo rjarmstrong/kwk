@@ -18,6 +18,7 @@ type ApiMock struct {
 	CloneCalledWith []string
 	TagCalledWith map[string][]string
 	UnTagCalledWith map[string][]string
+	ListCalledWith []string
 }
 
 func (a *ApiMock) PrintProfile() {
@@ -82,4 +83,9 @@ func (a *ApiMock) UnTag(fullKey string, tag ...string) *Alias {
 	m[fullKey] = tag
 	a.UnTagCalledWith = m
 	return &Alias{}
+}
+
+func (a *ApiMock) List(args []string) *AliasList {
+	a.ListCalledWith = args
+	return &AliasList{}
 }

@@ -8,6 +8,9 @@ import (
 	"os"
 	"github.com/kwk-links/kwk-cli/libs/system"
 	"github.com/kwk-links/kwk-cli/libs/api"
+	"strings"
+	"github.com/dustin/go-humanize"
+	"github.com/olekukonko/tablewriter"
 )
 
 var aliasResponses = map[string]gui.Template{
@@ -89,6 +92,64 @@ var aliasResponses = map[string]gui.Template{
 	},
 	"untag": func(input interface{}) interface{}{
 		fmt.Println("UnTagged")
+		return nil
+	},
+	"list": func(input interface{}) interface{}{
+		list := input.(*api.AliasList)
+		fmt.Print(gui.Colour(gui.LightBlue, "\nkwk.co/" + "rjarmstrong/"))
+		fmt.Printf(gui.Build(102, " ") + "%d of %d records\n\n", len(list.Items), list.Total)
+
+		tbl := tablewriter.NewWriter(os.Stdout)
+		tbl.SetHeader([]string{"Alias", "Version", "URI", "Tags", ""})
+		tbl.SetAutoWrapText(false)
+		tbl.SetBorder(false)
+		tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
+		tbl.SetCenterSeparator("")
+		tbl.SetColumnSeparator("")
+		tbl.SetAutoFormatHeaders(false)
+		tbl.SetHeaderLine(true)
+		tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
+
+		for _, v := range list.Items {
+			v.Uri = strings.Replace(v.Uri, "https://", "", 1)
+			v.Uri = strings.Replace(v.Uri, "http://", "", 1)
+			v.Uri = strings.Replace(v.Uri, "www.", "", 1)
+			v.Uri = strings.Replace(v.Uri, "\n", " ", -1)
+			if len(v.Uri) >= 40 {
+				v.Uri = v.Uri[0:10] + gui.Colour(gui.Subdued, "...") + v.Uri[len(v.Uri) - 30:len(v.Uri)]
+			}
+
+			var tags = []string{}
+			for _, v := range v.Tags {
+				if v == "error" {
+					tags = append(tags, gui.Colour(gui.Pink, v))
+				} else {
+					tags = append(tags, v)
+				}
+
+			}
+
+			tbl.Append([]string{
+				gui.Colour(gui.LightBlue, v.Key) + gui.Colour(gui.Subdued, "." + v.Extension),
+				fmt.Sprintf("%d", v.Version),
+				fmt.Sprintf("%s", v.Uri),
+				strings.Join(tags, ", "),
+				humanize.Time(v.Created),
+			})
+
+		}
+		tbl.Render()
+
+		if len(list.Items) == 0 {
+			fmt.Println(gui.Colour(gui.Yellow, "No records on this page! Use a lower page number.\n"))
+		} else {
+			//gui.Colour(gui.Subdued, nextcmd)
+			//nextcmd := fmt.Sprintf("For next page run: kwk list %v", 2)
+		}
+		if list.Size != 0 {
+			fmt.Printf("\n %d of %d pages", list.Page, (list.Total / list.Size) + 1)
+		}
+		fmt.Print("\n\n")
 		return nil
 	},
 }

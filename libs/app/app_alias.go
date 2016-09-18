@@ -102,6 +102,14 @@ func aliasCommands(a api.IApi, s system.ISystem, i gui.IInteraction, o openers.I
 				return nil
 			},
 		},
+		{
+			Name:    "list",
+			Aliases: []string{"ls"},
+			Action:  func(c *cli.Context) error {
+				i.Respond("list", a.List([]string(c.Args())))
+				return nil
+			},
+		},
 
 	}
 	return c

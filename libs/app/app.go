@@ -14,8 +14,9 @@ type KwkApp struct {
 }
 
 func NewKwkApp(a api.IApi, s system.ISystem, i gui.IInteraction, o openers.IOpen) *KwkApp {
-
 	app := cli.NewApp()
+
+	//cli.HelpPrinter = system.Help
 
 	app.Commands = append(app.Commands, accountCommands(a)...)
 	app.Commands = append(app.Commands, systemCommands(s, i)...)
