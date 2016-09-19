@@ -9,6 +9,8 @@ import (
 )
 
 func aliasCommands(a api.IApi, s system.ISystem, i gui.IInteraction, o openers.IOpen) []cli.Command {
+	//m := NewMultiResultPrompt(o, i)
+
 	c := []cli.Command{
 		{
 			Name:    "new",
@@ -57,8 +59,10 @@ func aliasCommands(a api.IApi, s system.ISystem, i gui.IInteraction, o openers.I
 			Name:    "edit",
 			Aliases: []string{"e"},
 			Action:  func(c *cli.Context) error {
-				key := c.Args().First()
-				i.Respond("edit", o.Edit(key))
+				//fullKey := c.Args().First()
+				// := a.Get(fullKey)
+				//m.CheckAndPrompt(fullKey, list, c.Args())
+				//i.Respond("edit", o.Edit(&list.Items[0]))
 				return nil
 			},
 		},

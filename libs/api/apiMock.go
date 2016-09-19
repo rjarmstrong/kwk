@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/kwk-links/kwk-cli/libs/system"
+	"github.com/kwk-links/kwk-cli/libs/models"
 )
 
 type ApiMock struct {
@@ -25,14 +25,14 @@ func (a *ApiMock) PrintProfile() {
 	a.PrintProfileCalled = true
 }
 
-func (a *ApiMock) Login(username string, password string) *system.User {
+func (a *ApiMock) Login(username string, password string) *models.User {
 	a.LoginCalledWith = []string{username, password}
-	return &system.User{}
+	return &models.User{}
 }
 
-func (a *ApiMock) SignUp(email string, username string, password string) *system.User {
+func (a *ApiMock) SignUp(email string, username string, password string) *models.User {
 	a.SignupCalledWith = []string{email, username, password }
-	return &system.User{}
+	return &models.User{}
 }
 
 func (a *ApiMock) Signout() {

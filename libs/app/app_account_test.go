@@ -6,13 +6,15 @@ import (
 	"testing"
 	"github.com/kwk-links/kwk-cli/libs/api"
 	"github.com/kwk-links/kwk-cli/libs/gui"
+	"github.com/kwk-links/kwk-cli/libs/settings"
 )
 
 func Test_App(t *testing.T) {
 	Convey("ACCOUNT COMMANDS", t, func() {
 		a := &api.ApiMock{}
 		w := &gui.Interaction{}
-		app := NewKwkApp(a, nil, w, nil)
+		sett := &settings.SettingsMock{}
+		app := NewKwkApp(a, nil, sett, w, nil)
 
 		Convey(`Profile`, func() {
 			Convey(`Should run by name`, func() {
@@ -21,7 +23,7 @@ func Test_App(t *testing.T) {
 				p2 := app.App.Command("me")
 				So(p2.Name, should.Equal, p.Name)
 			})
-			Convey(`Should call api print profile`, func() {
+			Convey(`Should get profile and respond with template`, func() {
 				app.App.Run([]string{"[app]", "profile"})
 				So(a.PrintProfileCalled, should.BeTrue)
 			})

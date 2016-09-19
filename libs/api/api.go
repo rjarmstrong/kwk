@@ -14,6 +14,8 @@ import (
 	"net/url"
 	"github.com/kwk-links/kwk-cli/libs/gui"
 	"github.com/kwk-links/kwk-cli/libs/system"
+	"github.com/kwk-links/kwk-cli/libs/models"
+	"github.com/kwk-links/kwk-cli/libs/settings"
 )
 
 const (
@@ -23,10 +25,10 @@ const (
 )
 
 type ApiClient struct {
-	Settings *system.Settings
+	Settings settings.ISettings
 }
 
-func New(s *system.Settings) *ApiClient {
+func New(s settings.ISettings) IApi {
 	return &ApiClient{Settings:s}
 }
 
@@ -86,8 +88,8 @@ func (a *ApiClient) List(args []string) *AliasList {
 	return list
 }
 
-func (a *ApiClient) Get(fullKey string) *Alias {
-	k := &Alias{}
+func (a *ApiClient) Get(fullKey string) *AliasList {
+	k := &AliasList{}
 	a.Request("GET", fmt.Sprintf("alias/%s/%s", "richard", url.QueryEscape(fullKey)), "", k)
 	return k
 }
@@ -130,7 +132,7 @@ func (a *ApiClient) Patch(fullKey string, uri string) *Alias {
 	return k
 }
 
-func (a *ApiClient) Login(username string, password string) *system.User {
+func (a *ApiClient) Login(username string, password string) *models.User {
 	if username == "" {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print(gui.Colour(gui.LightBlue, "Your Kwk Username: "))
@@ -145,7 +147,7 @@ func (a *ApiClient) Login(username string, password string) *system.User {
 	}
 
 	body := fmt.Sprintf(`{"username":"%s", "password":"%s"}`, username, password)
-	u := &system.User{}
+	u := &models.User{}
 	a.Request("POST", "users/login", body, u)
 	if len(u.Token) > 50 {
 		a.Settings.Upsert(userDbKey, u)
@@ -155,9 +157,9 @@ func (a *ApiClient) Login(username string, password string) *system.User {
 	return nil
 }
 
-func (a *ApiClient) SignUp(email string, username string, password string) *system.User {
+func (a *ApiClient) SignUp(email string, username string, password string) *models.User {
 	body := fmt.Sprintf(`{"email":"%s", "username":"%s", "password":"%s"}`, email, username, password)
-	u := &system.User{}
+	u := &models.User{}
 	a.Request("POST", "users", body, u)
 	if len(u.Token) > 50 {
 		a.Settings.Upsert(userDbKey, u)
@@ -167,25 +169,31 @@ func (a *ApiClient) SignUp(email string, username string, password string) *syst
 	return nil
 }
 
-func (a *ApiClient) Tag(fullKey string, tags ...string) {
+func (a *ApiClient) Clone(fullKey string, newKey string) *Alias {
+	return nil
+}
+
+func (a *ApiClient) Tag(fullKey string, tags ...string) *Alias {
 	json, _ := json.Marshal(tags)
 	body := fmt.Sprintf(`{"tags":%s}`, json)
 	a.Request("POST", fmt.Sprintf("alias/%s/%s/tag", "richard", url.QueryEscape(fullKey)), body, nil)
+	return nil
 }
 
-func (a *ApiClient) UnTag(fullKey string, tags ...string) {
+func (a *ApiClient) UnTag(fullKey string, tags ...string) *Alias {
 	json, _ := json.Marshal(tags)
 	body := fmt.Sprintf(`{"tags":%s}`, json)
 	a.Request("DELETE", fmt.Sprintf("alias/%s/%s/tag", "richard", url.QueryEscape(fullKey)), body, nil)
+	return nil
 }
 
-func (a *ApiClient) Logout() {
+func (a *ApiClient) Signout() {
 	a.Settings.Delete(userDbKey)
 	fmt.Println("Logged out.")
 }
 
 func (a *ApiClient) PrintProfile() {
-	u := &system.User{}
+	u := &models.User{}
 	err := a.Settings.Get(userDbKey, u)
 	if err != nil {
 		fmt.Println("You are not logged in please log in: kwk login <username> <password>")
@@ -217,7 +225,7 @@ func (a *ApiClient) Request(method string, path string, body string, model inter
 	} else {
 		req, _ = http.NewRequest(method, url, nil)
 	}
-	u := &system.User{}
+	u := &models.User{}
 	if a.Settings.Get(userDbKey, u); u == nil {
 		fmt.Println("You are not logged in.")
 		return

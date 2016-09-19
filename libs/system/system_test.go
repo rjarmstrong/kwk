@@ -9,38 +9,12 @@ import (
 )
 
 func Test_System(t *testing.T) {
-	Convey("Manage settings", t, func() {
-		Convey(`Should create, update, delete and get a setting`, func() {
-			s := NewSettings("test_leveldb")
-			key := "user"
-			expected := User{
-				Email:"richard@kwk.co",
-				Token:"asdfsdfsdfuiu",
-			}
-			s.Upsert(key, expected)
-			actual := &User{}
-			s.Get(key, actual)
-			So(*actual, should.Resemble, expected)
-
-			expectedUpdate := User{
-				Email:"richard@kwk.io",
-				Token:"asdfsdfsdfuiu",
-			}
-			s.Upsert(key, expectedUpdate)
-			s.Get(key, actual)
-			So(*actual, should.Resemble, expectedUpdate)
-
-			err := s.Delete(key)
-			So(err, ShouldBeNil)
-
-			actual = &User{}
-			err = s.Get(key, actual)
-			So(err.Error(), should.Equal, "Not found.")
-		})
+	Convey("System test", t, func() {
+		s := NewSystem()
 
 		Convey(`Should create a directory if not exists`, func() {
 			dir := "test_dir"
-			path, err := GetDirPath(dir)
+			path, err := s.GetDirPath(dir)
 			So(err, ShouldBeNil)
 			So(path, should.Equal, fmt.Sprintf("/Users/%s/Library/Caches/kwk/%s", os.Getenv("USER"), dir))
 			fi, err := os.Stat(path)
@@ -50,13 +24,13 @@ func Test_System(t *testing.T) {
 		})
 
 		Convey(`Should check file exists and not exists`, func() {
-			path, err := WriteToFile(".", "testfile.js", "some text")
+			path, err := s.WriteToFile(".", "testfile.js", "some text")
 			So(err, should.BeNil)
-			ok, err := Exists(path)
+			ok, err := s.Exists(path)
 			So(ok, should.BeTrue)
 			err = os.RemoveAll(path)
 			So(err, should.BeNil)
-			ok, err = Exists(path)
+			ok, err = s.Exists(path)
 			So(ok, should.BeFalse)
 			So(err, should.BeNil)
 		})
@@ -65,13 +39,13 @@ func Test_System(t *testing.T) {
 		Convey(`Should write and read from file`, func() {
 			dir := "test_dir"
 			uri := "git status"
-			path, err := GetDirPath(dir)
+			path, err := s.GetDirPath(dir)
 			fullKey := "test.bash"
-			p, err := WriteToFile(dir, fullKey, uri)
+			p, err := s.WriteToFile(dir, fullKey, uri)
 			So(err, ShouldBeNil)
 			So(p, should.Equal, fmt.Sprintf("/Users/%s/Library/Caches/kwk/%s/%s", os.Getenv("USER"), dir, fullKey))
 
-			txt, err := ReadFromFile(dir, fullKey)
+			txt, err := s.ReadFromFile(dir, fullKey)
 			So(txt, should.Equal, uri)
 
 			err = os.RemoveAll(path)
