@@ -1,6 +1,26 @@
-//print profile
+package controllers
 
-if err != nil {
+import (
+	"github.com/kwk-links/kwk-cli/libs/services/users"
+	"fmt"
+	"github.com/kwk-links/kwk-cli/libs/services/gui"
+	"github.com/kwk-links/kwk-cli/libs/services/settings"
+	"bufio"
+	"os"
+)
+
+type AccountController struct {
+	service users.IUsers
+	settings settings.ISettings
+}
+
+func NewAccountController(u users.IUsers, s settings.ISettings) *AliasController {
+	return &AccountController{service:u, settings:s}
+}
+
+func (c *AccountController) Get(){
+	if u, err := c.service.Get(); err != nil {
+		fmt.Println(err)
 		fmt.Println("You are not logged in please log in: kwk login <username> <password>")
 	} else {
 		fmt.Println("~~~~~~ Your Profile ~~~~~~~~~")
@@ -15,19 +35,24 @@ if err != nil {
 
 		fmt.Printf("Email:      %v\n", u.Email)
 		fmt.Printf("Username:   %v\n", u.Username)
-		fmt.Printf("Host:       %v\n", u.Host)
 		fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 	}
-
-// signing
-if len(u.Token) > 50 {
-		a.Settings.Upsert(userDbKey, u)
-		fmt.Printf("Welcome to kwk %s! You're signed in already.", u.Username)
-		return u
 }
 
-// login
-if username == "" {
+func (c *AccountController) SignUp(email string, username string, password string){
+	if u, err := c.service.SignUp(email, username, password); err != nil {
+		fmt.Println(err)
+	} else {
+		if len(u.Token) > 50 {
+			c.settings.Upsert("me", u)
+			fmt.Printf("Welcome to kwk %s! You're signed in already.", u.Username)
+		}
+	}
+}
+
+
+func (c *AccountController) SignIn(username string, password string){
+	if username == "" {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print(gui.Colour(gui.LightBlue, "Your Kwk Username: "))
 		usernameBytes, _, _ := reader.ReadLine()
@@ -39,12 +64,16 @@ if username == "" {
 		passwordBytes, _, _ := reader.ReadLine()
 		password = string(passwordBytes)
 	}
-
-	body := fmt.Sprintf(`{"username":"%s", "password":"%s"}`, username, password)
-	u := &models.User{}
-	a.Request("POST", "users/login", body, u)
-	if len(u.Token) > 50 {
-		a.Settings.Upsert(userDbKey, u)
-		fmt.Printf("%v signed in!", u.Username)
-		return u
+	if u, err := c.service.SignIn(username, password); err != nil {
+		fmt.Println(err)
+	} else {
+		if len(u.Token) > 50 {
+			c.settings.Upsert("me", u)
+			fmt.Printf("Welcome back %s!", u.Username)
+		}
 	}
+}
+
+func (c *AccountController) SignOut(){
+	c.settings.Delete("me")
+}

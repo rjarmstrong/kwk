@@ -4,9 +4,9 @@ import "time"
 
 type AliasList struct {
 	Items []Alias `json:"items"`
-	Total int `json:"total"`
-	Page  int `json:"page"`
-	Size  int `json:"size"`
+	Total int32 `json:"total"`
+	Page  int32 `json:"page"`
+	Size  int32 `json:"size"`
 }
 
 type Alias struct {
@@ -18,7 +18,7 @@ type Alias struct {
 	Extension string `json:"extension"`
 
 	Uri       string `json:"uri"`
-	Version   int `json:"version"`
+	Version   int32 `json:"version"`
 	Runtime   string `json:"runtime"`
 	Media     string `json:"media"`
 	Tags      []string `json:"tags"`

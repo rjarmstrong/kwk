@@ -1,7 +1,6 @@
 package aliases
 
 import (
-	"strconv"
 	"github.com/kwk-links/kwk-cli/libs/services/settings"
 	"bitbucket.com/sharingmachine/kwkweb/rpc/aliasesRpc"
 	"github.com/kwk-links/kwk-cli/libs/rpc"
@@ -21,21 +20,8 @@ func New(s settings.ISettings) IAliases {
 	return &Aliases{Settings:s}
 }
 
-func (a *Aliases) List(args []string) (*models.AliasList, error) {
-	var page, size int
-	var tags = []string{}
-	for _, v := range args {
-		if num, err := strconv.Atoi(v); err == nil {
-			if page == 0 {
-				page = num
-			} else {
-				size = num
-			}
-		} else {
-			tags = append(tags, v)
-		}
-	}
-	if res, err := a.client.List(a.GetContext(), &aliasesRpc.ListRequest{Username:"richard", Page:page, Size:size, Tags:tags}); err != nil {
+func (a *Aliases) List(username string, page int32, size int32, tags ...string) (*models.AliasList, error) {
+	if res, err := a.client.List(a.GetContext(), &aliasesRpc.ListRequest{Username:username, Page:page, Size:size, Tags:tags}); err != nil {
 		return nil, err
 	} else {
 		list := &models.AliasList{}
@@ -45,13 +31,12 @@ func (a *Aliases) List(args []string) (*models.AliasList, error) {
 }
 
 func (a *Aliases) Get(fullKey string) (*models.AliasList, error) {
-
 	if res, err := a.client.Get(a.GetContext(), &aliasesRpc.GetRequest{FullKey:fullKey}); err != nil {
 		return nil, err
 	} else {
 		list := &models.AliasList{}
 		mapAliasList(res, list)
-		return list
+		return list, nil
 	}
 }
 
@@ -90,7 +75,7 @@ func (a *Aliases) Patch(fullKey string, uri string) (*models.Alias, error) {
 	}
 }
 
-func (a *Aliases) Clone(fullKey string, newFullKey string) *models.Alias {
+func (a *Aliases) Clone(fullKey string, newFullKey string) (*models.Alias, error) {
 	if res, err := a.client.Clone(a.GetContext(), &aliasesRpc.CloneRequest{FullKey:fullKey, NewFullKey:newFullKey}); err != nil {
 		return nil, err
 	} else {
@@ -100,7 +85,7 @@ func (a *Aliases) Clone(fullKey string, newFullKey string) *models.Alias {
 	}
 }
 
-func (a *Aliases) Tag(fullKey string, tags ...string) *models.Alias {
+func (a *Aliases) Tag(fullKey string, tags ...string) (*models.Alias, error) {
 	if res, err := a.client.Tag(a.GetContext(), &aliasesRpc.TagRequest{FullKey:fullKey, Tags:tags}); err != nil {
 		return nil, err
 	} else {
@@ -110,7 +95,7 @@ func (a *Aliases) Tag(fullKey string, tags ...string) *models.Alias {
 	}
 }
 
-func (a *Aliases) UnTag(fullKey string, tags ...string) *models.Alias {
+func (a *Aliases) UnTag(fullKey string, tags ...string)(*models.Alias, error) {
 	if res, err := a.client.UnTag(a.GetContext(), &aliasesRpc.UnTagRequest{FullKey:fullKey, Tags:tags}); err != nil {
 		return nil, err
 	} else {
@@ -142,8 +127,8 @@ func mapAliasList(rpc *aliasesRpc.AliasListResponse, model *models.AliasList) {
 	model.Page = rpc.Page
 	for _, v := range rpc.Items {
 		item := &models.Alias{}
-		mapAlias(&v, item)
-		model.Items = append(model.Items, item)
+		mapAlias(v, item)
+		model.Items = append(model.Items, *item)
 	}
 	model.Size = rpc.Size
 }

@@ -29,8 +29,8 @@ func main() {
 	// Move project to bitbucket path
 
 	conn := rpc.Conn("127.0.0.1:7777");
-	users := users.New(conn)
-	u, err := users.SignIn("dilld", "D1llbuck")
+	usrs := users.New(conn)
+	u, err := usrs.SignIn("dilld", "D1llbuck")
 	if err != nil {
 		panic(err)
 	}

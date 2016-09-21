@@ -1,25 +1,17 @@
-package app
+package routes
 
-import  (
+import (
 	"gopkg.in/urfave/cli.v1"
-	"github.com/kwk-links/kwk-cli/libs/services/gui"
-	"github.com/kwk-links/kwk-cli/libs/services/aliases"
-	"github.com/kwk-links/kwk-cli/libs/services/system"
-	"github.com/kwk-links/kwk-cli/libs/services/openers"
+	"github.com/kwk-links/kwk-cli/libs/controllers"
 )
 
-func aliasCommands(a aliases.IAliases, s system.ISystem, i gui.IInteraction, o openers.IOpen) []cli.Command {
-	//m := NewMultiResultPrompt(o, i)
-
+func Alias(ctrl controllers.AliasController) []cli.Command {
 	c := []cli.Command{
 		{
 			Name:    "new",
 			Aliases: []string{"create", "save"},
 			Action:  func(c *cli.Context) error {
-				if k := a.Create(c.Args().Get(0), c.Args().Get(1)); k != nil {
-					s.CopyToClipboard(k.FullKey)
-					i.Respond("new", k)
-				}
+				ctrl.New(c.Args().Get(0), c.Args().Get(1))
 				return nil
 			},
 		},
@@ -27,7 +19,7 @@ func aliasCommands(a aliases.IAliases, s system.ISystem, i gui.IInteraction, o o
 			Name:    "inspect",
 			Aliases: []string{"i"},
 			Action: func(c *cli.Context) error {
-				i.Respond("inspect", a.Get(c.Args().First()))
+				ctrl.Inspect(c.Args().First())
 				return nil
 			},
 		},
@@ -35,7 +27,7 @@ func aliasCommands(a aliases.IAliases, s system.ISystem, i gui.IInteraction, o o
 			Name:    "cat",
 			Aliases: []string{"raw", "read", "print", "get"},
 			Action:  func(c *cli.Context) error {
-				i.Respond("cat", a.Get(c.Args().First()))
+				ctrl.Cat(c.Args().First())
 				return nil
 			},
 		},
@@ -43,7 +35,7 @@ func aliasCommands(a aliases.IAliases, s system.ISystem, i gui.IInteraction, o o
 			Name:    "rename",
 			Aliases: []string{"mv"},
 			Action:  func(c *cli.Context) error {
-				i.Respond("rename", a.Rename(c.Args().Get(0), c.Args().Get(1)))
+				ctrl.Rename(c.Args().Get(0), c.Args().Get(1))
 				return nil
 			},
 		},
@@ -51,7 +43,7 @@ func aliasCommands(a aliases.IAliases, s system.ISystem, i gui.IInteraction, o o
 			Name:    "clone",
 			Aliases: []string{},
 			Action:  func(c *cli.Context) error {
-				i.Respond("clone", a.Clone(c.Args().First(), c.Args().Get(1)))
+				ctrl.Clone(c.Args().First(), c.Args().Get(1))
 				return nil
 			},
 		},
@@ -59,10 +51,7 @@ func aliasCommands(a aliases.IAliases, s system.ISystem, i gui.IInteraction, o o
 			Name:    "edit",
 			Aliases: []string{"e"},
 			Action:  func(c *cli.Context) error {
-				//fullKey := c.Args().First()
-				// := a.Get(fullKey)
-				//m.CheckAndPrompt(fullKey, list, c.Args())
-				//i.Respond("edit", o.Edit(&list.Items[0]))
+				ctrl.Edit(c.Args().First())
 				return nil
 			},
 		},
@@ -70,7 +59,7 @@ func aliasCommands(a aliases.IAliases, s system.ISystem, i gui.IInteraction, o o
 			Name:    "patch",
 			Aliases: []string{"patch"},
 			Action:  func(c *cli.Context) error {
-				i.Respond("patch", a.Patch(c.Args().First(), c.Args()[1]))
+				ctrl.Patch(c.Args().First(), c.Args()[1])
 				return nil
 			},
 		},
@@ -78,13 +67,7 @@ func aliasCommands(a aliases.IAliases, s system.ISystem, i gui.IInteraction, o o
 			Name:    "delete",
 			Aliases: []string{"rm"},
 			Action:  func(c *cli.Context) error {
-				fullKey := c.Args().First()
-				if i.Respond("delete", fullKey).(bool) {
-					a.Delete(fullKey)
-					i.Respond("deleted", fullKey)
-				} else {
-					i.Respond("notdeleted", fullKey)
-				}
+				ctrl.Delete(c.Args().First())
 				return nil
 			},
 		},
@@ -93,7 +76,7 @@ func aliasCommands(a aliases.IAliases, s system.ISystem, i gui.IInteraction, o o
 			Aliases: []string{"t"},
 			Action:  func(c *cli.Context) error {
 				args := []string(c.Args())
-				i.Respond("tag", a.Tag(args[0], args[1:]...))
+				ctrl.Tag(args[0], args[1:]...)
 				return nil
 			},
 		},
@@ -102,7 +85,7 @@ func aliasCommands(a aliases.IAliases, s system.ISystem, i gui.IInteraction, o o
 			Aliases: []string{"ut"},
 			Action:  func(c *cli.Context) error {
 				args := []string(c.Args())
-				i.Respond("untag", a.UnTag(args[0], args[1:]...))
+				ctrl.UnTag(args[0], args[1:]...)
 				return nil
 			},
 		},
@@ -110,7 +93,7 @@ func aliasCommands(a aliases.IAliases, s system.ISystem, i gui.IInteraction, o o
 			Name:    "list",
 			Aliases: []string{"ls"},
 			Action:  func(c *cli.Context) error {
-				i.Respond("list", a.List([]string(c.Args())))
+				ctrl.List(c.Args())
 				return nil
 			},
 		},

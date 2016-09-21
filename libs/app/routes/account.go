@@ -1,17 +1,17 @@
-package app
+package routes
 
 import (
 	"gopkg.in/urfave/cli.v1"
-	"github.com/kwk-links/kwk-cli/libs/services/users"
+	"github.com/kwk-links/kwk-cli/libs/controllers"
 )
 
-func accountCommands(u users.IUsers) []cli.Command {
+func Accounts(ctrl controllers.AccountController) []cli.Command {
 	c := []cli.Command{
 		{
 			Name:    "profile",
 			Aliases: []string{"me"},
 			Action: func(c *cli.Context) error {
-				u.Get()
+				ctrl.Get()
 				return nil
 			},
 		},
@@ -19,7 +19,7 @@ func accountCommands(u users.IUsers) []cli.Command {
 			Name:    "signin",
 			Aliases: []string{"login"},
 			Action:  func(c *cli.Context) error {
-				u.Login(c.Args().Get(0), c.Args().Get(1))
+				ctrl.SignIn(c.Args().Get(0), c.Args().Get(1))
 				return nil
 			},
 		},
@@ -27,7 +27,7 @@ func accountCommands(u users.IUsers) []cli.Command {
 			Name:    "signup",
 			Aliases: []string{"register"},
 			Action:  func(c *cli.Context) error {
-				u.SignUp(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2));
+				ctrl.SignUp(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2));
 				return nil
 			},
 		},
@@ -35,7 +35,7 @@ func accountCommands(u users.IUsers) []cli.Command {
 			Name:    "signout",
 			Aliases: []string{"logout"},
 			Action:  func(c *cli.Context) error {
-				u.Signout();
+				ctrl.SignOut();
 				return nil
 			},
 		},

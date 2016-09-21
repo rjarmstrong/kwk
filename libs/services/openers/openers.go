@@ -49,24 +49,26 @@ func (o *Opener) Edit(alias *models.Alias) error {
 	if text, err := o.system.ReadFromFile(filecache, alias.FullKey); err != nil {
 		return err
 	} else {
-		alias = o.aliases.Patch(alias.FullKey, text)
+		if alias, err = o.aliases.Patch(alias.FullKey, text); err != nil {
+			return err
+		}
 		fmt.Println(gui.Colour(gui.LightBlue, "Successfully updated " + alias.FullKey))
 		return nil
 	}
 }
 
-func (o *Opener) Open(alias *models.Alias, args []string) {
+func (o *Opener) Open(alias *models.Alias, args []string) error {
 
 	if args[0] == "covert" {
 		o.OpenCovert(alias.Uri)
-		return
+		return nil
 	}
 
 	uri := alias.Uri
 	iterationCount += 1
 	if iterationCount > 3 {
 		fmt.Println("Max recursion reached.")
-		return
+		return nil
 	}
 	//printUri(link.Uri)
 
@@ -80,26 +82,26 @@ func (o *Opener) Open(alias *models.Alias, args []string) {
 		}
 		if alias.Runtime == "bash" {
 			o.system.ExecSafe("/bin/bash", append([]string{"-c", alias.Uri}, args...)...)
-			return
+			return nil
 		}
 		if alias.Runtime == "nodejs" {
 			args = append([]string{uri}, args...)
 			// -r (require flag)
 			o.system.ExecSafe("node", append([]string{"-e"}, args...)...)
-			return
+			return nil
 		}
 		if alias.Runtime == "python" {
 			args = append([]string{uri}, args...)
 			o.system.ExecSafe("python", append([]string{"-c"}, args...)...)
-			return
+			return nil
 		}
 		if alias.Runtime == "php" {
 			args = append([]string{uri}, args...)
 			o.system.ExecSafe("php", append([]string{"-r"}, args...)...)
-			return
+			return nil
 		}
 		if alias.Runtime == "csharp" {
-			return
+			return nil
 		}
 		if alias.Runtime == "golang" {
 			// check if file exists
@@ -122,7 +124,7 @@ func (o *Opener) Open(alias *models.Alias, args []string) {
 			// run it
 			// args
 			//system.ExecSafe(file)
-			return
+			return nil
 		}
 		if alias.Runtime == "scala" {
 			// scalac HelloWorld.scala
@@ -139,7 +141,7 @@ func (o *Opener) Open(alias *models.Alias, args []string) {
 			// run it
 			// args
 			//system.ExecSafe("java", key .class)
-			return
+			return nil
 		}
 
 	}
@@ -151,21 +153,25 @@ func (o *Opener) Open(alias *models.Alias, args []string) {
 			firstArg := args[1]
 			if firstArg == "upgrade" {
 				o.system.Upgrade()
-				return
+				return nil
 			}
-			alias := o.aliases.Get(firstArg)
-			if alias.Total == 1 {
-				o.Open(&alias.Items[0], args)
-			} else if alias.Total > 1 {
-				fmt.Println("More than one option please give a file extension.")
+			if alias, err := o.aliases.Get(firstArg); err != nil {
+				return err
 			} else {
-				fmt.Printf(gui.Colour(gui.Yellow, "Can't run sub-command: '%s' - has it been deleted?\n"), v)
+				if alias.Total == 1 {
+					o.Open(&alias.Items[0], args)
+				} else if alias.Total > 1 {
+					fmt.Println("More than one option please give a file extension.")
+				} else {
+					fmt.Printf(gui.Colour(gui.Yellow, "Can't run sub-command: '%s' - has it been deleted?\n"), v)
+				}
 			}
 
 		} else {
 			o.system.ExecSafe("/bin/bash", "-c", v)
 		}
 	}
+	return nil
 }
 
 func (o *Opener) OpenCovert(uri string) {

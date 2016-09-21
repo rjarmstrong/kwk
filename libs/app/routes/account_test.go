@@ -1,4 +1,4 @@
-package app
+package routes
 
 import (
 	. "github.com/smartystreets/goconvey/convey"
@@ -7,6 +7,7 @@ import (
 	"github.com/kwk-links/kwk-cli/libs/services/gui"
 	"github.com/kwk-links/kwk-cli/libs/services/settings"
 	"github.com/kwk-links/kwk-cli/libs/services/users"
+	"github.com/kwk-links/kwk-cli/libs/app"
 )
 
 func Test_App(t *testing.T) {
@@ -14,30 +15,30 @@ func Test_App(t *testing.T) {
 		u := &users.UsersMock{}
 		w := &gui.Interaction{}
 		sett := &settings.SettingsMock{}
-		app := NewKwkApp(u, nil, sett, w, nil)
+		appl := app.NewKwkApp(u, nil, sett, w, nil)
 
 		Convey(`Profile`, func() {
 			Convey(`Should run by name`, func() {
-				p := app.App.Command("profile")
+				p := appl.App.Command("profile")
 				So(p, should.NotBeNil)
-				p2 := app.App.Command("me")
+				p2 := appl.App.Command("me")
 				So(p2.Name, should.Equal, p.Name)
 			})
 			Convey(`Should get profile and respond with template`, func() {
-				app.App.Run([]string{"[app]", "profile"})
+				appl.App.Run([]string{"[app]", "profile"})
 				So(u.GetCalled, should.BeTrue)
 			})
 		})
 
 		Convey(`Signin`, func() {
 			Convey(`Should run by name`, func() {
-				p := app.App.Command("signin")
+				p := appl.App.Command("signin")
 				So(p, should.NotBeNil)
-				p2 := app.App.Command("login")
+				p2 := appl.App.Command("login")
 				So(p2.Name, should.Equal, p.Name)
 			})
 			Convey(`Should call api signin`, func() {
-				app.App.Run([]string{"[app]", "signin", "richard", "password"})
+				appl.App.Run([]string{"[app]", "signin", "richard", "password"})
 				So(u.LoginCalledWith[0], should.Equal, "richard")
 				So(u.LoginCalledWith[1], should.Equal, "password")
 			})
@@ -45,13 +46,13 @@ func Test_App(t *testing.T) {
 
 		Convey(`Signup`, func() {
 			Convey(`Should run by name`, func() {
-				p := app.App.Command("signup")
+				p := appl.App.Command("signup")
 				So(p, should.NotBeNil)
-				p2 := app.App.Command("register")
+				p2 := appl.App.Command("register")
 				So(p2.Name, should.Equal, p.Name)
 			})
 			Convey(`Should call api signup`, func() {
-				app.App.Run([]string{"[app]", "signup", "richard@kwk.co", "richard", "password"})
+				appl.App.Run([]string{"[app]", "signup", "richard@kwk.co", "richard", "password"})
 				So(u.SignupCalledWith[0], should.Equal, "richard@kwk.co")
 				So(u.SignupCalledWith[1], should.Equal, "richard")
 				So(u.SignupCalledWith[2], should.Equal, "password")
@@ -60,13 +61,13 @@ func Test_App(t *testing.T) {
 
 		Convey(`Signout`, func() {
 			Convey(`Should run by name`, func() {
-				p := app.App.Command("signout")
+				p := appl.App.Command("signout")
 				So(p, should.NotBeNil)
-				p2 := app.App.Command("logout")
+				p2 := appl.App.Command("logout")
 				So(p2.Name, should.Equal, p.Name)
 			})
 			Convey(`Should call api signout`, func() {
-				app.App.Run([]string{"[app]", "signout"})
+				appl.App.Run([]string{"[app]", "signout"})
 				So(u.SignoutCalled, should.BeTrue)
 			})
 		})

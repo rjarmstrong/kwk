@@ -1,4 +1,4 @@
-package app
+package routes
 
 import (
 	. "github.com/smartystreets/goconvey/convey"
@@ -7,6 +7,7 @@ import (
 	"github.com/kwk-links/kwk-cli/libs/services/system"
 	"github.com/kwk-links/kwk-cli/libs/services/gui"
 	"github.com/kwk-links/kwk-cli/libs/services/settings"
+	"github.com/kwk-links/kwk-cli/libs/app"
 )
 
 func Test_System(t *testing.T) {
@@ -14,26 +15,26 @@ func Test_System(t *testing.T) {
 		s := &system.SystemMock{}
 		i := &gui.InteractionMock{}
 		sett := &settings.SettingsMock{}
-		app := NewKwkApp(nil, s, sett, i, nil)
+		appl := app.NewKwkApp(nil, s, sett, i, nil)
 
 		Convey(`Upgrade`, func() {
 			Convey(`Should run by name`, func() {
-				p := app.App.Command("upgrade")
+				p := appl.App.Command("upgrade")
 				So(p, should.NotBeNil)
 			})
 			Convey(`Should call upgrade`, func() {
-				app.App.Run([]string{"[app]", "upgrade"})
+				appl.App.Run([]string{"[app]", "upgrade"})
 				So(s.UpgradeCalled, should.BeTrue)
 			})
 		})
 
 		Convey(`Version`, func() {
 			Convey(`Should run by name`, func() {
-				p := app.App.Command("version")
+				p := appl.App.Command("version")
 				So(p, should.NotBeNil)
 			})
 			Convey(`Should get version and call writer print`, func() {
-				app.App.Run([]string{"[app]", "version"})
+				appl.App.Run([]string{"[app]", "version"})
 				So(s.VersionCalled, should.BeTrue)
 				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"version", "0.0.1"})
 			})
@@ -41,11 +42,11 @@ func Test_System(t *testing.T) {
 
 		Convey(`CD`, func() {
 			Convey(`Should run by name`, func() {
-				p := app.App.Command("cd")
+				p := appl.App.Command("cd")
 				So(p, should.NotBeNil)
 			})
 			Convey(`Should change directory`, func() {
-				app.App.Run([]string{"[app]", "cd", "dillbuck"})
+				appl.App.Run([]string{"[app]", "cd", "dillbuck"})
 				So(sett.ChangeDirectoryCalledWith, should.Equal, "dillbuck")
 				So(i.LastRespondCalledWith, should.Resemble, []interface{}{"cd", "dillbuck"})
 			})

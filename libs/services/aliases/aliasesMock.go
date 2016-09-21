@@ -17,7 +17,7 @@ type AliasesMock struct {
 
 func (a *AliasesMock) Get(fullKey string) *models.AliasList {
 	a.GetCalledWith = fullKey
-	return &models.AliasList{Items:a.ReturnItemsForGet, Total:len(a.ReturnItemsForGet)}
+	return &models.AliasList{Items:a.ReturnItemsForGet, Total:int32(len(a.ReturnItemsForGet))}
 }
 
 func (a *AliasesMock) Create(uri string, fullKey string) *models.Alias {
