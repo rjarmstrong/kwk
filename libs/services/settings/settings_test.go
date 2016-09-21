@@ -11,8 +11,8 @@ import (
 func Test_System(t *testing.T) {
 	Convey("Settings test", t, func() {
 		Convey(`Should create, update, delete and get a setting`, func() {
-			sys := system.NewSystem()
-			s := NewSettings(sys, "test_leveldb")
+			sys := system.New()
+			s := New(sys, "test_leveldb")
 			key := "user"
 			expected := models.User{
 				Email:"richard@kwk.co",

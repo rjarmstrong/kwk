@@ -5,7 +5,7 @@ import (
 	"github.com/kwk-links/kwk-cli/libs/controllers"
 )
 
-func Accounts(ctrl controllers.AccountController) []cli.Command {
+func Accounts(ctrl *controllers.AccountController) []cli.Command {
 	c := []cli.Command{
 		{
 			Name:    "profile",

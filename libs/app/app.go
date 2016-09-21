@@ -24,7 +24,7 @@ func NewKwkApp(a aliases.IAliases, s system.ISystem, settings settings.ISettings
 	accCtrl := controllers.NewAccountController(u, settings)
 	app.Commands = append(app.Commands, routes.Accounts(accCtrl)...)
 
-	sysCtrl := controllers.NewSystemController(s)
+	sysCtrl := controllers.NewSystemController(s, u)
 	app.Commands = append(app.Commands, routes.System(sysCtrl)...)
 
 	aliasCtrl := controllers.NewAliasController(a, o)

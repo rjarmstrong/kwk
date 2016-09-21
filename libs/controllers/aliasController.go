@@ -109,7 +109,7 @@ func (a *AliasController) Rename(fullKey string, newKey string){
 
 
 func (a *AliasController) Tag(fullKey string, tags ...string){
-	if alias, err := a.service.Tag(fullKey, tags); err != nil {
+	if alias, err := a.service.Tag(fullKey, tags...); err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Printf(gui.Colour(gui.LightBlue, "Tagged %s"), alias.FullKey)
@@ -117,7 +117,7 @@ func (a *AliasController) Tag(fullKey string, tags ...string){
 }
 
 func (a *AliasController) UnTag(fullKey string, tags ...string){
-	if alias, err := a.service.UnTag(fullKey, tags); err != nil {
+	if alias, err := a.service.UnTag(fullKey, tags...); err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Printf(gui.Colour(gui.LightBlue, "UnTagged %s"), alias.FullKey)
@@ -139,7 +139,7 @@ func (a *AliasController) List(args ...string){
 		}
 	}
 
-	if list, err := a.service.List("richard", page, size, tags); err != nil {
+	if list, err := a.service.List("richard", page, size, tags...); err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Print(gui.Colour(gui.LightBlue, "\nkwk.co/" + "rjarmstrong/"))
@@ -216,5 +216,5 @@ func (a *AliasController) handleMultiResponse(fullKey string, list *models.Alias
 //"notfound" : func(input interface{}) interface{}{
 //	fmt.Printf(gui.Colour(gui.Yellow, "kwklink: '%s' not found\n"), input)
 //	return nil
-/*
+//
 

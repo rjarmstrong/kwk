@@ -5,7 +5,7 @@ import (
 	"github.com/kwk-links/kwk-cli/libs/controllers"
 )
 
-func Alias(ctrl controllers.AliasController) []cli.Command {
+func Alias(ctrl *controllers.AliasController) []cli.Command {
 	c := []cli.Command{
 		{
 			Name:    "new",
@@ -93,7 +93,7 @@ func Alias(ctrl controllers.AliasController) []cli.Command {
 			Name:    "list",
 			Aliases: []string{"ls"},
 			Action:  func(c *cli.Context) error {
-				ctrl.List(c.Args())
+				ctrl.List([]string(c.Args())...)
 				return nil
 			},
 		},

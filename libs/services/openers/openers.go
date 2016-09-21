@@ -20,7 +20,7 @@ type Opener struct {
 	system  system.ISystem
 }
 
-func NewOpener(system system.ISystem, aliases aliases.IAliases) *Opener {
+func New(system system.ISystem, aliases aliases.IAliases) *Opener {
 	return &Opener{aliases:aliases, system:system}
 }
 

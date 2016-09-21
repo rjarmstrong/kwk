@@ -14,7 +14,7 @@ import (
 	"github.com/atotto/clipboard"
 )
 
-func NewSystem() ISystem {
+func New() ISystem {
 	return &System{}
 }
 

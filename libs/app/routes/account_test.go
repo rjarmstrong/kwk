@@ -13,9 +13,8 @@ import (
 func Test_App(t *testing.T) {
 	Convey("ACCOUNT COMMANDS", t, func() {
 		u := &users.UsersMock{}
-		w := &gui.Interaction{}
 		sett := &settings.SettingsMock{}
-		appl := app.NewKwkApp(u, nil, sett, w, nil)
+		appl := app.NewKwkApp(u, nil, sett, nil, nil)
 
 		Convey(`Profile`, func() {
 			Convey(`Should run by name`, func() {

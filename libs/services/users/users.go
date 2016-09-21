@@ -5,6 +5,7 @@ import (
 	"google.golang.org/grpc"
 	"github.com/kwk-links/kwk-cli/libs/rpc"
 	"github.com/kwk-links/kwk-cli/libs/models"
+	"github.com/kwk-links/kwk-cli/libs/services/settings"
 )
 
 const (
@@ -13,11 +14,12 @@ const (
 
 type Users struct {
 	client usersRpc.UsersRpcClient
+	settings settings.ISettings
 	rpc.Headers
 }
 
-func New(conn *grpc.ClientConn) *Users {
-	return &Users{client:usersRpc.NewUsersRpcClient(conn)}
+func New(conn *grpc.ClientConn, s settings.ISettings) *Users {
+	return &Users{client:usersRpc.NewUsersRpcClient(conn), settings:s}
 }
 
 func (u *Users) SignIn(username string, password string) (*models.User, error) {
@@ -41,9 +43,12 @@ func (u *Users) SignUp(email string, username string, password string) (*models.
 }
 
 func (u *Users) Get() (*models.User, error) {
-	//err := a.Settings.Get(userDbKey, u)
-	return nil, nil
-	// map
+	user := &models.User{}
+	if err := u.settings.Get(userDbKey, user); err != nil {
+		return nil, err
+	} else {
+		return user, nil
+	}
 }
 
 func (u *Users) Signout() {

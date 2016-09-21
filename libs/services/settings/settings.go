@@ -10,7 +10,7 @@ type Settings struct {
 	System        system.ISystem
 }
 
-func NewSettings(system system.ISystem, directoryName string) *Settings {
+func New(system system.ISystem, directoryName string) *Settings {
 	return &Settings{DirectoryName: directoryName, System:system}
 }
 

@@ -5,6 +5,6 @@ import (
 )
 
 type IOpen interface {
-	Open(alias *models.Alias, args []string)
+	Open(alias *models.Alias, args []string) error
 	Edit(alias *models.Alias) error
 }

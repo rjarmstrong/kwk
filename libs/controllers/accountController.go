@@ -14,7 +14,7 @@ type AccountController struct {
 	settings settings.ISettings
 }
 
-func NewAccountController(u users.IUsers, s settings.ISettings) *AliasController {
+func NewAccountController(u users.IUsers, s settings.ISettings) *AccountController {
 	return &AccountController{service:u, settings:s}
 }
 

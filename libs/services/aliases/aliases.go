@@ -6,6 +6,7 @@ import (
 	"github.com/kwk-links/kwk-cli/libs/rpc"
 	"github.com/kwk-links/kwk-cli/libs/models"
 	"time"
+	"google.golang.org/grpc"
 )
 
 const TimeLayout = time.RFC3339
@@ -16,8 +17,8 @@ type Aliases struct {
 	rpc.Headers
 }
 
-func New(s settings.ISettings) IAliases {
-	return &Aliases{Settings:s}
+func New(conn *grpc.ClientConn, s settings.ISettings) IAliases {
+	return &Aliases{Settings:s, client:aliasesRpc.NewAliasesRpcClient(conn)}
 }
 
 func (a *Aliases) List(username string, page int32, size int32, tags ...string) (*models.AliasList, error) {
