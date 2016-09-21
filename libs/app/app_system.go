@@ -2,9 +2,9 @@ package app
 
 import (
 	"gopkg.in/urfave/cli.v1"
-	"github.com/kwk-links/kwk-cli/libs/gui"
-	"github.com/kwk-links/kwk-cli/libs/system"
-	"github.com/kwk-links/kwk-cli/libs/settings"
+	"github.com/kwk-links/kwk-cli/libs/services/gui"
+	"github.com/kwk-links/kwk-cli/libs/services/system"
+	"github.com/kwk-links/kwk-cli/libs/services/settings"
 )
 
 func systemCommands(s system.ISystem, settings settings.ISettings, w gui.IInteraction) []cli.Command {

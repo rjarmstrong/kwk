@@ -5,7 +5,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 	"testing"
 	"github.com/kwk-links/kwk-cli/libs/models"
-	"github.com/kwk-links/kwk-cli/libs/system"
+	"github.com/kwk-links/kwk-cli/libs/services/system"
 )
 
 func Test_System(t *testing.T) {

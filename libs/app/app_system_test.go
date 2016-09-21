@@ -4,9 +4,9 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/smartystreets/assertions/should"
 	"testing"
-	"github.com/kwk-links/kwk-cli/libs/system"
-	"github.com/kwk-links/kwk-cli/libs/gui"
-	"github.com/kwk-links/kwk-cli/libs/settings"
+	"github.com/kwk-links/kwk-cli/libs/services/system"
+	"github.com/kwk-links/kwk-cli/libs/services/gui"
+	"github.com/kwk-links/kwk-cli/libs/services/settings"
 )
 
 func Test_System(t *testing.T) {

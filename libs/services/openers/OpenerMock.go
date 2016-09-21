@@ -1,18 +1,18 @@
 package openers
 
-import "github.com/kwk-links/kwk-cli/libs/api"
+import "github.com/kwk-links/kwk-cli/libs/models"
 
 type OpenerMock struct {
 	OpenCalledWith []interface{}
-	EditCalledWith *api.Alias
+	EditCalledWith *models.Alias
 	EditError error
 }
 
-func (o *OpenerMock) Open(alias *api.Alias, args []string) {
+func (o *OpenerMock) Open(alias *models.Alias, args []string) {
 	o.OpenCalledWith = []interface{}{alias, args}
 }
 
-func (o *OpenerMock) Edit(alias *api.Alias) error {
+func (o *OpenerMock) Edit(alias *models.Alias) error {
 	o.EditCalledWith = alias
 	if o.EditError != nil {
 		return o.EditError

@@ -3,14 +3,14 @@ package app
 import (
 	"fmt"
 	"time"
-	"github.com/kwk-links/kwk-cli/libs/gui"
+	"github.com/kwk-links/kwk-cli/libs/services/gui"
 	"bufio"
 	"os"
-	"github.com/kwk-links/kwk-cli/libs/system"
-	"github.com/kwk-links/kwk-cli/libs/api"
+	"github.com/kwk-links/kwk-cli/libs/services/system"
 	"strings"
 	"github.com/dustin/go-humanize"
 	"github.com/olekukonko/tablewriter"
+	"github.com/kwk-links/kwk-cli/libs/models"
 )
 
 var aliasResponses = map[string]gui.Template{
@@ -23,12 +23,12 @@ var aliasResponses = map[string]gui.Template{
 		return nil
 	},
 	"new" : func(input interface{}) interface{}{
-		k := input.(*api.Alias)
+		k := input.(*models.Alias)
 		fmt.Println(k.FullKey)
 		return nil
 	},
 	"cat" : func(input interface{}) interface{}{
-		k := input.(*api.AliasList)
+		k := input.(*models.AliasList)
 		fmt.Println(k)
 		return nil
 	},
@@ -38,7 +38,7 @@ var aliasResponses = map[string]gui.Template{
 	},
 	"patch" : func(input interface{}) interface{}{
 		if input != nil {
-			k := input.(*api.Alias)
+			k := input.(*models.Alias)
 			fmt.Printf(gui.Colour(gui.LightBlue, "Patched %s"), k.FullKey)
 		} else {
 			fmt.Println("Invalid kwklink")
@@ -78,7 +78,7 @@ var aliasResponses = map[string]gui.Template{
 	 */
 
 	"clone": func(input interface{}) interface{}{
-		k := input.(*api.Alias)
+		k := input.(*models.Alias)
 		if input != nil {
 			fmt.Printf(gui.Colour(gui.LightBlue, "Cloned as %s"), k.FullKey)
 		} else {
@@ -95,7 +95,7 @@ var aliasResponses = map[string]gui.Template{
 		return nil
 	},
 	"list": func(input interface{}) interface{}{
-		list := input.(*api.AliasList)
+		list := input.(*models.AliasList)
 		fmt.Print(gui.Colour(gui.LightBlue, "\nkwk.co/" + "rjarmstrong/"))
 		fmt.Printf(gui.Build(102, " ") + "%d of %d records\n\n", len(list.Items), list.Total)
 

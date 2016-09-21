@@ -1,13 +1,14 @@
 package openers
 
 import (
-	"github.com/kwk-links/kwk-cli/libs/system"
+	"github.com/kwk-links/kwk-cli/libs/services/system"
 	"strings"
-	"github.com/kwk-links/kwk-cli/libs/api"
 	"fmt"
-	"github.com/kwk-links/kwk-cli/libs/gui"
+	"github.com/kwk-links/kwk-cli/libs/services/gui"
 	"os"
 	"time"
+	"github.com/kwk-links/kwk-cli/libs/models"
+	"github.com/kwk-links/kwk-cli/libs/services/aliases"
 )
 
 const (
@@ -15,12 +16,12 @@ const (
 )
 
 type Opener struct {
-	api    api.IApi
-	system system.ISystem
+	aliases aliases.IAliases
+	system  system.ISystem
 }
 
-func NewOpener(system system.ISystem, api api.IApi) *Opener {
-	return &Opener{api:api, system:system}
+func NewOpener(system system.ISystem, aliases aliases.IAliases) *Opener {
+	return &Opener{aliases:aliases, system:system}
 }
 
 var iterationCount = 0
@@ -29,7 +30,7 @@ func printUri(uri string) {
 	fmt.Printf(gui.Colour(gui.LightBlue, " %d - %s\n"), iterationCount, uri)
 }
 
-func (o *Opener) Edit(alias *api.Alias) error {
+func (o *Opener) Edit(alias *models.Alias) error {
 	filePath, err := o.system.WriteToFile(filecache, alias.FullKey, alias.Uri)
 	if err != nil {
 		return err
@@ -48,13 +49,13 @@ func (o *Opener) Edit(alias *api.Alias) error {
 	if text, err := o.system.ReadFromFile(filecache, alias.FullKey); err != nil {
 		return err
 	} else {
-		alias = o.api.Patch(alias.FullKey, text)
+		alias = o.aliases.Patch(alias.FullKey, text)
 		fmt.Println(gui.Colour(gui.LightBlue, "Successfully updated " + alias.FullKey))
 		return nil
 	}
 }
 
-func (o *Opener) Open(alias *api.Alias, args []string) {
+func (o *Opener) Open(alias *models.Alias, args []string) {
 
 	if args[0] == "covert" {
 		o.OpenCovert(alias.Uri)
@@ -152,7 +153,7 @@ func (o *Opener) Open(alias *api.Alias, args []string) {
 				o.system.Upgrade()
 				return
 			}
-			alias := o.api.Get(firstArg)
+			alias := o.aliases.Get(firstArg)
 			if alias.Total == 1 {
 				o.Open(&alias.Items[0], args)
 			} else if alias.Total > 1 {

@@ -1,9 +1,9 @@
 package app
 
 import (
-	"github.com/kwk-links/kwk-cli/libs/openers"
-	"github.com/kwk-links/kwk-cli/libs/gui"
-	"github.com/kwk-links/kwk-cli/libs/api"
+	"github.com/kwk-links/kwk-cli/libs/services/openers"
+	"github.com/kwk-links/kwk-cli/libs/services/gui"
+	"github.com/kwk-links/kwk-cli/libs/models"
 )
 
 func NewMultiResultPrompt(o openers.IOpen, i gui.IInteraction) *MultiResultPrompt {
@@ -15,7 +15,7 @@ type MultiResultPrompt struct {
 	Interaction gui.IInteraction
 }
 
-func (m *MultiResultPrompt) CheckAndPrompt(fullKey string, list *api.AliasList, args []string){
+func (m *MultiResultPrompt) CheckAndPrompt(fullKey string, list *models.AliasList, args []string){
 	if list.Total == 1 {
 		m.Openers.Open(&list.Items[0], args[1:])
 	} else if list.Total > 1 {

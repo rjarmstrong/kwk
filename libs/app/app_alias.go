@@ -1,14 +1,14 @@
 package app
 
-import (
+import  (
 	"gopkg.in/urfave/cli.v1"
-	"github.com/kwk-links/kwk-cli/libs/gui"
-	"github.com/kwk-links/kwk-cli/libs/api"
-	"github.com/kwk-links/kwk-cli/libs/system"
-	"github.com/kwk-links/kwk-cli/libs/openers"
+	"github.com/kwk-links/kwk-cli/libs/services/gui"
+	"github.com/kwk-links/kwk-cli/libs/services/aliases"
+	"github.com/kwk-links/kwk-cli/libs/services/system"
+	"github.com/kwk-links/kwk-cli/libs/services/openers"
 )
 
-func aliasCommands(a api.IApi, s system.ISystem, i gui.IInteraction, o openers.IOpen) []cli.Command {
+func aliasCommands(a aliases.IAliases, s system.ISystem, i gui.IInteraction, o openers.IOpen) []cli.Command {
 	//m := NewMultiResultPrompt(o, i)
 
 	c := []cli.Command{

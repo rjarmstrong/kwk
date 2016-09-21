@@ -43,24 +43,24 @@ func (s GraphItemSorter) Less(i, j int) bool {
 	return s.Items[i].Value > s.Items[j].Value
 }
 
-func PrintTags(list *api.AliasList){
-	tags := map[string]int{}
-	for _, v := range list.Items {
-		for _, t := range v.Tags {
-			tags[t] += 1
-		}
-	}
-	fmt.Print(gui.Colour(gui.LightBlue, "\n     kwklinks by tag\n\n"))
-	sorter := GraphItemSorter{Items:[]GraphItem{}}
-	for k, v := range tags {
-		sorter.Items = append(sorter.Items, GraphItem{k, v})
-	}
-	sort.Sort(sorter)
-	index := 0
-	for index <= 10 {
-		item := sorter.Items[index]
-		fmt.Println(gui.Build(5, " ") + fmt.Sprintf("%-12s %2d   ", item.Key, item.Value) + gui.Build(item.Value, gui.UBlock))
-		index += 1
-	}
-	fmt.Println()
-}
+//func PrintTags(list *models.AliasList){
+//	tags := map[string]int{}
+//	for _, v := range list.Items {
+//		for _, t := range v.Tags {
+//			tags[t] += 1
+//		}
+//	}
+//	fmt.Print(gui.Colour(gui.LightBlue, "\n     kwklinks by tag\n\n"))
+//	sorter := GraphItemSorter{Items:[]GraphItem{}}
+//	for k, v := range tags {
+//		sorter.Items = append(sorter.Items, GraphItem{k, v})
+//	}
+//	sort.Sort(sorter)
+//	index := 0
+//	for index <= 10 {
+//		item := sorter.Items[index]
+//		fmt.Println(gui.Build(5, " ") + fmt.Sprintf("%-12s %2d   ", item.Key, item.Value) + gui.Build(item.Value, gui.UBlock))
+//		index += 1
+//	}
+//	fmt.Println()
+//}

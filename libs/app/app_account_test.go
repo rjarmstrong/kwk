@@ -4,17 +4,17 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/smartystreets/assertions/should"
 	"testing"
-	"github.com/kwk-links/kwk-cli/libs/api"
-	"github.com/kwk-links/kwk-cli/libs/gui"
-	"github.com/kwk-links/kwk-cli/libs/settings"
+	"github.com/kwk-links/kwk-cli/libs/services/gui"
+	"github.com/kwk-links/kwk-cli/libs/services/settings"
+	"github.com/kwk-links/kwk-cli/libs/services/users"
 )
 
 func Test_App(t *testing.T) {
 	Convey("ACCOUNT COMMANDS", t, func() {
-		a := &api.ApiMock{}
+		u := &users.UsersMock{}
 		w := &gui.Interaction{}
 		sett := &settings.SettingsMock{}
-		app := NewKwkApp(a, nil, sett, w, nil)
+		app := NewKwkApp(u, nil, sett, w, nil)
 
 		Convey(`Profile`, func() {
 			Convey(`Should run by name`, func() {
@@ -25,7 +25,7 @@ func Test_App(t *testing.T) {
 			})
 			Convey(`Should get profile and respond with template`, func() {
 				app.App.Run([]string{"[app]", "profile"})
-				So(a.PrintProfileCalled, should.BeTrue)
+				So(u.GetCalled, should.BeTrue)
 			})
 		})
 
@@ -38,8 +38,8 @@ func Test_App(t *testing.T) {
 			})
 			Convey(`Should call api signin`, func() {
 				app.App.Run([]string{"[app]", "signin", "richard", "password"})
-				So(a.LoginCalledWith[0], should.Equal, "richard")
-				So(a.LoginCalledWith[1], should.Equal, "password")
+				So(u.LoginCalledWith[0], should.Equal, "richard")
+				So(u.LoginCalledWith[1], should.Equal, "password")
 			})
 		})
 
@@ -52,9 +52,9 @@ func Test_App(t *testing.T) {
 			})
 			Convey(`Should call api signup`, func() {
 				app.App.Run([]string{"[app]", "signup", "richard@kwk.co", "richard", "password"})
-				So(a.SignupCalledWith[0], should.Equal, "richard@kwk.co")
-				So(a.SignupCalledWith[1], should.Equal, "richard")
-				So(a.SignupCalledWith[2], should.Equal, "password")
+				So(u.SignupCalledWith[0], should.Equal, "richard@kwk.co")
+				So(u.SignupCalledWith[1], should.Equal, "richard")
+				So(u.SignupCalledWith[2], should.Equal, "password")
 			})
 		})
 
@@ -67,7 +67,7 @@ func Test_App(t *testing.T) {
 			})
 			Convey(`Should call api signout`, func() {
 				app.App.Run([]string{"[app]", "signout"})
-				So(a.SignoutCalled, should.BeTrue)
+				So(u.SignoutCalled, should.BeTrue)
 			})
 		})
 	})

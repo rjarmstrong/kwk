@@ -1,0 +1,50 @@
+//print profile
+
+if err != nil {
+		fmt.Println("You are not logged in please log in: kwk login <username> <password>")
+	} else {
+		fmt.Println("~~~~~~ Your Profile ~~~~~~~~~")
+		fmt.Println(gui.Build(2, gui.Space) + gui.Build(11, "~") + gui.Build(2, gui.Space))
+		fmt.Println(gui.Build(6, gui.Space) + gui.Build(3, gui.UBlock) + gui.Build(6, gui.Space))
+		fmt.Println(gui.Build(5, gui.Space) + gui.Build(5, gui.UBlock) + gui.Build(5, gui.Space))
+		fmt.Println(gui.Build(6, gui.Space) + gui.Build(3, gui.UBlock) + gui.Build(6, gui.Space))
+		fmt.Println(gui.Build(3, gui.Space) + gui.Build(9, gui.UBlock) + gui.Build(3, gui.Space))
+		fmt.Println(gui.Build(3, gui.Space) + gui.Build(9, gui.UBlock) + gui.Build(3, gui.Space))
+		fmt.Println(gui.Build(3, gui.Space) + gui.Build(9, gui.UBlock) + gui.Build(3, gui.Space))
+		fmt.Println(gui.Build(2, gui.Space) + gui.Build(11, "~") + gui.Build(2, gui.Space))
+
+		fmt.Printf("Email:      %v\n", u.Email)
+		fmt.Printf("Username:   %v\n", u.Username)
+		fmt.Printf("Host:       %v\n", u.Host)
+		fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	}
+
+// signing
+if len(u.Token) > 50 {
+		a.Settings.Upsert(userDbKey, u)
+		fmt.Printf("Welcome to kwk %s! You're signed in already.", u.Username)
+		return u
+}
+
+// login
+if username == "" {
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print(gui.Colour(gui.LightBlue, "Your Kwk Username: "))
+		usernameBytes, _, _ := reader.ReadLine()
+		username = string(usernameBytes)
+	}
+	if password == "" {
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print(gui.Colour(gui.LightBlue, "Your Password: "))
+		passwordBytes, _, _ := reader.ReadLine()
+		password = string(passwordBytes)
+	}
+
+	body := fmt.Sprintf(`{"username":"%s", "password":"%s"}`, username, password)
+	u := &models.User{}
+	a.Request("POST", "users/login", body, u)
+	if len(u.Token) > 50 {
+		a.Settings.Upsert(userDbKey, u)
+		fmt.Printf("%v signed in!", u.Username)
+		return u
+	}
