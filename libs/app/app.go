@@ -8,7 +8,6 @@ import (
 	"github.com/kwk-links/kwk-cli/libs/services/aliases"
 	"github.com/kwk-links/kwk-cli/libs/services/users"
 	"github.com/kwk-links/kwk-cli/libs/controllers"
-	"github.com/kwk-links/kwk-cli/libs/app/routes"
 )
 
 type KwkApp struct {
@@ -22,13 +21,13 @@ func NewKwkApp(a aliases.IAliases, s system.ISystem, settings settings.ISettings
 	//cli.HelpPrinter = system.Help
 
 	accCtrl := controllers.NewAccountController(u, settings)
-	app.Commands = append(app.Commands, routes.Accounts(accCtrl)...)
+	app.Commands = append(app.Commands, Accounts(accCtrl)...)
 
 	sysCtrl := controllers.NewSystemController(s, u)
-	app.Commands = append(app.Commands, routes.System(sysCtrl)...)
+	app.Commands = append(app.Commands, System(sysCtrl)...)
 
 	aliasCtrl := controllers.NewAliasController(a, o)
-	app.Commands = append(app.Commands, routes.Alias(aliasCtrl)...)
+	app.Commands = append(app.Commands, Alias(aliasCtrl)...)
 	app.CommandNotFound = func(c *cli.Context, fullKey string) {
 		aliasCtrl.Get(fullKey)
 	}

@@ -10,18 +10,19 @@ type UsersMock struct {
 	GetCalledWith    string
 }
 
-func (a *UsersMock) Get() {
+func (a *UsersMock) Get() (*models.User, error){
 	a.GetCalled = true
+	return &models.User{}, nil
 }
 
-func (a *UsersMock) SignIn(username string, password string) *models.User {
+func (a *UsersMock) SignIn(username string, password string) (*models.User, error) {
 	a.LoginCalledWith = []string{username, password}
-	return &models.User{}
+	return &models.User{}, nil
 }
 
-func (a *UsersMock) SignUp(email string, username string, password string) *models.User {
+func (a *UsersMock) SignUp(email string, username string, password string) (*models.User, error) {
 	a.SignupCalledWith = []string{email, username, password }
-	return &models.User{}
+	return &models.User{}, nil
 }
 
 func (a *UsersMock) Signout() {

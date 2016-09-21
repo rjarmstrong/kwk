@@ -8,8 +8,9 @@ type OpenerMock struct {
 	EditError error
 }
 
-func (o *OpenerMock) Open(alias *models.Alias, args []string) {
+func (o *OpenerMock) Open(alias *models.Alias, args []string) error {
 	o.OpenCalledWith = []interface{}{alias, args}
+	return nil
 }
 
 func (o *OpenerMock) Edit(alias *models.Alias) error {
