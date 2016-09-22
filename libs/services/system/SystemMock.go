@@ -8,17 +8,19 @@ type SystemMock struct {
 	CopyToClipboardCalledWith string
 }
 
-func (s *SystemMock) Upgrade() {
+func (s *SystemMock) Upgrade() error {
 	s.UpgradeCalled = true
+	return nil
 }
 
-func (s *SystemMock) GetVersion() string {
+func (s *SystemMock) GetVersion() (string, error) {
 	s.VersionCalled = true
-	return "0.0.1"
+	return "0.0.1", nil
 }
 
-func (s *SystemMock) CopyToClipboard(input string) {
+func (s *SystemMock) CopyToClipboard(input string) error {
 	s.CopyToClipboardCalledWith = input
+	return nil
 }
 
 func (s *SystemMock) Exists(path string) (bool, error) {

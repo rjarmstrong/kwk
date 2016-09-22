@@ -2,10 +2,9 @@ package app
 
 import (
 	"gopkg.in/urfave/cli.v1"
-	"github.com/kwk-links/kwk-cli/libs/controllers"
 )
 
-func Accounts(ctrl *controllers.AccountController) []cli.Command {
+func Accounts(ctrl *AccountController) []cli.Command {
 	c := []cli.Command{
 		{
 			Name:    "profile",
@@ -36,6 +35,14 @@ func Accounts(ctrl *controllers.AccountController) []cli.Command {
 			Aliases: []string{"logout"},
 			Action:  func(c *cli.Context) error {
 				ctrl.SignOut();
+				return nil
+			},
+		},
+		{
+			Name:    "cd",
+			Aliases: []string{},
+			Action:  func(c *cli.Context) error {
+				ctrl.ChangeDirectory(c.Args().Get(0))
 				return nil
 			},
 		},

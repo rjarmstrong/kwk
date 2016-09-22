@@ -44,7 +44,6 @@ func Test_System(t *testing.T) {
 			p, err := s.WriteToFile(dir, fullKey, uri)
 			So(err, ShouldBeNil)
 			So(p, should.Equal, fmt.Sprintf("/Users/%s/Library/Caches/kwk/%s/%s", os.Getenv("USER"), dir, fullKey))
-
 			txt, err := s.ReadFromFile(dir, fullKey)
 			So(txt, should.Equal, uri)
 

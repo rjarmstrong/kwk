@@ -9,6 +9,7 @@ import (
 	"github.com/kwk-links/kwk-cli/libs/rpc"
 	"github.com/kwk-links/kwk-cli/libs/services/users"
 	"github.com/kwk-links/kwk-cli/libs/services/system"
+	"github.com/kwk-links/kwk-cli/libs/services/gui"
 )
 
 func main() {
@@ -23,7 +24,9 @@ func main() {
 	u := users.New(conn, t)
 	a := aliases.New(conn, t)
 	o := openers.New(s, a)
+	w := gui.NewTemplateWriter(os.Stdout)
+	d := gui.NewDialogues(w)
 
-	kwkApp := app.NewKwkApp(a, s, t, o, u)
+	kwkApp := app.NewKwkApp(a, s, t, o, u, d, w)
 	kwkApp.App.Run(os.Args)
 }

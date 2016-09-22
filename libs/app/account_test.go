@@ -4,15 +4,18 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/smartystreets/assertions/should"
 	"testing"
-	"github.com/kwk-links/kwk-cli/libs/services/settings"
 	"github.com/kwk-links/kwk-cli/libs/services/users"
+	"github.com/kwk-links/kwk-cli/libs/services/settings"
+	"github.com/kwk-links/kwk-cli/libs/services/gui"
 )
 
 func Test_App(t *testing.T) {
 	Convey("ACCOUNT COMMANDS", t, func() {
-		u := &users.UsersMock{}
-		sett := &settings.SettingsMock{}
-		app := NewKwkApp(nil, nil, sett, nil, u)
+		app := CreateAppStub()
+		u := app.Users.(*users.UsersMock)
+		t := app.Settings.(*settings.SettingsMock)
+		w := app.TemplateWriter.(*gui.TemplateWriterMock)
+		d := app.Dialogues.(*gui.DialogueMock)
 
 		Convey(`Profile`, func() {
 			Convey(`Should run by name`, func() {
@@ -38,6 +41,12 @@ func Test_App(t *testing.T) {
 				app.App.Run([]string{"[app]", "signin", "richard", "password"})
 				So(u.LoginCalledWith[0], should.Equal, "richard")
 				So(u.LoginCalledWith[1], should.Equal, "password")
+			})
+			Convey(`Should call api signin and enter form details`, func() {
+				d.FieldResponse = &gui.DialogueResponse{Value:"richard"}
+				app.App.Run([]string{"[app]", "signin"})
+				So(d.FieldCallHistory[0], should.Resemble, []interface{}{"account:usernamefield", nil})
+				So(d.FieldCallHistory[1], should.Resemble, []interface{}{"account:passwordfield", nil})
 			})
 		})
 
@@ -66,6 +75,18 @@ func Test_App(t *testing.T) {
 			Convey(`Should call api signout`, func() {
 				app.App.Run([]string{"[app]", "signout"})
 				So(u.SignoutCalled, should.BeTrue)
+			})
+		})
+
+		Convey(`cd`, func() {
+			Convey(`Should run by name`, func() {
+				p := app.App.Command("cd")
+				So(p, should.NotBeNil)
+			})
+			Convey(`Should change directory`, func() {
+				app.App.Run([]string{"[app]", "cd", "dillbuck"})
+				So(t.ChangeDirectoryCalledWith, should.Equal, "dillbuck")
+				So(w.RenderCalledWith, should.Resemble, []interface{}{"account:cd", map[string]string{"username" :"dillbuck"}})
 			})
 		})
 	})

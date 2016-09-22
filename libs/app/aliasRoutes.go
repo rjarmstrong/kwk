@@ -2,10 +2,9 @@ package app
 
 import (
 	"gopkg.in/urfave/cli.v1"
-	"github.com/kwk-links/kwk-cli/libs/controllers"
 )
 
-func Alias(ctrl *controllers.AliasController) []cli.Command {
+func Alias(ctrl *AliasController) []cli.Command {
 	c := []cli.Command{
 		{
 			Name:    "new",

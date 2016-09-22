@@ -5,7 +5,6 @@ import "github.com/kwk-links/kwk-cli/libs/models"
 type OpenerMock struct {
 	OpenCalledWith []interface{}
 	EditCalledWith *models.Alias
-	EditError error
 }
 
 func (o *OpenerMock) Open(alias *models.Alias, args []string) error {
@@ -15,8 +14,5 @@ func (o *OpenerMock) Open(alias *models.Alias, args []string) error {
 
 func (o *OpenerMock) Edit(alias *models.Alias) error {
 	o.EditCalledWith = alias
-	if o.EditError != nil {
-		return o.EditError
-	}
 	return nil
 }

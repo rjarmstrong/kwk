@@ -14,9 +14,10 @@ func New(system system.ISystem, directoryName string) *Settings {
 	return &Settings{DirectoryName: directoryName, System:system}
 }
 
-func (s *Settings) Upsert(key string, value interface{}) {
+func (s *Settings) Upsert(key string, value interface{}) error {
 	bytes, _ := json.Marshal(value)
-	s.System.WriteToFile(s.DirectoryName, key, string(bytes))
+	_, err := s.System.WriteToFile(s.DirectoryName, key, string(bytes))
+	return err
 }
 
 func (s *Settings) Get(key string, value interface{}) error {
@@ -32,6 +33,6 @@ func (s *Settings) Delete(key string) error {
 	return s.System.Delete(s.DirectoryName, key)
 }
 
-func (s *Settings) ChangeDirectory(username string) {
-
+func (s *Settings) ChangeDirectory(username string) error {
+  return nil
 }

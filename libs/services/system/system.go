@@ -2,7 +2,6 @@ package system
 
 import (
 	"os/exec"
-	"fmt"
 	"bytes"
 	"io"
 	"encoding/json"
@@ -12,6 +11,7 @@ import (
 	"os"
 	"errors"
 	"github.com/atotto/clipboard"
+	"fmt"
 )
 
 func New() ISystem {
@@ -109,18 +109,19 @@ func (s *System) Exists(path string) (bool, error) {
 	return true, nil
 }
 
-func (s *System) GetVersion() string {
-	return os.Getenv("version")
+func (s *System) GetVersion() (string, error) {
+	if v := os.Getenv("version"); v == "" {
+		return "", errors.New("version has not been set.")
+	} else {
+		return v, nil
+	}
 }
 
-func (s *System) Upgrade(){
+func (s *System) Upgrade() error {
 	distributionUri := "/Volumes/development/go/src/github.com/kwk-links/kwk-cli/kwk-cli"
 	installPath := "/usr/local/bin/kwk"
 	//download in future
-	s.CopyFile(distributionUri, installPath)
-	fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-	fmt.Println("      Successfully upgraded!")
-	fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	return s.CopyFile(distributionUri, installPath)
 }
 
 // CopyFile copies a file from src to dst. If src and dst files exist, and are
@@ -183,6 +184,6 @@ func copyFileContents(src, dst string) (err error) {
 	return
 }
 
-func (s *System) CopyToClipboard(input string){
-	clipboard.WriteAll(input)
+func (s *System) CopyToClipboard(input string) error {
+	return clipboard.WriteAll(input)
 }

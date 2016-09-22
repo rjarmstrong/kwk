@@ -8,8 +8,9 @@ type SettingsMock struct {
 // Save to settings
 // Print confirmation
 //fmt.Println(gui.Colour(gui.LightBlue, "Switched to kwk.co/" + args[0] + "/"))
-func (s *SettingsMock) ChangeDirectory(username string) {
+func (s *SettingsMock) ChangeDirectory(username string) error {
 	s.ChangeDirectoryCalledWith = username
+	return nil
 }
 
 func (s *SettingsMock) Delete(key string) error {
@@ -20,5 +21,6 @@ func (s *SettingsMock) Get(key string, input interface{}) error {
 	return nil
 }
 
-func (s *SettingsMock) Upsert(dir string, data interface{}) {
+func (s *SettingsMock) Upsert(dir string, data interface{}) error {
+	return nil
 }
