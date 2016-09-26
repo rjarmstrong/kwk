@@ -21,7 +21,7 @@ func main() {
 	s := system.New()
 	t := settings.New(s, "settings")
 	h := rpc.NewHeaders(t)
-	u := users.New(conn, t)
+	u := users.New(conn, t, h)
 	a := aliases.New(conn, t, h)
 	o := openers.New(s, a)
 	w := gui.NewTemplateWriter(os.Stdout)

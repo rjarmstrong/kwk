@@ -15,15 +15,15 @@ const (
 type Users struct {
 	client usersRpc.UsersRpcClient
 	settings settings.ISettings
-	rpc.Headers
+	headers *rpc.Headers
 }
 
-func New(conn *grpc.ClientConn, s settings.ISettings) *Users {
-	return &Users{client:usersRpc.NewUsersRpcClient(conn), settings:s}
+func New(conn *grpc.ClientConn, s settings.ISettings, h *rpc.Headers) *Users {
+	return &Users{client:usersRpc.NewUsersRpcClient(conn), settings:s, headers:h}
 }
 
 func (u *Users) SignIn(username string, password string) (*models.User, error) {
-	 if res, err := u.client.SignIn(u.GetContext(), &usersRpc.SignInRequest{Username:username, Password:password}); err != nil {
+	 if res, err := u.client.SignIn(u.headers.GetContext(), &usersRpc.SignInRequest{Username:username, Password:password}); err != nil {
 		 return nil, err
 	 } else {
 		 model := &models.User{}
@@ -33,7 +33,7 @@ func (u *Users) SignIn(username string, password string) (*models.User, error) {
 }
 
 func (u *Users) SignUp(email string, username string, password string) (*models.User, error) {
-	if res, err := u.client.SignUp(u.GetContext(), &usersRpc.SignUpRequest{Username:username, Email:email, Password:password}); err != nil {
+	if res, err := u.client.SignUp(u.headers.GetContext(), &usersRpc.SignUpRequest{Username:username, Email:email, Password:password}); err != nil {
 		return nil, err
 	} else {
 		model := &models.User{}
