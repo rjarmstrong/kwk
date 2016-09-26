@@ -1,10 +1,13 @@
 package settings
 
+import "reflect"
+
 type SettingsMock struct {
 	GetCalledWith []interface{}
 	ChangeDirectoryCalledWith string
 	UpsertCalledWith []interface{}
 	DeleteCalledWith string
+	GetHydrateWith interface{}
 }
 
 // get and check username exists
@@ -23,6 +26,11 @@ func (s *SettingsMock) Delete(fullKey string) error {
 
 func (s *SettingsMock) Get(fullKey string, input interface{}) error {
 	s.GetCalledWith = []interface{}{fullKey, input}
+	if s.GetHydrateWith != nil {
+		v1 := reflect.ValueOf(input).Elem()
+		v2 := reflect.ValueOf(s.GetHydrateWith).Elem()
+		v1.Set(v2)
+	}
 	return nil
 }
 

@@ -2,6 +2,11 @@ package models
 
 import "time"
 
+const (
+	ProfileFullKey = "profile.json"
+	TokenHeaderName = "token"
+)
+
 type AliasList struct {
 	Items []Alias `json:"items"`
 	Total int32 `json:"total"`

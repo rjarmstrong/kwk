@@ -13,16 +13,16 @@ import (
 )
 
 func main() {
-	os.Setenv("version", "v0.0.1")
+	os.Setenv("version", "v0.0.3")
 
 	conn := rpc.Conn("127.0.0.1:7777");
 	defer conn.Close()
 
 	s := system.New()
 	t := settings.New(s, "settings")
-
+	h := rpc.NewHeaders(t)
 	u := users.New(conn, t)
-	a := aliases.New(conn, t)
+	a := aliases.New(conn, t, h)
 	o := openers.New(s, a)
 	w := gui.NewTemplateWriter(os.Stdout)
 	d := gui.NewDialogues(w)

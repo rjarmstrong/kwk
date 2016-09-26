@@ -7,10 +7,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/libs/models"
 )
 
-const (
-	ProfileFullKey = "profile.json"
-)
-
 type AccountController struct {
 	service users.IUsers
 	settings settings.ISettings
@@ -24,7 +20,7 @@ func NewAccountController(u users.IUsers, s settings.ISettings, w gui.ITemplateW
 
 func (c *AccountController) Get(){
 	u := &models.User{}
-	if err := c.settings.Get(ProfileFullKey, u); err != nil {
+	if err := c.settings.Get(models.ProfileFullKey, u); err != nil {
 		c.Render("error", err)
 		c.Render("account:notloggedin", nil)
 	} else {
@@ -37,7 +33,7 @@ func (c *AccountController) SignUp(email string, username string, password strin
 		c.Render("error", err)
 	} else {
 		if len(u.Token) > 50 {
-			c.settings.Upsert(ProfileFullKey, u)
+			c.settings.Upsert(models.ProfileFullKey, u)
 			c.Render("account:signedup", u.Username)
 		}
 	}
@@ -54,8 +50,8 @@ func (c *AccountController) SignIn(username string, password string){
 		c.Render("error", err)
 	} else {
 		if len(u.Token) > 50 {
-			c.settings.Upsert(ProfileFullKey, u)
-			c.Field("account:signedin", u.Username)
+			c.settings.Upsert(models.ProfileFullKey, u)
+			c.Render("account:signedin", u)
 		}
 	}
 }
@@ -64,7 +60,7 @@ func (c *AccountController) SignOut(){
 	if err := c.service.Signout(); err != nil {
 		c.Render("error", err)
 	}
-	if err := c.settings.Delete(ProfileFullKey); err != nil {
+	if err := c.settings.Delete(models.ProfileFullKey); err != nil {
 		c.Render("error", err)
 	}
 }

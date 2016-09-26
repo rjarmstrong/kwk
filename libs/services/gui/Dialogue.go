@@ -42,6 +42,7 @@ func (d *Dialogues) Field(templateName string, data interface{}) *DialogueRespon
 	reader := bufio.NewReader(os.Stdin)
 	d.writer.Render(templateName, data)
 	value, _, _ := reader.ReadLine()
+	reader.Reset(nil)
 	return &DialogueResponse{
 		Value:string(value),
 	}

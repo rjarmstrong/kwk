@@ -7,6 +7,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"golang.org/x/net/context"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
+	"bitbucket.com/sharingmachine/kwkcli/libs/models"
 )
 
 //serverAddr  := flag.String("server_addr", "127.0.0.1:7777", "The server address in the format of host:port")
@@ -27,21 +29,25 @@ func Conn(serverAddress string) *grpc.ClientConn {
 	return conn
 }
 
-type Headers struct {
+func NewHeaders(t settings.ISettings) *Headers {
+	return &Headers{settings:t}
+}
 
+type Headers struct {
+	settings settings.ISettings
 }
 
 func (i *Headers) GetContext() context.Context {
-	//if a.Settings.Get(userDbKey, u); u == nil {
-	//	fmt.Println("You are not logged in.")
-	//	return
-	//}
-
-	ctx := metadata.NewContext(
-		context.Background(),
-		metadata.Pairs("token", "ZingZongZang"),
-	)
-	return ctx
+	u := &models.User{}
+	if i.settings.Get(models.ProfileFullKey, u); u == nil {
+		return context.Background()
+	} else {
+		ctx := metadata.NewContext(
+			context.Background(),
+			metadata.Pairs(models.TokenHeaderName, u.Token),
+		)
+		return ctx
+	}
 }
 
 /*

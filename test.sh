@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-cd ./libs/app/
+cd ./libs/rpc/
 $GOPATH/bin/goconvey -port 3456

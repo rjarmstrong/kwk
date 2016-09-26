@@ -18,7 +18,7 @@ func NewSystemController(s system.ISystem, u users.IUsers, w gui.ITemplateWriter
 
 func (c *SystemController) Upgrade() {
 	if err := c.service.Upgrade(); err != nil {
-
+		c.Render("error", err)
 	} else {
 		c.Render("system:upgraded", nil)
 	}

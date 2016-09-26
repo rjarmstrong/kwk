@@ -118,7 +118,7 @@ func (s *System) GetVersion() (string, error) {
 }
 
 func (s *System) Upgrade() error {
-	distributionUri := "/Volumes/development/go/src/github.com/kwk-links/kwk-cli/kwk-cli"
+	distributionUri := "/Volumes/development/go/src/bitbucket.com/sharingmachine/kwkcli/kwkcli"
 	installPath := "/usr/local/bin/kwk"
 	//download in future
 	return s.CopyFile(distributionUri, installPath)
