@@ -1,12 +1,12 @@
 package app
 
 import (
-	"github.com/kwk-links/kwk-cli/libs/services/gui"
-	"github.com/kwk-links/kwk-cli/libs/services/aliases"
-	"github.com/kwk-links/kwk-cli/libs/services/system"
 	"strconv"
-	"github.com/kwk-links/kwk-cli/libs/models"
-	"github.com/kwk-links/kwk-cli/libs/services/openers"
+	"bitbucket.com/sharingmachine/kwkcli/libs/models"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/aliases"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/openers"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
 )
 
 type AliasController struct {

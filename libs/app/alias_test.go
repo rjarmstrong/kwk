@@ -4,11 +4,11 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/smartystreets/assertions/should"
 	"testing"
-	"github.com/kwk-links/kwk-cli/libs/services/aliases"
-	"github.com/kwk-links/kwk-cli/libs/models"
-	"github.com/kwk-links/kwk-cli/libs/services/openers"
-	"github.com/kwk-links/kwk-cli/libs/services/system"
-	"github.com/kwk-links/kwk-cli/libs/services/gui"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
+	"bitbucket.com/sharingmachine/kwkcli/libs/models"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/aliases"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/openers"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
 )
 
 

@@ -10,6 +10,7 @@ var Templates = map[string]*template.Template{
 	"account:usernamefield" : t("account:usernamefield", "Your Kwk Username: "),
 	"account:passwordfield" : t("account:passwordfield", "Your Password: "),
 	"account:signedin" : t("account:signedin", "Welcome back {{.username}}!"),
+	"account:profile" : t("account:profile", "You are: {{.Username}}!"),
 	"system:upgraded" : t("system:upgraded",
 		"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n   Successfully upgraded!  \n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"),
 	"alias:notfound": t("alias:notfound", "kwklink: {{.fullKey}} not found\n"),

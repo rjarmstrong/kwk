@@ -2,7 +2,7 @@ package settings
 
 import (
 	"encoding/json"
-	"github.com/kwk-links/kwk-cli/libs/services/system"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
 )
 
 type Settings struct {

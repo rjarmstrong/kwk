@@ -1,9 +1,9 @@
 package app
 
 import (
-	"github.com/kwk-links/kwk-cli/libs/services/system"
-	"github.com/kwk-links/kwk-cli/libs/services/users"
-	"github.com/kwk-links/kwk-cli/libs/services/gui"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/users"
 )
 
 type SystemController struct {

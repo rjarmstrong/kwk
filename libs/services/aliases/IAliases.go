@@ -1,6 +1,6 @@
 package aliases
 
-import "github.com/kwk-links/kwk-cli/libs/models"
+import "bitbucket.com/sharingmachine/kwkcli/libs/models"
 
 type IAliases interface {
 	Create(uri string, fullKey string) (*models.Alias, error)

@@ -2,12 +2,12 @@ package app
 
 import (
 	"gopkg.in/urfave/cli.v1"
-	"github.com/kwk-links/kwk-cli/libs/services/system"
-	"github.com/kwk-links/kwk-cli/libs/services/openers"
-	"github.com/kwk-links/kwk-cli/libs/services/settings"
-	"github.com/kwk-links/kwk-cli/libs/services/aliases"
-	"github.com/kwk-links/kwk-cli/libs/services/users"
-	"github.com/kwk-links/kwk-cli/libs/services/gui"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/aliases"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/openers"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/users"
 )
 
 type KwkApp struct {

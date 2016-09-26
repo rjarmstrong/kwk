@@ -1,9 +1,14 @@
 package app
 
 import (
-	"github.com/kwk-links/kwk-cli/libs/services/users"
-	"github.com/kwk-links/kwk-cli/libs/services/gui"
-	"github.com/kwk-links/kwk-cli/libs/services/settings"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/users"
+	"bitbucket.com/sharingmachine/kwkcli/libs/models"
+)
+
+const (
+	ProfileFullKey = "profile.json"
 )
 
 type AccountController struct {
@@ -18,7 +23,8 @@ func NewAccountController(u users.IUsers, s settings.ISettings, w gui.ITemplateW
 }
 
 func (c *AccountController) Get(){
-	if u, err := c.service.Get(); err != nil {
+	u := &models.User{}
+	if err := c.settings.Get(ProfileFullKey, u); err != nil {
 		c.Render("error", err)
 		c.Render("account:notloggedin", nil)
 	} else {
@@ -31,7 +37,7 @@ func (c *AccountController) SignUp(email string, username string, password strin
 		c.Render("error", err)
 	} else {
 		if len(u.Token) > 50 {
-			c.settings.Upsert("me", u)
+			c.settings.Upsert(ProfileFullKey, u)
 			c.Render("account:signedup", u.Username)
 		}
 	}
@@ -48,14 +54,19 @@ func (c *AccountController) SignIn(username string, password string){
 		c.Render("error", err)
 	} else {
 		if len(u.Token) > 50 {
-			c.settings.Upsert("me", u)
+			c.settings.Upsert(ProfileFullKey, u)
 			c.Field("account:signedin", u.Username)
 		}
 	}
 }
 
 func (c *AccountController) SignOut(){
-	c.service.Signout()
+	if err := c.service.Signout(); err != nil {
+		c.Render("error", err)
+	}
+	if err := c.settings.Delete(ProfileFullKey); err != nil {
+		c.Render("error", err)
+	}
 }
 
 func (c *AccountController) ChangeDirectory(username string) {

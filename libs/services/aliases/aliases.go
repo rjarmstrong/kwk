@@ -1,12 +1,12 @@
 package aliases
 
 import (
-	"github.com/kwk-links/kwk-cli/libs/services/settings"
 	"bitbucket.com/sharingmachine/kwkweb/rpc/aliasesRpc"
-	"github.com/kwk-links/kwk-cli/libs/rpc"
-	"github.com/kwk-links/kwk-cli/libs/models"
 	"time"
 	"google.golang.org/grpc"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
+	"bitbucket.com/sharingmachine/kwkcli/libs/models"
+	"bitbucket.com/sharingmachine/kwkcli/libs/rpc"
 )
 
 const TimeLayout = time.RFC3339

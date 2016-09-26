@@ -4,9 +4,10 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/smartystreets/assertions/should"
 	"testing"
-	"github.com/kwk-links/kwk-cli/libs/services/users"
-	"github.com/kwk-links/kwk-cli/libs/services/settings"
-	"github.com/kwk-links/kwk-cli/libs/services/gui"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/users"
+	"bitbucket.com/sharingmachine/kwkcli/libs/models"
 )
 
 func Test_App(t *testing.T) {
@@ -26,7 +27,7 @@ func Test_App(t *testing.T) {
 			})
 			Convey(`Should get profile and respond with template`, func() {
 				app.App.Run([]string{"[app]", "profile"})
-				So(u.GetCalled, should.BeTrue)
+				So(t.GetCalledWith, should.Resemble, []interface{}{ProfileFullKey, &models.User{}})
 			})
 		})
 
@@ -45,8 +46,14 @@ func Test_App(t *testing.T) {
 			Convey(`Should call api signin and enter form details`, func() {
 				d.FieldResponse = &gui.DialogueResponse{Value:"richard"}
 				app.App.Run([]string{"[app]", "signin"})
-				So(d.FieldCallHistory[0], should.Resemble, []interface{}{"account:usernamefield", nil})
-				So(d.FieldCallHistory[1], should.Resemble, []interface{}{"account:passwordfield", nil})
+			})
+			Convey(`Should save details to file when signed in`, func() {
+				d.FieldResponse = &gui.DialogueResponse{Value:"richard"}
+				u.SignInResponse = &models.User{
+					Token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dnZWRJbkFzIjoiYWRtaW4iLCJpYXQiOjE0MjI3Nzk2Mzh9.gzSraSYS8EXBxLN_oWnFSRgCzcmJmMjLiuyu5CSpyHI",
+				}
+				app.App.Run([]string{"[app]", "signin"})
+				So(t.UpsertCalledWith, should.Resemble, []interface{}{ProfileFullKey, u.SignInResponse})
 			})
 		})
 
@@ -75,6 +82,7 @@ func Test_App(t *testing.T) {
 			Convey(`Should call api signout`, func() {
 				app.App.Run([]string{"[app]", "signout"})
 				So(u.SignoutCalled, should.BeTrue)
+				So(t.DeleteCalledWith, should.Resemble, ProfileFullKey)
 			})
 		})
 

@@ -1,14 +1,14 @@
 package openers
 
 import (
-	"github.com/kwk-links/kwk-cli/libs/services/system"
 	"strings"
 	"fmt"
-	"github.com/kwk-links/kwk-cli/libs/services/gui"
 	"os"
 	"time"
-	"github.com/kwk-links/kwk-cli/libs/models"
-	"github.com/kwk-links/kwk-cli/libs/services/aliases"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/aliases"
+	"bitbucket.com/sharingmachine/kwkcli/libs/models"
 )
 
 const (

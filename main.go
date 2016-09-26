@@ -1,15 +1,15 @@
 package main
 
 import (
-	"github.com/kwk-links/kwk-cli/libs/services/settings"
-	"github.com/kwk-links/kwk-cli/libs/services/aliases"
 	"os"
-	"github.com/kwk-links/kwk-cli/libs/services/openers"
-	"github.com/kwk-links/kwk-cli/libs/app"
-	"github.com/kwk-links/kwk-cli/libs/rpc"
-	"github.com/kwk-links/kwk-cli/libs/services/users"
-	"github.com/kwk-links/kwk-cli/libs/services/system"
-	"github.com/kwk-links/kwk-cli/libs/services/gui"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/aliases"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/openers"
+	"bitbucket.com/sharingmachine/kwkcli/libs/app"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
+	"bitbucket.com/sharingmachine/kwkcli/libs/rpc"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/users"
 )
 
 func main() {

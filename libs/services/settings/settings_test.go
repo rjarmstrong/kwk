@@ -4,15 +4,16 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/smartystreets/assertions/should"
 	"testing"
-	"github.com/kwk-links/kwk-cli/libs/models"
-	"github.com/kwk-links/kwk-cli/libs/services/system"
+	"bitbucket.com/sharingmachine/kwkcli/libs/models"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
+	"os"
 )
 
 func Test_System(t *testing.T) {
 	Convey("Settings test", t, func() {
 		Convey(`Should create, update, delete and get a setting`, func() {
 			sys := system.New()
-			s := New(sys, "test_leveldb")
+			s := New(sys, "test_settings")
 			key := "user"
 			expected := models.User{
 				Email:"richard@kwk.co",
@@ -37,6 +38,8 @@ func Test_System(t *testing.T) {
 			actual = &models.User{}
 			err = s.Get(key, actual)
 			So(err.Error(), should.Equal, "Not found.")
+			p, _ := sys.GetDirPath("test_settings")
+			os.RemoveAll(p)
 		})
 	})
 }

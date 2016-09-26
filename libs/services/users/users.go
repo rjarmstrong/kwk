@@ -3,9 +3,9 @@ package users
 import (
 	"bitbucket.com/sharingmachine/kwkweb/rpc/usersRpc"
 	"google.golang.org/grpc"
-	"github.com/kwk-links/kwk-cli/libs/rpc"
-	"github.com/kwk-links/kwk-cli/libs/models"
-	"github.com/kwk-links/kwk-cli/libs/services/settings"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
+	"bitbucket.com/sharingmachine/kwkcli/libs/models"
+	"bitbucket.com/sharingmachine/kwkcli/libs/rpc"
 )
 
 const (
@@ -51,9 +51,9 @@ func (u *Users) Get() (*models.User, error) {
 	}
 }
 
-func (u *Users) Signout() {
-	//a.Settings.Delete(userDbKey)
-	//fmt.Println("Logged out.")
+func (u *Users) Signout() error {
+	// Implement service call which would be more informational/analytical in nature
+	return nil
 }
 
 func mapUser(rpc *usersRpc.UserResponse, model *models.User){

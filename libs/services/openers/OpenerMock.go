@@ -1,6 +1,6 @@
 package openers
 
-import "github.com/kwk-links/kwk-cli/libs/models"
+import "bitbucket.com/sharingmachine/kwkcli/libs/models"
 
 type OpenerMock struct {
 	OpenCalledWith []interface{}
