@@ -3,7 +3,7 @@ package aliases
 import "bitbucket.com/sharingmachine/kwkcli/libs/models"
 
 type IAliases interface {
-	Create(uri string, fullKey string) (*models.Alias, error)
+	Create(uri string, fullKey string) (*models.CreateAlias, error)
 	Rename(fullKey string, newFullKey string) (*models.Alias, error)
 	Patch(fullKey string, uri string) (*models.Alias, error)
 	Delete(fullKey string) error

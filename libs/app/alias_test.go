@@ -225,7 +225,7 @@ func Test_Alias(t *testing.T) {
 				So(p, should.NotBeNil)
 			})
 			//can only patch with a fullKey, an ambiguous key will give 404
-			//TODO: When updating a pinned kwklink, must force to give a new name
+			//TODO: When updating a pinned alias, must force to give a new name
 			// (since it is technically no longer the original)
 			Convey(`Should call patch and respond with patch`, func() {
 				app.App.Run([]string{"[app]", "patch", "arrows.js", "console.log('patched')"})

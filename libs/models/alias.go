@@ -30,3 +30,19 @@ type Alias struct {
 	Created   time.Time `json:"created"`
 	Updated   time.Time `json:"updated"`
 }
+
+type CreateAlias struct {
+	Alias *Alias
+	TypeMatch *TypeMatch
+}
+
+type TypeMatch struct {
+	Matches []Match
+}
+
+type Match struct {
+	Score     int32
+	Media     string
+	Runtime   string
+	Extension string
+}

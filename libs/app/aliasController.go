@@ -12,7 +12,7 @@ import (
 type AliasController struct {
 	service aliases.IAliases
 	openers openers.IOpen
-	system system.ISystem
+	system  system.ISystem
 	gui.IDialogues
 	gui.ITemplateWriter
 }
@@ -21,7 +21,7 @@ func NewAliasController(a aliases.IAliases, o openers.IOpen, s system.ISystem, d
 	return &AliasController{service:a, openers:o, system:s, IDialogues:d, ITemplateWriter:w}
 }
 
-func (a *AliasController) Open(fullKey string, args []string){
+func (a *AliasController) Open(fullKey string, args []string) {
 	if list, err := a.service.Get(fullKey); err != nil {
 		a.Render("error", err)
 	} else {
@@ -34,11 +34,17 @@ func (a *AliasController) Open(fullKey string, args []string){
 }
 
 func (a *AliasController) New(uri string, fullKey string) {
-	if alias, err := a.service.Create(uri, fullKey); err != nil {
+	if createAlias, err := a.service.Create(uri, fullKey); err != nil {
 		a.Render("error", err)
 	} else {
-		a.Render("alias:new", alias)
-		a.system.CopyToClipboard(alias.FullKey)
+		if createAlias.Alias != nil {
+			a.Render("alias:new", createAlias.Alias)
+			a.system.CopyToClipboard(createAlias.Alias.FullKey)
+		} else {
+			r := a.MultiChoice("alias:chooseruntime", "Choose the correct type for this link:", createAlias.TypeMatch.Matches)
+			winner := r.Value.(models.Match)
+			a.New(uri, fullKey + "." + winner.Extension)
+		}
 	}
 }
 
@@ -68,7 +74,7 @@ func (a *AliasController) Inspect(fullKey string) {
 
 func (a *AliasController) Delete(fullKey string) {
 	data := map[string]string{"fullKey" : fullKey}
-	if r := a.Modal("alias:delete", data) ; r.Ok {
+	if r := a.Modal("alias:delete", data); r.Ok {
 		if err := a.service.Delete(fullKey); err != nil {
 			a.Render("error", err)
 		}
@@ -86,7 +92,7 @@ func (a *AliasController) Cat(fullKey string) {
 	}
 }
 
-func (a *AliasController) Patch(fullKey string, uri string){
+func (a *AliasController) Patch(fullKey string, uri string) {
 	if alias, err := a.service.Patch(fullKey, uri); err != nil {
 		a.Render("error", err)
 	} else {
@@ -94,7 +100,7 @@ func (a *AliasController) Patch(fullKey string, uri string){
 	}
 }
 
-func (a *AliasController) Clone(fullKey string, newFullKey string){
+func (a *AliasController) Clone(fullKey string, newFullKey string) {
 	if alias, err := a.service.Clone(fullKey, newFullKey); err != nil {
 		a.Render("error", err)
 	} else {
@@ -102,7 +108,7 @@ func (a *AliasController) Clone(fullKey string, newFullKey string){
 	}
 }
 
-func (a *AliasController) Rename(fullKey string, newKey string){
+func (a *AliasController) Rename(fullKey string, newKey string) {
 	if alias, err := a.service.Rename(fullKey, newKey); err != nil {
 		a.Render("error", err)
 	} else {
@@ -110,8 +116,7 @@ func (a *AliasController) Rename(fullKey string, newKey string){
 	}
 }
 
-
-func (a *AliasController) Tag(fullKey string, tags ...string){
+func (a *AliasController) Tag(fullKey string, tags ...string) {
 	if alias, err := a.service.Tag(fullKey, tags...); err != nil {
 		a.Render("error", err)
 	} else {
@@ -119,7 +124,7 @@ func (a *AliasController) Tag(fullKey string, tags ...string){
 	}
 }
 
-func (a *AliasController) UnTag(fullKey string, tags ...string){
+func (a *AliasController) UnTag(fullKey string, tags ...string) {
 	if alias, err := a.service.UnTag(fullKey, tags...); err != nil {
 		a.Render("error", err)
 	} else {
@@ -127,7 +132,7 @@ func (a *AliasController) UnTag(fullKey string, tags ...string){
 	}
 }
 
-func (a *AliasController) List(args ...string){
+func (a *AliasController) List(args ...string) {
 	var page, size int32
 	var tags = []string{}
 	for _, v := range args {
@@ -148,7 +153,6 @@ func (a *AliasController) List(args ...string){
 		a.Render("alias:list", list)
 	}
 }
-
 
 func (a *AliasController) handleMultiResponse(fullKey string, list *models.AliasList) *models.Alias {
 	if list.Total == 1 {

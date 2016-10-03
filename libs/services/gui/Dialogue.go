@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"os"
 	"github.com/siddontang/go/num"
+	"fmt"
+	"reflect"
 )
 
 func NewDialogues(w ITemplateWriter) *Dialogues {
@@ -23,19 +25,36 @@ func (d *Dialogues) Modal(templateName string, data interface{}) *DialogueRespon
 	}
 }
 
-func (d *Dialogues) MultiChoice(templateName string, header interface{}, options ...interface{}) *DialogueResponse {
+func (d *Dialogues) MultiChoice(templateName string, header interface{}, options interface{}) *DialogueResponse {
 	reader := bufio.NewReader(os.Stdin)
 	// TODO: Render header and options
-	//d.writer.Render(templateName, data)
+	items := InterfaceSlice(options)
+	fmt.Println(items)
+	d.writer.Render(templateName, items)
 	value, _, _ := reader.ReadRune()
 	// upper and lower contraints
 	if i, err := num.ParseInt(string(value)); err != nil {
 		panic(err)
 	} else {
+		fmt.Println(i)
 		return &DialogueResponse{
-			Value: options[i],
+			Value: items[i],
 		}
 	}
+}
+
+func InterfaceSlice(slice interface{}) []interface{} {
+	s := reflect.ValueOf(slice)
+	if s.Kind() != reflect.Slice {
+		panic("InterfaceSlice() given a non-slice type")
+	}
+
+	ret := make([]interface{}, s.Len())
+
+	for i := 0; i < s.Len(); i++ {
+		ret[i] = s.Index(i).Interface()
+	}
+	return ret
 }
 
 func (d *Dialogues) Field(templateName string, data interface{}) *DialogueResponse {
@@ -49,6 +68,6 @@ func (d *Dialogues) Field(templateName string, data interface{}) *DialogueRespon
 }
 
 type DialogueResponse struct {
-     Ok bool
-     Value interface{}
+	Ok    bool
+	Value interface{}
 }

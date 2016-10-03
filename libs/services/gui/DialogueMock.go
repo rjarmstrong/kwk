@@ -21,7 +21,7 @@ func (d *DialogueMock) Field(templateName string, data interface{}) *DialogueRes
 	return d.FieldResponse
 }
 
-func (d *DialogueMock) MultiChoice(templateName string, header interface{}, options ...interface{}) *DialogueResponse {
+func (d *DialogueMock) MultiChoice(templateName string, header interface{}, options interface{}) *DialogueResponse {
 	d.MultiChoiceCalledWith = []interface{}{templateName, header, options}
 	return d.MultiChoiceResponse
 }

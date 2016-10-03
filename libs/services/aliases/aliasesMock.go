@@ -20,12 +20,12 @@ func (a *AliasesMock) Get(fullKey string) (*models.AliasList, error) {
 	return &models.AliasList{Items:a.ReturnItemsForGet, Total:int32(len(a.ReturnItemsForGet))}, nil
 }
 
-func (a *AliasesMock) Create(uri string, fullKey string) (*models.Alias, error) {
+func (a *AliasesMock) Create(uri string, fullKey string) (*models.CreateAlias, error) {
 	a.CreateCalledWith = []string{uri, fullKey}
 	if fullKey == "" {
 		fullKey = "x5hi23"
 	}
-	return &models.Alias{FullKey:fullKey}, nil
+	return &models.CreateAlias{Alias: &models.Alias{FullKey:fullKey}}, nil
 }
 
 func (a *AliasesMock) Rename(fullKey string, newFullKey string) (*models.Alias, error) {

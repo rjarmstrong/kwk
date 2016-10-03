@@ -19,9 +19,11 @@ var Templates = map[string]*template.Template{}
 func init() {
 	// Aliases
 	add("alias:delete", "Are you sure you want to delete {{.fullKey}} y/n?", nil)
-	add("alias:notfound", "kwklink: {{.fullKey}} not found\n", nil)
+	add("alias:notfound", "alias: {{.fullKey}} not found\n", nil)
 	add("alias:new", "{{.fullKey}}", nil)
 	add("alias:list", "{{. | listAliases}}", template.FuncMap{"listAliases" : listAliases})
+	//add("alias:chooseruntime", "{{. | listRuntimes}}", template.FuncMap{"listRuntimes" : listRuntimes})
+	add("alias:chooseruntime", "{{.}}", nil)
 
 	// System
 	add("system:upgraded", "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n   Successfully upgraded!  \n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", nil)
@@ -129,6 +131,14 @@ func add(name string, templateText string, funcMap template.FuncMap) {
 			}
 			fmt.Print("\n\n")
  */
+
+func listRuntimes(list []*models.Match) string {
+	var options string
+	for i, v := range list {
+		options = options + fmt.Sprintf("%d) %s   ", i, v.Runtime)
+	}
+	return options
+}
 
 func listAliases(list *models.AliasList) string {
 	buf := new(bytes.Buffer)

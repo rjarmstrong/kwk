@@ -46,7 +46,7 @@ func (s GraphItemSorter) Less(i, j int) bool {
 //			tags[t] += 1
 //		}
 //	}
-//	fmt.Print(gui.Colour(gui.LightBlue, "\n     kwklinks by tag\n\n"))
+//	fmt.Print(gui.Colour(gui.LightBlue, "\n     aliases by tag\n\n"))
 //	sorter := GraphItemSorter{Items:[]GraphItem{}}
 //	for k, v := range tags {
 //		sorter.Items = append(sorter.Items, GraphItem{k, v})

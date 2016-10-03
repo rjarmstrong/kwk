@@ -46,13 +46,30 @@ func (a *Aliases) Delete(fullKey string) error {
 	return err
 }
 
-func (a *Aliases) Create(uri string, path string) (*models.Alias, error) {
+func (a *Aliases) Create(uri string, path string) (*models.CreateAlias, error) {
 	if res, err := a.client.Create(a.headers.GetContext(), &aliasesRpc.CreateRequest{Uri:uri, FullKey:path}); err != nil {
 		return nil, err
 	} else {
-		alias := &models.Alias{}
-		mapAlias(res, alias)
-		return alias, nil
+		createAlias := &models.CreateAlias{}
+		if res.Alias != nil {
+			alias := &models.Alias{}
+			mapAlias(res.Alias, alias)
+			createAlias.Alias = alias
+		} else {
+			createAlias.TypeMatch = &models.TypeMatch{
+				Matches: []models.Match{},
+			}
+			for _, v := range res.TypeMatch.Matches {
+				m := models.Match{
+					Extension:v.Extension,
+					Media:v.Media,
+					Runtime:v.Runtime,
+					Score:v.Score,
+				}
+				createAlias.TypeMatch.Matches = append(createAlias.TypeMatch.Matches, m)
+			}
+		}
+		return createAlias, nil
 	}
 }
 
