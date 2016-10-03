@@ -29,14 +29,14 @@ func (d *Dialogues) MultiChoice(templateName string, header interface{}, options
 	reader := bufio.NewReader(os.Stdin)
 	// TODO: Render header and options
 	items := InterfaceSlice(options)
-	fmt.Println(items)
+	fmt.Println(header)
 	d.writer.Render(templateName, items)
+	fmt.Println()
 	value, _, _ := reader.ReadRune()
 	// upper and lower contraints
 	if i, err := num.ParseInt(string(value)); err != nil {
 		panic(err)
 	} else {
-		fmt.Println(i)
 		return &DialogueResponse{
 			Value: items[i],
 		}
