@@ -11,7 +11,7 @@ import (
 func Test_System(t *testing.T) {
 	Convey("System test", t, func() {
 		s := New()
-
+		
 		Convey(`Should create a directory if not exists`, func() {
 			dir := "test_dir"
 			path, err := s.GetDirPath(dir)
