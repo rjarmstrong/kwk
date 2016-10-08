@@ -7,6 +7,11 @@ const (
 	TokenHeaderName = "token"
 )
 
+type KwkKey struct {
+	Username string `json:"username" schema:"username"`
+	FullKey string `json:"fullKey" schema:"fullKey"`
+}
+
 type AliasList struct {
 	Items []Alias `json:"items"`
 	Total int32 `json:"total"`

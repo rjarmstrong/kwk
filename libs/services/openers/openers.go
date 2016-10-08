@@ -58,7 +58,6 @@ func (o *Opener) Edit(alias *models.Alias) error {
 }
 
 func (o *Opener) Open(alias *models.Alias, args []string) error {
-
 	if args[0] == "covert" {
 		o.OpenCovert(alias.Uri)
 		return nil
@@ -155,7 +154,11 @@ func (o *Opener) Open(alias *models.Alias, args []string) error {
 				o.system.Upgrade()
 				return nil
 			}
-			if alias, err := o.aliases.Get(firstArg); err != nil {
+			username := func() string {
+				panic("not implemented")
+			}()
+			k := &models.KwkKey{Username:username, FullKey:firstArg}
+			if alias, err := o.aliases.Get(k); err != nil {
 				return err
 			} else {
 				if alias.Total == 1 {

@@ -31,8 +31,8 @@ func (a *Aliases) List(username string, page int32, size int32, tags ...string) 
 	}
 }
 
-func (a *Aliases) Get(fullKey string) (*models.AliasList, error) {
-	if res, err := a.client.Get(a.headers.GetContext(), &aliasesRpc.GetRequest{FullKey:fullKey}); err != nil {
+func (a *Aliases) Get(k *models.KwkKey) (*models.AliasList, error) {
+	if res, err := a.client.Get(a.headers.GetContext(), &aliasesRpc.GetRequest{Username: k.Username, FullKey: k.FullKey}); err != nil {
 		return nil, err
 	} else {
 		list := &models.AliasList{}
@@ -93,8 +93,8 @@ func (a *Aliases) Patch(fullKey string, uri string) (*models.Alias, error) {
 	}
 }
 
-func (a *Aliases) Clone(fullKey string, newFullKey string) (*models.Alias, error) {
-	if res, err := a.client.Clone(a.headers.GetContext(), &aliasesRpc.CloneRequest{FullKey:fullKey, NewFullKey:newFullKey}); err != nil {
+func (a *Aliases) Clone(k *models.KwkKey, newFullKey string) (*models.Alias, error) {
+	if res, err := a.client.Clone(a.headers.GetContext(), &aliasesRpc.CloneRequest{FullKey:k.FullKey, NewFullKey:newFullKey}); err != nil {
 		return nil, err
 	} else {
 		alias := &models.Alias{}

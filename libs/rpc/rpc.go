@@ -39,7 +39,7 @@ type Headers struct {
 
 func (i *Headers) GetContext() context.Context {
 	u := &models.User{}
-	if i.settings.Get(models.ProfileFullKey, u); u == nil {
+	if err := i.settings.Get(models.ProfileFullKey, u); err != nil {
 		return context.Background()
 	} else {
 		ctx := metadata.NewContext(

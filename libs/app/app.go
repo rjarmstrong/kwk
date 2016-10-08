@@ -34,7 +34,7 @@ func NewKwkApp(a aliases.IAliases, s system.ISystem, t settings.ISettings, o ope
 	sysCtrl := NewSystemController(s, u, w)
 	app.Commands = append(app.Commands, System(sysCtrl)...)
 
-	aliasCtrl := NewAliasController(a, o, s, d, w)
+	aliasCtrl := NewAliasController(a, o, s, d, w, t)
 	app.Commands = append(app.Commands, Alias(aliasCtrl)...)
 	app.CommandNotFound = func(c *cli.Context, fullKey string) {
 		aliasCtrl.Open(fullKey, []string(c.Args())[1:])

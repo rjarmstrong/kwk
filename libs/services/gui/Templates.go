@@ -18,11 +18,16 @@ var Templates = map[string]*template.Template{}
 
 func init() {
 	// Aliases
-	add("alias:delete", "Are you sure you want to delete {{.fullKey}} y/n?", nil)
-	add("alias:notfound", "alias: {{.fullKey}} not found\n", nil)
+	add("alias:delete", "Are you sure you want to delete {{.FullKey}} y/n?", nil)
+	add("alias:notfound", "alias: {{.FullKey}} not found\n", nil)
 	add("alias:new", "{{.FullKey}} created.\n", nil)
+	add("alias:cat", "{{range $item := .Items}} {{ $item }}\n{{end}}", nil)
 	add("alias:list", "{{. | listAliases}}", template.FuncMap{"listAliases" : listAliases})
 	add("alias:chooseruntime", "{{. | listRuntimes}}", template.FuncMap{"listRuntimes" : listRuntimes})
+	add("alias:edited", "{{.FullKey}} updated.", nil)
+	add("alias:renamed", "{{.FullKey}} renamed.", nil)
+	add("alias:patched", "{{.FullKey}} patched.", nil)
+	add("alias:notdeleted", "{{.FullKey}} was pardoned.", nil)
 	//add("alias:chooseruntime", "{{.}}", nil)
 
 	// System
@@ -31,10 +36,11 @@ func init() {
 
 	// Account
 	add("account:signedup", "Welcome to kwk {{.username}}! You're signed in already.", nil)
-	add("account:notloggedin", "You are not logged in please log in: kwk login <username> <password>", nil)
+	add("account:notloggedin", "You are not logged in please log in: kwk login <username> <password>\n", nil)
 	add("account:usernamefield", "Your Kwk Username: ", nil)
 	add("account:passwordfield", "Your Password: ", nil)
 	add("account:signedin", "Welcome back {{.Username}}!", nil)
+	add("account:signedout", "And you're signed out.", nil)
 	add("account:profile", "You are: {{.Username}}!", nil)
 
 	// General
@@ -135,7 +141,8 @@ func add(name string, templateText string, funcMap template.FuncMap) {
 func listRuntimes(list []interface{}) string {
 	var options string
 	for i, v := range list {
-		options = options + fmt.Sprintf("%d) %s   ", i, v.(models.Match).Runtime)
+		m := v.(models.Match)
+		options = options + fmt.Sprintf("%d) %s  %d%%\n", i, m.Runtime, m.Score)
 	}
 	return options
 }

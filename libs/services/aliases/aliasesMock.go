@@ -3,20 +3,20 @@ package aliases
 import "bitbucket.com/sharingmachine/kwkcli/libs/models"
 
 type AliasesMock struct {
-	GetCalledWith      string
+	GetCalledWith    *models.KwkKey
 	RenameCalledWith []string
 	CreateCalledWith   []string
 	ReturnItemsForGet  []models.Alias
 	PatchCalledWith []string
 	DeleteCalledWith string
-	CloneCalledWith []string
+	CloneCalledWith []interface{}
 	TagCalledWith map[string][]string
 	UnTagCalledWith map[string][]string
 	ListCalledWith []interface{}
 }
 
-func (a *AliasesMock) Get(fullKey string) (*models.AliasList, error) {
-	a.GetCalledWith = fullKey
+func (a *AliasesMock) Get(k *models.KwkKey) (*models.AliasList, error) {
+	a.GetCalledWith = k
 	return &models.AliasList{Items:a.ReturnItemsForGet, Total:int32(len(a.ReturnItemsForGet))}, nil
 }
 
@@ -43,8 +43,8 @@ func (a *AliasesMock) Delete(fullKey string) error {
 	return nil
 }
 
-func (a *AliasesMock) Clone(fullKey string, newKey string) (*models.Alias, error) {
-	a.CloneCalledWith = []string{fullKey,newKey}
+func (a *AliasesMock) Clone(k *models.KwkKey, newKey string) (*models.Alias, error) {
+	a.CloneCalledWith = []interface{}{k,newKey}
 	return &models.Alias{},nil
 }
 

@@ -21,7 +21,6 @@ func NewAccountController(u users.IUsers, s settings.ISettings, w gui.ITemplateW
 func (c *AccountController) Get(){
 	u := &models.User{}
 	if err := c.settings.Get(models.ProfileFullKey, u); err != nil {
-		c.Render("error", err)
 		c.Render("account:notloggedin", nil)
 	} else {
 		c.Render("account:profile", u)
@@ -59,10 +58,13 @@ func (c *AccountController) SignIn(username string, password string){
 func (c *AccountController) SignOut(){
 	if err := c.service.Signout(); err != nil {
 		c.Render("error", err)
+		return
 	}
 	if err := c.settings.Delete(models.ProfileFullKey); err != nil {
 		c.Render("error", err)
+		return
 	}
+	c.Render("account:signedout", nil)
 }
 
 func (c *AccountController) ChangeDirectory(username string) {
