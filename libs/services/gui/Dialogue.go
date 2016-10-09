@@ -2,37 +2,35 @@ package gui
 
 import (
 	"bufio"
-	"os"
 	"github.com/siddontang/go/num"
 	"fmt"
 	"reflect"
 )
 
-func NewDialogues(w ITemplateWriter) *Dialogues {
-	return &Dialogues{writer:w}
+func NewDialogues(w ITemplateWriter, reader *bufio.Reader) *Dialogues {
+	return &Dialogues{writer:w, reader:reader}
 }
 
 type Dialogues struct {
 	writer ITemplateWriter
+	reader *bufio.Reader
 }
 
 func (d *Dialogues) Modal(templateName string, data interface{}) *DialogueResponse {
-	reader := bufio.NewReader(os.Stdin)
 	d.writer.Render(templateName, data)
-	yesNo, _, _ := reader.ReadRune()
+	yesNo, _, _ := d.reader.ReadRune()
 	return &DialogueResponse{
 		Ok:string(yesNo) == "y",
 	}
 }
 
 func (d *Dialogues) MultiChoice(templateName string, header interface{}, options interface{}) *DialogueResponse {
-	reader := bufio.NewReader(os.Stdin)
 	// TODO: Render header and options
 	items := InterfaceSlice(options)
 	fmt.Println(header)
 	d.writer.Render(templateName, items)
 	fmt.Println()
-	value, _, _ := reader.ReadRune()
+	value, _, _ := d.reader.ReadRune()
 	// upper and lower contraints
 	if i, err := num.ParseInt(string(value)); err != nil {
 		panic(err)
@@ -58,10 +56,12 @@ func InterfaceSlice(slice interface{}) []interface{} {
 }
 
 func (d *Dialogues) Field(templateName string, data interface{}) *DialogueResponse {
-	reader := bufio.NewReader(os.Stdin)
 	d.writer.Render(templateName, data)
-	value, _, _ := reader.ReadLine()
-	reader.Reset(nil)
+	value, _, err := d.reader.ReadLine()
+	if err != nil {
+		panic(err.Error())
+	}
+	//d.reader.Reset(nil)
 	return &DialogueResponse{
 		Value:string(value),
 	}

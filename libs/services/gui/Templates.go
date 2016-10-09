@@ -12,6 +12,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"strings"
 	"github.com/dustin/go-humanize"
+	"google.golang.org/grpc"
 )
 
 var Templates = map[string]*template.Template{}
@@ -43,8 +44,17 @@ func init() {
 	add("account:signedout", "And you're signed out.", nil)
 	add("account:profile", "You are: {{.Username}}!", nil)
 
+	add("account:signup:email", "What's your email? ", nil)
+	add("account:signup:username", "Choose a great username: ", nil)
+	add("account:signup:password", "And enter a password (1 num, 1 cap, 8 chars): ", nil)
+
 	// General
-	add("error", "{{.}}", nil)
+	add("error", "{{. | printError }}", template.FuncMap{"printError" : printError})
+	//add("error", "{{.Desc}}", nil)
+}
+
+func printError(err error) string {
+	return grpc.ErrorDesc(err)
 }
 
 func add(name string, templateText string, funcMap template.FuncMap) {

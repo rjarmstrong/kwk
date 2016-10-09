@@ -46,7 +46,6 @@ func (i *Headers) GetContext() context.Context {
 			context.Background(),
 			metadata.Pairs(models.TokenHeaderName, u.Token),
 		)
-
 		return ctx
 	}
 }

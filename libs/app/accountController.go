@@ -27,7 +27,12 @@ func (c *AccountController) Get(){
 	}
 }
 
-func (c *AccountController) SignUp(email string, username string, password string){
+func (c *AccountController) SignUp(){
+
+	email := c.Field("account:signup:email", nil).Value.(string)
+	username := c.Field("account:signup:username", nil).Value.(string)
+	password := c.Field("account:signup:password", nil).Value.(string)
+
 	if u, err := c.service.SignUp(email, username, password); err != nil {
 		c.Render("error", err)
 	} else {

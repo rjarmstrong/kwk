@@ -26,7 +26,7 @@ func Accounts(ctrl *AccountController) []cli.Command {
 			Name:    "signup",
 			Aliases: []string{"register"},
 			Action:  func(c *cli.Context) error {
-				ctrl.SignUp(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2));
+				ctrl.SignUp();
 				return nil
 			},
 		},

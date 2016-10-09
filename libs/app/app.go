@@ -41,3 +41,9 @@ func NewKwkApp(a aliases.IAliases, s system.ISystem, t settings.ISettings, o ope
 	}
 	return &KwkApp{App:app, System:s, Settings:t, Openers:o, Users:u, Dialogues:d, Aliases:a, TemplateWriter:w}
 }
+
+func (a *KwkApp) Run(args ...string){
+	params := []string{"[app]"}
+	params = append(params, args...)
+	a.App.Run(params)
+}
