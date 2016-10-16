@@ -13,6 +13,7 @@ import (
 	"strings"
 	"github.com/dustin/go-humanize"
 	"google.golang.org/grpc"
+	"encoding/json"
 )
 
 var Templates = map[string]*template.Template{}
@@ -50,11 +51,16 @@ func init() {
 
 	// General
 	add("error", "{{. | printError }}", template.FuncMap{"printError" : printError})
-	//add("error", "{{.Desc}}", nil)
 }
 
 func printError(err error) string {
-	return grpc.ErrorDesc(err)
+	e := new(models.Error)
+	eString := strings.Replace(grpc.ErrorDesc(err), "\nError: ", "", -1)
+	errBytes := []byte(eString)
+	if e2 := json.Unmarshal(errBytes, e); e2 != nil {
+		return eString
+	}
+	return e.Message
 }
 
 func add(name string, templateText string, funcMap template.FuncMap) {
