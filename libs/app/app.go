@@ -8,6 +8,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/users"
+	"os"
 )
 
 type KwkApp struct {
@@ -25,7 +26,7 @@ type KwkApp struct {
 func NewKwkApp(a aliases.IAliases, s system.ISystem, t settings.ISettings, o openers.IOpen, u users.IUsers, d gui.IDialogues, w gui.ITemplateWriter) *KwkApp {
 
 	app := cli.NewApp()
-
+	os.Setenv(system.APP_VERSION, "0.0.1")
 	//cli.HelpPrinter = system.Help
 
 	accCtrl := NewAccountController(u, t, w, d)

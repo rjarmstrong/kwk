@@ -34,23 +34,23 @@ func init() {
 
 	// System
 	add("system:upgraded", "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n   Successfully upgraded!  \n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", nil)
-	add("system:version", "kwkcli {{.version}}", nil)
+	add("system:version", "kwk {{.version}}'\n", nil)
 
 	// Account
-	add("account:signedup", "Welcome to kwk {{.username}}! You're signed in already.", nil)
+	add("account:signedup", "Welcome to kwk {{.Username}}! You're signed in already.\n", nil)
 	add("account:notloggedin", "You are not logged in please log in: kwk login <username> <password>\n", nil)
 	add("account:usernamefield", "Your Kwk Username: ", nil)
 	add("account:passwordfield", "Your Password: ", nil)
-	add("account:signedin", "Welcome back {{.Username}}!", nil)
-	add("account:signedout", "And you're signed out.", nil)
-	add("account:profile", "You are: {{.Username}}!", nil)
+	add("account:signedin", "Welcome back {{.Username}}!\n", nil)
+	add("account:signedout", "And you're signed out.\n", nil)
+	add("account:profile", "You are: {{.Username}}!\n", nil)
 
 	add("account:signup:email", "What's your email? ", nil)
 	add("account:signup:username", "Choose a great username: ", nil)
 	add("account:signup:password", "And enter a password (1 num, 1 cap, 8 chars): ", nil)
 
 	// General
-	add("error", "{{. | printError }}", template.FuncMap{"printError" : printError})
+	add("error", "{{. | printError }}\n", template.FuncMap{"printError" : printError})
 }
 
 func printError(err error) string {

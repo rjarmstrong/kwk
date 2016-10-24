@@ -38,7 +38,7 @@ func (c *AccountController) SignUp(){
 	} else {
 		if len(u.Token) > 50 {
 			c.settings.Upsert(models.ProfileFullKey, u)
-			c.Render("account:signedup", u.Username)
+			c.Render("account:signedup", u)
 		}
 	}
 }

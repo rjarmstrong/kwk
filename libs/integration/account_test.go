@@ -13,7 +13,6 @@ import (
 func Test_App(t *testing.T) {
 	Convey("ACCOUNT COMMANDS", t, func() {
 		conn := rpc.Conn("127.0.0.1:7777");
-		//defer conn.Close() // Not sure if we should be closing this??
 		w := &bytes.Buffer{}
 		reader := &bytes.Buffer{}
 		r := bufio.NewReader(reader)
@@ -33,17 +32,18 @@ func Test_App(t *testing.T) {
 
 		Convey(`Profile`, func() {
 			notLoggedIn := "You are not logged in please log in: kwk login <username> <password>\n"
+			wrongCreds := "Wrong username or password.\n"
 
 			Convey(`SIGNUP`, func() {
 				Convey(`Should signup`, func() {
 					signup()
-					So(w.String(), should.ContainSubstring, "Welcome to kwk")
+					So(w.String(), should.ContainSubstring, "Welcome to kwk testuser! You're signed in already.\n")
 					w.Reset()
 				})
 
 				Convey(`Should get profile`, func() {
 					kwk.Run("me")
-					So(w.String(), should.Equal, "You are: testuser!")
+					So(w.String(), should.Equal, "You are: testuser!\n")
 				})
 
 				Convey(`Should signout`, func() {
@@ -58,7 +58,7 @@ func Test_App(t *testing.T) {
 					reader.WriteString("testuser2\n")
 					reader.WriteString("TestPassword1\n")
 					kwk.Run("signup")
-					So(w.String(), should.ContainSubstring, "Email has been taken.")
+					So(w.String(), should.ContainSubstring, "Email has been taken.\n")
 					w.Reset()
 				})
 
@@ -67,24 +67,23 @@ func Test_App(t *testing.T) {
 					reader.WriteString("testuser\n")
 					reader.WriteString("TestPassword1\n")
 					kwk.Run("signup")
-					So(w.String(), should.ContainSubstring, "Username has been taken.")
+					So(w.String(), should.ContainSubstring, "Username has been taken.\n")
 					w.Reset()
 				})
 			})
 
 			Convey(`SIGNIN`, func() {
-				wrongCreds := "Wrong username or password."
 
 				Convey(`Should successfully signin`, func() {
 					kwk.Run("signin", username, password)
-					So(w.String(), should.Equal, "Welcome back testuser!")
+					So(w.String(), should.Equal, "Welcome back testuser!\n")
 					w.Reset()
 				})
 				Convey(`Should print profile`, func() {
 					signup()
 					w.Reset()
 					kwk.Run("profile")
-					So(w.String(), should.Equal, "You are: testuser!")
+					So(w.String(), should.Equal, "You are: testuser!\n")
 					kwk.Run("signout")
 				})
 				Convey(`Should not signin with wrong password`, func() {

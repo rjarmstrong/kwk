@@ -14,6 +14,10 @@ import (
 	"fmt"
 )
 
+const (
+	APP_VERSION ="APP_VERSION"
+)
+
 func New() ISystem {
 	return &System{}
 }
@@ -110,8 +114,8 @@ func (s *System) Exists(path string) (bool, error) {
 }
 
 func (s *System) GetVersion() (string, error) {
-	if v := os.Getenv("version"); v == "" {
-		return "", errors.New("version has not been set.")
+	if v := os.Getenv(APP_VERSION); v == "" {
+		return "", errors.New(APP_VERSION + " has not been set.")
 	} else {
 		return v, nil
 	}
