@@ -30,6 +30,7 @@ func init() {
 	add("alias:renamed", "{{.FullKey}} renamed.", nil)
 	add("alias:patched", "{{.FullKey}} patched.", nil)
 	add("alias:notdeleted", "{{.FullKey}} was pardoned.", nil)
+	add("alias:inspect", "{{range .Items}}Alias: {{.Username}}/{{.FullKey}}\nRuntime: {{.Runtime}}\nURI: {{.Uri}}\nVersion: {{.Version}}{{ end }}", nil)
 	//add("alias:chooseruntime", "{{.}}", nil)
 
 	// System

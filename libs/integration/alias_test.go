@@ -24,13 +24,30 @@ func Test_Alias(t *testing.T) {
 				So(w.String(), should.Equal, notLoggedIn)
 				w.Reset()
 			})
-			Convey(`Should create new url`, func() {
+			Convey(`Given no extension should prompt and assign choosen url`, func() {
 				signup(reader, kwk)
 				w.Reset()
 
-				reader.WriteString("1\n")
+				reader.WriteString("7\n")
 				kwk.Run("new", "echo \"hello\"", "hello")
+				So(lastLine(w.String()), should.Equal, "hello.url created.")
+				w.Reset()
+			})
+			Convey(`Should create new url with an extension`, func() {
+				signup(reader, kwk)
+				w.Reset()
+				kwk.Run("new", "echo \"hello\"", "hello.go")
 				So(lastLine(w.String()), should.Equal, "hello.go created.")
+				w.Reset()
+			})
+			Convey(`Should inspect alias`, func() {
+				signup(reader, kwk)
+				w.Reset()
+				kwk.Run("new", "echo \"hello\"", "hello.go")
+				So(lastLine(w.String()), should.Equal, "hello.go created.")
+				w.Reset()
+				kwk.Run("inspect", "hello.go")
+				So(w.String(), should.Resemble, "Alias: testuser/hello.go\nRuntime: golang\nURI: echo \"hello\"\nVersion: 1")
 				w.Reset()
 			})
 		})
