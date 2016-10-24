@@ -14,7 +14,7 @@ import (
 
 func Test_System(t *testing.T) {
 	Convey("SYSTEM COMMANDS", t, func() {
-		conn := rpc.Conn("127.0.0.1:7777");
+		conn := rpc.Conn("127.0.0.1:6666");
 		w := &bytes.Buffer{}
 		reader := &bytes.Buffer{}
 		r := bufio.NewReader(reader)

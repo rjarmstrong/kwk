@@ -12,31 +12,18 @@ import (
 
 func Test_App(t *testing.T) {
 	Convey("ACCOUNT COMMANDS", t, func() {
-		conn := rpc.Conn("127.0.0.1:7777");
+		conn := rpc.Conn("127.0.0.1:6666");
 		w := &bytes.Buffer{}
 		reader := &bytes.Buffer{}
 		r := bufio.NewReader(reader)
 		kwk := createApp(conn, w, r)
 
-		const (
-			email="test@kwk.co"
-			username="testuser"
-			password="TestPassword1"
-		)
-		signup := func() {
-			reader.WriteString(email + "\n")
-			reader.WriteString(username + "\n")
-			reader.WriteString(password + "\n")
-			kwk.Run("signup")
-		}
-
 		Convey(`Profile`, func() {
-			notLoggedIn := "You are not logged in please log in: kwk login <username> <password>\n"
 			wrongCreds := "Wrong username or password.\n"
 
 			Convey(`SIGNUP`, func() {
 				Convey(`Should signup`, func() {
-					signup()
+					signup(reader, kwk)
 					So(w.String(), should.ContainSubstring, "Welcome to kwk testuser! You're signed in already.\n")
 					w.Reset()
 				})
@@ -80,7 +67,7 @@ func Test_App(t *testing.T) {
 					w.Reset()
 				})
 				Convey(`Should print profile`, func() {
-					signup()
+					signup(reader, kwk)
 					w.Reset()
 					kwk.Run("profile")
 					So(w.String(), should.Equal, "You are: testuser!\n")

@@ -58,9 +58,19 @@ func printError(err error) string {
 	eString := strings.Replace(grpc.ErrorDesc(err), "\nError: ", "", -1)
 	errBytes := []byte(eString)
 	if e2 := json.Unmarshal(errBytes, e); e2 != nil {
-		return eString
+		if eString == "Forbidden" {
+			return render("account:notloggedin", nil)
+		} else {
+			return eString
+		}
 	}
 	return e.Message
+}
+
+func render(name string, value interface{}) string {
+	buf := new(bytes.Buffer)
+	Templates[name].Execute(buf, value)
+	return strings.Replace(buf.String(), "\n", "", -1)
 }
 
 func add(name string, templateText string, funcMap template.FuncMap) {
