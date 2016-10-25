@@ -103,8 +103,10 @@ func (a *AliasController) Cat(fullKey string) {
 	} else {
 		if len(list.Items) == 0 {
 			a.Render("alias:notfound", &models.Alias{FullKey:fullKey})
+		} else if (len(list.Items) == 1) {
+			a.Render("alias:cat", list.Items[0])
 		} else {
-			a.Render("alias:cat", list)
+			a.Render("alias:ambiguouscat", list)
 		}
 	}
 }

@@ -50,6 +50,30 @@ func Test_Alias(t *testing.T) {
 				So(w.String(), should.Resemble, "Alias: testuser/hello.go\nRuntime: golang\nURI: echo \"hello\"\nVersion: 1")
 				w.Reset()
 			})
+			Convey(`Should cat unambiguous alias`, func() {
+				signup(reader, kwk)
+				w.Reset()
+				uri := "echo \"hello\""
+				kwk.Run("new", uri, "hello.go")
+				So(lastLine(w.String()), should.Equal, "hello.go created.")
+				w.Reset()
+				kwk.Run("cat", "hello")
+				So(w.String(), should.Equal, uri)
+				w.Reset()
+			})
+
+			Convey(`Should prompt cat  ambiguous alias`, func() {
+				signup(reader, kwk)
+				w.Reset()
+				uri := "echo \"hello\""
+				uri2 := "console.log('hello');"
+				kwk.Run("new", uri, "hello.go")
+				kwk.Run("new", uri2, "hello.js")
+				w.Reset()
+				kwk.Run("cat", "hello")
+				So(w.String(), should.Resemble, "That alias is ambiguous please run it again with the extension:\nhello.go\nhello.js\n")
+				w.Reset()
+			})
 		})
 	})
 }
