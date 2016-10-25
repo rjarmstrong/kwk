@@ -131,7 +131,14 @@ func (a *AliasController) Rename(fullKey string, newKey string) {
 	if alias, err := a.service.Rename(fullKey, newKey); err != nil {
 		a.Render("error", err)
 	} else {
-		a.Render("alias:renamed", alias)
+		newFullKey := newKey
+		if strings.Index(newKey, ".") < 0 {
+			newFullKey += alias.Extension
+		}
+		a.Render("alias:renamed", &map[string]string{
+			"fullKey":fullKey,
+			"newFullKey":newFullKey,
+		})
 	}
 }
 

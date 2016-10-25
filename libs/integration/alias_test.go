@@ -62,7 +62,7 @@ func Test_Alias(t *testing.T) {
 				w.Reset()
 			})
 
-			Convey(`Should prompt cat  ambiguous alias`, func() {
+			Convey(`Should prompt cat ambiguous alias`, func() {
 				signup(reader, kwk)
 				w.Reset()
 				uri := "echo \"hello\""
@@ -72,6 +72,15 @@ func Test_Alias(t *testing.T) {
 				w.Reset()
 				kwk.Run("cat", "hello")
 				So(w.String(), should.Resemble, "That alias is ambiguous please run it again with the extension:\nhello.go\nhello.js\n")
+				w.Reset()
+			})
+			Convey(`Should rename an alias`, func() {
+				signup(reader, kwk)
+				w.Reset()
+				kwk.Run("new", "echo \"hello\"", "hello.js")
+				w.Reset()
+				kwk.Run("mv", "hello.js", "dong.js")
+				So(w.String(), should.Resemble, "hello.js renamed to dong.js")
 				w.Reset()
 			})
 		})
