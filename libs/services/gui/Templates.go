@@ -28,7 +28,7 @@ func init() {
 	add("alias:list", "{{. | listAliases}}", template.FuncMap{"listAliases" : listAliases})
 	add("alias:chooseruntime", "{{. | listRuntimes}}", template.FuncMap{"listRuntimes" : listRuntimes})
 	add("alias:edited", "{{.FullKey}} updated.", nil)
-	add("alias:renamed", "{{.fullKey}} renamed to {{.newFullKey}}.", nil)
+	add("alias:renamed", "{{.fullKey}} renamed to {{.newFullKey}}", nil)
 	add("alias:patched", "{{.FullKey}} patched.", nil)
 	add("alias:notdeleted", "{{.FullKey}} was pardoned.", nil)
 	add("alias:inspect", "{{range .Items}}Alias: {{.Username}}/{{.FullKey}}\nRuntime: {{.Runtime}}\nURI: {{.Uri}}\nVersion: {{.Version}}{{ end }}", nil)

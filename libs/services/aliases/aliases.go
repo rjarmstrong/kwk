@@ -1,12 +1,12 @@
 package aliases
 
 import (
-	"bitbucket.com/sharingmachine/kwkweb/rpc/aliasesRpc"
 	"time"
 	"google.golang.org/grpc"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
 	"bitbucket.com/sharingmachine/kwkcli/libs/models"
 	"bitbucket.com/sharingmachine/kwkcli/libs/rpc"
+	"bitbucket.com/sharingmachine/rpc/src/aliasesRpc"
 )
 
 const TimeLayout = time.RFC3339
@@ -73,13 +73,13 @@ func (a *Aliases) Create(uri string, path string) (*models.CreateAlias, error) {
 	}
 }
 
-func (a *Aliases) Rename(fullKey string, newFullKey string) (*models.Alias, error) {
+func (a *Aliases) Rename(fullKey string, newFullKey string) (*models.Alias, string, error) {
 	if res, err := a.client.Rename(a.headers.GetContext(), &aliasesRpc.RenameRequest{FullKey:fullKey, NewFullKey:newFullKey}); err != nil {
-		return nil, err
+		return nil, "", err
 	} else {
 		alias := &models.Alias{}
-		mapAlias(res, alias)
-		return alias, nil
+		mapAlias(res.Alias, alias)
+		return alias, res.OriginalFullKey, nil
 	}
 }
 

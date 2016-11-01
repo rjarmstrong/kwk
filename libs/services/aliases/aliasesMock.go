@@ -28,9 +28,9 @@ func (a *AliasesMock) Create(uri string, fullKey string) (*models.CreateAlias, e
 	return &models.CreateAlias{Alias: &models.Alias{FullKey:fullKey}}, nil
 }
 
-func (a *AliasesMock) Rename(fullKey string, newFullKey string) (*models.Alias, error) {
+func (a *AliasesMock) Rename(fullKey string, newFullKey string) (*models.Alias, string, error) {
 	a.RenameCalledWith = []string{fullKey, newFullKey}
-	return &models.Alias{FullKey:newFullKey}, nil
+	return &models.Alias{FullKey:newFullKey}, fullKey, nil
 }
 
 func (a *AliasesMock) Patch(fullKey string, uri string) (*models.Alias, error){

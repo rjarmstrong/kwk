@@ -4,7 +4,7 @@ import "bitbucket.com/sharingmachine/kwkcli/libs/models"
 
 type IAliases interface {
 	Create(uri string, fullKey string) (*models.CreateAlias, error)
-	Rename(fullKey string, newFullKey string) (*models.Alias, error)
+	Rename(fullKey string, newFullKey string) (*models.Alias, string, error)
 	Patch(fullKey string, uri string) (*models.Alias, error)
 	Delete(fullKey string) error
 	Clone(k *models.KwkKey, newKey string) (*models.Alias, error)

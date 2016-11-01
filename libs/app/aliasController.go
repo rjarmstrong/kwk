@@ -128,16 +128,12 @@ func (a *AliasController) Clone(fullKey string, newFullKey string) {
 }
 
 func (a *AliasController) Rename(fullKey string, newKey string) {
-	if alias, err := a.service.Rename(fullKey, newKey); err != nil {
+	if alias, originalFullKey, err := a.service.Rename(fullKey, newKey); err != nil {
 		a.Render("error", err)
 	} else {
-		newFullKey := newKey
-		if strings.Index(newKey, ".") < 0 {
-			newFullKey += alias.Extension
-		}
 		a.Render("alias:renamed", &map[string]string{
-			"fullKey":fullKey,
-			"newFullKey":newFullKey,
+			"fullKey":originalFullKey,
+			"newFullKey":alias.FullKey,
 		})
 	}
 }

@@ -16,7 +16,7 @@ import (
 func main() {
 	os.Setenv("version", "v0.0.3")
 
-	conn := rpc.Conn("127.0.0.1:7777");
+	conn := rpc.Conn("aus1.kwk.co:80");
 	defer conn.Close()
 
 	s := system.New()
