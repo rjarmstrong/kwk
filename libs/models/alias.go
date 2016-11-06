@@ -13,6 +13,7 @@ type KwkKey struct {
 }
 
 type AliasList struct {
+	Username string `json:"username"`
 	Items []Alias `json:"items"`
 	Total int32 `json:"total"`
 	Page  int32 `json:"page"`

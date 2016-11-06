@@ -157,11 +157,8 @@ func (a *AliasController) List(args ...string) {
 	var page, size int32
 	var tags = []string{}
 	u := &models.User{}
-	if err := a.settings.Get(models.ProfileFullKey, u); err != nil {
-		a.Render("account:notloggedin", nil)
-		return
-	}
-	for _, v := range args {
+	var username = ""
+	for i, v := range args {
 		if num, err := strconv.Atoi(v); err == nil {
 			if page == 0 {
 				page = int32(num)
@@ -169,12 +166,25 @@ func (a *AliasController) List(args ...string) {
 				size = int32(num)
 			}
 		} else {
-			tags = append(tags, v)
+			if i == 0 && v[0] == '/' {
+				username = strings.Replace(v, "/", "", -1)
+			} else {
+				tags = append(tags, v)
+			}
 		}
 	}
-	if list, err := a.service.List(u.Username, page, size, tags...); err != nil {
+	if username == "" {
+		if err := a.settings.Get(models.ProfileFullKey, u); err != nil {
+			a.Render("account:notloggedin", nil)
+			return
+		} else {
+			username = u.Username
+		}
+	}
+	if list, err := a.service.List(username, page, size, tags...); err != nil {
 		a.Render("error", err)
 	} else {
+		list.Username = username
 		a.Render("alias:list", list)
 	}
 }

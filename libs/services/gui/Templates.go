@@ -181,7 +181,7 @@ func listRuntimes(list []interface{}) string {
 func listAliases(list *models.AliasList) string {
 	buf := new(bytes.Buffer)
 
-	fmt.Fprint(buf, Colour(LightBlue, "\nkwk.co/" + "rjarmstrong/"))
+	fmt.Fprint(buf, Colour(LightBlue, "\nkwk.co/" + list.Username))
 	fmt.Fprintf(buf, Build(102, " ") + "%d of %d records\n\n", len(list.Items), list.Total)
 
 	tbl := tablewriter.NewWriter(buf)
