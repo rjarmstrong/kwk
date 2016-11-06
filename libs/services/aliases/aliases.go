@@ -88,7 +88,7 @@ func (a *Aliases) Patch(fullKey string, target string, patch string) (*models.Al
 		return nil, err
 	} else {
 		alias := &models.Alias{}
-		mapAlias(res, alias)
+		mapAlias(res.Alias, alias)
 		return alias, nil
 	}
 }
@@ -98,7 +98,7 @@ func (a *Aliases) Clone(k *models.KwkKey, newFullKey string) (*models.Alias, err
 		return nil, err
 	} else {
 		alias := &models.Alias{}
-		mapAlias(res, alias)
+		mapAlias(res.Alias, alias)
 		return alias, nil
 	}
 }
@@ -108,7 +108,7 @@ func (a *Aliases) Tag(fullKey string, tags ...string) (*models.Alias, error) {
 		return nil, err
 	} else {
 		alias := &models.Alias{}
-		mapAlias(res, alias)
+		mapAlias(res.Alias, alias)
 		return alias, nil
 	}
 }
@@ -118,7 +118,7 @@ func (a *Aliases) UnTag(fullKey string, tags ...string)(*models.Alias, error) {
 		return nil, err
 	} else {
 		alias := &models.Alias{}
-		mapAlias(res, alias)
+		mapAlias(res.Alias, alias)
 		return alias, nil
 	}
 }

@@ -29,10 +29,12 @@ func init() {
 	add("alias:list", "{{. | listAliases}}", template.FuncMap{"listAliases" : listAliases})
 	add("alias:chooseruntime", "{{. | listRuntimes}}", template.FuncMap{"listRuntimes" : listRuntimes})
 	add("alias:edited", "{{.FullKey}} updated.", nil)
+	add("alias:tag", "{{.FullKey}} tagged.", nil)
+	add("alias:untag", "{{.FullKey}} untagged.", nil)
 	add("alias:renamed", "{{.fullKey}} renamed to {{.newFullKey}}", nil)
 	add("alias:patched", "{{.FullKey}} patched.", nil)
 	add("alias:notdeleted", "{{.FullKey}} was pardoned.", nil)
-	add("alias:inspect", "{{range .Items}}Alias: {{.Username}}/{{.FullKey}}\nRuntime: {{.Runtime}}\nURI: {{.Uri}}\nVersion: {{.Version}}{{ end }}", nil)
+	add("alias:inspect", "{{range .Items}}Alias: {{.Username}}/{{.FullKey}}\nRuntime: {{.Runtime}}\nURI: {{.Uri}}\nVersion: {{.Version}}\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}}{{$element}}{{ end }}{{ end }}", nil)
 	//add("alias:chooseruntime", "{{.}}", nil)
 
 	// System
