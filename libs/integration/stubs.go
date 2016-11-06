@@ -29,6 +29,8 @@ func createApp(conn *grpc.ClientConn, writer *bytes.Buffer, r *bufio.Reader) *ap
 }
 
 const (
+	sqlContainer="localtest_mysql_1"
+	testHost="localhost:8000"
 	email="test@kwk.co"
 	username="testuser"
 	password="TestPassword1"
@@ -43,17 +45,17 @@ func signup(reader *bytes.Buffer, kwk *app.KwkApp) {
 }
 
 func getApp(reader *bytes.Buffer, writer *bytes.Buffer) *app.KwkApp{
-	conn := rpc.Conn("127.0.0.1:6666");
+	conn := rpc.Conn(testHost);
 	r := bufio.NewReader(reader)
 	return createApp(conn, writer, r)
 }
 
 func cleanup(){
-	cmd := exec.Command("/bin/sh", "-c", "docker exec -i mysql_test sh -c 'mysql -uroot -D kwk -e \"DELETE FROM aliases\"'")
+	cmd := exec.Command("/bin/sh", "-c", "docker exec -i " + sqlContainer + " sh -c 'mysql -uroot -D kwk -e \"DELETE FROM aliases\"'")
 	if err := cmd.Run(); err !=nil {
 		panic(err)
 	}
-	cmd2 := exec.Command("/bin/sh", "-c", "docker exec -i mysql_test sh -c 'mysql -uroot -D kwk -e \"DELETE FROM users\"'")
+	cmd2 := exec.Command("/bin/sh", "-c", "docker exec -i " + sqlContainer + "  sh -c 'mysql -uroot -D kwk -e \"DELETE FROM users\"'")
 	if err := cmd2.Run(); err !=nil {
 		panic(err)
 	}
@@ -66,4 +68,9 @@ func lastLine(input string) string {
 		return lines[l-2]
 	}
 	return lines[l-1]
+}
+
+func line(input string, index int) string {
+	lines := strings.Split(input, "\n")
+	return lines[index]
 }

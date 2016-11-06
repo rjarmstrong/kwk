@@ -4,9 +4,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 	"github.com/smartystreets/assertions/should"
-	"bitbucket.com/sharingmachine/kwkcli/libs/rpc"
 	"bytes"
-	"bufio"
 	_ "github.com/go-sql-driver/mysql"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
 	"os"
@@ -14,11 +12,9 @@ import (
 
 func Test_System(t *testing.T) {
 	Convey("SYSTEM COMMANDS", t, func() {
-		conn := rpc.Conn("127.0.0.1:6666");
 		w := &bytes.Buffer{}
 		reader := &bytes.Buffer{}
-		r := bufio.NewReader(reader)
-		kwk := createApp(conn, w, r)
+		kwk := getApp(reader, w)
 
 		Convey(`SYSTEM`, func() {
 			Convey(`VERSION`, func() {

@@ -85,9 +85,8 @@ func (a *AliasController) Inspect(fullKey string) {
 }
 
 func (a *AliasController) Delete(fullKey string) {
-	data := map[string]string{"fullKey" : fullKey}
 	alias := &models.Alias{FullKey:fullKey}
-	if r := a.Modal("alias:delete", data); r.Ok {
+	if r := a.Modal("alias:delete", alias); r.Ok {
 		if err := a.service.Delete(fullKey); err != nil {
 			a.Render("error", err)
 		}

@@ -101,6 +101,30 @@ func Test_Alias(t *testing.T) {
 				So(w.String(), should.Resemble, "hello.js renamed to dong.js")
 				w.Reset()
 			})
+			Convey(`Should prompt to delete alias and delete when 'y'`, func() {
+				signup(reader, kwk)
+				w.Reset()
+				kwk.Run("new", "echo \"hello\"", "hello.js")
+				w.Reset()
+
+				reader.WriteString("y\n")
+
+				kwk.Run("rm", "hello.js")
+				So(w.String(), should.Resemble, "Are you sure you want to delete hello.js? y/nhello.js deleted.")
+				w.Reset()
+			})
+			Convey(`Should prompt to delete alias and not delete when not 'y'`, func() {
+				signup(reader, kwk)
+				w.Reset()
+				kwk.Run("new", "echo \"hello\"", "hello.js")
+				w.Reset()
+
+				reader.WriteString("b\n")
+
+				kwk.Run("rm", "hello.js")
+				So(w.String(), should.Resemble, "Are you sure you want to delete hello.js? y/nhello.js was pardoned.")
+				w.Reset()
+			})
 		})
 	})
 }

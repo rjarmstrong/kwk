@@ -69,7 +69,7 @@ func Test_Alias(t *testing.T) {
 				So(p, should.NotBeNil)
 				p2 := app.App.Command("create")
 				p3 := app.App.Command("save")
-				So(p2.Name, should.Equal, p.Name)
+				So(p2.Name, should.Equal, p.Name + "x")
 				So(p3.Name, should.Equal, p.Name)
 			})
 			Convey(`Should call create, save to clip board and respond with template WITH a fullKey`, func() {

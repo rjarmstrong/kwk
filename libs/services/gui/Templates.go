@@ -20,7 +20,8 @@ var Templates = map[string]*template.Template{}
 
 func init() {
 	// Aliases
-	add("alias:delete", "Are you sure you want to delete {{.FullKey}} y/n?", nil)
+	add("alias:delete", "Are you sure you want to delete {{.FullKey}}? y/n", nil)
+	add("alias:deleted", "{{.FullKey}} deleted.", nil)
 	add("alias:notfound", "alias: {{.FullKey}} not found\n", nil)
 	add("alias:new", "{{.FullKey}} created.\n", nil)
 	add("alias:cat", "{{.Uri}}", nil)

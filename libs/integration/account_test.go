@@ -4,19 +4,15 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 	"github.com/smartystreets/assertions/should"
-	"bitbucket.com/sharingmachine/kwkcli/libs/rpc"
 	"bytes"
-	"bufio"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func Test_App(t *testing.T) {
 	Convey("ACCOUNT COMMANDS", t, func() {
-		conn := rpc.Conn("127.0.0.1:6666");
 		w := &bytes.Buffer{}
 		reader := &bytes.Buffer{}
-		r := bufio.NewReader(reader)
-		kwk := createApp(conn, w, r)
+		kwk := getApp(reader, w)
 
 		Convey(`Profile`, func() {
 			wrongCreds := "Wrong username or password.\n"
