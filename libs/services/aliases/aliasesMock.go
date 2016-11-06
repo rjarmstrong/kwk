@@ -33,9 +33,9 @@ func (a *AliasesMock) Rename(fullKey string, newFullKey string) (*models.Alias, 
 	return &models.Alias{FullKey:newFullKey}, fullKey, nil
 }
 
-func (a *AliasesMock) Patch(fullKey string, uri string) (*models.Alias, error){
-	a.PatchCalledWith = []string{fullKey, uri}
-	return &models.Alias{FullKey:fullKey, Uri:uri}, nil
+func (a *AliasesMock) Patch(fullKey string, target string, patch string) (*models.Alias, error){
+	a.PatchCalledWith = []string{fullKey, target, patch}
+	return &models.Alias{FullKey:fullKey, Uri:patch}, nil
 }
 
 func (a *AliasesMock) Delete(fullKey string) error {

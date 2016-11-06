@@ -56,9 +56,9 @@ func Alias(ctrl *AliasController) []cli.Command {
 		},
 		{
 			Name:    "patch",
-			Aliases: []string{"patch"},
+			Aliases: []string{"replace"},
 			Action:  func(c *cli.Context) error {
-				ctrl.Patch(c.Args().First(), c.Args()[1])
+				ctrl.Patch(c.Args().First(), c.Args()[1], c.Args()[2])
 				return nil
 			},
 		},

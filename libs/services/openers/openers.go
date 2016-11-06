@@ -49,7 +49,7 @@ func (o *Opener) Edit(alias *models.Alias) error {
 	if text, err := o.system.ReadFromFile(filecache, alias.FullKey); err != nil {
 		return err
 	} else {
-		if alias, err = o.aliases.Patch(alias.FullKey, text); err != nil {
+		if alias, err = o.aliases.Patch(alias.FullKey, alias.Uri, text); err != nil {
 			return err
 		}
 		fmt.Println(gui.Colour(gui.LightBlue, "Successfully updated " + alias.FullKey))

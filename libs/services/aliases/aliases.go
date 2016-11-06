@@ -83,8 +83,8 @@ func (a *Aliases) Rename(fullKey string, newFullKey string) (*models.Alias, stri
 	}
 }
 
-func (a *Aliases) Patch(fullKey string, uri string) (*models.Alias, error) {
-	if res, err := a.client.Patch(a.headers.GetContext(), &aliasesRpc.PatchRequest{FullKey:fullKey, Uri:uri}); err != nil {
+func (a *Aliases) Patch(fullKey string, target string, patch string) (*models.Alias, error) {
+	if res, err := a.client.Patch(a.headers.GetContext(), &aliasesRpc.PatchRequest{FullKey:fullKey, Target:target, Patch:patch}); err != nil {
 		return nil, err
 	} else {
 		alias := &models.Alias{}

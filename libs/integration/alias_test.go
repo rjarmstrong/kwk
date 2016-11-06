@@ -145,5 +145,22 @@ func Test_Alias(t *testing.T) {
 				w.Reset()
 			})
 		})
+
+		Convey(`PATCH`, func() {
+			Convey(`Should patch alias (find and replace)`, func() {
+				signup(reader, kwk)
+				w.Reset()
+				kwk.Run("new", "echo \"hello\"", "hello.js")
+				w.Reset()
+
+				kwk.Run("patch", "hello.js",  "echo", "printf")
+				So(w.String(), should.Resemble, "hello.js patched.")
+				w.Reset()
+				kwk.Run("get", "hello.js")
+				So(w.String(), should.Resemble, "printf \"hello\"")
+				w.Reset()
+			})
+
+		})
 	})
 }

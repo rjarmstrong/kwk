@@ -110,8 +110,8 @@ func (a *AliasController) Cat(fullKey string) {
 	}
 }
 
-func (a *AliasController) Patch(fullKey string, uri string) {
-	if alias, err := a.service.Patch(fullKey, uri); err != nil {
+func (a *AliasController) Patch(fullKey string, target string, patch string) {
+	if alias, err := a.service.Patch(fullKey, target, patch); err != nil {
 		a.Render("error", err)
 	} else {
 		a.Render("alias:patched", alias)
