@@ -201,6 +201,9 @@ func listAliases(list *models.AliasList) string {
 		if len(v.Uri) >= 40 {
 			v.Uri = v.Uri[0:10] + Colour(Subdued, "...") + v.Uri[len(v.Uri) - 30:len(v.Uri)]
 		}
+		if v.Uri == ""{
+			v.Uri = "<empty>"
+		}
 
 		var tags = []string{}
 		for _, v := range v.Tags {

@@ -27,7 +27,6 @@ func Test_Alias(t *testing.T) {
 			Convey(`Given no extension should prompt and assign choosen url`, func() {
 				signup(reader, kwk)
 				w.Reset()
-
 				reader.WriteString("7\n")
 				kwk.Run("new", "echo \"hello\"", "hello")
 				So(lastLine(w.String()), should.Equal, "hello.url created.")
@@ -40,6 +39,17 @@ func Test_Alias(t *testing.T) {
 				So(lastLine(w.String()), should.Equal, "hello.go created.")
 				w.Reset()
 			})
+			Convey(`Should create new blank alias if no content or alias is given`, func() {
+				signup(reader, kwk)
+				w.Reset()
+				reader.WriteString("7\n")
+				kwk.Run("new")
+				So(lastLine(w.String()), should.ContainSubstring, ".url created.")
+				w.Reset()
+			})
+		})
+
+		Convey(`INSPECT`, func() {
 			Convey(`Should inspect alias`, func() {
 				signup(reader, kwk)
 				w.Reset()
@@ -50,6 +60,10 @@ func Test_Alias(t *testing.T) {
 				So(w.String(), should.Resemble, "Alias: testuser/hello.go\nRuntime: golang\nURI: echo \"hello\"\nVersion: 1")
 				w.Reset()
 			})
+		})
+
+
+		Convey(`CAT`, func() {
 			Convey(`Should cat unambiguous alias`, func() {
 				signup(reader, kwk)
 				w.Reset()
@@ -61,7 +75,6 @@ func Test_Alias(t *testing.T) {
 				So(w.String(), should.Equal, uri)
 				w.Reset()
 			})
-
 			Convey(`Should prompt cat ambiguous alias`, func() {
 				signup(reader, kwk)
 				w.Reset()
@@ -74,6 +87,9 @@ func Test_Alias(t *testing.T) {
 				So(w.String(), should.Resemble, "That alias is ambiguous please run it again with the extension:\nhello.go\nhello.js\n")
 				w.Reset()
 			})
+		})
+
+		Convey(`RENAME`, func() {
 			Convey(`Should rename an alias`, func() {
 				signup(reader, kwk)
 				w.Reset()
@@ -101,6 +117,9 @@ func Test_Alias(t *testing.T) {
 				So(w.String(), should.Resemble, "hello.js renamed to dong.js")
 				w.Reset()
 			})
+		})
+
+		Convey(`DELETE`, func() {
 			Convey(`Should prompt to delete alias and delete when 'y'`, func() {
 				signup(reader, kwk)
 				w.Reset()
