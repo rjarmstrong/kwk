@@ -131,6 +131,10 @@ func Test_Alias(t *testing.T) {
 				kwk.Run("rm", "hello.js")
 				So(w.String(), should.Resemble, "Are you sure you want to delete hello.js? y/nhello.js deleted.")
 				w.Reset()
+
+				kwk.Run("get", "hello.js")
+				So(w.String(), should.Resemble, "alias: hello.js not found\n")
+				w.Reset()
 			})
 			Convey(`Should prompt to delete alias and not delete when not 'y'`, func() {
 				signup(reader, kwk)
