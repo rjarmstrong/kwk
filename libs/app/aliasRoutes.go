@@ -2,7 +2,6 @@ package app
 
 import (
 	"gopkg.in/urfave/cli.v1"
-	"github.com/iris-contrib/errors"
 )
 
 func Alias(ctrl *AliasController) []cli.Command {
@@ -95,14 +94,6 @@ func Alias(ctrl *AliasController) []cli.Command {
 			Action:  func(c *cli.Context) error {
 				ctrl.List([]string(c.Args())...)
 				return nil
-			},
-		},
-		{
-			Name:    "find",
-			Aliases: []string{"search"},
-			Action:  func(c *cli.Context) error {
-				//ctrl.List([]string(c.Args())...)
-				return errors.New("Not implemented")
 			},
 		},
 	}

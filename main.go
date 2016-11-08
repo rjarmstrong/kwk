@@ -11,6 +11,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/users"
 	"bufio"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/search"
 )
 
 func main() {
@@ -28,7 +29,8 @@ func main() {
 	w := gui.NewTemplateWriter(os.Stdout)
 	r := bufio.NewReader(os.Stdin)
 	d := gui.NewDialogues(w, r)
+	ch := search.New(conn, t, h)
 
-	kwkApp := app.NewKwkApp(a, s, t, o, u, d, w)
+	kwkApp := app.NewKwkApp(a, s, t, o, u, d, w, ch)
 	kwkApp.App.Run(os.Args)
 }

@@ -14,6 +14,7 @@ import (
 	"bufio"
 	"os/exec"
 	"strings"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/search"
 )
 
 func createApp(conn *grpc.ClientConn, writer *bytes.Buffer, r *bufio.Reader) *app.KwkApp{
@@ -25,7 +26,8 @@ func createApp(conn *grpc.ClientConn, writer *bytes.Buffer, r *bufio.Reader) *ap
 	o := openers.New(s, a)
 	w := gui.NewTemplateWriter(writer)
 	d := gui.NewDialogues(w, r)
-	return app.NewKwkApp(a, s, t, o, u, d, w)
+	ch := search.New(conn, t, h)
+	return app.NewKwkApp(a, s, t, o, u, d, w, ch)
 }
 
 const (

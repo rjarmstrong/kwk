@@ -7,6 +7,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/users"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/search"
 )
 
 func CreateAppStub() *KwkApp {
@@ -17,6 +18,7 @@ func CreateAppStub() *KwkApp {
 	u := &users.UsersMock{}
 	d := &gui.DialogueMock{}
 	w := &gui.TemplateWriterMock{}
-	app := NewKwkApp(a, s, t, o, u, d, w)
+	h := &search.SearchMock{}
+	app := NewKwkApp(a, s, t, o, u, d, w, h)
 	return app
 }

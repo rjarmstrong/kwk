@@ -9,6 +9,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/users"
 	"os"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/search"
 )
 
 type KwkApp struct {
@@ -23,7 +24,7 @@ type KwkApp struct {
 	TemplateWriter gui.ITemplateWriter
 }
 
-func NewKwkApp(a aliases.IAliases, s system.ISystem, t settings.ISettings, o openers.IOpen, u users.IUsers, d gui.IDialogues, w gui.ITemplateWriter) *KwkApp {
+func NewKwkApp(a aliases.IAliases, s system.ISystem, t settings.ISettings, o openers.IOpen, u users.IUsers, d gui.IDialogues, w gui.ITemplateWriter, h search.ISearch) *KwkApp {
 
 	app := cli.NewApp()
 	os.Setenv(system.APP_VERSION, "0.0.1")
@@ -40,6 +41,9 @@ func NewKwkApp(a aliases.IAliases, s system.ISystem, t settings.ISettings, o ope
 	app.CommandNotFound = func(c *cli.Context, fullKey string) {
 		aliasCtrl.Open(fullKey, []string(c.Args())[1:])
 	}
+	searchCtrl := NewSearchController(h, w, d)
+	app.Commands = append(app.Commands, Search(searchCtrl)...)
+
 	return &KwkApp{App:app, System:s, Settings:t, Openers:o, Users:u, Dialogues:d, Aliases:a, TemplateWriter:w}
 }
 

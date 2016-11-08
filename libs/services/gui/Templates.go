@@ -54,6 +54,9 @@ func init() {
 	add("account:signup:username", "Choose a great username: ", nil)
 	add("account:signup:password", "And enter a password (1 num, 1 cap, 8 chars): ", nil)
 
+
+	add("search:alpha", "Time: {{ .Took }}ms Count: {{ .Total }}\n{{range .Results}} {{ .Username }}/{{ .Key }}.{{ .Extension }}   {{.Uri | formatUri}} \n{{end}}", template.FuncMap{"formatUri" : formatUri})
+
 	// General
 	add("error", "{{. | printError }}\n", template.FuncMap{"printError" : printError})
 }
@@ -196,16 +199,7 @@ func listAliases(list *models.AliasList) string {
 	tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
 
 	for _, v := range list.Items {
-		v.Uri = strings.Replace(v.Uri, "https://", "", 1)
-		v.Uri = strings.Replace(v.Uri, "http://", "", 1)
-		v.Uri = strings.Replace(v.Uri, "www.", "", 1)
-		v.Uri = strings.Replace(v.Uri, "\n", " ", -1)
-		if len(v.Uri) >= 40 {
-			v.Uri = v.Uri[0:10] + Colour(Subdued, "...") + v.Uri[len(v.Uri) - 30:len(v.Uri)]
-		}
-		if v.Uri == ""{
-			v.Uri = "<empty>"
-		}
+		v.Uri = formatUri(v.Uri)
 
 		var tags = []string{}
 		for _, v := range v.Tags {
@@ -240,4 +234,19 @@ func listAliases(list *models.AliasList) string {
 	fmt.Fprint(buf, "\n\n")
 
 	return buf.String()
+}
+
+
+func formatUri(uri string) string {
+	uri = strings.Replace(uri, "https://", "", 1)
+	uri = strings.Replace(uri, "http://", "", 1)
+	uri = strings.Replace(uri, "www.", "", 1)
+	uri = strings.Replace(uri, "\n", " ", -1)
+	if len(uri) >= 40 {
+		uri = uri[0:10] + Colour(Subdued, "...") + uri[len(uri) - 30:]
+	}
+	if uri == ""{
+		uri = "<empty>"
+	}
+	return uri
 }
