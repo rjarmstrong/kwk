@@ -136,6 +136,24 @@ func Test_Alias(t *testing.T) {
 				So(w.String(), should.Resemble, "alias: hello.js not found\n")
 				w.Reset()
 			})
+
+			Convey(`Should delete when partial key given which is not ambiguous`, func() {
+				signup(reader, kwk)
+				w.Reset()
+				kwk.Run("new", "echo \"hello\"", "hello.js")
+				w.Reset()
+
+				reader.WriteString("y\n")
+
+				kwk.Run("rm", "hello")
+				w.Reset()
+
+				kwk.Run("get", "hello.js")
+				So(w.String(), should.Resemble, "alias: hello.js not found\n")
+				w.Reset()
+			})
+
+
 			Convey(`Should prompt to delete alias and not delete when not 'y'`, func() {
 				signup(reader, kwk)
 				w.Reset()
