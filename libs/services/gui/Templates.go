@@ -55,7 +55,7 @@ func init() {
 	add("account:signup:password", "And enter a password (1 num, 1 cap, 8 chars): ", nil)
 
 
-	add("search:alpha", "\n\033[7m  \"{{ .Term }}\" found in {{ .Total }} results in {{ .Took }} ms  \033[0m\n\n{{range .Results}} {{ .Username }}{{ \"/\" }}{{ .Key | blue }}.{{ .Extension | subdued }}\n\n{{ .Highlights | formatHighlight}}\n\n{{end}}", template.FuncMap{"formatHighlight" : formatHighlights, "blue" : formatBlue, "subdued" : formatSubdued })
+	add("search:alpha", "\n\033[7m  \"{{ .Term }}\" found in {{ .Total }} results in {{ .Took }} ms  \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Key | blue }}.{{ .Extension | subdued }}\n{{ . | formatSearchResult}}\n{{end}}", template.FuncMap{"formatSearchResult" : formatSearchResult, "blue" : formatBlue, "subdued" : formatSubdued })
 
 	// General
 	add("error", "{{. | printError }}\n", template.FuncMap{"printError" : printError})
@@ -251,17 +251,39 @@ func formatUri(uri string) string {
 	return uri
 }
 
-func formatHighlights(highlights map[string]string) string {
-	r := ""
-	for _, v := range highlights {
+// if there is no uri highlight then show it
+
+func formatSearchResult(result models.SearchResult) string {
+	if result.Highlights == nil {
+		result.Highlights = map[string]string{}
+	}
+	if result.Highlights["uri"] == "" {
+		result.Highlights["uri"] = result.Uri
+	}
+	lines := highlightsToLines(result.Highlights)
+	f := ""
+	for _, line := range lines {
+		f = f + line.Key[:3] + "\u2847  " + line.Line + "\n"
+	}
+	f = Colour(Subdued, f)
+	f = ColourSpan(40, f, "<em>", "</em>", Subdued)
+	return f
+}
+
+func highlightsToLines(highlights map[string]string) []SearchResultLine {
+	allLines := []SearchResultLine{}
+	for k, v := range highlights {
 		lines := strings.Split(v, "\n")
 		for _, line := range lines {
-			line =  "\u28FF    " + line
-			line = ColourSpan(40, line, "<em>", "</em>", Subdued)
-			r = r + line + "\n"
+			allLines = append(allLines, SearchResultLine{Key:k, Line:line})
 		}
 	}
-	return Colour(Subdued, r)
+	return allLines
+}
+
+type SearchResultLine struct {
+	Key string
+	Line string
 }
 
 func formatSubdued(text string) string {
