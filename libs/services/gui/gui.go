@@ -55,9 +55,9 @@ func Colour(colour int, params ...interface{}) string {
 	return fmt.Sprintf("\033[%dm%v\033[0m", colour, text)
 }
 
-func ColourSpan(colour int, text string, start string, end string) string {
-	text = strings.Replace(text, start, "\033[" + strconv.Itoa(colour) + "m", -1)
-	text = strings.Replace(text, end, "\033[0m", -1)
+func ColourSpan(colour int, text string, openTag string, closeTag string, surroundingColor int) string {
+	text = strings.Replace(text, openTag, End + "\033[" + strconv.Itoa(colour) + "m", -1)
+	text = strings.Replace(text, closeTag, "\033[0m" + Start + strconv.Itoa(surroundingColor) + "m", -1)
 	return text
 }
 

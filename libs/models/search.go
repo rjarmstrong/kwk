@@ -18,4 +18,5 @@ type SearchResponse struct {
 	Results []*SearchResult
 	Total   int64
 	Took    int64
+	Term     string
 }

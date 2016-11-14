@@ -21,6 +21,7 @@ func (c *SearchController) Search(args ...string){
 	if res, err := c.service.Search(term); err != nil {
 		c.Render("error", err)
 	} else {
+		res.Term = term
 		c.Render("search:alpha", res)
 	}
 }
