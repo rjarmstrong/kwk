@@ -2,6 +2,8 @@ package gui
 
 import (
 	"fmt"
+	"strings"
+	"strconv"
 )
 
 
@@ -15,6 +17,7 @@ const (
 	DarkBlue = 34
 	Pink = 35
 	LightBlue = 36
+	LightBlueHighlight = 46
 	ClearLine = "\033[1K"
 	MoveBack = "\033[9D"
 	Block = "2588"
@@ -51,3 +54,11 @@ func Colour(colour int, params ...interface{}) string {
 	}
 	return fmt.Sprintf("\033[%dm%v\033[0m", colour, text)
 }
+
+func ColourSpan(colour int, text string, start string, end string) string {
+	text = strings.Replace(text, start, "\033[" + strconv.Itoa(colour) + "m", -1)
+	text = strings.Replace(text, end, "\033[0m", -1)
+	return text
+}
+
+

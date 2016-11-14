@@ -33,6 +33,7 @@ func (s *Search) Search(term string) (*models.SearchResponse, error) {
 			item.Username = v.Username
 			item.Uri = v.Uri
 			item.Extension = v.Extension
+			item.Highlights = v.Highlights
 			r.Results = append(r.Results, item)
 		}
 		return r, nil

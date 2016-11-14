@@ -55,7 +55,7 @@ func init() {
 	add("account:signup:password", "And enter a password (1 num, 1 cap, 8 chars): ", nil)
 
 
-	add("search:alpha", "Time: {{ .Took }}ms Count: {{ .Total }}\n{{range .Results}} {{ .Username }}/{{ .Key }}.{{ .Extension }}   {{.Uri | formatUri}} \n{{end}}", template.FuncMap{"formatUri" : formatUri})
+	add("search:alpha", "Time: {{ .Took }}ms Count: {{ .Total }}\n{{range .Results}}-------------------------------------\n {{ .Username | blue }}{{ \"/\" | blue }}{{ .Key | blue }}.{{ .Extension | subdued }}\n\n{{ .Highlights | formatHighlight}} \n{{end}}", template.FuncMap{"formatHighlight" : formatHighlights, "blue" : formatBlue, "subdued" : formatSubdued })
 
 	// General
 	add("error", "{{. | printError }}\n", template.FuncMap{"printError" : printError})
@@ -249,4 +249,25 @@ func formatUri(uri string) string {
 		uri = "<empty>"
 	}
 	return uri
+}
+
+func formatHighlights(highlights map[string]string) string {
+	r := ""
+	for _, v := range highlights {
+		lines := strings.Split(v, "\n")
+		for _, line := range lines {
+			line = Colour(Subdued, "\u28FF") + "    " + line
+			line = ColourSpan(LightBlue, line, "<em>", "</em>")
+			r = r + line + "\n"
+		}
+	}
+	return r
+}
+
+func formatSubdued(text string) string {
+	return Colour(Subdued, text)
+}
+
+func formatBlue(text string) string {
+	return Colour(LightBlue, text)
 }

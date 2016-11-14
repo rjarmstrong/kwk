@@ -11,6 +11,7 @@ type SearchResult struct {
 	Version int64
 	CreatedUTC string
 	UpdatedUTC string
+	Highlights map[string]string
 }
 
 type SearchResponse struct {

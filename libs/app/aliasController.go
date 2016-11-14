@@ -208,6 +208,7 @@ func (a *AliasController) getKwkKey(fullKey string) *models.KwkKey {
 	}
 	k := &models.KwkKey{}
 	k.Username = u.Username
+	// TODO: MOVE LOGIC SERVER SIDE
 	if strings.Contains(fullKey, "/") {
 		tokens := strings.Split(fullKey, "/")
 		k.Username = tokens[0]
