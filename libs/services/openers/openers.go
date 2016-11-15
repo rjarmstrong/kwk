@@ -7,6 +7,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/aliases"
 	"bitbucket.com/sharingmachine/kwkcli/libs/models"
+	"fmt"
 )
 
 const (
@@ -38,12 +39,22 @@ func (o *Opener) Edit(alias *models.Alias) error {
 			time.Sleep(time.Millisecond * 100)
 		}
 	}
+
+	closer := func(){
+		o.system.ExecSafe("osascript", "-e",
+			fmt.Sprintf("tell application %q to close (every window whose name is \"%s.%s\")", "XCode",  alias.Key, alias.Extension))
+		o.system.ExecSafe("osascript", "-e", "tell application \"iTerm2\" to activate")
+	}
+
 	if text, err := o.system.ReadFromFile(filecache, alias.FullKey); err != nil {
+		closer()
 		return err
 	} else {
 		if alias, err = o.aliases.Patch(alias.FullKey, alias.Uri, text); err != nil {
+			closer()
 			return err
 		}
+		closer()
 		return nil
 	}
 }
@@ -59,7 +70,8 @@ func (o *Opener) Open(alias *models.Alias, args []string) error {
 		return nil
 	}
 	if alias.Runtime == "bash" {
-		o.system.ExecSafe("/bin/bash", append([]string{"-c", uri}, args...)...)
+		args = append([]string{uri}, args...)
+		o.system.ExecSafe("/bin/bash", append([]string{"-c"}, args...)...)
 		return nil
 	}
 	if alias.Runtime == "nodejs" {
@@ -80,6 +92,9 @@ func (o *Opener) Open(alias *models.Alias, args []string) error {
 	}
 	if alias.Runtime == "csharp" {
 		return nil
+	}
+	if alias.Runtime == "applescript" {
+		o.system.ExecSafe("osascript", append([]string{"-e"}, args...)...)
 	}
 	if alias.Runtime == "golang" {
 		// check if file exists
