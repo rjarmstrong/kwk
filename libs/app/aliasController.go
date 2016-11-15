@@ -44,6 +44,7 @@ func (a *AliasController) New(uri string, fullKey string) {
 		if createAlias.Alias != nil {
 			a.Render("alias:new", createAlias.Alias)
 			a.system.CopyToClipboard(createAlias.Alias.FullKey)
+			a.Edit(createAlias.Alias.FullKey)
 		} else {
 			matches := createAlias.TypeMatch.Matches
 			r := a.MultiChoice("alias:chooseruntime", "Choose a type for this alias:", matches)
@@ -53,7 +54,8 @@ func (a *AliasController) New(uri string, fullKey string) {
 				matches = ca.TypeMatch.Matches
 				winner = a.MultiChoice("alias:chooseruntime", "Choose a type for this alias:", matches).Value.(models.Match)
 			}
-			a.New(uri, fullKey + "." + winner.Extension)
+			fk := fullKey + "." + winner.Extension
+			a.New(uri, fk)
 		}
 	}
 }
