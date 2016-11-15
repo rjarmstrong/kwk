@@ -37,7 +37,6 @@ func init() {
 	add("alias:patched", "{{.FullKey}} patched.", nil)
 	add("alias:notdeleted", "{{.FullKey}} was pardoned.", nil)
 	add("alias:inspect", "{{range .Items}}Alias: {{.Username}}/{{.FullKey}}\nRuntime: {{.Runtime}}\nURI: {{.Uri}}\nVersion: {{.Version}}\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}}{{$element}}{{ end }}{{ end }}", nil)
-	//add("alias:chooseruntime", "{{.}}", nil)
 
 	// System
 	add("system:upgraded", "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n   Successfully upgraded!  \n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", nil)
@@ -95,7 +94,7 @@ func listRuntimes(list []interface{}) string {
 	var options string
 	for i, v := range list {
 		m := v.(models.Match)
-		options = options + fmt.Sprintf("%d) %s  %d%%\n", i, m.Runtime, m.Score)
+		options = options + fmt.Sprintf("%s %s   ", Colour(LightBlue, i+1), m.Runtime)
 	}
 	return options
 }

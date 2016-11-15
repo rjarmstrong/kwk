@@ -25,18 +25,20 @@ func (d *Dialogues) Modal(templateName string, data interface{}) *DialogueRespon
 }
 
 func (d *Dialogues) MultiChoice(templateName string, header interface{}, options interface{}) *DialogueResponse {
-	// TODO: Render header and options
 	items := InterfaceSlice(options)
 	fmt.Println(header)
 	d.writer.Render(templateName, items)
 	fmt.Println()
-	value, _, _ := d.reader.ReadRune()
+	value, _, _ := d.reader.ReadLine()
 	// upper and lower contraints
 	if i, err := num.ParseInt(string(value)); err != nil {
 		panic(err)
 	} else {
+		if i > len(items){
+			d.MultiChoice(templateName, header, options)
+		}
 		return &DialogueResponse{
-			Value: items[i],
+			Value: items[i-1],
 		}
 	}
 }

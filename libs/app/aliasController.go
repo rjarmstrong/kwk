@@ -46,14 +46,12 @@ func (a *AliasController) New(uri string, fullKey string) {
 			a.system.CopyToClipboard(createAlias.Alias.FullKey)
 		} else {
 			matches := createAlias.TypeMatch.Matches
-			matches = append(matches, models.Match{Runtime:"Show more options", Score:-1})
-			r := a.MultiChoice("alias:chooseruntime", "Choose the correct type for this link:", matches)
+			r := a.MultiChoice("alias:chooseruntime", "Choose a type for this alias:", matches)
 			winner := r.Value.(models.Match)
 			if winner.Score == -1 {
-				// Get all serverside options.
 				ca, _ := a.service.Create("_", "_")
 				matches = ca.TypeMatch.Matches
-				winner = a.MultiChoice("alias:chooseruntime", "Choose the correct type for this link:", matches).Value.(models.Match)
+				winner = a.MultiChoice("alias:chooseruntime", "Choose a type for this alias:", matches).Value.(models.Match)
 			}
 			a.New(uri, fullKey + "." + winner.Extension)
 		}
