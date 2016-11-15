@@ -25,10 +25,12 @@ func init() {
 	add("alias:notfound", "alias: {{.FullKey}} not found\n", nil)
 	add("alias:new", "{{.FullKey}} created.\n", nil)
 	add("alias:cat", "{{.Uri}}", nil)
+	add("alias:edited", "Successfully updated {{ .FullKey | blue }}", template.FuncMap{ "blue" : formatBlue })
+	add("alias:editing", "{{ \"Editing file in default editor.\" | blue }}\nPlease save and close to continue. Or Ctrl+C to abort.\n", template.FuncMap{ "blue" : formatBlue })
+
 	add("alias:ambiguouscat", "That alias is ambiguous please run it again with the extension:\n{{range .Items}}{{.FullKey}}\n{{ end }}", nil)
 	add("alias:list", "{{. | listAliases}}", template.FuncMap{"listAliases" : listAliases})
 	add("alias:chooseruntime", "{{. | listRuntimes}}", template.FuncMap{"listRuntimes" : listRuntimes})
-	add("alias:edited", "{{.FullKey}} updated.", nil)
 	add("alias:tag", "{{.FullKey}} tagged.", nil)
 	add("alias:untag", "{{.FullKey}} untagged.", nil)
 	add("alias:renamed", "{{.fullKey}} renamed to {{.newFullKey}}", nil)
@@ -87,6 +89,122 @@ func add(name string, templateText string, funcMap template.FuncMap) {
 		t.Funcs(funcMap)
 	}
 	Templates[name] = template.Must(t.Parse(templateText))
+}
+
+func listRuntimes(list []interface{}) string {
+	var options string
+	for i, v := range list {
+		m := v.(models.Match)
+		options = options + fmt.Sprintf("%d) %s  %d%%\n", i, m.Runtime, m.Score)
+	}
+	return options
+}
+
+func listAliases(list *models.AliasList) string {
+	buf := new(bytes.Buffer)
+
+	fmt.Fprint(buf, Colour(LightBlue, "\nkwk.co/" + list.Username))
+	fmt.Fprintf(buf, Build(102, " ") + "%d of %d records\n\n", len(list.Items), list.Total)
+
+	tbl := tablewriter.NewWriter(buf)
+	tbl.SetHeader([]string{"Alias", "Version", "URI", "Tags", ""})
+	tbl.SetAutoWrapText(false)
+	tbl.SetBorder(false)
+	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
+	tbl.SetCenterSeparator("")
+	tbl.SetColumnSeparator("")
+	tbl.SetAutoFormatHeaders(false)
+	tbl.SetHeaderLine(true)
+	tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
+
+	for _, v := range list.Items {
+		v.Uri = formatUri(v.Uri)
+
+		var tags = []string{}
+		for _, v := range v.Tags {
+			if v == "error" {
+				tags = append(tags, Colour(Pink, v))
+			} else {
+				tags = append(tags, v)
+			}
+
+		}
+
+		tbl.Append([]string{
+			Colour(LightBlue, v.Key) + Colour(Subdued, "." + v.Extension),
+			fmt.Sprintf("%d", v.Version),
+			fmt.Sprintf("%s", v.Uri),
+			strings.Join(tags, ", "),
+			humanize.Time(v.Created),
+		})
+
+	}
+	tbl.Render()
+
+	if len(list.Items) == 0 {
+		fmt.Println(Colour(Yellow, "No records on this page! Use a lower page number.\n"))
+	}
+	if list.Size != 0 {
+		fmt.Fprintf(buf, "\n %d of %d pages", list.Page, (list.Total / list.Size) + 1)
+	}
+	fmt.Fprint(buf, "\n\n")
+
+	return buf.String()
+}
+
+func formatUri(uri string) string {
+	uri = strings.Replace(uri, "https://", "", 1)
+	uri = strings.Replace(uri, "http://", "", 1)
+	uri = strings.Replace(uri, "www.", "", 1)
+	uri = strings.Replace(uri, "\n", " ", -1)
+	if len(uri) >= 40 {
+		uri = uri[0:10] + Colour(Subdued, "...") + uri[len(uri) - 30:]
+	}
+	if uri == ""{
+		uri = "<empty>"
+	}
+	return uri
+}
+
+func formatSearchResult(result models.SearchResult) string {
+	if result.Highlights == nil {
+		result.Highlights = map[string]string{}
+	}
+	if result.Highlights["uri"] == "" {
+		result.Highlights["uri"] = result.Uri
+	}
+	lines := highlightsToLines(result.Highlights)
+	f := ""
+	for _, line := range lines {
+		f = f + line.Key[:3] + "\u2847  " + line.Line + "\n"
+	}
+	f = Colour(Subdued, f)
+	f = ColourSpan(40, f, "<em>", "</em>", Subdued)
+	return f
+}
+
+func highlightsToLines(highlights map[string]string) []SearchResultLine {
+	allLines := []SearchResultLine{}
+	for k, v := range highlights {
+		lines := strings.Split(v, "\n")
+		for _, line := range lines {
+			allLines = append(allLines, SearchResultLine{Key:k, Line:line})
+		}
+	}
+	return allLines
+}
+
+type SearchResultLine struct {
+	Key string
+	Line string
+}
+
+func formatSubdued(text string) string {
+	return Colour(Subdued, text)
+}
+
+func formatBlue(text string) string {
+	return Colour(LightBlue, text)
 }
 
 /*
@@ -171,125 +289,3 @@ func add(name string, templateText string, funcMap template.FuncMap) {
 			}
 			fmt.Print("\n\n")
  */
-
-func listRuntimes(list []interface{}) string {
-	var options string
-	for i, v := range list {
-		m := v.(models.Match)
-		options = options + fmt.Sprintf("%d) %s  %d%%\n", i, m.Runtime, m.Score)
-	}
-	return options
-}
-
-func listAliases(list *models.AliasList) string {
-	buf := new(bytes.Buffer)
-
-	fmt.Fprint(buf, Colour(LightBlue, "\nkwk.co/" + list.Username))
-	fmt.Fprintf(buf, Build(102, " ") + "%d of %d records\n\n", len(list.Items), list.Total)
-
-	tbl := tablewriter.NewWriter(buf)
-	tbl.SetHeader([]string{"Alias", "Version", "URI", "Tags", ""})
-	tbl.SetAutoWrapText(false)
-	tbl.SetBorder(false)
-	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
-	tbl.SetCenterSeparator("")
-	tbl.SetColumnSeparator("")
-	tbl.SetAutoFormatHeaders(false)
-	tbl.SetHeaderLine(true)
-	tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
-
-	for _, v := range list.Items {
-		v.Uri = formatUri(v.Uri)
-
-		var tags = []string{}
-		for _, v := range v.Tags {
-			if v == "error" {
-				tags = append(tags, Colour(Pink, v))
-			} else {
-				tags = append(tags, v)
-			}
-
-		}
-
-		tbl.Append([]string{
-			Colour(LightBlue, v.Key) + Colour(Subdued, "." + v.Extension),
-			fmt.Sprintf("%d", v.Version),
-			fmt.Sprintf("%s", v.Uri),
-			strings.Join(tags, ", "),
-			humanize.Time(v.Created),
-		})
-
-	}
-	tbl.Render()
-
-	if len(list.Items) == 0 {
-		fmt.Println(Colour(Yellow, "No records on this page! Use a lower page number.\n"))
-	} else {
-		//Colour(Subdued, nextcmd)
-		//nextcmd := fmt.Sprintf("For next page run: kwk list %v", 2)
-	}
-	if list.Size != 0 {
-		fmt.Fprintf(buf, "\n %d of %d pages", list.Page, (list.Total / list.Size) + 1)
-	}
-	fmt.Fprint(buf, "\n\n")
-
-	return buf.String()
-}
-
-
-func formatUri(uri string) string {
-	uri = strings.Replace(uri, "https://", "", 1)
-	uri = strings.Replace(uri, "http://", "", 1)
-	uri = strings.Replace(uri, "www.", "", 1)
-	uri = strings.Replace(uri, "\n", " ", -1)
-	if len(uri) >= 40 {
-		uri = uri[0:10] + Colour(Subdued, "...") + uri[len(uri) - 30:]
-	}
-	if uri == ""{
-		uri = "<empty>"
-	}
-	return uri
-}
-
-// if there is no uri highlight then show it
-
-func formatSearchResult(result models.SearchResult) string {
-	if result.Highlights == nil {
-		result.Highlights = map[string]string{}
-	}
-	if result.Highlights["uri"] == "" {
-		result.Highlights["uri"] = result.Uri
-	}
-	lines := highlightsToLines(result.Highlights)
-	f := ""
-	for _, line := range lines {
-		f = f + line.Key[:3] + "\u2847  " + line.Line + "\n"
-	}
-	f = Colour(Subdued, f)
-	f = ColourSpan(40, f, "<em>", "</em>", Subdued)
-	return f
-}
-
-func highlightsToLines(highlights map[string]string) []SearchResultLine {
-	allLines := []SearchResultLine{}
-	for k, v := range highlights {
-		lines := strings.Split(v, "\n")
-		for _, line := range lines {
-			allLines = append(allLines, SearchResultLine{Key:k, Line:line})
-		}
-	}
-	return allLines
-}
-
-type SearchResultLine struct {
-	Key string
-	Line string
-}
-
-func formatSubdued(text string) string {
-	return Colour(Subdued, text)
-}
-
-func formatBlue(text string) string {
-	return Colour(LightBlue, text)
-}

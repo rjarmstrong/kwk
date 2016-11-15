@@ -65,6 +65,7 @@ func (a *AliasController) Edit(fullKey string) {
 		a.Render("error", err)
 	} else {
 		if alias := a.handleMultiResponse(fullKey, list); alias != nil {
+			a.Render("alias:editing", alias)
 			if err := a.openers.Edit(alias); err != nil {
 				a.Render("error", err)
 			} else {

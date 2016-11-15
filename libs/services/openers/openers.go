@@ -1,8 +1,6 @@
 package openers
 
 import (
-	"strings"
-	"fmt"
 	"os"
 	"time"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
@@ -18,16 +16,11 @@ const (
 type Opener struct {
 	aliases aliases.IAliases
 	system  system.ISystem
+	writer gui.ITemplateWriter
 }
 
-func New(system system.ISystem, aliases aliases.IAliases) *Opener {
-	return &Opener{aliases:aliases, system:system}
-}
-
-var iterationCount = 0
-
-func printUri(uri string) {
-	fmt.Printf(gui.Colour(gui.LightBlue, " %d - %s\n"), iterationCount, uri)
+func New(system system.ISystem, aliases aliases.IAliases, w gui.ITemplateWriter) *Opener {
+	return &Opener{aliases:aliases, system:system, writer:w}
 }
 
 func (o *Opener) Edit(alias *models.Alias) error {
@@ -37,7 +30,6 @@ func (o *Opener) Edit(alias *models.Alias) error {
 	}
 	fi, _ := os.Stat(filePath);
 	o.system.ExecSafe("open", filePath)
-	fmt.Println(gui.Colour(gui.LightBlue, "Editing file in default editor. Please save and close to continue. Or Ctrl+C to abort."))
 	edited := false
 	for edited == false {
 		if fi2, _ := os.Stat(filePath); fi2.ModTime().UnixNano() > fi.ModTime().UnixNano() {
@@ -52,127 +44,83 @@ func (o *Opener) Edit(alias *models.Alias) error {
 		if alias, err = o.aliases.Patch(alias.FullKey, alias.Uri, text); err != nil {
 			return err
 		}
-		fmt.Println(gui.Colour(gui.LightBlue, "Successfully updated " + alias.FullKey))
 		return nil
 	}
 }
 
 func (o *Opener) Open(alias *models.Alias, args []string) error {
-	if args[0] == "covert" {
+	if len(args) > 0 && args[0] == "covert" {
 		o.OpenCovert(alias.Uri)
 		return nil
 	}
-
 	uri := alias.Uri
-	iterationCount += 1
-	if iterationCount > 3 {
-		fmt.Println("Max recursion reached.")
+	if alias.Runtime == "url" {
+		o.system.ExecSafe("open", uri)
 		return nil
 	}
-	//printUri(link.Uri)
-
-	if alias.Media == "script" {
-		if alias.Runtime == "app" {
-			// Should we be string replacing??
-			if len(args) == 1 {
-				uri = strings.Replace(uri, "${1}", args[0], 1)
-			}
-			o.system.ExecSafe("/bin/bash", "-c", uri)
-		}
-		if alias.Runtime == "bash" {
-			o.system.ExecSafe("/bin/bash", append([]string{"-c", alias.Uri}, args...)...)
-			return nil
-		}
-		if alias.Runtime == "nodejs" {
-			args = append([]string{uri}, args...)
-			// -r (require flag)
-			o.system.ExecSafe("node", append([]string{"-e"}, args...)...)
-			return nil
-		}
-		if alias.Runtime == "python" {
-			args = append([]string{uri}, args...)
-			o.system.ExecSafe("python", append([]string{"-c"}, args...)...)
-			return nil
-		}
-		if alias.Runtime == "php" {
-			args = append([]string{uri}, args...)
-			o.system.ExecSafe("php", append([]string{"-r"}, args...)...)
-			return nil
-		}
-		if alias.Runtime == "csharp" {
-			return nil
-		}
-		if alias.Runtime == "golang" {
-			// check if file exists
-			// if not
-			// write file to disk in cache
-			// compile it
-			//system.ExecSafe("go", "build", key .go)
-			// java file name
-			// run it
-			// args
-			//system.ExecSafe(key)
-		}
-		if alias.Runtime == "rust" {
-			// check if file exists
-			// if not
-			// write file to disk in cache
-			// compile it
-			//system.ExecSafe("rustc", key .rs)
-			// java file name
-			// run it
-			// args
-			//system.ExecSafe(file)
-			return nil
-		}
-		if alias.Runtime == "scala" {
-			// scalac HelloWorld.scala
-			// args
-			// scala HelloWorld
-		}
-		if alias.Runtime == "java" {
-			// check if file exists
-			// if not
-			// write file to disk in cache
-			// compile it
-			//system.ExecSafe("javac", key .java)
-			// java file name
-			// run it
-			// args
-			//system.ExecSafe("java", key .class)
-			return nil
-		}
-
+	if alias.Runtime == "bash" {
+		o.system.ExecSafe("/bin/bash", append([]string{"-c", uri}, args...)...)
+		return nil
 	}
-	independants := strings.Split(alias.Uri, " && ")
-	// This model is a bit odd but necessary to get around the locking issue, will have to redirect stdin and out to make piping work.
-	for _, v := range independants {
-		if len(v) > 3 && v[0:4] == "kwk " {
-			args := strings.Split(v, " ")
-			firstArg := args[1]
-			if firstArg == "upgrade" {
-				o.system.Upgrade()
-				return nil
-			}
-			username := func() string {
-				panic("not implemented")
-			}()
-			k := &models.KwkKey{Username:username, FullKey:firstArg}
-			if alias, err := o.aliases.Get(k); err != nil {
-				return err
-			} else {
-				if alias.Total == 1 {
-					o.Open(&alias.Items[0], args)
-				} else if alias.Total > 1 {
-					fmt.Println("More than one option please give a file extension.")
-				} else {
-					fmt.Printf(gui.Colour(gui.Yellow, "Can't run sub-command: '%s' - has it been deleted?\n"), v)
-				}
-			}
+	if alias.Runtime == "nodejs" {
+		args = append([]string{uri}, args...)
+		// -r (require flag)
+		o.system.ExecSafe("node", append([]string{"-e"}, args...)...)
+		return nil
+	}
+	if alias.Runtime == "python" {
+		args = append([]string{uri}, args...)
+		o.system.ExecSafe("python", append([]string{"-c"}, args...)...)
+		return nil
+	}
+	if alias.Runtime == "php" {
+		args = append([]string{uri}, args...)
+		o.system.ExecSafe("php", append([]string{"-r"}, args...)...)
+		return nil
+	}
+	if alias.Runtime == "csharp" {
+		return nil
+	}
+	if alias.Runtime == "golang" {
+		// check if file exists
+		// if not
+		// write file to disk in cache
+		// compile it
+		//system.ExecSafe("go", "build", key .go)
+		// java file name
+		// run it
+		// args
+		//system.ExecSafe(key)
+	}
+	if alias.Runtime == "rust" {
+		// check if file exists
+		// if not
+		// write file to disk in cache
+		// compile it
+		//system.ExecSafe("rustc", key .rs)
+		// java file name
+		// run it
+		// args
+		//system.ExecSafe(file)
+		return nil
+	}
+	if alias.Runtime == "scala" {
+		// scalac HelloWorld.scala
+		// args
+		// scala HelloWorld
+	}
+	if alias.Runtime == "java" {
 
-		} else {
-			o.system.ExecSafe("/bin/bash", "-c", v)
-		}
+		// check if file exists
+		// if not
+		// write file to disk in cache
+		// compile it
+		//system.ExecSafe("javac", key .java)
+		// java file name
+		// run it
+		// args
+		//system.ExecSafe("java", key .class)
+		return nil
 	}
 	return nil
 }
