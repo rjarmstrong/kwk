@@ -2,7 +2,7 @@ package rpc
 
 import (
 	"crypto/tls"
-	"google.golang.org/grpc/credentials"
+	//"google.golang.org/grpc/credentials"
 	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -17,12 +17,13 @@ func Conn(serverAddress string) *grpc.ClientConn {
 	// test
 	config := &tls.Config{}
 	config.InsecureSkipVerify = true
-	cert := credentials.NewTLS(config)
+	//cert := credentials.NewTLS(config)
 
 	// production
 	//cert := credentials.NewClientTLSFromCert(nil, "")
+	//grpc.WithTransportCredentials(cert)
 
-	conn, err := grpc.Dial(serverAddress, grpc.WithTransportCredentials(cert))
+	conn, err := grpc.Dial(serverAddress, grpc.WithInsecure())
 	if err != nil {
 		panic(fmt.Sprintf("Failure: %v", err))
 	}

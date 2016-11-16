@@ -96,6 +96,14 @@ func Alias(ctrl *AliasController) []cli.Command {
 				return nil
 			},
 		},
+		{
+			Name:    "share",
+			Aliases: []string{"send"},
+			Action:  func(c *cli.Context) error {
+				ctrl.Share(c.Args().First(), c.Args().Get(2))
+				return nil
+			},
+		},
 	}
 	return c
 }

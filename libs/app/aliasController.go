@@ -24,6 +24,21 @@ func NewAliasController(a aliases.IAliases, o openers.IOpen, s system.ISystem, d
 	return &AliasController{service:a, openers:o, system:s, IDialogues:d, ITemplateWriter:w, settings: t}
 }
 
+func (a *AliasController) Share(fullKey string, destination string) {
+	k := a.getKwkKey(fullKey);
+	if list, err := a.service.Get(k); err != nil {
+		a.Render("error", err)
+	} else {
+		if alias := a.handleMultiResponse(fullKey, list); alias != nil {
+			gmail := &models.Alias{Runtime:"url", Extension:"url"}
+			gmail.Uri = "https://mail.google.com/mail/?ui=2&view=cm&fs=1&tf=1&su=&body=http%3A%2F%2Faus.kwk.co%2F" + alias.Username + "%2f" + alias.FullKey
+			a.openers.Open(gmail, []string{})
+		} else {
+			a.Render("alias:notfound", map[string]interface{}{"fullKey":fullKey})
+		}
+	}
+}
+
 func (a *AliasController) Open(fullKey string, args []string) {
 	k := a.getKwkKey(fullKey);
 	if list, err := a.service.Get(k); err != nil {
