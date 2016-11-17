@@ -59,7 +59,9 @@ func (a *AliasController) New(uri string, fullKey string) {
 		if createAlias.Alias != nil {
 			a.Render("alias:new", createAlias.Alias)
 			a.system.CopyToClipboard(createAlias.Alias.FullKey)
-			a.Edit(createAlias.Alias.FullKey)
+			if createAlias.Alias.Runtime != "url" {
+				a.Edit(createAlias.Alias.FullKey)
+			}
 		} else {
 			matches := createAlias.TypeMatch.Matches
 			r := a.MultiChoice("alias:chooseruntime", "Choose a type for this alias:", matches)
