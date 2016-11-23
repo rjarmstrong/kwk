@@ -63,6 +63,14 @@ func Alias(ctrl *AliasController) []cli.Command {
 			},
 		},
 		{
+			Name:    "clone",
+			Aliases: []string{"fork", "copy", "c"},
+			Action:  func(c *cli.Context) error {
+				ctrl.Clone(c.Args().First(), c.Args().Get(2))
+				return nil
+			},
+		},
+		{
 			Name:    "patch",
 			Aliases: []string{"replace"},
 			Action:  func(c *cli.Context) error {
