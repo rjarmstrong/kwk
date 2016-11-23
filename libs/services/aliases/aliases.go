@@ -104,7 +104,7 @@ func (a *Aliases) Patch(fullKey string, target string, patch string) (*models.Al
 }
 
 func (a *Aliases) Clone(k *models.KwkKey, newFullKey string) (*models.Alias, error) {
-	if res, err := a.client.Clone(a.headers.GetContext(), &aliasesRpc.CloneRequest{FullKey:k.FullKey, NewFullKey:newFullKey}); err != nil {
+	if res, err := a.client.Clone(a.headers.GetContext(), &aliasesRpc.CloneRequest{Username: k.Username, FullKey:k.FullKey, NewFullKey:newFullKey}); err != nil {
 		return nil, err
 	} else {
 		alias := &models.Alias{}

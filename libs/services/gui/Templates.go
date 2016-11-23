@@ -24,6 +24,7 @@ func init() {
 	add("alias:deleted", "{{.FullKey}} deleted.", nil)
 	add("alias:updated", "Description updated:\n{{ .Description | blue }}", template.FuncMap{ "blue" : formatBlue })
 	add("alias:notfound", "alias: {{.FullKey}} not found\n", nil)
+	add("alias:cloned", "Forked as {{.Username}}/{{.FullKey | blue}}\n", template.FuncMap{ "blue" : formatBlue })
 	add("alias:new", "{{.FullKey}} created.\n", nil)
 	add("alias:cat", "{{.Uri}}", nil)
 	add("alias:edited", "Successfully updated {{ .FullKey | blue }}", template.FuncMap{ "blue" : formatBlue })
