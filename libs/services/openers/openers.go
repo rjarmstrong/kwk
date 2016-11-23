@@ -60,10 +60,17 @@ func (o *Opener) Edit(alias *models.Alias) error {
 }
 
 func (o *Opener) Open(alias *models.Alias, args []string) error {
-	if len(args) > 0 && args[0] == "covert" {
-		o.OpenCovert(alias.Uri)
-		return nil
+	if len(args) > 0 {
+		if args[0] == "covert" {
+			o.OpenCovert(alias.Uri)
+			return nil
+		}
+		if args[0] == "web" {
+			o.OpenWeb(alias)
+			return nil
+		}
 	}
+
 	uri := alias.Uri
 	if alias.Runtime == "url" {
 		o.system.ExecSafe("open", uri)
@@ -138,6 +145,11 @@ func (o *Opener) Open(alias *models.Alias, args []string) error {
 		return nil
 	}
 	return nil
+}
+
+func (o *Opener) OpenWeb(alias *models.Alias) {
+	o.system.ExecSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", fmt.Sprintf("http://aus.kwk.co/%s/%s", alias.Username, alias.FullKey))
+	o.system.ExecSafe("osascript", "-e", "activate application \"Google Chrome\"")
 }
 
 func (o *Opener) OpenCovert(uri string) {

@@ -21,7 +21,7 @@ func New(conn *grpc.ClientConn, s settings.ISettings, h *rpc.Headers) IAliases {
 	return &Aliases{Settings:s, client:aliasesRpc.NewAliasesRpcClient(conn), headers:h}
 }
 
-func (a *Aliases) List(username string, page int32, size int32, tags ...string) (*models.AliasList, error) {
+func (a *Aliases) List(username string, page int64, size int64, tags ...string) (*models.AliasList, error) {
 	if res, err := a.client.List(a.headers.GetContext(), &aliasesRpc.ListRequest{Username:username, Page:page, Size:size, Tags:tags}); err != nil {
 		return nil, err
 	} else {

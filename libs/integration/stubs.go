@@ -23,9 +23,9 @@ func createApp(conn *grpc.ClientConn, writer *bytes.Buffer, r *bufio.Reader) *ap
 	h := rpc.NewHeaders(t)
 	u := users.New(conn, t, h)
 	a := aliases.New(conn, t, h)
-	o := openers.New(s, a)
 	w := gui.NewTemplateWriter(writer)
 	d := gui.NewDialogues(w, r)
+	o := openers.New(s, a, w)
 	ch := search.New(conn, t, h)
 	return app.NewKwkApp(a, s, t, o, u, d, w, ch)
 }

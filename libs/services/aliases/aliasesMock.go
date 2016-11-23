@@ -17,7 +17,7 @@ type AliasesMock struct {
 
 func (a *AliasesMock) Get(k *models.KwkKey) (*models.AliasList, error) {
 	a.GetCalledWith = k
-	return &models.AliasList{Items:a.ReturnItemsForGet, Total:int32(len(a.ReturnItemsForGet))}, nil
+	return &models.AliasList{Items:a.ReturnItemsForGet, Total:int64(len(a.ReturnItemsForGet))}, nil
 }
 
 func (a *AliasesMock) Create(uri string, fullKey string) (*models.CreateAlias, error) {
@@ -62,7 +62,7 @@ func (a *AliasesMock) UnTag(fullKey string, tag ...string) (*models.Alias, error
 	return &models.Alias{},nil
 }
 
-func (a *AliasesMock) List(username string, page int32, size int32, tags ...string) (*models.AliasList, error) {
+func (a *AliasesMock) List(username string, page int64, size int64, tags ...string) (*models.AliasList, error) {
 	a.ListCalledWith = []interface{}{username, page, size, tags}
 	return &models.AliasList{}, nil
 }

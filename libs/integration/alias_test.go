@@ -6,6 +6,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 	"bytes"
 	_ "github.com/go-sql-driver/mysql"
+	"fmt"
 )
 
 func Test_Alias(t *testing.T) {
@@ -13,6 +14,8 @@ func Test_Alias(t *testing.T) {
 		w := &bytes.Buffer{}
 		reader := &bytes.Buffer{}
 		kwk := getApp(reader, w)
+		uriOptions := "\x1b[36m1\x1b[0m bash   \x1b[36m2\x1b[0m golang   \x1b[36m3\x1b[0m java   \x1b[36m4\x1b[0m json   \x1b[36m5\x1b[0m nodejs   \x1b[36m6\x1b[0m php   \x1b[36m7\x1b[0m python   \x1b[36m8\x1b[0m rust   \x1b[36m9\x1b[0m txt   \x1b[36m10\x1b[0m url   \x1b[36m11\x1b[0m xml   \x1b[36m12\x1b[0m yml"
+
 		cleanup()
 
 		Convey(`NEW`, func() {
@@ -29,7 +32,7 @@ func Test_Alias(t *testing.T) {
 				w.Reset()
 				reader.WriteString("7\n")
 				kwk.Run("new", "echo \"hello\"", "hello")
-				So(lastLine(w.String()), should.Equal, "hello.url created.")
+				So(lastLine(w.String()), should.Resemble, fmt.Sprintf("%s   hello.py created.", uriOptions))
 				w.Reset()
 			})
 			Convey(`Should create new url with an extension`, func() {
@@ -44,7 +47,7 @@ func Test_Alias(t *testing.T) {
 				w.Reset()
 				reader.WriteString("7\n")
 				kwk.Run("new")
-				So(lastLine(w.String()), should.ContainSubstring, ".url created.")
+				So(lastLine(w.String()), should.ContainSubstring, ".py created.")
 				w.Reset()
 			})
 		})
@@ -57,7 +60,7 @@ func Test_Alias(t *testing.T) {
 				So(lastLine(w.String()), should.Equal, "hello.go created.")
 				w.Reset()
 				kwk.Run("inspect", "hello.go")
-				So(w.String(), should.Resemble, "Alias: testuser/hello.go\nRuntime: golang\nURI: echo \"hello\"\nVersion: 1\nTags: ")
+				So(w.String(), should.Resemble, "\nAlias: testuser/hello.go\nRuntime: golang\nURI: echo \"hello\"\nVersion: 1\nTags: \n\x1b[4mhttp://aus.kwk.co/testuser/hello.go\x1b[0m\n\n")
 				w.Reset()
 			})
 		})

@@ -15,9 +15,9 @@ type KwkKey struct {
 type AliasList struct {
 	Username string `json:"username"`
 	Items []Alias `json:"items"`
-	Total int32 `json:"total"`
-	Page  int32 `json:"page"`
-	Size  int32 `json:"size"`
+	Total int64 `json:"total"`
+	Page  int64 `json:"page"`
+	Size  int64 `json:"size"`
 }
 
 type Alias struct {
@@ -29,7 +29,7 @@ type Alias struct {
 	Extension string `json:"extension"`
 
 	Uri       string `json:"uri"`
-	Version   int32 `json:"version"`
+	Version   int64 `json:"version"`
 	Runtime   string `json:"runtime"`
 	Media     string `json:"media"`
 	Tags      []string `json:"tags"`
@@ -47,7 +47,7 @@ type TypeMatch struct {
 }
 
 type Match struct {
-	Score     int32
+	Score     int64
 	Media     string
 	Runtime   string
 	Extension string

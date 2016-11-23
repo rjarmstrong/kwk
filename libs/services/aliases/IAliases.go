@@ -11,5 +11,5 @@ type IAliases interface {
 	Tag(fullKey string, tag ...string) (*models.Alias, error)
 	UnTag(fullKey string, tag ...string) (*models.Alias, error)
 	Get(k *models.KwkKey) (*models.AliasList, error)
-	List(username string, page int32, size int32, tags ...string) (*models.AliasList, error)
+	List(username string, page int64, size int64, tags ...string) (*models.AliasList, error)
 }

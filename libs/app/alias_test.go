@@ -252,7 +252,7 @@ func Test_Alias(t *testing.T) {
 			})
 			Convey(`Should call list and respond with template`, func() {
 				app.App.Run([]string{"[app]", "list", "3", "5", "tag1"})
-				So(a.ListCalledWith, should.Resemble, []interface{}{"", int32(3), int32(5), []string{"tag1"}})
+				So(a.ListCalledWith, should.Resemble, []interface{}{"", int64(3), int64(5), []string{"tag1"}})
 				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:list", &models.AliasList{}})
 			})
 		})

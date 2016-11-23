@@ -59,9 +59,9 @@ func (a *AliasController) New(uri string, fullKey string) {
 		if createAlias.Alias != nil {
 			a.Render("alias:new", createAlias.Alias)
 			a.system.CopyToClipboard(createAlias.Alias.FullKey)
-			if createAlias.Alias.Runtime != "url" {
-				a.Edit(createAlias.Alias.FullKey)
-			}
+			//if createAlias.Alias.Runtime != "url" {
+			//	a.Edit(createAlias.Alias.FullKey)
+			//}
 		} else {
 			matches := createAlias.TypeMatch.Matches
 			r := a.MultiChoice("alias:chooseruntime", "Choose a type for this alias:", matches)
@@ -172,16 +172,16 @@ func (a *AliasController) UnTag(fullKey string, tags ...string) {
 }
 
 func (a *AliasController) List(args ...string) {
-	var page, size int32
+	var page, size int64
 	var tags = []string{}
 	u := &models.User{}
 	var username = ""
 	for i, v := range args {
 		if num, err := strconv.Atoi(v); err == nil {
 			if page == 0 {
-				page = int32(num)
+				page = int64(num)
 			} else {
-				size = int32(num)
+				size = int64(num)
 			}
 		} else {
 			if i == 0 && v[0] == '/' {
