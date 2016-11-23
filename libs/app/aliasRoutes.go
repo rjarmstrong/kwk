@@ -15,6 +15,14 @@ func Alias(ctrl *AliasController) []cli.Command {
 			},
 		},
 		{
+			Name:    "describe",
+			Aliases: []string{"update", "d"},
+			Action:  func(c *cli.Context) error {
+				ctrl.Describe(c.Args().Get(0), c.Args().Get(1))
+				return nil
+			},
+		},
+		{
 			Name:    "inspect",
 			Aliases: []string{"i"},
 			Action: func(c *cli.Context) error {

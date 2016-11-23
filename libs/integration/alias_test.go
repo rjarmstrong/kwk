@@ -52,6 +52,19 @@ func Test_Alias(t *testing.T) {
 			})
 		})
 
+		Convey(`UPDATE`, func() {
+			Convey(`Should add a description`, func() {
+				signup(reader, kwk)
+				w.Reset()
+				kwk.Run("new", "echo \"hello\"", "hello.go")
+				w.Reset()
+				description := "This is for saying hello."
+				kwk.Run("describe", "hello.go", description)
+				So(w.String(), should.Resemble,  "Description updated:\n\x1b[36mThis is for saying hello.\x1b[0m")
+				w.Reset()
+			})
+		})
+
 		Convey(`INSPECT`, func() {
 			Convey(`Should inspect alias`, func() {
 				signup(reader, kwk)
@@ -59,12 +72,15 @@ func Test_Alias(t *testing.T) {
 				kwk.Run("new", "echo \"hello\"", "hello.go")
 				So(lastLine(w.String()), should.Equal, "hello.go created.")
 				w.Reset()
+				kwk.Run("describe", "hello.go", "Hi there!")
+				w.Reset()
+				kwk.Run("get", "hello.go")
+				w.Reset()
 				kwk.Run("inspect", "hello.go")
-				So(w.String(), should.Resemble, "\nAlias: testuser/hello.go\nRuntime: golang\nURI: echo \"hello\"\nVersion: 1\nTags: \n\x1b[4mhttp://aus.kwk.co/testuser/hello.go\x1b[0m\n\n")
+				So(w.String(), should.Resemble, "\nAlias: testuser/hello.go\nRuntime: golang\nURI: echo \"hello\"\nVersion: 1\nTags: \nWeb: \x1b[4mhttp://aus.kwk.co/testuser/hello.go\x1b[0m\nDescription: Hi there!\nRun count: 2\n\n")
 				w.Reset()
 			})
 		})
-
 
 		Convey(`CAT`, func() {
 			Convey(`Should cat unambiguous alias`, func() {

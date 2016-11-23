@@ -35,6 +35,13 @@ type Alias struct {
 	Tags      []string `json:"tags"`
 	Created   time.Time `json:"created"`
 	Updated   time.Time `json:"updated"`
+
+	Description       string
+	ForkedFromFullKey string
+	ForkedFromVersion int64
+	Private           bool
+	ForkCount         int64
+	RunCount          int64
 }
 
 type CreateAlias struct {

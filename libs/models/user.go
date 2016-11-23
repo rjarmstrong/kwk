@@ -5,4 +5,6 @@ type User struct {
 	Username string
 	Email 	string
 	Token    string
+	AliasCount int64
+	RunCount int64
 }

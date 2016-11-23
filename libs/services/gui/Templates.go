@@ -22,6 +22,7 @@ func init() {
 	// Aliases
 	add("alias:delete", "Are you sure you want to delete {{.FullKey}}? y/n", nil)
 	add("alias:deleted", "{{.FullKey}} deleted.", nil)
+	add("alias:updated", "Description updated:\n{{ .Description | blue }}", template.FuncMap{ "blue" : formatBlue })
 	add("alias:notfound", "alias: {{.FullKey}} not found\n", nil)
 	add("alias:new", "{{.FullKey}} created.\n", nil)
 	add("alias:cat", "{{.Uri}}", nil)
@@ -36,7 +37,17 @@ func init() {
 	add("alias:renamed", "{{.fullKey}} renamed to {{.newFullKey}}", nil)
 	add("alias:patched", "{{.FullKey}} patched.", nil)
 	add("alias:notdeleted", "{{.FullKey}} was pardoned.", nil)
-	add("alias:inspect", "\n{{range .Items}}Alias: {{.Username}}/{{.FullKey}}\nRuntime: {{.Runtime}}\nURI: {{.Uri}}\nVersion: {{.Version}}\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}}{{$element}}{{ end }}\n\033[4mhttp://aus.kwk.co/{{.Username}}/{{.FullKey}}\033[0m{{ end }}\n\n", nil)
+	add("alias:inspect",
+		"\n{{range .Items}}" +
+		"Alias: {{.Username}}/{{.FullKey}}" +
+		"\nRuntime: {{.Runtime}}" +
+		"\nURI: {{.Uri}}" +
+		"\nVersion: {{.Version}}" +
+		"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}" +
+		"\nWeb: \033[4mhttp://aus.kwk.co/{{.Username}}/{{.FullKey}}\033[0m" +
+		"\nDescription: {{.Description}}" +
+		"\nRun count: {{.RunCount}}" +
+		"{{ end }}\n\n", nil)
 
 	// System
 	add("system:upgraded", "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n   Successfully upgraded!  \n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", nil)

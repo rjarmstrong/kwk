@@ -21,6 +21,16 @@ func New(conn *grpc.ClientConn, s settings.ISettings, h *rpc.Headers) IAliases {
 	return &Aliases{Settings:s, client:aliasesRpc.NewAliasesRpcClient(conn), headers:h}
 }
 
+func (a *Aliases) Update(fullKey string, description string) (*models.Alias, error) {
+	if r, err := a.client.Update(a.headers.GetContext(), &aliasesRpc.UpdateRequest{FullKey:fullKey, Description:description}); err != nil {
+		return nil, err
+	} else {
+		m := &models.Alias{}
+		mapAlias(r.Alias, m)
+		return m, nil
+	}
+}
+
 func (a *Aliases) List(username string, page int64, size int64, tags ...string) (*models.AliasList, error) {
 	if res, err := a.client.List(a.headers.GetContext(), &aliasesRpc.ListRequest{Username:username, Page:page, Size:size, Tags:tags}); err != nil {
 		return nil, err
@@ -113,7 +123,7 @@ func (a *Aliases) Tag(fullKey string, tags ...string) (*models.Alias, error) {
 	}
 }
 
-func (a *Aliases) UnTag(fullKey string, tags ...string)(*models.Alias, error) {
+func (a *Aliases) UnTag(fullKey string, tags ...string) (*models.Alias, error) {
 	if res, err := a.client.UnTag(a.headers.GetContext(), &aliasesRpc.UnTagRequest{FullKey:fullKey, Tags:tags}); err != nil {
 		return nil, err
 	} else {
@@ -138,6 +148,13 @@ func mapAlias(rpc *aliasesRpc.AliasResponse, model *models.Alias) {
 	model.Created = created
 	updated, _ := time.Parse(TimeLayout, rpc.UpdatedUTC)
 	model.Updated = updated
+
+	model.Description = rpc.Description
+	model.ForkedFromFullKey = rpc.ForkedFromFullKey
+	model.ForkedFromVersion  = rpc.ForkedFromVersion
+	model.Private	 = rpc.Private
+	model.RunCount  = rpc.RunCount
+	model.ForkCount  = rpc.ForkCount
 }
 
 func mapAliasList(rpc *aliasesRpc.AliasListResponse, model *models.AliasList) {

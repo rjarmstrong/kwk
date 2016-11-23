@@ -94,6 +94,14 @@ func (a *AliasController) Edit(fullKey string) {
 	}
 }
 
+func (a *AliasController) Describe(fullKey string, description string) {
+	if alias, err := a.service.Update(fullKey, description); err != nil {
+		a.Render("error", err)
+	} else {
+		a.Render("alias:updated", alias)
+	}
+}
+
 func (a *AliasController) Inspect(fullKey string) {
 	if list, err := a.service.Get(a.getKwkKey(fullKey)); err != nil {
 		a.Render("error", err)

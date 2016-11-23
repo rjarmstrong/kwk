@@ -61,4 +61,6 @@ func mapUser(rpc *usersRpc.UserResponse, model *models.User){
 	model.Username = rpc.Username
 	model.Email = rpc.Email
 	model.Token = rpc.Token
+	model.AliasCount = rpc.AliasCount
+	model.RunCount = rpc.RunCount
 }
