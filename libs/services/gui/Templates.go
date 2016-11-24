@@ -23,14 +23,14 @@ func init() {
 	add("alias:delete", "Are you sure you want to delete {{.FullKey}}? y/n", nil)
 	add("alias:deleted", "{{.FullKey}} deleted.", nil)
 	add("alias:updated", "Description updated:\n{{ .Description | blue }}", template.FuncMap{ "blue" : formatBlue })
-	add("alias:notfound", "alias: {{.FullKey}} not found\n", nil)
-	add("alias:cloned", "Forked as {{.Username}}/{{.FullKey | blue}}\n", template.FuncMap{ "blue" : formatBlue })
+	add("alias:notfound", "Snippet: {{.FullKey}} not found\n", nil)
+	add("alias:cloned", "Cloned as {{.Username}}/{{.FullKey | blue}}\n", template.FuncMap{ "blue" : formatBlue })
 	add("alias:new", "{{.FullKey}} created.\n", nil)
 	add("alias:cat", "{{.Uri}}", nil)
 	add("alias:edited", "Successfully updated {{ .FullKey | blue }}", template.FuncMap{ "blue" : formatBlue })
 	add("alias:editing", "{{ \"Editing file in default editor.\" | blue }}\nPlease save and close to continue. Or Ctrl+C to abort.\n", template.FuncMap{ "blue" : formatBlue })
 
-	add("alias:ambiguouscat", "That alias is ambiguous please run it again with the extension:\n{{range .Items}}{{.FullKey}}\n{{ end }}", nil)
+	add("alias:ambiguouscat", "That snippet is ambiguous please run it again with the extension:\n{{range .Items}}{{.FullKey}}\n{{ end }}", nil)
 	add("alias:list", "{{. | listAliases}}", template.FuncMap{"listAliases" : listAliases})
 	add("alias:chooseruntime", "{{. | listRuntimes}}", template.FuncMap{"listRuntimes" : listRuntimes})
 	add("alias:tag", "{{.FullKey}} tagged.", nil)
@@ -40,15 +40,16 @@ func init() {
 	add("alias:notdeleted", "{{.FullKey}} was pardoned.", nil)
 	add("alias:inspect",
 		"\n{{range .Items}}" +
-		"Alias: {{.Username}}/{{.FullKey}}" +
+		"Name: {{.Username}}/{{.FullKey}}" +
 		"\nRuntime: {{.Runtime}}" +
-		"\nURI: {{.Uri}}" +
+		"\nSnippet: {{.Uri}}" +
 		"\nVersion: {{.Version}}" +
 		"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}" +
 		"\nWeb: \033[4mhttp://aus.kwk.co/{{.Username}}/{{.FullKey}}\033[0m" +
 		"\nDescription: {{.Description}}" +
 		"\nRun count: {{.RunCount}}" +
-		"{{ end }}\n\n", nil)
+		"\nClone count: {{.ForkCount}}" +
+		"\n{{ end }}\n\n", nil)
 
 	// System
 	add("system:upgraded", "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n   Successfully upgraded!  \n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", nil)
@@ -68,7 +69,9 @@ func init() {
 	add("account:signup:password", "And enter a password (1 num, 1 cap, 8 chars): ", nil)
 
 
-	add("search:alpha", "\n\033[7m  \"{{ .Term }}\" found in {{ .Total }} results in {{ .Took }} ms  \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Key | blue }}.{{ .Extension | subdued }}\n{{ . | formatSearchResult}}\n{{end}}", template.FuncMap{"formatSearchResult" : formatSearchResult, "blue" : formatBlue, "subdued" : formatSubdued })
+	add("search:alpha", "\n\033[7m  \"{{ .Term }}\" found in {{ .Total }} results in {{ .Took }} ms  \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Key | blue }}.{{ .Extension | subdued }}\n{{ . | formatSearchResult}}\n{{end}}", template.FuncMap{"formatSearchResult" : alphaSearchResult, "blue" : formatBlue, "subdued" : formatSubdued })
+
+	add("search:beta", "\n\033[7m Suggestions: \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Key | blue }}.{{ .Extension | subdued }}\n{{end}}\n", template.FuncMap{ "blue" : formatBlue, "subdued" : formatSubdued })
 
 	// General
 	add("error", "{{. | printError }}\n", template.FuncMap{"printError" : printError})
@@ -118,7 +121,7 @@ func listAliases(list *models.AliasList) string {
 	fmt.Fprintf(buf, Build(102, " ") + "%d of %d records\n\n", len(list.Items), list.Total)
 
 	tbl := tablewriter.NewWriter(buf)
-	tbl.SetHeader([]string{"Alias", "Version", "URI", "Tags", ""})
+	tbl.SetHeader([]string{"Name", "Version", "Snippet", "Tags", ""})
 	tbl.SetAutoWrapText(false)
 	tbl.SetBorder(false)
 	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
@@ -177,7 +180,7 @@ func formatUri(uri string) string {
 	return uri
 }
 
-func formatSearchResult(result models.SearchResult) string {
+func alphaSearchResult(result models.SearchResult) string {
 	if result.Highlights == nil {
 		result.Highlights = map[string]string{}
 	}

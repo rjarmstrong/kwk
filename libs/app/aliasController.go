@@ -9,9 +9,11 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
 	"strings"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/search"
 )
 
 type AliasController struct {
+	search   search.ISearch
 	service  aliases.IAliases
 	openers  openers.IOpen
 	system   system.ISystem
@@ -20,8 +22,8 @@ type AliasController struct {
 	gui.ITemplateWriter
 }
 
-func NewAliasController(a aliases.IAliases, o openers.IOpen, s system.ISystem, d gui.IDialogues, w gui.ITemplateWriter, t settings.ISettings) *AliasController {
-	return &AliasController{service:a, openers:o, system:s, IDialogues:d, ITemplateWriter:w, settings: t}
+func NewAliasController(a aliases.IAliases, o openers.IOpen, s system.ISystem, d gui.IDialogues, w gui.ITemplateWriter, t settings.ISettings, search search.ISearch) *AliasController {
+	return &AliasController{service:a, openers:o, system:s, IDialogues:d, ITemplateWriter:w, settings: t, search:search}
 }
 
 func (a *AliasController) Share(fullKey string, destination string) {
@@ -47,7 +49,13 @@ func (a *AliasController) Open(fullKey string, args []string) {
 		if alias := a.handleMultiResponse(fullKey, list); alias != nil {
 			a.openers.Open(alias, args)
 		} else {
-			a.Render("alias:notfound", map[string]interface{}{"fullKey":fullKey})
+			if res, err := a.search.Search(fullKey); err != nil {
+				a.Render("error", err)
+			} else if res.Total > 0 {
+				a.Render("search:beta", res)
+				return
+			}
+			a.Render("alias:notfound", map[string]interface{}{"FullKey":fullKey})
 		}
 	}
 }
