@@ -66,7 +66,7 @@ func (a *AliasesMock) UnTag(fullKey string, tag ...string) (*models.Alias, error
 	return &models.Alias{},nil
 }
 
-func (a *AliasesMock) List(username string, page int64, size int64, tags ...string) (*models.AliasList, error) {
-	a.ListCalledWith = []interface{}{username, page, size, tags}
+func (a *AliasesMock) List(username string, size int64, since int64, tags ...string) (*models.AliasList, error) {
+	a.ListCalledWith = []interface{}{username, size, since, tags}
 	return &models.AliasList{}, nil
 }

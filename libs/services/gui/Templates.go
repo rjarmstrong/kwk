@@ -25,7 +25,8 @@ func init() {
 	add("alias:updated", "Description updated:\n{{ .Description | blue }}", template.FuncMap{ "blue" : formatBlue })
 	add("alias:notfound", "Snippet: {{.FullKey}} not found\n", nil)
 	add("alias:cloned", "Cloned as {{.Username}}/{{.FullKey | blue}}\n", template.FuncMap{ "blue" : formatBlue })
-	add("alias:new", "{{.FullKey}} created.\n", nil)
+	add("alias:new", "{{.FullKey}} created " + OpenLock + "\n", nil)
+	add("alias:newprivate", "{{.FullKey}} created " + Lock + "\n", nil)
 	add("alias:cat", "{{.Uri}}", nil)
 	add("alias:edited", "Successfully updated {{ .FullKey | blue }}", template.FuncMap{ "blue" : formatBlue })
 	add("alias:editing", "{{ \"Editing file in default editor.\" | blue }}\nPlease save and close to continue. Or Ctrl+C to abort.\n", template.FuncMap{ "blue" : formatBlue })
@@ -36,6 +37,7 @@ func init() {
 	add("alias:tag", "{{.FullKey}} tagged.", nil)
 	add("alias:untag", "{{.FullKey}} untagged.", nil)
 	add("alias:renamed", "{{.fullKey}} renamed to {{.newFullKey}}", nil)
+	add("alias:madeprivate", "{{.fullKey | blue }} made private " + Lock, template.FuncMap{ "blue" : formatBlue })
 	add("alias:patched", "{{.FullKey}} patched.", nil)
 	add("alias:notdeleted", "{{.FullKey}} was pardoned.", nil)
 	add("alias:inspect",
@@ -117,8 +119,7 @@ func listRuntimes(list []interface{}) string {
 func listAliases(list *models.AliasList) string {
 	buf := new(bytes.Buffer)
 
-	fmt.Fprint(buf, Colour(LightBlue, "\nkwk.co/" + list.Username))
-	fmt.Fprintf(buf, Build(102, " ") + "%d of %d records\n\n", len(list.Items), list.Total)
+	fmt.Fprint(buf, Colour(LightBlue, "\nkwk.co/" + list.Username + "\n\n"))
 
 	tbl := tablewriter.NewWriter(buf)
 	tbl.SetHeader([]string{"Name", "Version", "Snippet", "Tags", ""})
@@ -132,8 +133,6 @@ func listAliases(list *models.AliasList) string {
 	tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
 
 	for _, v := range list.Items {
-		v.Uri = formatUri(v.Uri)
-
 		var tags = []string{}
 		for _, v := range v.Tags {
 			if v == "error" {
@@ -144,10 +143,20 @@ func listAliases(list *models.AliasList) string {
 
 		}
 
+		var snip string
+		var name string
+		if v.Private {
+			name = Colour(Subdued, "." + v.Key  + "." + v.Extension)
+			snip = Colour(Subdued, `<private>`)
+		} else {
+			name = Colour(LightBlue, v.Key) + Colour(Subdued, "." + v.Extension)
+			snip = fmt.Sprintf("%s", formatUri(v.Uri))
+		}
+
 		tbl.Append([]string{
-			Colour(LightBlue, v.Key) + Colour(Subdued, "." + v.Extension),
+			name,
 			fmt.Sprintf("%d", v.Version),
-			fmt.Sprintf("%s", v.Uri),
+			snip,
 			strings.Join(tags, ", "),
 			humanize.Time(v.Created),
 		})
@@ -156,11 +165,9 @@ func listAliases(list *models.AliasList) string {
 	tbl.Render()
 
 	if len(list.Items) == 0 {
-		fmt.Println(Colour(Yellow, "No records on this page! Use a lower page number.\n"))
+		fmt.Println(Colour(Yellow, "Create some snippets to fill this view!\n"))
 	}
-	if list.Size != 0 {
-		fmt.Fprintf(buf, "\n %d of %d pages", list.Page, (list.Total / list.Size) + 1)
-	}
+	fmt.Fprintf(buf, "\n%d of %d records\n\n", len(list.Items), list.Total)
 	fmt.Fprint(buf, "\n\n")
 
 	return buf.String()

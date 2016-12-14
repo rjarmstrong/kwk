@@ -23,8 +23,10 @@ const (
 	Block = "2588"
 	Start = "\033["
 	End = "\033[0m"
-	Space = " "
+	Space = 20
 	UBlock = "\u2588"
+	Lock = "\xF0\x9F\x94\x92"
+	OpenLock = "\xF0\x9F\x94\x93"
 )
 
 func Build(quant int, unicode string) string {

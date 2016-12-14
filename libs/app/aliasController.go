@@ -10,6 +10,7 @@ import (
 	"strings"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/search"
+	"time"
 )
 
 type AliasController struct {
@@ -65,8 +66,12 @@ func (a *AliasController) New(uri string, fullKey string) {
 		a.Render("error", err)
 	} else {
 		if createAlias.Alias != nil {
-			a.Render("alias:new", createAlias.Alias)
-			a.system.CopyToClipboard(createAlias.Alias.FullKey)
+			if createAlias.Alias.Private {
+				a.Render("alias:newprivate", createAlias.Alias)
+			} else {
+				a.Render("alias:new", createAlias.Alias)
+			}
+				a.system.CopyToClipboard(createAlias.Alias.FullKey)
 			//if createAlias.Alias.Runtime != "url" {
 			//	a.Edit(createAlias.Alias.FullKey)
 			//}
@@ -164,10 +169,16 @@ func (a *AliasController) Rename(fullKey string, newKey string) {
 	if alias, originalFullKey, err := a.service.Rename(fullKey, newKey); err != nil {
 		a.Render("error", err)
 	} else {
-		a.Render("alias:renamed", &map[string]string{
-			"fullKey":originalFullKey,
-			"newFullKey":alias.FullKey,
-		})
+		if alias.Private {
+			a.Render("alias:madeprivate", &map[string]string{
+				"fullKey":originalFullKey,
+			})
+		} else {
+			a.Render("alias:renamed", &map[string]string{
+				"fullKey":originalFullKey,
+				"newFullKey":alias.FullKey,
+			})
+		}
 	}
 }
 
@@ -188,17 +199,13 @@ func (a *AliasController) UnTag(fullKey string, tags ...string) {
 }
 
 func (a *AliasController) List(args ...string) {
-	var page, size int64
+	var size int64
 	var tags = []string{}
 	u := &models.User{}
 	var username = ""
 	for i, v := range args {
 		if num, err := strconv.Atoi(v); err == nil {
-			if page == 0 {
-				page = int64(num)
-			} else {
 				size = int64(num)
-			}
 		} else {
 			if i == 0 && v[0] == '/' {
 				username = strings.Replace(v, "/", "", -1)
@@ -215,7 +222,7 @@ func (a *AliasController) List(args ...string) {
 			username = u.Username
 		}
 	}
-	if list, err := a.service.List(username, page, size, tags...); err != nil {
+	if list, err := a.service.List(username, size, int64(time.Now().Unix()*1000), tags...); err != nil {
 		a.Render("error", err)
 	} else {
 		list.Username = username

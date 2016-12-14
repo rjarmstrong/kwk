@@ -31,8 +31,9 @@ func (a *Aliases) Update(fullKey string, description string) (*models.Alias, err
 	}
 }
 
-func (a *Aliases) List(username string, page int64, size int64, tags ...string) (*models.AliasList, error) {
-	if res, err := a.client.List(a.headers.GetContext(), &aliasesRpc.ListRequest{Username:username, Page:page, Size:size, Tags:tags}); err != nil {
+// since unix time in milliseconds
+func (a *Aliases) List(username string, size int64, since int64, tags ...string) (*models.AliasList, error) {
+	if res, err := a.client.List(a.headers.GetContext(), &aliasesRpc.ListRequest{Username:username, Since:since, Size:size, Tags:tags}); err != nil {
 		return nil, err
 	} else {
 		list := &models.AliasList{}
@@ -159,12 +160,12 @@ func mapAlias(rpc *aliasesRpc.AliasResponse, model *models.Alias) {
 
 func mapAliasList(rpc *aliasesRpc.AliasListResponse, model *models.AliasList) {
 	model.Total = rpc.Total
-	model.Page = rpc.Page
+	model.Since = time.Unix(rpc.Since/1000, 0)
+	model.Size = rpc.Size
 	for _, v := range rpc.Items {
 		item := &models.Alias{}
 		mapAlias(v, item)
 		model.Items = append(model.Items, *item)
 	}
-	model.Size = rpc.Size
 }
 

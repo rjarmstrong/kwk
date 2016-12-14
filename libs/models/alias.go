@@ -16,12 +16,12 @@ type AliasList struct {
 	Username string `json:"username"`
 	Items []Alias `json:"items"`
 	Total int64 `json:"total"`
-	Page  int64 `json:"page"`
-	Size  int64 `json:"size"`
+	Since time.Time
+	Size int64
 }
 
 type Alias struct {
-	Id        int64 `json:"id"`
+	Id        string `json:"id"`
 
 	FullKey   string `json:"fullKey"`
 	Username  string `json:"username"`

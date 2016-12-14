@@ -12,6 +12,7 @@ import (
 	"errors"
 	"github.com/atotto/clipboard"
 	"fmt"
+	"runtime"
 )
 
 const (
@@ -92,7 +93,12 @@ func (s *System) GetDirPath(directoryName string) (string, error) {
 }
 
 func (s *System) GetCachePath() string {
-	p := fmt.Sprintf("/Users/%s/Library/Caches/kwk", os.Getenv("USER"))
+	p := ""
+	if runtime.GOOS == "windows" {
+		p = "%temp%"
+	} else {
+		p = fmt.Sprintf("/Users/%s/Library/Caches/kwk", os.Getenv("USER"))
+	}
 	if err := os.Mkdir(p, os.ModeDir); err != nil {
 		if os.IsExist(err) {
 			return p
