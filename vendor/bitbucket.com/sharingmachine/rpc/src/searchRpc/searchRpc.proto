@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.kwk.service.search";
+option java_outer_classname = "SearchRpc";
+
+package searchRpc;
+
+service SearchRpc {
+    rpc Alpha (AlphaRequest) returns (AlphaResponse) {}
+}
+
+message AlphaRequest {
+    string term = 1;
+    string runtime = 2;
+    string extension = 3;
+    string username = 4;
+}
+
+message AlphaResponse {
+    repeated AlphaResult results = 1;
+    int64 total = 2;
+    int64 took = 3;
+}
+
+message AlphaResult {
+    string snipId = 1;
+    string username = 2;
+    string key = 3;
+    string runtime = 4;
+    string fullKey = 18;
+    string extension = 10;
+    string snip = 5;
+    int64 snipVersion = 6;
+    int64 created = 8;
+    repeated string tags = 9;
+    map<string, string> highlights = 11;
+    string forkedFromFullKey = 12;
+    int64 forkedFromVersion = 13;
+    int64 runCount = 14;
+    int64 cloneCount = 15;
+    string description = 16;
+    string private = 17;
+}

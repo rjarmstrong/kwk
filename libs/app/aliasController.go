@@ -46,6 +46,7 @@ func (a *AliasController) Open(fullKey string, args []string) {
 	k := a.getKwkKey(fullKey);
 	if list, err := a.service.Get(k); err != nil {
 		a.Render("error", err)
+
 	} else {
 		if alias := a.handleMultiResponse(fullKey, list); alias != nil {
 			a.openers.Open(alias, args)
