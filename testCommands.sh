@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-CONTAINER=localtest_mysql_1
+docker exec -i cass cqlsh -e "use kwk; TRUNCATE snips; TRUNCATE users_by_email; TRUNCATE users;"
+go test -short ./libs/integration/
 
- docker exec -i ${CONTAINER} sh -c 'mysql -uroot -D kwk -e "DELETE FROM aliases"'
- docker exec -i ${CONTAINER} sh -c 'mysql -uroot -D kwk -e "DELETE FROM users"'
- go test -v ./libs/integration/
+-- snips, users_by_email, users

@@ -135,27 +135,22 @@ func (a *Aliases) UnTag(fullKey string, tags ...string) (*models.Alias, error) {
 }
 
 func mapAlias(rpc *aliasesRpc.AliasResponse, model *models.Alias) {
-	model.Id = rpc.Id
+	model.Id = rpc.SnipId
 	model.FullKey = rpc.FullKey
 	model.Username = rpc.Username
 	model.Key = rpc.Key
 	model.Extension = rpc.Extension
-	model.Uri = rpc.Uri
-	model.Version = rpc.Version
-	model.Media = rpc.Media
+	model.Snip = rpc.Snip
+	model.Version = rpc.SnipVersion
 	model.Runtime = rpc.Runtime
 	model.Tags = rpc.Tags
-	created, _ := time.Parse(TimeLayout, rpc.CreatedUTC)
-	model.Created = created
-	updated, _ := time.Parse(TimeLayout, rpc.UpdatedUTC)
-	model.Updated = updated
-
+	model.Created = time.Unix(rpc.Created/1000, 0)
 	model.Description = rpc.Description
 	model.ForkedFromFullKey = rpc.ForkedFromFullKey
 	model.ForkedFromVersion  = rpc.ForkedFromVersion
 	model.Private	 = rpc.Private
 	model.RunCount  = rpc.RunCount
-	model.ForkCount  = rpc.ForkCount
+	model.CloneCount = rpc.CloneCount
 }
 
 func mapAliasList(rpc *aliasesRpc.AliasListResponse, model *models.AliasList) {

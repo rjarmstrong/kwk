@@ -25,7 +25,7 @@ func New(system system.ISystem, aliases aliases.IAliases, w gui.ITemplateWriter)
 }
 
 func (o *Opener) Edit(alias *models.Alias) error {
-	filePath, err := o.system.WriteToFile(filecache, alias.FullKey, alias.Uri)
+	filePath, err := o.system.WriteToFile(filecache, alias.FullKey, alias.Snip)
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func (o *Opener) Edit(alias *models.Alias) error {
 		closer()
 		return err
 	} else {
-		if alias, err = o.aliases.Patch(alias.FullKey, alias.Uri, text); err != nil {
+		if alias, err = o.aliases.Patch(alias.FullKey, alias.Snip, text); err != nil {
 			closer()
 			return err
 		}
@@ -62,7 +62,7 @@ func (o *Opener) Edit(alias *models.Alias) error {
 func (o *Opener) Open(alias *models.Alias, args []string) error {
 	if len(args) > 0 {
 		if args[0] == "covert" {
-			o.OpenCovert(alias.Uri)
+			o.OpenCovert(alias.Snip)
 			return nil
 		}
 		if args[0] == "web" {
@@ -71,7 +71,7 @@ func (o *Opener) Open(alias *models.Alias, args []string) error {
 		}
 	}
 
-	uri := alias.Uri
+	uri := alias.Snip
 	if alias.Runtime == "url" {
 		o.system.ExecSafe("open", uri)
 		return nil

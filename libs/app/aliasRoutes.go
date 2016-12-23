@@ -120,6 +120,22 @@ func Alias(ctrl *AliasController) []cli.Command {
 				return nil
 			},
 		},
+		{
+			Name:    "lock",
+			Aliases: []string{},
+			Action:  func(c *cli.Context) error {
+				ctrl.Rename(c.Args().First(), "." + c.Args().First())
+				return nil
+			},
+		},
+		{
+			Name:    "unlock",
+			Aliases: []string{},
+			Action:  func(c *cli.Context) error {
+				ctrl.Rename(c.Args().First(), c.Args().First())
+				return nil
+			},
+		},
 	}
 	return c
 }

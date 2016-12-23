@@ -239,7 +239,7 @@ func Test_Alias(t *testing.T) {
 			Convey(`Should call patch and respond with patch`, func() {
 				app.App.Run([]string{"[app]", "patch", "arrows.js", "console.log('patched')"})
 				So(a.PatchCalledWith, should.Resemble, []string{"arrows.js", "console.log('patched')"})
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:patched", &models.Alias{FullKey:"arrows.js", Uri:"console.log('patched')"}})
+				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:patched", &models.Alias{FullKey:"arrows.js", Snip:"console.log('patched')"}})
 			})
 		})
 

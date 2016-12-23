@@ -6,60 +6,42 @@ import (
 	"github.com/smartystreets/assertions/should"
 	"bytes"
 	_ "github.com/go-sql-driver/mysql"
-	"fmt"
 )
 
 func Test_Alias(t *testing.T) {
+	cleanup()
+	w := &bytes.Buffer{}
+	reader := &bytes.Buffer{}
+	app := getApp(reader, w)
+	signup(reader, app)
+	w.Reset()
+
 	Convey("ALIAS COMMANDS", t, func() {
-		w := &bytes.Buffer{}
-		reader := &bytes.Buffer{}
-		kwk := getApp(reader, w)
-		uriOptions := "\x1b[36m1\x1b[0m bash   \x1b[36m2\x1b[0m golang   \x1b[36m3\x1b[0m java   \x1b[36m4\x1b[0m json   \x1b[36m5\x1b[0m nodejs   \x1b[36m6\x1b[0m php   \x1b[36m7\x1b[0m python   \x1b[36m8\x1b[0m rust   \x1b[36m9\x1b[0m txt   \x1b[36m10\x1b[0m url   \x1b[36m11\x1b[0m xml   \x1b[36m12\x1b[0m yml"
-
-		cleanup()
-
 		Convey(`NEW`, func() {
-			Convey(`Not logged in when creating new`, func() {
-				kwk.Run("logout")
-				So(w.String(), should.Equal, "And you're signed out.\n")
-				w.Reset()
-				kwk.Run("new", "http://somelink.com")
-				So(w.String(), should.Equal, notLoggedIn)
-				w.Reset()
-			})
-			Convey(`Given no extension should prompt and assign choosen url`, func() {
-				signup(reader, kwk)
-				w.Reset()
-				reader.WriteString("7\n")
-				kwk.Run("new", "echo \"hello\"", "hello")
-				So(lastLine(w.String()), should.Resemble, fmt.Sprintf("%s   hello.py created.", uriOptions))
+			Convey(`Given no extension should use txt by default`, func() {
+				//signin(reader, app)
+				app.Run("new", "echo \"hello\"", "hello")
+				So(lastLine(w.String()), should.Resemble, "hello.txt created.")
 				w.Reset()
 			})
 			Convey(`Should create new url with an extension`, func() {
-				signup(reader, kwk)
-				w.Reset()
-				kwk.Run("new", "echo \"hello\"", "hello.go")
+				app.Run("new", "echo \"hello\"", "hello.go")
 				So(lastLine(w.String()), should.Equal, "hello.go created.")
 				w.Reset()
 			})
 			Convey(`Should create new blank alias if no content or alias is given`, func() {
-				signup(reader, kwk)
-				w.Reset()
-				reader.WriteString("7\n")
-				kwk.Run("new")
-				So(lastLine(w.String()), should.ContainSubstring, ".py created.")
+				app.Run("new")
+				So(lastLine(w.String()), should.ContainSubstring, ".txt created.")
 				w.Reset()
 			})
 		})
 
 		Convey(`UPDATE`, func() {
 			Convey(`Should add a description`, func() {
-				signup(reader, kwk)
-				w.Reset()
-				kwk.Run("new", "echo \"hello\"", "hello.go")
+				app.Run("new", "echo \"hello\"", "hello.go")
 				w.Reset()
 				description := "This is for saying hello."
-				kwk.Run("describe", "hello.go", description)
+				app.Run("describe", "hello.go", description)
 				So(w.String(), should.Resemble,  "Description updated:\n\x1b[36mThis is for saying hello.\x1b[0m")
 				w.Reset()
 			})
@@ -67,16 +49,14 @@ func Test_Alias(t *testing.T) {
 
 		Convey(`INSPECT`, func() {
 			Convey(`Should inspect alias`, func() {
-				signup(reader, kwk)
-				w.Reset()
-				kwk.Run("new", "echo \"hello\"", "hello.go")
+				app.Run("new", "echo \"hello\"", "hello.go")
 				So(lastLine(w.String()), should.Equal, "hello.go created.")
 				w.Reset()
-				kwk.Run("describe", "hello.go", "Hi there!")
+				app.Run("describe", "hello.go", "Hi there!")
 				w.Reset()
-				kwk.Run("get", "hello.go")
+				app.Run("get", "hello.go")
 				w.Reset()
-				kwk.Run("inspect", "hello.go")
+				app.Run("inspect", "hello.go")
 				So(w.String(), should.Resemble, "\nAlias: testuser/hello.go\nRuntime: golang\nURI: echo \"hello\"\nVersion: 1\nTags: \nWeb: \x1b[4mhttp://aus.kwk.co/testuser/hello.go\x1b[0m\nDescription: Hi there!\nRun count: 2\n\n")
 				w.Reset()
 			})
@@ -84,55 +64,45 @@ func Test_Alias(t *testing.T) {
 
 		Convey(`CAT`, func() {
 			Convey(`Should cat unambiguous alias`, func() {
-				signup(reader, kwk)
-				w.Reset()
 				uri := "echo \"hello\""
-				kwk.Run("new", uri, "hello.go")
+				app.Run("new", uri, "hello.go")
 				So(lastLine(w.String()), should.Equal, "hello.go created.")
 				w.Reset()
-				kwk.Run("cat", "hello")
+				app.Run("cat", "hello")
 				So(w.String(), should.Equal, uri)
 				w.Reset()
 			})
 			Convey(`Should prompt cat ambiguous alias`, func() {
-				signup(reader, kwk)
-				w.Reset()
 				uri := "echo \"hello\""
 				uri2 := "console.log('hello');"
-				kwk.Run("new", uri, "hello.go")
-				kwk.Run("new", uri2, "hello.js")
+				app.Run("new", uri, "hello.go")
+				app.Run("new", uri2, "hello.js")
 				w.Reset()
-				kwk.Run("cat", "hello")
-				So(w.String(), should.Resemble, "That alias is ambiguous please run it again with the extension:\nhello.go\nhello.js\n")
+				app.Run("cat", "hello")
+				So(w.String(), should.Resemble, "That snippet is ambiguous please run it again with the extension:\nhello.go\nhello.js\n")
 				w.Reset()
 			})
 		})
 
 		Convey(`RENAME`, func() {
 			Convey(`Should rename an alias`, func() {
-				signup(reader, kwk)
+				app.Run("new", "echo \"hello\"", "hello.js")
 				w.Reset()
-				kwk.Run("new", "echo \"hello\"", "hello.js")
-				w.Reset()
-				kwk.Run("mv", "hello.js", "dong.js")
+				app.Run("mv", "hello.js", "dong.js")
 				So(w.String(), should.Resemble, "hello.js renamed to dong.js")
 				w.Reset()
 			})
 			Convey(`Should rename an alias and auto-add the extension if not given in the new key`, func() {
-				signup(reader, kwk)
+				app.Run("new", "echo \"hello\"", "hello.js")
 				w.Reset()
-				kwk.Run("new", "echo \"hello\"", "hello.js")
-				w.Reset()
-				kwk.Run("mv", "hello.js", "dong")
+				app.Run("mv", "hello.js", "dong")
 				So(w.String(), should.Resemble, "hello.js renamed to dong.js")
 				w.Reset()
 			})
 			Convey(`Should rename an alias and even if no extension is given for the original key`, func() {
-				signup(reader, kwk)
+				app.Run("new", "echo \"hello\"", "hello.js")
 				w.Reset()
-				kwk.Run("new", "echo \"hello\"", "hello.js")
-				w.Reset()
-				kwk.Run("mv", "hello", "dong")
+				app.Run("mv", "hello", "dong")
 				So(w.String(), should.Resemble, "hello.js renamed to dong.js")
 				w.Reset()
 			})
@@ -140,48 +110,42 @@ func Test_Alias(t *testing.T) {
 
 		Convey(`DELETE`, func() {
 			Convey(`Should prompt to delete alias and delete when 'y'`, func() {
-				signup(reader, kwk)
-				w.Reset()
-				kwk.Run("new", "echo \"hello\"", "hello.js")
+				app.Run("new", "echo \"hello\"", "hello.js")
 				w.Reset()
 
 				reader.WriteString("y\n")
 
-				kwk.Run("rm", "hello.js")
+				app.Run("rm", "hello.js")
 				So(w.String(), should.Resemble, "Are you sure you want to delete hello.js? y/nhello.js deleted.")
 				w.Reset()
 
-				kwk.Run("get", "hello.js")
+				app.Run("get", "hello.js")
 				So(w.String(), should.Resemble, "alias: hello.js not found\n")
 				w.Reset()
 			})
 
 			Convey(`Should delete when partial key given which is not ambiguous`, func() {
-				signup(reader, kwk)
-				w.Reset()
-				kwk.Run("new", "echo \"hello\"", "hello.js")
+				app.Run("new", "echo \"hello\"", "hello.js")
 				w.Reset()
 
 				reader.WriteString("y\n")
 
-				kwk.Run("rm", "hello")
+				app.Run("rm", "hello")
 				w.Reset()
 
-				kwk.Run("get", "hello.js")
+				app.Run("get", "hello.js")
 				So(w.String(), should.Resemble, "alias: hello.js not found\n")
 				w.Reset()
 			})
 
 
 			Convey(`Should prompt to delete alias and not delete when not 'y'`, func() {
-				signup(reader, kwk)
-				w.Reset()
-				kwk.Run("new", "echo \"hello\"", "hello.js")
+				app.Run("new", "echo \"hello\"", "hello.js")
 				w.Reset()
 
 				reader.WriteString("b\n")
 
-				kwk.Run("rm", "hello.js")
+				app.Run("rm", "hello.js")
 				So(w.String(), should.Resemble, "Are you sure you want to delete hello.js? y/nhello.js was pardoned.")
 				w.Reset()
 			})
@@ -189,15 +153,13 @@ func Test_Alias(t *testing.T) {
 
 		Convey(`PATCH`, func() {
 			Convey(`Should patch alias (find and replace)`, func() {
-				signup(reader, kwk)
-				w.Reset()
-				kwk.Run("new", "echo \"hello\"", "hello.js")
+				app.Run("new", "echo \"hello\"", "hello.js")
 				w.Reset()
 
-				kwk.Run("patch", "hello.js",  "echo", "printf")
+				app.Run("patch", "hello.js",  "echo", "printf")
 				So(w.String(), should.Resemble, "hello.js patched.")
 				w.Reset()
-				kwk.Run("get", "hello.js")
+				app.Run("get", "hello.js")
 				So(w.String(), should.Resemble, "printf \"hello\"")
 				w.Reset()
 			})
@@ -206,47 +168,41 @@ func Test_Alias(t *testing.T) {
 
 		Convey(`TAG`, func() {
 			Convey(`Should tag an alias`, func() {
-				signup(reader, kwk)
+				app.Run("new", "echo \"hello\"", "hello.js")
 				w.Reset()
-				kwk.Run("new", "echo \"hello\"", "hello.js")
-				w.Reset()
-				kwk.Run("tag", "hello.js", "tag1")
+				app.Run("tag", "hello.js", "tag1")
 				So(w.String(), should.Resemble, "hello.js tagged.")
 				w.Reset()
 			})
 			Convey(`Should show error if no tag given`, func() {
-				signup(reader, kwk)
+				app.Run("new", "echo \"hello\"", "hello.js")
 				w.Reset()
-				kwk.Run("new", "echo \"hello\"", "hello.js")
-				w.Reset()
-				kwk.Run("tag", "hello.js")
+				app.Run("tag", "hello.js")
 				So(w.String(), should.Resemble, "Please provide at least one tag.\n")
 				w.Reset()
 			})
 			Convey(`Should untag an alias`, func() {
-				signup(reader, kwk)
+				app.Run("new", "echo \"hello\"", "hello.js")
 				w.Reset()
-				kwk.Run("new", "echo \"hello\"", "hello.js")
-				w.Reset()
-				kwk.Run("tag", "hello.js", "tag1")
+				app.Run("tag", "hello.js", "tag1")
 				So(w.String(), should.Resemble, "hello.js tagged.")
 				w.Reset()
-				kwk.Run("untag", "hello.js", "tag1")
+				app.Run("untag", "hello.js", "tag1")
 				So(w.String(), should.Resemble, "hello.js untagged.")
 				w.Reset()
 			})
-			Convey(`Should show error when untagging if tag does not exist`, func() {
-				signup(reader, kwk)
-				w.Reset()
-				kwk.Run("new", "echo \"hello\"", "hello.js")
-				w.Reset()
-				kwk.Run("tag", "hello.js", "tag1")
-				So(w.String(), should.Resemble, "hello.js tagged.")
-				w.Reset()
-				kwk.Run("untag", "hello.js", "donkey")
-				So(w.String(), should.Resemble, "None of these tag(s) apply to 'hello.js': donkey\n")
-				w.Reset()
-			})
+			//Convey(`Should show error when untagging if tag does not exist`, func() {
+			//	signup(reader, kwk)
+			//	w.Reset()
+			//	app.Run("new", "echo \"hello\"", "hello.js")
+			//	w.Reset()
+			//	app.Run("tag", "hello.js", "tag1")
+			//	So(w.String(), should.Resemble, "hello.js tagged.")
+			//	w.Reset()
+			//	app.Run("untag", "hello.js", "donkey")
+			//	So(w.String(), should.Resemble, "None of these tag(s) apply to 'hello.js': donkey\n")
+			//	w.Reset()
+			//})
 		})
 	})
 }

@@ -150,7 +150,7 @@ func listAliases(list *models.AliasList) string {
 			snip = Colour(Subdued, `<private>`)
 		} else {
 			name = Colour(LightBlue, v.Key) + Colour(Subdued, "." + v.Extension)
-			snip = fmt.Sprintf("%s", formatUri(v.Uri))
+			snip = fmt.Sprintf("%s", formatUri(v.Snip))
 		}
 
 		tbl.Append([]string{
@@ -192,7 +192,7 @@ func alphaSearchResult(result models.SearchResult) string {
 		result.Highlights = map[string]string{}
 	}
 	if result.Highlights["uri"] == "" {
-		result.Highlights["uri"] = result.Uri
+		result.Highlights["uri"] = result.Snip
 	}
 	lines := highlightsToLines(result.Highlights)
 	f := ""

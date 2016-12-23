@@ -21,26 +21,26 @@ type AliasList struct {
 }
 
 type Alias struct {
-	Id        string `json:"id"`
+	Id                string `json:"id"`
 
-	FullKey   string `json:"fullKey"`
-	Username  string `json:"username"`
-	Key       string `json:"key"`
-	Extension string `json:"extension"`
+	FullKey           string `json:"fullKey"`
+	Username          string `json:"username"`
+	Key               string `json:"key"`
+	Extension         string `json:"extension"`
 
-	Uri       string `json:"uri"`
-	Version   int64 `json:"version"`
-	Runtime   string `json:"runtime"`
-	Media     string `json:"media"`
-	Tags      []string `json:"tags"`
-	Created   time.Time `json:"created"`
-	Updated   time.Time `json:"updated"`
+	Snip              string `json:"uri"`
+	Version           int64 `json:"version"`
+	Runtime           string `json:"runtime"`
+	Media             string `json:"media"`
+	Tags              []string `json:"tags"`
+	Created           time.Time `json:"created"`
+	Updated           time.Time `json:"updated"`
 
 	Description       string
 	ForkedFromFullKey string
 	ForkedFromVersion int64
 	Private           bool
-	ForkCount         int64
+	CloneCount        int64
 	RunCount          int64
 }
 

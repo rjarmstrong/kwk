@@ -31,7 +31,9 @@ func (s *Search) Search(term string) (*models.SearchResponse, error) {
 			item := &models.SearchResult{}
 			item.Key = v.Key
 			item.Username = v.Username
-			item.Uri = v.Uri
+			item.Description = v.Description
+			item.SnipVersion = v.SnipVersion
+			item.Snip = v.Snip
 			item.Extension = v.Extension
 			item.Highlights = v.Highlights
 			r.Results = append(r.Results, item)

@@ -15,6 +15,7 @@ import (
 	"os/exec"
 	"strings"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/search"
+	"fmt"
 )
 
 func createApp(conn *grpc.ClientConn, writer *bytes.Buffer, r *bufio.Reader) *app.KwkApp{
@@ -31,13 +32,19 @@ func createApp(conn *grpc.ClientConn, writer *bytes.Buffer, r *bufio.Reader) *ap
 }
 
 const (
-	sqlContainer="localtest_mysql_1"
+	sqlContainer="cass"
 	testHost="localhost:8000"
 	email="test@kwk.co"
 	username="testuser"
 	password="TestPassword1"
 	notLoggedIn="You are not logged in please log in: kwk login <username> <password>\n"
 )
+
+func signin(reader *bytes.Buffer, kwk *app.KwkApp) {
+	reader.WriteString(username + "\n")
+	reader.WriteString(password + "\n")
+	kwk.Run("signin")
+}
 
 func signup(reader *bytes.Buffer, kwk *app.KwkApp) {
 	reader.WriteString(email + "\n")
@@ -53,14 +60,11 @@ func getApp(reader *bytes.Buffer, writer *bytes.Buffer) *app.KwkApp{
 }
 
 func cleanup(){
-	cmd := exec.Command("/bin/sh", "-c", "docker exec -i " + sqlContainer + " sh -c 'mysql -uroot -D kwk -e \"DELETE FROM aliases\"'")
-	if err := cmd.Run(); err !=nil {
-		panic(err)
-	}
-	cmd2 := exec.Command("/bin/sh", "-c", "docker exec -i " + sqlContainer + "  sh -c 'mysql -uroot -D kwk -e \"DELETE FROM users\"'")
-	if err := cmd2.Run(); err !=nil {
-		panic(err)
-	}
+		cmd := exec.Command("/bin/sh", "-c", "docker exec -i " + sqlContainer + " cqlsh -e 'use kwk; TRUNCATE snips; TRUNCATE users_by_email; TRUNCATE users;'")
+		if err := cmd.Run(); err != nil {
+			panic(err)
+		}
+	fmt.Println("clean up")
 }
 
 func lastLine(input string) string {

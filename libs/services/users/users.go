@@ -6,6 +6,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/libs/models"
 	"bitbucket.com/sharingmachine/kwkcli/libs/rpc"
 	"bitbucket.com/sharingmachine/rpc/src/usersRpc"
+	"time"
 )
 
 const (
@@ -61,6 +62,8 @@ func mapUser(rpc *usersRpc.UserResponse, model *models.User){
 	model.Username = rpc.Username
 	model.Email = rpc.Email
 	model.Token = rpc.Token
-	model.AliasCount = rpc.AliasCount
+	model.SnipCount = rpc.SnipCount
 	model.RunCount = rpc.RunCount
+	model.ClonedCount = rpc.ClonedCount
+	model.Created = time.Unix(rpc.Created/1000, 0)
 }

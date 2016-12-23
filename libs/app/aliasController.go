@@ -34,7 +34,7 @@ func (a *AliasController) Share(fullKey string, destination string) {
 	} else {
 		if alias := a.handleMultiResponse(fullKey, list); alias != nil {
 			gmail := &models.Alias{Runtime:"url", Extension:"url"}
-			gmail.Uri = "https://mail.google.com/mail/?ui=2&view=cm&fs=1&tf=1&su=&body=http%3A%2F%2Faus.kwk.co%2F" + alias.Username + "%2f" + alias.FullKey
+			gmail.Snip = "https://mail.google.com/mail/?ui=2&view=cm&fs=1&tf=1&su=&body=http%3A%2F%2Faus.kwk.co%2F" + alias.Username + "%2f" + alias.FullKey
 			a.openers.Open(gmail, []string{})
 		} else {
 			a.Render("alias:notfound", map[string]interface{}{"fullKey":fullKey})
