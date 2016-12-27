@@ -1,10 +1,10 @@
 package execution
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
 	"github.com/smartystreets/assertions/should"
-	"testing"
+	. "github.com/smartystreets/goconvey/convey"
 	"os/exec"
+	"testing"
 	//"os"
 	"bytes"
 	//"io"
@@ -37,7 +37,7 @@ func Test_Execution(t *testing.T) {
 				`),
 				exec.Command("node", "-e", script),
 				exec.Command("/bin/bash", "-c", `echo "start| $(cat -)|end"`),
-			);
+			)
 			So(err, ShouldBeNil)
 			So(b.String(), should.Equal, "start| hola, zingo, |end\n")
 			//io.Copy(os.Stdout, &b)
@@ -53,7 +53,7 @@ func Test_Execution(t *testing.T) {
 			err := Execute(&b,
 				exec.Command("node", "-e", script, "arg1", "arg2"),
 				exec.Command("/bin/bash", "-c", `echo "start| $(cat -)|end"`),
-			);
+			)
 			So(err, ShouldBeNil)
 			So(b.String(), should.Equal, "start| arg1, arg2, |end\n")
 			//io.Copy(os.Stdout, &b)
@@ -61,5 +61,3 @@ func Test_Execution(t *testing.T) {
 
 	})
 }
-
-

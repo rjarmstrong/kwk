@@ -2,24 +2,24 @@ package search
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/libs/models"
+	"bitbucket.com/sharingmachine/kwkcli/libs/rpc"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
 	"bitbucket.com/sharingmachine/rpc/src/searchRpc"
-	"bitbucket.com/sharingmachine/kwkcli/libs/rpc"
 	"google.golang.org/grpc"
 )
 
 type Search struct {
-	client   searchRpc.SearchRpcClient
-	headers  *rpc.Headers
+	client  searchRpc.SearchRpcClient
+	headers *rpc.Headers
 }
 
 func New(conn *grpc.ClientConn, s settings.ISettings, h *rpc.Headers) ISearch {
-	return &Search{ client:searchRpc.NewSearchRpcClient(conn), headers:h}
+	return &Search{client: searchRpc.NewSearchRpcClient(conn), headers: h}
 }
 
 func (s *Search) Search(term string) (*models.SearchResponse, error) {
 	if res, err := s.client.Alpha(s.headers.GetContext(), &searchRpc.AlphaRequest{
-		Term:term,
+		Term: term,
 	}); err != nil {
 		return nil, err
 	} else {

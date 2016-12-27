@@ -1,24 +1,25 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/users"
 	"bitbucket.com/sharingmachine/kwkcli/libs/models"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/users"
+	"bitbucket.com/sharingmachine/kwkcli/libs/ui/tmpl"
+	"bitbucket.com/sharingmachine/kwkcli/libs/ui/dlg"
 )
 
 type AccountController struct {
-	service users.IUsers
+	service  users.IUsers
 	settings settings.ISettings
-	gui.ITemplateWriter
-	gui.IDialogues
+	tmpl.Writer
+	dlg.Dialogue
 }
 
-func NewAccountController(u users.IUsers, s settings.ISettings, w gui.ITemplateWriter, d gui.IDialogues) *AccountController {
-	return &AccountController{service:u, settings:s, ITemplateWriter: w, IDialogues: d}
+func NewAccountController(u users.IUsers, s settings.ISettings, w tmpl.Writer, d dlg.Dialogue) *AccountController {
+	return &AccountController{service: u, settings: s, Writer: w, Dialogue: d}
 }
 
-func (c *AccountController) Get(){
+func (c *AccountController) Get() {
 	u := &models.User{}
 	if err := c.settings.Get(models.ProfileFullKey, u); err != nil {
 		c.Render("account:notloggedin", nil)
@@ -27,7 +28,7 @@ func (c *AccountController) Get(){
 	}
 }
 
-func (c *AccountController) SignUp(){
+func (c *AccountController) SignUp() {
 
 	email := c.Field("account:signup:email", nil).Value.(string)
 	username := c.Field("account:signup:username", nil).Value.(string)
@@ -43,7 +44,7 @@ func (c *AccountController) SignUp(){
 	}
 }
 
-func (c *AccountController) SignIn(username string, password string){
+func (c *AccountController) SignIn(username string, password string) {
 	if username == "" {
 		username = c.Field("account:usernamefield", nil).Value.(string)
 	}
@@ -60,7 +61,7 @@ func (c *AccountController) SignIn(username string, password string){
 	}
 }
 
-func (c *AccountController) SignOut(){
+func (c *AccountController) SignOut() {
 	if err := c.service.Signout(); err != nil {
 		c.Render("error", err)
 		return
@@ -73,9 +74,9 @@ func (c *AccountController) SignOut(){
 }
 
 func (c *AccountController) ChangeDirectory(username string) {
-    if err := c.settings.ChangeDirectory(username); err != nil {
-	    c.Render("error", err)
-    } else {
-	    c.Render("account:cd", map[string]string{"username" : username})
-    }
+	if err := c.settings.ChangeDirectory(username); err != nil {
+		c.Render("error", err)
+	} else {
+		c.Render("account:cd", map[string]string{"username": username})
+	}
 }

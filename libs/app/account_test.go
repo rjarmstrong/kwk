@@ -1,13 +1,13 @@
 package app
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
-	"github.com/smartystreets/assertions/should"
-	"testing"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/users"
 	"bitbucket.com/sharingmachine/kwkcli/libs/models"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/users"
+	"github.com/smartystreets/assertions/should"
+	. "github.com/smartystreets/goconvey/convey"
+	"testing"
 )
 
 func Test_App(t *testing.T) {
@@ -44,13 +44,13 @@ func Test_App(t *testing.T) {
 				So(u.LoginCalledWith[1], should.Equal, "password")
 			})
 			Convey(`Should call api signin and enter form details`, func() {
-				d.FieldResponse = &gui.DialogueResponse{Value:"richard"}
+				d.FieldResponse = &gui.DialogueResponse{Value: "richard"}
 				app.App.Run([]string{"[app]", "signin"})
 			})
 			Convey(`Should save details to file when signed in`, func() {
-				d.FieldResponse = &gui.DialogueResponse{Value:"richard"}
+				d.FieldResponse = &gui.DialogueResponse{Value: "richard"}
 				u.SignInResponse = &models.User{
-					Token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dnZWRJbkFzIjoiYWRtaW4iLCJpYXQiOjE0MjI3Nzk2Mzh9.gzSraSYS8EXBxLN_oWnFSRgCzcmJmMjLiuyu5CSpyHI",
+					Token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dnZWRJbkFzIjoiYWRtaW4iLCJpYXQiOjE0MjI3Nzk2Mzh9.gzSraSYS8EXBxLN_oWnFSRgCzcmJmMjLiuyu5CSpyHI",
 				}
 				app.App.Run([]string{"[app]", "signin"})
 				So(t.UpsertCalledWith, should.Resemble, []interface{}{models.ProfileFullKey, u.SignInResponse})
@@ -94,10 +94,8 @@ func Test_App(t *testing.T) {
 			Convey(`Should change directory`, func() {
 				app.App.Run([]string{"[app]", "cd", "dillbuck"})
 				So(t.ChangeDirectoryCalledWith, should.Equal, "dillbuck")
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"account:cd", map[string]string{"username" :"dillbuck"}})
+				So(w.RenderCalledWith, should.Resemble, []interface{}{"account:cd", map[string]string{"username": "dillbuck"}})
 			})
 		})
 	})
 }
-
-

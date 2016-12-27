@@ -1,10 +1,10 @@
 package integration
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
-	"github.com/smartystreets/assertions/should"
-	"testing"
 	"bytes"
+	"github.com/smartystreets/assertions/should"
+	. "github.com/smartystreets/goconvey/convey"
+	"testing"
 )
 
 func Test_Logged_out(t *testing.T) {

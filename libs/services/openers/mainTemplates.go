@@ -1,6 +1,6 @@
 package openers
 
-const JavaMain  = `
+const JavaMain = `
 import java.util.*;
 import java.lang.*;
 import java.io.*;
@@ -16,30 +16,30 @@ class {{key}}
 
 const JavaImport = `import {{import}};`
 
-const BashMain  = `{{uri}}`
+const BashMain = `{{uri}}`
 
-const NodeJsMain  = `
+const NodeJsMain = `
 {{imports}}
 
 {{uri}}`
 
-const NodeJsImport  = `require('{{import}}')`
+const NodeJsImport = `require('{{import}}')`
 
-const PhpMain  = `
+const PhpMain = `
 {{imports}}
 
 {{uri}}`
 
-const PhpImport  = `include '{{import}}'`
+const PhpImport = `include '{{import}}'`
 
-const PythonMain  = `
+const PythonMain = `
 {{imports}}
 
 {{uri}}`
 
-const PythonImport  = `import {{import}}`
+const PythonImport = `import {{import}}`
 
-const GoMain  = `
+const GoMain = `
 package main
 
 import (
@@ -50,17 +50,16 @@ func main() {
  {{uri}}
 }
 `
-const GoImport  = `"{{import}}"`
+const GoImport = `"{{import}}"`
 
 // We'll not allow the 'use' statement so implementers will have to specify the fill path to modules in the main
-const RustMain  = `
+const RustMain = `
 fn main() {
     {{uri}}
 }
 `
 
 const RustImport = `extern crate {{import}};`
-
 
 const CSharpMain = `
 {{imports}}

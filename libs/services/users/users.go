@@ -1,11 +1,11 @@
 package users
 
 import (
-	"google.golang.org/grpc"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
 	"bitbucket.com/sharingmachine/kwkcli/libs/models"
 	"bitbucket.com/sharingmachine/kwkcli/libs/rpc"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
 	"bitbucket.com/sharingmachine/rpc/src/usersRpc"
+	"google.golang.org/grpc"
 	"time"
 )
 
@@ -14,27 +14,27 @@ const (
 )
 
 type Users struct {
-	client usersRpc.UsersRpcClient
+	client   usersRpc.UsersRpcClient
 	settings settings.ISettings
-	headers *rpc.Headers
+	headers  *rpc.Headers
 }
 
 func New(conn *grpc.ClientConn, s settings.ISettings, h *rpc.Headers) *Users {
-	return &Users{client:usersRpc.NewUsersRpcClient(conn), settings:s, headers:h}
+	return &Users{client: usersRpc.NewUsersRpcClient(conn), settings: s, headers: h}
 }
 
 func (u *Users) SignIn(username string, password string) (*models.User, error) {
-	 if res, err := u.client.SignIn(u.headers.GetContext(), &usersRpc.SignInRequest{Username:username, Password:password}); err != nil {
-		 return nil, err
-	 } else {
-		 model := &models.User{}
-		 mapUser(res, model)
-		 return model, nil
-	 }
+	if res, err := u.client.SignIn(u.headers.GetContext(), &usersRpc.SignInRequest{Username: username, Password: password}); err != nil {
+		return nil, err
+	} else {
+		model := &models.User{}
+		mapUser(res, model)
+		return model, nil
+	}
 }
 
 func (u *Users) SignUp(email string, username string, password string) (*models.User, error) {
-	if res, err := u.client.SignUp(u.headers.GetContext(), &usersRpc.SignUpRequest{Username:username, Email:email, Password:password}); err != nil {
+	if res, err := u.client.SignUp(u.headers.GetContext(), &usersRpc.SignUpRequest{Username: username, Email: email, Password: password}); err != nil {
 		return nil, err
 	} else {
 		model := &models.User{}
@@ -57,7 +57,7 @@ func (u *Users) Signout() error {
 	return nil
 }
 
-func mapUser(rpc *usersRpc.UserResponse, model *models.User){
+func mapUser(rpc *usersRpc.UserResponse, model *models.User) {
 	model.Id = rpc.Id
 	model.Username = rpc.Username
 	model.Email = rpc.Email

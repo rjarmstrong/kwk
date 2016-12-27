@@ -1,13 +1,13 @@
 package integration
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
-	"testing"
-	"github.com/smartystreets/assertions/should"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
 	"bytes"
 	_ "github.com/go-sql-driver/mysql"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
+	"github.com/smartystreets/assertions/should"
+	. "github.com/smartystreets/goconvey/convey"
 	"os"
+	"testing"
 )
 
 func Test_System(t *testing.T) {
@@ -27,7 +27,7 @@ func Test_System(t *testing.T) {
 					v := os.Getenv(system.APP_VERSION)
 					os.Setenv(system.APP_VERSION, "")
 					kwk.Run("version")
-					So(w.String(), should.Equal, system.APP_VERSION + " has not been set.\n")
+					So(w.String(), should.Equal, system.APP_VERSION+" has not been set.\n")
 					w.Reset()
 					os.Setenv(system.APP_VERSION, v)
 				})

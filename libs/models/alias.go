@@ -3,38 +3,38 @@ package models
 import "time"
 
 const (
-	ProfileFullKey = "profile.json"
+	ProfileFullKey  = "profile.json"
 	TokenHeaderName = "token"
 )
 
 type KwkKey struct {
 	Username string `json:"username" schema:"username"`
-	FullKey string `json:"fullKey" schema:"fullKey"`
+	FullKey  string `json:"fullKey" schema:"fullKey"`
 }
 
 type AliasList struct {
-	Username string `json:"username"`
-	Items []Alias `json:"items"`
-	Total int64 `json:"total"`
-	Since time.Time
-	Size int64
+	Username string  `json:"username"`
+	Items    []Alias `json:"items"`
+	Total    int64   `json:"total"`
+	Since    time.Time
+	Size     int64
 }
 
 type Alias struct {
-	Id                string `json:"id"`
+	Id string `json:"id"`
 
-	FullKey           string `json:"fullKey"`
-	Username          string `json:"username"`
-	Key               string `json:"key"`
-	Extension         string `json:"extension"`
+	FullKey   string `json:"fullKey"`
+	Username  string `json:"username"`
+	Key       string `json:"key"`
+	Extension string `json:"extension"`
 
-	Snip              string `json:"uri"`
-	Version           int64 `json:"version"`
-	Runtime           string `json:"runtime"`
-	Media             string `json:"media"`
-	Tags              []string `json:"tags"`
-	Created           time.Time `json:"created"`
-	Updated           time.Time `json:"updated"`
+	Snip    string    `json:"uri"`
+	Version int64     `json:"version"`
+	Runtime string    `json:"runtime"`
+	Media   string    `json:"media"`
+	Tags    []string  `json:"tags"`
+	Created time.Time `json:"created"`
+	Updated time.Time `json:"updated"`
 
 	Description       string
 	ForkedFromFullKey string
@@ -45,7 +45,7 @@ type Alias struct {
 }
 
 type CreateAlias struct {
-	Alias *Alias
+	Alias     *Alias
 	TypeMatch *TypeMatch
 }
 

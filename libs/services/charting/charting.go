@@ -1,9 +1,9 @@
 package charting
 
 import (
+	"fmt"
 	tm "github.com/buger/goterm"
 	"math"
-	"fmt"
 )
 
 func PrintSine() {
@@ -14,14 +14,13 @@ func PrintSine() {
 	d.AddColumn("Cos(x+1)")
 
 	for i := 0.0; i < 20.0; i += 1.0 {
-		d.AddRow(i, math.Sin(i), math.Cos(i + 1))
+		d.AddRow(i, math.Sin(i), math.Cos(i+1))
 	}
 	fmt.Println(chart.Draw(d))
 }
 
-
 type GraphItem struct {
-	Key string
+	Key   string
 	Value int
 }
 

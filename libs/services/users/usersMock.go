@@ -8,10 +8,10 @@ type UsersMock struct {
 	SignupCalledWith []string
 	SignoutCalled    bool
 	GetCalledWith    string
-	SignInResponse *models.User
+	SignInResponse   *models.User
 }
 
-func (a *UsersMock) Get() (*models.User, error){
+func (a *UsersMock) Get() (*models.User, error) {
 	a.GetCalled = true
 	return &models.User{}, nil
 }
@@ -25,7 +25,7 @@ func (a *UsersMock) SignIn(username string, password string) (*models.User, erro
 }
 
 func (a *UsersMock) SignUp(email string, username string, password string) (*models.User, error) {
-	a.SignupCalledWith = []string{email, username, password }
+	a.SignupCalledWith = []string{email, username, password}
 	return &models.User{}, nil
 }
 

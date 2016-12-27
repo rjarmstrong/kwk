@@ -1,16 +1,17 @@
 package app
 
 import (
-	"strconv"
 	"bitbucket.com/sharingmachine/kwkcli/libs/models"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/aliases"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/openers"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
-	"strings"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/search"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
+	"strconv"
+	"strings"
 	"time"
+	"bitbucket.com/sharingmachine/kwkcli/libs/ui/dlg"
+	"bitbucket.com/sharingmachine/kwkcli/libs/ui/tmpl"
 )
 
 type AliasController struct {
@@ -19,31 +20,31 @@ type AliasController struct {
 	openers  openers.IOpen
 	system   system.ISystem
 	settings settings.ISettings
-	gui.IDialogues
-	gui.ITemplateWriter
+	dlg.Dialogue
+	tmpl.Writer
 }
 
-func NewAliasController(a aliases.IAliases, o openers.IOpen, s system.ISystem, d gui.IDialogues, w gui.ITemplateWriter, t settings.ISettings, search search.ISearch) *AliasController {
-	return &AliasController{service:a, openers:o, system:s, IDialogues:d, ITemplateWriter:w, settings: t, search:search}
+func NewAliasController(a aliases.IAliases, o openers.IOpen, s system.ISystem, d dlg.Dialogue, w tmpl.Writer, t settings.ISettings, search search.ISearch) *AliasController {
+	return &AliasController{service: a, openers: o, system: s, Dialogue: d, Writer: w, settings: t, search: search}
 }
 
 func (a *AliasController) Share(fullKey string, destination string) {
-	k := a.getKwkKey(fullKey);
+	k := a.getKwkKey(fullKey)
 	if list, err := a.service.Get(k); err != nil {
 		a.Render("error", err)
 	} else {
 		if alias := a.handleMultiResponse(fullKey, list); alias != nil {
-			gmail := &models.Alias{Runtime:"url", Extension:"url"}
+			gmail := &models.Alias{Runtime: "url", Extension: "url"}
 			gmail.Snip = "https://mail.google.com/mail/?ui=2&view=cm&fs=1&tf=1&su=&body=http%3A%2F%2Faus.kwk.co%2F" + alias.Username + "%2f" + alias.FullKey
 			a.openers.Open(gmail, []string{})
 		} else {
-			a.Render("alias:notfound", map[string]interface{}{"fullKey":fullKey})
+			a.Render("alias:notfound", map[string]interface{}{"fullKey": fullKey})
 		}
 	}
 }
 
 func (a *AliasController) Open(fullKey string, args []string) {
-	k := a.getKwkKey(fullKey);
+	k := a.getKwkKey(fullKey)
 	if list, err := a.service.Get(k); err != nil {
 		a.Render("error", err)
 
@@ -57,7 +58,7 @@ func (a *AliasController) Open(fullKey string, args []string) {
 				a.Render("search:beta", res)
 				return
 			}
-			a.Render("alias:notfound", map[string]interface{}{"FullKey":fullKey})
+			a.Render("alias:notfound", map[string]interface{}{"FullKey": fullKey})
 		}
 	}
 }
@@ -72,7 +73,7 @@ func (a *AliasController) New(uri string, fullKey string) {
 			} else {
 				a.Render("alias:new", createAlias.Alias)
 			}
-				a.system.CopyToClipboard(createAlias.Alias.FullKey)
+			a.system.CopyToClipboard(createAlias.Alias.FullKey)
 			//if createAlias.Alias.Runtime != "url" {
 			//	a.Edit(createAlias.Alias.FullKey)
 			//}
@@ -103,7 +104,7 @@ func (a *AliasController) Edit(fullKey string) {
 				a.Render("alias:edited", alias)
 			}
 		} else {
-			a.Render("alias:notfound", &models.Alias{FullKey:fullKey})
+			a.Render("alias:notfound", &models.Alias{FullKey: fullKey})
 		}
 	}
 }
@@ -125,7 +126,7 @@ func (a *AliasController) Inspect(fullKey string) {
 }
 
 func (a *AliasController) Delete(fullKey string) {
-	alias := &models.Alias{FullKey:fullKey}
+	alias := &models.Alias{FullKey: fullKey}
 	if r := a.Modal("alias:delete", alias); r.Ok {
 		if err := a.service.Delete(fullKey); err != nil {
 			a.Render("error", err)
@@ -141,8 +142,8 @@ func (a *AliasController) Cat(fullKey string) {
 		a.Render("error", err)
 	} else {
 		if len(list.Items) == 0 {
-			a.Render("alias:notfound", &models.Alias{FullKey:fullKey})
-		} else if (len(list.Items) == 1) {
+			a.Render("alias:notfound", &models.Alias{FullKey: fullKey})
+		} else if len(list.Items) == 1 {
 			a.Render("alias:cat", list.Items[0])
 		} else {
 			a.Render("alias:ambiguouscat", list)
@@ -172,12 +173,12 @@ func (a *AliasController) Rename(fullKey string, newKey string) {
 	} else {
 		if alias.Private {
 			a.Render("alias:madeprivate", &map[string]string{
-				"fullKey":originalFullKey,
+				"fullKey": originalFullKey,
 			})
 		} else {
 			a.Render("alias:renamed", &map[string]string{
-				"fullKey":originalFullKey,
-				"newFullKey":alias.FullKey,
+				"fullKey":    originalFullKey,
+				"newFullKey": alias.FullKey,
 			})
 		}
 	}
@@ -206,7 +207,7 @@ func (a *AliasController) List(args ...string) {
 	var username = ""
 	for i, v := range args {
 		if num, err := strconv.Atoi(v); err == nil {
-				size = int64(num)
+			size = int64(num)
 		} else {
 			if i == 0 && v[0] == '/' {
 				username = strings.Replace(v, "/", "", -1)
@@ -260,4 +261,3 @@ func (a *AliasController) getKwkKey(fullKey string) *models.KwkKey {
 	}
 	return k
 }
-

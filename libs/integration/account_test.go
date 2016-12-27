@@ -1,11 +1,11 @@
 package integration
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
-	"testing"
-	"github.com/smartystreets/assertions/should"
 	"bytes"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/smartystreets/assertions/should"
+	. "github.com/smartystreets/goconvey/convey"
+	"testing"
 )
 
 func Test_App(t *testing.T) {

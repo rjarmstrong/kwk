@@ -1,12 +1,12 @@
 package settings
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
-	"github.com/smartystreets/assertions/should"
-	"testing"
 	"bitbucket.com/sharingmachine/kwkcli/libs/models"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
+	"github.com/smartystreets/assertions/should"
+	. "github.com/smartystreets/goconvey/convey"
 	"os"
+	"testing"
 )
 
 func Test_System(t *testing.T) {
@@ -16,8 +16,8 @@ func Test_System(t *testing.T) {
 			s := New(sys, "test_settings")
 			key := "user"
 			expected := models.User{
-				Email:"richard@kwk.co",
-				Token:"asdfsdfsdfuiu",
+				Email: "richard@kwk.co",
+				Token: "asdfsdfsdfuiu",
 			}
 			s.Upsert(key, expected)
 			actual := &models.User{}
@@ -25,8 +25,8 @@ func Test_System(t *testing.T) {
 			So(*actual, should.Resemble, expected)
 
 			expectedUpdate := models.User{
-				Email:"richard@kwk.io",
-				Token:"asdfsdfsdfuiu",
+				Email: "richard@kwk.io",
+				Token: "asdfsdfsdfuiu",
 			}
 			s.Upsert(key, expectedUpdate)
 			s.Get(key, actual)
@@ -43,5 +43,3 @@ func Test_System(t *testing.T) {
 		})
 	})
 }
-
-

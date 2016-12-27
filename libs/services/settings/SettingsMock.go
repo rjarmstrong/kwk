@@ -1,15 +1,15 @@
 package settings
 
-import   (
+import (
 	"reflect"
 )
 
 type SettingsMock struct {
-	GetCalledWith []interface{}
+	GetCalledWith             []interface{}
 	ChangeDirectoryCalledWith string
-	UpsertCalledWith []interface{}
-	DeleteCalledWith string
-	GetHydrateWith interface{}
+	UpsertCalledWith          []interface{}
+	DeleteCalledWith          string
+	GetHydrateWith            interface{}
 }
 
 // get and check username exists

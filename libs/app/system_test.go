@@ -1,11 +1,11 @@
 package app
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
-	"github.com/smartystreets/assertions/should"
-	"testing"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
+	"github.com/smartystreets/assertions/should"
+	. "github.com/smartystreets/goconvey/convey"
+	"testing"
 )
 
 func Test_System(t *testing.T) {
@@ -40,5 +40,3 @@ func Test_System(t *testing.T) {
 		})
 	})
 }
-
-

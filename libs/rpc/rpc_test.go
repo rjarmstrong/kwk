@@ -1,12 +1,12 @@
 package rpc
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
-	"github.com/smartystreets/assertions/should"
-	"testing"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
-	"google.golang.org/grpc/metadata"
 	"bitbucket.com/sharingmachine/kwkcli/libs/models"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
+	"github.com/smartystreets/assertions/should"
+	. "github.com/smartystreets/goconvey/convey"
+	"google.golang.org/grpc/metadata"
+	"testing"
 )
 
 func Test_RPC(t *testing.T) {
@@ -16,7 +16,7 @@ func Test_RPC(t *testing.T) {
 			Convey(`Given the current settings has a profile (signed in user) should add token to context`, func() {
 				t := &settings.SettingsMock{}
 				token := "sometoken234234234"
-				t.GetHydrateWith = &models.User{Token:token}
+				t.GetHydrateWith = &models.User{Token: token}
 				h := NewHeaders(t)
 				md, _ := metadata.FromContext(h.GetContext())
 				So(md[models.TokenHeaderName][0], should.Equal, token)

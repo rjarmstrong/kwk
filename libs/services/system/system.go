@@ -1,22 +1,22 @@
 package system
 
 import (
-	"os/exec"
 	"bytes"
-	"io"
 	"encoding/json"
-	"github.com/kennygrant/sanitize"
-	"io/ioutil"
-	"path"
-	"os"
 	"errors"
-	"github.com/atotto/clipboard"
 	"fmt"
+	"github.com/atotto/clipboard"
+	"github.com/kennygrant/sanitize"
+	"io"
+	"io/ioutil"
+	"os"
+	"os/exec"
+	"path"
 	"runtime"
 )
 
 const (
-	APP_VERSION ="APP_VERSION"
+	APP_VERSION = "APP_VERSION"
 )
 
 func New() ISystem {
@@ -48,7 +48,7 @@ func PrettyPrint(obj interface{}) {
 }
 
 func (s *System) UpsertDirectory(dir string) error {
-	ok, err := s.Exists(dir);
+	ok, err := s.Exists(dir)
 	if ok {
 		return nil
 	}
@@ -70,7 +70,9 @@ func (s *System) WriteToFile(directoryName string, fullKey string, uri string) (
 
 func (s *System) ReadFromFile(directoryName string, fullKey string) (string, error) {
 	dirPath, err := s.GetDirPath(directoryName)
-	if err != nil { return "", err }
+	if err != nil {
+		return "", err
+	}
 	fp := path.Join(dirPath, fullKey)
 	if ok, _ := s.Exists(fp); !ok {
 		return "", errors.New("Not found.")
@@ -81,14 +83,16 @@ func (s *System) ReadFromFile(directoryName string, fullKey string) (string, err
 
 func (s *System) Delete(directoryName string, fullKey string) error {
 	dirPath, err := s.GetDirPath(directoryName)
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 	fp := path.Join(dirPath, fullKey)
 	return os.RemoveAll(fp)
 }
 
 func (s *System) GetDirPath(directoryName string) (string, error) {
 	dir := path.Join(s.GetCachePath(), directoryName)
-	err:= s.UpsertDirectory(dir)
+	err := s.UpsertDirectory(dir)
 	return dir, err
 }
 

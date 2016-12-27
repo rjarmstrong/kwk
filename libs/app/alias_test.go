@@ -1,17 +1,16 @@
 package app
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
-	"github.com/smartystreets/assertions/should"
-	"testing"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
 	"bitbucket.com/sharingmachine/kwkcli/libs/models"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/aliases"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/openers"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/openers"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
+	"github.com/smartystreets/assertions/should"
+	. "github.com/smartystreets/goconvey/convey"
+	"testing"
 )
-
 
 func Test_Alias(t *testing.T) {
 	Convey("ALIAS COMMANDS", t, func() {
@@ -27,11 +26,11 @@ func Test_Alias(t *testing.T) {
 			Convey(`Should call get and open if found`, func() {
 				fullKey := "hola.sh"
 				a.ReturnItemsForGet = []models.Alias{
-					{FullKey:fullKey},
+					{FullKey: fullKey},
 				}
-				t.GetHydrateWith = &models.User{Username:"rjarmstrong"}
+				t.GetHydrateWith = &models.User{Username: "rjarmstrong"}
 				app.App.Run([]string{"[app]", fullKey, "covert", "arg2"})
-				So(a.GetCalledWith, should.Resemble, &models.KwkKey{FullKey: fullKey, Username:"rjarmstrong"})
+				So(a.GetCalledWith, should.Resemble, &models.KwkKey{FullKey: fullKey, Username: "rjarmstrong"})
 				So(o.OpenCalledWith, should.Resemble, []interface{}{&a.ReturnItemsForGet[0], []string{"covert", "arg2"}})
 				a.ReturnItemsForGet = nil
 			})
@@ -39,13 +38,13 @@ func Test_Alias(t *testing.T) {
 				fullKey1 := "hola.sh"
 				fullKey2 := "hola.js"
 				a.ReturnItemsForGet = []models.Alias{
-					{FullKey:fullKey1},
-					{FullKey:fullKey2},
+					{FullKey: fullKey1},
+					{FullKey: fullKey2},
 				}
-				t.GetHydrateWith = &models.User{Username:"rjarmstrong"}
-				d.MultiChoiceResponse = &gui.DialogueResponse{Value:&a.ReturnItemsForGet[0]}
+				t.GetHydrateWith = &models.User{Username: "rjarmstrong"}
+				d.MultiChoiceResponse = &gui.DialogueResponse{Value: &a.ReturnItemsForGet[0]}
 				app.App.Run([]string{"[app]", "hola", "arg1", "arg2"})
-				So(a.GetCalledWith, should.Resemble, &models.KwkKey{Username:"rjarmstrong", FullKey:"hola"})
+				So(a.GetCalledWith, should.Resemble, &models.KwkKey{Username: "rjarmstrong", FullKey: "hola"})
 				So(d.MultiChoiceCalledWith, should.Resemble, []interface{}{"alias:choose", nil,
 					a.ReturnItemsForGet})
 				a.ReturnItemsForGet = nil
@@ -54,10 +53,10 @@ func Test_Alias(t *testing.T) {
 				fullKey := "hola.sh"
 				a.ReturnItemsForGet = []models.Alias{}
 				app.App.Run([]string{"[app]", fullKey, "arg1", "arg2"})
-				So(a.GetCalledWith, should.Resemble, &models.KwkKey{FullKey:"hola.sh"})
+				So(a.GetCalledWith, should.Resemble, &models.KwkKey{FullKey: "hola.sh"})
 				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:notfound",
 					map[string]interface{}{
-						"fullKey" : "hola.sh",
+						"fullKey": "hola.sh",
 					}})
 				a.ReturnItemsForGet = nil
 			})
@@ -69,7 +68,7 @@ func Test_Alias(t *testing.T) {
 				So(p, should.NotBeNil)
 				p2 := app.App.Command("create")
 				p3 := app.App.Command("save")
-				So(p2.Name, should.Equal, p.Name + "x")
+				So(p2.Name, should.Equal, p.Name+"x")
 				So(p3.Name, should.Equal, p.Name)
 			})
 			Convey(`Should call create, save to clip board and respond with template WITH a fullKey`, func() {
@@ -77,14 +76,14 @@ func Test_Alias(t *testing.T) {
 				app.App.Run([]string{"[app]", "new", "echo hola", fullKey})
 				So(a.CreateCalledWith, should.Resemble, []string{"echo hola", fullKey})
 				So(s.CopyToClipboardCalledWith, should.Equal, fullKey)
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:new", &models.Alias{FullKey:fullKey}})
+				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:new", &models.Alias{FullKey: fullKey}})
 			})
 			Convey(`Should call create, save to clip board and respond with template WITHOUT a fullKey`, func() {
 				app.App.Run([]string{"[app]", "new", "echo hola"})
 				So(a.CreateCalledWith, should.Resemble, []string{"echo hola", ""})
 				mockKey := "x5hi23"
 				So(s.CopyToClipboardCalledWith, should.Equal, mockKey)
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:new", &models.Alias{FullKey:mockKey}})
+				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:new", &models.Alias{FullKey: mockKey}})
 			})
 		})
 
@@ -97,7 +96,7 @@ func Test_Alias(t *testing.T) {
 			})
 			Convey(`Should call get and respond with template`, func() {
 				app.App.Run([]string{"[app]", "inspect", "arrows.js"})
-				So(a.GetCalledWith, should.Resemble, &models.KwkKey{FullKey:"arrows.js"})
+				So(a.GetCalledWith, should.Resemble, &models.KwkKey{FullKey: "arrows.js"})
 				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:inspect", &models.AliasList{}})
 			})
 		})
@@ -117,15 +116,15 @@ func Test_Alias(t *testing.T) {
 			})
 			Convey(`Should call tag and respond with template`, func() {
 				app.App.Run([]string{"[app]", "tag", "arrows.js", "tag1", "tag2"})
-				So(a.TagCalledWith, should.Resemble, map[string][]string {
-					"arrows.js" : []string{"tag1", "tag2"},
+				So(a.TagCalledWith, should.Resemble, map[string][]string{
+					"arrows.js": []string{"tag1", "tag2"},
 				})
 				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:tag", &models.Alias{}})
 			})
 			Convey(`Should call untag and respond with template`, func() {
 				app.App.Run([]string{"[app]", "untag", "arrows.js", "tag1", "tag2"})
-				So(a.UnTagCalledWith, should.Resemble, map[string][]string {
-					"arrows.js" : []string{"tag1", "tag2"},
+				So(a.UnTagCalledWith, should.Resemble, map[string][]string{
+					"arrows.js": []string{"tag1", "tag2"},
 				})
 				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:untag", &models.Alias{}})
 			})
@@ -140,17 +139,17 @@ func Test_Alias(t *testing.T) {
 				So(p2.Name, should.Equal, p.Name)
 			})
 			Convey(`Should prompt to delete and then confirm deleted`, func() {
-				d.ReturnItem = &gui.DialogueResponse{Ok:true}
+				d.ReturnItem = &gui.DialogueResponse{Ok: true}
 				app.App.Run([]string{"[app]", "delete", "arrows.js"})
 				So(a.DeleteCalledWith, should.Equal, "arrows.js")
-				So(d.LastModalCalledWith, should.Resemble, []interface{}{"alias:delete", map[string]string{"fullKey":"arrows.js"}})
+				So(d.LastModalCalledWith, should.Resemble, []interface{}{"alias:delete", map[string]string{"fullKey": "arrows.js"}})
 				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:deleted", data})
 				d.ReturnItem = nil
 			})
 			Convey(`Should prompt to delete and then confirm not deleted`, func() {
-				d.ReturnItem = &gui.DialogueResponse{Ok:false}
+				d.ReturnItem = &gui.DialogueResponse{Ok: false}
 				app.App.Run([]string{"[app]", "delete", "arrows.js"})
-				So(d.CallHistory[0], should.Resemble, []interface{}{"alias:delete", map[string]string{"fullKey":"arrows.js"}})
+				So(d.CallHistory[0], should.Resemble, []interface{}{"alias:delete", map[string]string{"fullKey": "arrows.js"}})
 				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:notdeleted", data})
 				d.ReturnItem = nil
 			})
@@ -170,12 +169,12 @@ func Test_Alias(t *testing.T) {
 				So(p5.Name, should.Equal, p.Name)
 			})
 			Convey(`Should call get and respond with template`, func() {
-				a.ReturnItemsForGet =[]models.Alias{
-					{FullKey:"arrows.js"},
+				a.ReturnItemsForGet = []models.Alias{
+					{FullKey: "arrows.js"},
 				}
 				app.App.Run([]string{"[app]", "cat", "arrows.js"})
-				So(a.GetCalledWith, should.Resemble, &models.KwkKey{FullKey:"arrows.js"})
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:cat", &models.AliasList{Items:a.ReturnItemsForGet, Total:1}})
+				So(a.GetCalledWith, should.Resemble, &models.KwkKey{FullKey: "arrows.js"})
+				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:cat", &models.AliasList{Items: a.ReturnItemsForGet, Total: 1}})
 			})
 		})
 
@@ -189,7 +188,7 @@ func Test_Alias(t *testing.T) {
 			Convey(`Should call rename and respond with template`, func() {
 				app.App.Run([]string{"[app]", "rename", "arrows.js", "pointers.js"})
 				So(a.RenameCalledWith, should.Resemble, []string{"arrows.js", "pointers.js"})
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:renamed", &models.Alias{FullKey:"pointers.js"}})
+				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:renamed", &models.Alias{FullKey: "pointers.js"}})
 			})
 		})
 
@@ -202,7 +201,7 @@ func Test_Alias(t *testing.T) {
 				app.App.Run([]string{"[app]", "clone", "unicode/arrows.js", "myarrows.js"})
 				So(a.CloneCalledWith, should.Resemble, []interface{}{
 
-					&models.KwkKey{Username:"unicode", FullKey:"arrows.js"}, "myarrows.js"})
+					&models.KwkKey{Username: "unicode", FullKey: "arrows.js"}, "myarrows.js"})
 
 				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:cloned", &models.Alias{}})
 			})
@@ -216,15 +215,15 @@ func Test_Alias(t *testing.T) {
 				So(p2.Name, should.Equal, p.Name)
 			})
 			Convey(`Should call edit and respond with template`, func() {
-				a.ReturnItemsForGet = []models.Alias{{FullKey:"arrows.js"}}
-				d.MultiChoiceResponse = &gui.DialogueResponse{Value:a.ReturnItemsForGet[0]}
+				a.ReturnItemsForGet = []models.Alias{{FullKey: "arrows.js"}}
+				d.MultiChoiceResponse = &gui.DialogueResponse{Value: a.ReturnItemsForGet[0]}
 				app.App.Run([]string{"[app]", "edit", "arrows.js"})
 				So(o.EditCalledWith, should.Resemble, &a.ReturnItemsForGet[0])
 				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:edited", &a.ReturnItemsForGet[0]})
 			})
 			Convey(`Should call edit and respond with error if not exists`, func() {
 				app.App.Run([]string{"[app]", "edit", "arrows.js"})
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:notfound", &models.Alias{FullKey:"arrows.js"}})
+				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:notfound", &models.Alias{FullKey: "arrows.js"}})
 			})
 		})
 
@@ -239,7 +238,7 @@ func Test_Alias(t *testing.T) {
 			Convey(`Should call patch and respond with patch`, func() {
 				app.App.Run([]string{"[app]", "patch", "arrows.js", "console.log('patched')"})
 				So(a.PatchCalledWith, should.Resemble, []string{"arrows.js", "console.log('patched')"})
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:patched", &models.Alias{FullKey:"arrows.js", Snip:"console.log('patched')"}})
+				So(w.RenderCalledWith, should.Resemble, []interface{}{"alias:patched", &models.Alias{FullKey: "arrows.js", Snip: "console.log('patched')"}})
 			})
 		})
 
@@ -258,5 +257,3 @@ func Test_Alias(t *testing.T) {
 		})
 	})
 }
-
-

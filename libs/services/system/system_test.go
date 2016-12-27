@@ -1,17 +1,17 @@
 package system
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
-	"github.com/smartystreets/assertions/should"
-	"testing"
 	"fmt"
+	"github.com/smartystreets/assertions/should"
+	. "github.com/smartystreets/goconvey/convey"
 	"os"
+	"testing"
 )
 
 func Test_System(t *testing.T) {
 	Convey("System test", t, func() {
 		s := New()
-		
+
 		Convey(`Should create a directory if not exists`, func() {
 			dir := "test_dir"
 			path, err := s.GetDirPath(dir)
@@ -50,5 +50,3 @@ func Test_System(t *testing.T) {
 		})
 	})
 }
-
-

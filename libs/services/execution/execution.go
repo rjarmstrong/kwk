@@ -2,8 +2,8 @@ package execution
 
 import (
 	"bytes"
-	"os/exec"
 	"io"
+	"os/exec"
 	//"fmt"
 )
 
@@ -22,7 +22,7 @@ func Execute(output_buffer *bytes.Buffer, stack ...*exec.Cmd) (err error) {
 	stack[i].Stdout = output_buffer
 	stack[i].Stderr = &error_buffer
 
-	return call(stack, pipe_stack);
+	return call(stack, pipe_stack)
 }
 
 func call(stack []*exec.Cmd, pipes []*io.PipeWriter) (err error) {

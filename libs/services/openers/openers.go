@@ -1,13 +1,13 @@
 package openers
 
 import (
+	"bitbucket.com/sharingmachine/kwkcli/libs/models"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/aliases"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
+	"fmt"
 	"os"
 	"time"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/aliases"
-	"bitbucket.com/sharingmachine/kwkcli/libs/models"
-	"fmt"
+	"bitbucket.com/sharingmachine/kwkcli/libs/ui/tmpl"
 )
 
 const (
@@ -17,11 +17,11 @@ const (
 type Opener struct {
 	aliases aliases.IAliases
 	system  system.ISystem
-	writer gui.ITemplateWriter
+	writer  tmpl.Writer
 }
 
-func New(system system.ISystem, aliases aliases.IAliases, w gui.ITemplateWriter) *Opener {
-	return &Opener{aliases:aliases, system:system, writer:w}
+func New(system system.ISystem, aliases aliases.IAliases, w tmpl.Writer) *Opener {
+	return &Opener{aliases: aliases, system: system, writer: w}
 }
 
 func (o *Opener) Edit(alias *models.Alias) error {
@@ -29,7 +29,7 @@ func (o *Opener) Edit(alias *models.Alias) error {
 	if err != nil {
 		return err
 	}
-	fi, _ := os.Stat(filePath);
+	fi, _ := os.Stat(filePath)
 	o.system.ExecSafe("open", filePath)
 	edited := false
 	for edited == false {
@@ -40,9 +40,9 @@ func (o *Opener) Edit(alias *models.Alias) error {
 		}
 	}
 
-	closer := func(){
+	closer := func() {
 		o.system.ExecSafe("osascript", "-e",
-			fmt.Sprintf("tell application %q to close (every window whose name is \"%s.%s\")", "XCode",  alias.Key, alias.Extension))
+			fmt.Sprintf("tell application %q to close (every window whose name is \"%s.%s\")", "XCode", alias.Key, alias.Extension))
 		o.system.ExecSafe("osascript", "-e", "tell application \"iTerm2\" to activate")
 	}
 

@@ -7,7 +7,7 @@ import (
 func System(ctrl *SystemController) []cli.Command {
 	c := []cli.Command{
 		{
-			Name:    "upgrade",
+			Name: "upgrade",
 			Action: func(c *cli.Context) error {
 				ctrl.Upgrade()
 				return nil
@@ -16,7 +16,7 @@ func System(ctrl *SystemController) []cli.Command {
 		{
 			Name:    "version",
 			Aliases: []string{"v"},
-			Action:  func(c *cli.Context) error {
+			Action: func(c *cli.Context) error {
 				ctrl.GetVersion()
 				return nil
 			},

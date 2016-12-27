@@ -1,8 +1,8 @@
 package settings
 
 import (
-	"encoding/json"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
+	"encoding/json"
 )
 
 type Settings struct {
@@ -11,7 +11,7 @@ type Settings struct {
 }
 
 func New(system system.ISystem, directoryName string) *Settings {
-	return &Settings{DirectoryName: directoryName, System:system}
+	return &Settings{DirectoryName: directoryName, System: system}
 }
 
 func (s *Settings) Upsert(key string, value interface{}) error {
@@ -34,5 +34,5 @@ func (s *Settings) Delete(key string) error {
 }
 
 func (s *Settings) ChangeDirectory(username string) error {
-  return nil
+	return nil
 }

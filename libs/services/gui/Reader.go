@@ -1,8 +1,7 @@
 package gui
 
-
 import (
-"io"
+	"io"
 )
 
 type Reader struct {
@@ -10,10 +9,9 @@ type Reader struct {
 }
 
 func NewReader(r io.Reader) *Reader {
-	return &Reader{Reader:r}
+	return &Reader{Reader: r}
 }
 
 func (r *Reader) Read(p []byte) (n int, err error) {
 	return 0, nil
 }
-

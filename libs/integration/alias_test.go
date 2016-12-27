@@ -1,11 +1,11 @@
 package integration
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
-	"testing"
-	"github.com/smartystreets/assertions/should"
 	"bytes"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/smartystreets/assertions/should"
+	. "github.com/smartystreets/goconvey/convey"
+	"testing"
 )
 
 func Test_Alias(t *testing.T) {
@@ -42,7 +42,7 @@ func Test_Alias(t *testing.T) {
 				w.Reset()
 				description := "This is for saying hello."
 				app.Run("describe", "hello.go", description)
-				So(w.String(), should.Resemble,  "Description updated:\n\x1b[36mThis is for saying hello.\x1b[0m")
+				So(w.String(), should.Resemble, "Description updated:\n\x1b[36mThis is for saying hello.\x1b[0m")
 				w.Reset()
 			})
 		})
@@ -138,7 +138,6 @@ func Test_Alias(t *testing.T) {
 				w.Reset()
 			})
 
-
 			Convey(`Should prompt to delete alias and not delete when not 'y'`, func() {
 				app.Run("new", "echo \"hello\"", "hello.js")
 				w.Reset()
@@ -156,7 +155,7 @@ func Test_Alias(t *testing.T) {
 				app.Run("new", "echo \"hello\"", "hello.js")
 				w.Reset()
 
-				app.Run("patch", "hello.js",  "echo", "printf")
+				app.Run("patch", "hello.js", "echo", "printf")
 				So(w.String(), should.Resemble, "hello.js patched.")
 				w.Reset()
 				app.Run("get", "hello.js")

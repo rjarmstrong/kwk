@@ -1,23 +1,24 @@
 package main
 
 import (
-	"os"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
+	"bitbucket.com/sharingmachine/kwkcli/libs/app"
+	"bitbucket.com/sharingmachine/kwkcli/libs/rpc"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/aliases"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/openers"
-	"bitbucket.com/sharingmachine/kwkcli/libs/app"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/gui"
-	"bitbucket.com/sharingmachine/kwkcli/libs/rpc"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/search"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/system"
 	"bitbucket.com/sharingmachine/kwkcli/libs/services/users"
 	"bufio"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/search"
+	"os"
+	"bitbucket.com/sharingmachine/kwkcli/libs/ui/tmpl"
+	"bitbucket.com/sharingmachine/kwkcli/libs/ui/dlg"
 )
 
 func main() {
 	os.Setenv("version", "v0.0.3")
 	host := os.Getenv("KWK_HOST")
-	conn := rpc.Conn(host);
+	conn := rpc.Conn(host)
 	defer conn.Close()
 
 	s := system.New()
@@ -25,10 +26,10 @@ func main() {
 	h := rpc.NewHeaders(t)
 	u := users.New(conn, t, h)
 	a := aliases.New(conn, t, h)
-	w := gui.NewTemplateWriter(os.Stdout)
+	w := tmpl.NewWriter(os.Stdout)
 	o := openers.New(s, a, w)
 	r := bufio.NewReader(os.Stdin)
-	d := gui.NewDialogues(w, r)
+	d := dlg.New(w, r)
 	ch := search.New(conn, t, h)
 
 	kwkApp := app.NewKwkApp(a, s, t, o, u, d, w, ch)

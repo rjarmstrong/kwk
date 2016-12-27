@@ -2,8 +2,8 @@ package system
 
 import (
 	"fmt"
-	"io"
 	"github.com/fatih/color"
+	"io"
 )
 
 func Help(w io.Writer, template string, data interface{}) {

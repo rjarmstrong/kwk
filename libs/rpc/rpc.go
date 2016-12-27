@@ -3,12 +3,12 @@ package rpc
 import (
 	"crypto/tls"
 	//"google.golang.org/grpc/credentials"
+	"bitbucket.com/sharingmachine/kwkcli/libs/models"
+	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
 	"fmt"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-	"golang.org/x/net/context"
-	"bitbucket.com/sharingmachine/kwkcli/libs/services/settings"
-	"bitbucket.com/sharingmachine/kwkcli/libs/models"
 )
 
 //serverAddr  := flag.String("server_addr", "127.0.0.1:7777", "The server address in the format of host:port")
@@ -31,7 +31,7 @@ func Conn(serverAddress string) *grpc.ClientConn {
 }
 
 func NewHeaders(t settings.ISettings) *Headers {
-	return &Headers{settings:t}
+	return &Headers{settings: t}
 }
 
 type Headers struct {
@@ -74,4 +74,4 @@ if e != nil {
 		fmt.Print("kwk server is unavailable, please try again later or tweet us @kwklinks.")
 		return
 	}
- */
+*/
