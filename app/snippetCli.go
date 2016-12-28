@@ -15,7 +15,7 @@ import (
 )
 
 type SnippetCli struct {
-	search   search.ISearch
+	search   search.Term
 	service  snippets.Service
 	openers  openers.IOpen
 	system   system.ISystem
@@ -24,7 +24,7 @@ type SnippetCli struct {
 	tmpl.Writer
 }
 
-func NewSnippetCli(a snippets.Service, o openers.IOpen, s system.ISystem, d dlg.Dialogue, w tmpl.Writer, t config.Settings, search search.ISearch) *SnippetCli {
+func NewSnippetCli(a snippets.Service, o openers.IOpen, s system.ISystem, d dlg.Dialogue, w tmpl.Writer, t config.Settings, search search.Term) *SnippetCli {
 	return &SnippetCli{service: a, openers: o, system: s, Dialogue: d, Writer: w, settings: t, search: search}
 }
 
@@ -52,7 +52,7 @@ func (a *SnippetCli) Open(fullKey string, args []string) {
 		if alias := a.handleMultiResponse(fullKey, list); alias != nil {
 			a.openers.Open(alias, args)
 		} else {
-			if res, err := a.search.Search(fullKey); err != nil {
+			if res, err := a.search.Execute(fullKey); err != nil {
 				a.Render("error", err)
 			} else if res.Total > 0 {
 				a.Render("search:beta", res)

@@ -8,18 +8,18 @@ import (
 )
 
 type SearchCli struct {
-	service search.ISearch
+	service search.Term
 	tmpl.Writer
 	dlg.Dialogue
 }
 
-func NewSearchCli(search search.ISearch, w tmpl.Writer, d dlg.Dialogue) *SearchCli {
+func NewSearchCli(search search.Term, w tmpl.Writer, d dlg.Dialogue) *SearchCli {
 	return &SearchCli{service: search, Writer: w, Dialogue: d}
 }
 
 func (c *SearchCli) Search(args ...string) {
 	term := strings.Join(args, " ")
-	if res, err := c.service.Search(term); err != nil {
+	if res, err := c.service.Execute(term); err != nil {
 		c.Render("error", err)
 	} else {
 		res.Term = term

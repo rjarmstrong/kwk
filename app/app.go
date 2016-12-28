@@ -26,7 +26,7 @@ type KwkApp struct {
 }
 
 func New(a snippets.Service, s system.ISystem, t config.Settings, o openers.IOpen, u users.IUsers,
-	d dlg.Dialogue, w tmpl.Writer, h search.ISearch) *KwkApp {
+	d dlg.Dialogue, w tmpl.Writer, h search.Term) *KwkApp {
 
 	app := cli.NewApp()
 	os.Setenv(system.APP_VERSION, "0.0.1")

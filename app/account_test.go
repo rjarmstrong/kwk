@@ -15,7 +15,7 @@ func Test_App(t *testing.T) {
 	Convey("ACCOUNT COMMANDS", t, func() {
 		app := CreateAppStub()
 		u := app.Users.(*users.UsersMock)
-		t := app.Settings.(*config.Mock)
+		t := app.Settings.(*config.SettingsMock)
 		w := app.TemplateWriter.(*tmpl.MockWriter)
 		d := app.Dialogues.(*dlg.MockDialogue)
 

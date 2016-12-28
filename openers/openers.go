@@ -4,10 +4,10 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/system"
-	"fmt"
+	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"os"
 	"time"
-	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
+	"fmt"
 )
 
 const (

@@ -29,7 +29,7 @@ func createApp(conn *grpc.ClientConn, writer *bytes.Buffer, r *bufio.Reader) *ap
 	w := tmpl.NewWriter(writer)
 	d := dlg.New(w, r)
 	o := openers.New(s, a, w)
-	ch := search.New(conn, t, h)
+	ch := search.NewAlpha(conn, t, h)
 	return app.New(a, s, t, o, u, d, w, ch)
 }
 

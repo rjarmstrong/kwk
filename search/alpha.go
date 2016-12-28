@@ -8,16 +8,16 @@ import (
 	"google.golang.org/grpc"
 )
 
-type Search struct {
+type Alpha struct {
 	client  searchRpc.SearchRpcClient
 	headers *rpc.Headers
 }
 
-func New(conn *grpc.ClientConn, s config.Settings, h *rpc.Headers) ISearch {
-	return &Search{client: searchRpc.NewSearchRpcClient(conn), headers: h}
+func NewAlpha(conn *grpc.ClientConn, s config.Settings, h *rpc.Headers) Term {
+	return &Alpha{client: searchRpc.NewSearchRpcClient(conn), headers: h}
 }
 
-func (s *Search) Search(term string) (*models.SearchResponse, error) {
+func (s *Alpha) Execute(term string) (*models.SearchResponse, error) {
 	if res, err := s.client.Alpha(s.headers.GetContext(), &searchRpc.AlphaRequest{
 		Term: term,
 	}); err != nil {

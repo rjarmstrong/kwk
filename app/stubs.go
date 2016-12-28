@@ -13,13 +13,13 @@ import (
 
 func CreateAppStub() *KwkApp {
 	s := &system.MockSystem{}
-	t := &config.Mock{}
+	t := &config.SettingsMock{}
 	a := &snippets.Mock{}
 	o := &openers.OpenerMock{}
 	u := &users.UsersMock{}
 	d := &dlg.MockDialogue{}
 	w := &tmpl.MockWriter{}
-	h := &search.SearchMock{}
+	h := &search.TermMock{}
 	app := New(a, s, t, o, u, d, w, h)
 	return app
 }

@@ -30,7 +30,7 @@ func main() {
 	o := openers.New(s, a, w)
 	r := bufio.NewReader(os.Stdin)
 	d := dlg.New(w, r)
-	ch := search.New(conn, t, h)
+	ch := search.NewAlpha(conn, t, h)
 
 	kwkApp := app.New(a, s, t, o, u, d, w, ch)
 	kwkApp.App.Run(os.Args)
