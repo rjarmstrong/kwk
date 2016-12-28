@@ -2,7 +2,7 @@ package app
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
-	"bitbucket.com/sharingmachine/kwkcli/settings"
+	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/users"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
@@ -10,12 +10,12 @@ import (
 
 type AccountCli struct {
 	service  users.IUsers
-	settings settings.ISettings
+	settings config.Settings
 	tmpl.Writer
 	dlg.Dialogue
 }
 
-func NewAccountCli(u users.IUsers, s settings.ISettings, w tmpl.Writer, d dlg.Dialogue) *AccountCli {
+func NewAccountCli(u users.IUsers, s config.Settings, w tmpl.Writer, d dlg.Dialogue) *AccountCli {
 	return &AccountCli{service: u, settings: s, Writer: w, Dialogue: d}
 }
 
@@ -71,12 +71,4 @@ func (c *AccountCli) SignOut() {
 		return
 	}
 	c.Render("account:signedout", nil)
-}
-
-func (c *AccountCli) ChangeDirectory(username string) {
-	if err := c.settings.ChangeDirectory(username); err != nil {
-		c.Render("error", err)
-	} else {
-		c.Render("account:cd", map[string]string{"username": username})
-	}
 }

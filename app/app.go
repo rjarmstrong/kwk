@@ -3,7 +3,7 @@ package app
 import (
 	"bitbucket.com/sharingmachine/kwkcli/openers"
 	"bitbucket.com/sharingmachine/kwkcli/search"
-	"bitbucket.com/sharingmachine/kwkcli/settings"
+	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/system"
 	"bitbucket.com/sharingmachine/kwkcli/users"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
@@ -18,14 +18,14 @@ type KwkApp struct {
 
 	Snippets        snippets.Service
 	System         system.ISystem
-	Settings       settings.ISettings
+	Settings       config.Settings
 	Users          users.IUsers
 	Openers        openers.IOpen
 	Dialogues      dlg.Dialogue
 	TemplateWriter tmpl.Writer
 }
 
-func New(a snippets.Service, s system.ISystem, t settings.ISettings, o openers.IOpen, u users.IUsers,
+func New(a snippets.Service, s system.ISystem, t config.Settings, o openers.IOpen, u users.IUsers,
 	d dlg.Dialogue, w tmpl.Writer, h search.ISearch) *KwkApp {
 
 	app := cli.NewApp()

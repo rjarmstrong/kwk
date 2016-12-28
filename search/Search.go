@@ -3,7 +3,7 @@ package search
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
-	"bitbucket.com/sharingmachine/kwkcli/settings"
+	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/rpc/src/searchRpc"
 	"google.golang.org/grpc"
 )
@@ -13,7 +13,7 @@ type Search struct {
 	headers *rpc.Headers
 }
 
-func New(conn *grpc.ClientConn, s settings.ISettings, h *rpc.Headers) ISearch {
+func New(conn *grpc.ClientConn, s config.Settings, h *rpc.Headers) ISearch {
 	return &Search{client: searchRpc.NewSearchRpcClient(conn), headers: h}
 }
 

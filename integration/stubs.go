@@ -7,7 +7,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/gui"
 	"bitbucket.com/sharingmachine/kwkcli/openers"
 	"bitbucket.com/sharingmachine/kwkcli/search"
-	"bitbucket.com/sharingmachine/kwkcli/settings"
+	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/system"
 	"bitbucket.com/sharingmachine/kwkcli/users"
 	"bufio"

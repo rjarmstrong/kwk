@@ -38,14 +38,6 @@ func Accounts(a *AccountCli) []cli.Command {
 				return nil
 			},
 		},
-		{
-			Name:    "cd",
-			Aliases: []string{},
-			Action: func(c *cli.Context) error {
-				a.ChangeDirectory(c.Args().Get(0))
-				return nil
-			},
-		},
 	}
 	return c
 }

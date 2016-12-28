@@ -1,4 +1,4 @@
-package settings
+package config
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
@@ -10,7 +10,7 @@ import (
 )
 
 func Test_System(t *testing.T) {
-	Convey("Settings test", t, func() {
+	Convey("FileSettings test", t, func() {
 		Convey(`Should create, update, delete and get a setting`, func() {
 			sys := system.New()
 			s := New(sys, "test_settings")

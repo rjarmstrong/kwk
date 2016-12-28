@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	//"google.golang.org/grpc/credentials"
 	"bitbucket.com/sharingmachine/kwkcli/models"
-	"bitbucket.com/sharingmachine/kwkcli/settings"
+	"bitbucket.com/sharingmachine/kwkcli/config"
 	"fmt"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -15,8 +15,8 @@ import (
 
 func Conn(serverAddress string) *grpc.ClientConn {
 	// test
-	config := &tls.Config{}
-	config.InsecureSkipVerify = true
+	c := &tls.Config{}
+	c.InsecureSkipVerify = true
 	//cert := credentials.NewTLS(config)
 
 	// production
@@ -30,12 +30,12 @@ func Conn(serverAddress string) *grpc.ClientConn {
 	return conn
 }
 
-func NewHeaders(t settings.ISettings) *Headers {
+func NewHeaders(t config.Settings) *Headers {
 	return &Headers{settings: t}
 }
 
 type Headers struct {
-	settings settings.ISettings
+	settings config.Settings
 }
 
 func (i *Headers) GetContext() context.Context {

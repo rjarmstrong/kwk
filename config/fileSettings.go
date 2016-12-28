@@ -1,26 +1,26 @@
-package settings
+package config
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/system"
 	"encoding/json"
 )
 
-type Settings struct {
+type FileSettings struct {
 	DirectoryName string
 	System        system.ISystem
 }
 
-func New(system system.ISystem, directoryName string) *Settings {
-	return &Settings{DirectoryName: directoryName, System: system}
+func New(system system.ISystem, directoryName string) *FileSettings {
+	return &FileSettings{DirectoryName: directoryName, System: system}
 }
 
-func (s *Settings) Upsert(key string, value interface{}) error {
+func (s *FileSettings) Upsert(key string, value interface{}) error {
 	bytes, _ := json.Marshal(value)
 	_, err := s.System.WriteToFile(s.DirectoryName, key, string(bytes))
 	return err
 }
 
-func (s *Settings) Get(key string, value interface{}) error {
+func (s *FileSettings) Get(key string, value interface{}) error {
 	str, err := s.System.ReadFromFile(s.DirectoryName, key)
 	if err != nil {
 		return err
@@ -29,10 +29,6 @@ func (s *Settings) Get(key string, value interface{}) error {
 	return err
 }
 
-func (s *Settings) Delete(key string) error {
+func (s *FileSettings) Delete(key string) error {
 	return s.System.Delete(s.DirectoryName, key)
-}
-
-func (s *Settings) ChangeDirectory(username string) error {
-	return nil
 }

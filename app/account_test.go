@@ -2,7 +2,7 @@ package app
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
-	"bitbucket.com/sharingmachine/kwkcli/settings"
+	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/users"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
@@ -15,7 +15,7 @@ func Test_App(t *testing.T) {
 	Convey("ACCOUNT COMMANDS", t, func() {
 		app := CreateAppStub()
 		u := app.Users.(*users.UsersMock)
-		t := app.Settings.(*settings.SettingsMock)
+		t := app.Settings.(*config.Mock)
 		w := app.TemplateWriter.(*tmpl.MockWriter)
 		d := app.Dialogues.(*dlg.MockDialogue)
 

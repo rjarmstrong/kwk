@@ -4,7 +4,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/openers"
-	"bitbucket.com/sharingmachine/kwkcli/settings"
+	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/system"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
@@ -21,7 +21,7 @@ func Test_Snippet(t *testing.T) {
 		o := app.Openers.(*openers.OpenerMock)
 		s := app.System.(*system.MockSystem)
 		d := app.Dialogues.(*dlg.MockDialogue)
-		t := app.Settings.(*settings.SettingsMock)
+		t := app.Settings.(*settings.Mock)
 		w := app.TemplateWriter.(*tmpl.MockWriter)
 
 		Convey(`Command not found`, func() {

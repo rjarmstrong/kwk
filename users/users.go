@@ -3,7 +3,7 @@ package users
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
-	"bitbucket.com/sharingmachine/kwkcli/settings"
+	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/rpc/src/usersRpc"
 	"google.golang.org/grpc"
 	"time"
@@ -15,11 +15,11 @@ const (
 
 type Users struct {
 	client   usersRpc.UsersRpcClient
-	settings settings.ISettings
+	settings config.Settings
 	headers  *rpc.Headers
 }
 
-func New(conn *grpc.ClientConn, s settings.ISettings, h *rpc.Headers) *Users {
+func New(conn *grpc.ClientConn, s config.Settings, h *rpc.Headers) *Users {
 	return &Users{client: usersRpc.NewUsersRpcClient(conn), settings: s, headers: h}
 }
 

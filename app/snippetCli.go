@@ -5,7 +5,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/openers"
 	"bitbucket.com/sharingmachine/kwkcli/search"
-	"bitbucket.com/sharingmachine/kwkcli/settings"
+	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/system"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
@@ -19,12 +19,12 @@ type SnippetCli struct {
 	service  snippets.Service
 	openers  openers.IOpen
 	system   system.ISystem
-	settings settings.ISettings
+	settings config.Settings
 	dlg.Dialogue
 	tmpl.Writer
 }
 
-func NewSnippetCli(a snippets.Service, o openers.IOpen, s system.ISystem, d dlg.Dialogue, w tmpl.Writer, t settings.ISettings, search search.ISearch) *SnippetCli {
+func NewSnippetCli(a snippets.Service, o openers.IOpen, s system.ISystem, d dlg.Dialogue, w tmpl.Writer, t config.Settings, search search.ISearch) *SnippetCli {
 	return &SnippetCli{service: a, openers: o, system: s, Dialogue: d, Writer: w, settings: t, search: search}
 }
 

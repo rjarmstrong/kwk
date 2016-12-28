@@ -6,7 +6,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/openers"
 	"bitbucket.com/sharingmachine/kwkcli/search"
-	"bitbucket.com/sharingmachine/kwkcli/settings"
+	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/system"
 	"bitbucket.com/sharingmachine/kwkcli/users"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
@@ -22,7 +22,7 @@ func main() {
 	defer conn.Close()
 
 	s := system.New()
-	t := settings.New(s, "settings")
+	t := config.New(s, "settings")
 	h := rpc.NewHeaders(t)
 	u := users.New(conn, t, h)
 	a := snippets.New(conn, t, h)

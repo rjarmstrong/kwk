@@ -1,7 +1,6 @@
-package settings
+package config
 
-type ISettings interface {
-	ChangeDirectory(username string) error
+type Settings interface {
 	Upsert(fullKey string, data interface{}) error
 	Get(fullKey string, value interface{}) error
 	Delete(fullKey string) error

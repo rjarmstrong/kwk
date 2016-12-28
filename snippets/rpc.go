@@ -3,19 +3,19 @@ package snippets
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
-	"bitbucket.com/sharingmachine/kwkcli/settings"
+	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/rpc/src/aliasesRpc"
 	"google.golang.org/grpc"
 	"time"
 )
 
 type Rpc struct {
-	Settings settings.ISettings
+	Settings config.Settings
 	client   aliasesRpc.AliasesRpcClient
 	headers  *rpc.Headers
 }
 
-func New(conn *grpc.ClientConn, s settings.ISettings, h *rpc.Headers) Service {
+func New(conn *grpc.ClientConn, s config.Settings, h *rpc.Headers) Service {
 	return &Rpc{Settings: s, client: aliasesRpc.NewAliasesRpcClient(conn), headers: h}
 }
 
