@@ -2,18 +2,18 @@ package app
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/system"
-	"bitbucket.com/sharingmachine/kwkcli/users"
+	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 )
 
 type SystemCli struct {
-	service system.ISystem
-	users   users.IUsers
+	service       system.ISystem
+	accountManage account.Manager
 	tmpl.Writer
 }
 
-func NewSystemCli(s system.ISystem, u users.IUsers, w tmpl.Writer) *SystemCli {
-	return &SystemCli{service: s, users: u, Writer: w}
+func NewSystemCli(s system.ISystem, u account.Manager, w tmpl.Writer) *SystemCli {
+	return &SystemCli{service: s, accountManage: u, Writer: w}
 }
 
 func (c *SystemCli) Upgrade() {

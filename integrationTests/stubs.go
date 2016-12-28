@@ -9,7 +9,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/system"
-	"bitbucket.com/sharingmachine/kwkcli/users"
+	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bufio"
 	"bytes"
 	"fmt"

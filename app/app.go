@@ -5,7 +5,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/system"
-	"bitbucket.com/sharingmachine/kwkcli/users"
+	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
@@ -15,17 +15,16 @@ import (
 
 type KwkApp struct {
 	App *cli.App
-
-	Snippets        snippets.Service
+	Snippets       snippets.Service
 	System         system.ISystem
 	Settings       config.Settings
-	Users          users.IUsers
+	AccountManage  account.Manager
 	Openers        openers.IOpen
 	Dialogues      dlg.Dialogue
 	TemplateWriter tmpl.Writer
 }
 
-func New(a snippets.Service, s system.ISystem, t config.Settings, o openers.IOpen, u users.IUsers,
+func New(a snippets.Service, s system.ISystem, t config.Settings, o openers.IOpen, u account.Manager,
 	d dlg.Dialogue, w tmpl.Writer, h search.Term) *KwkApp {
 
 	app := cli.NewApp()
@@ -46,7 +45,7 @@ func New(a snippets.Service, s system.ISystem, t config.Settings, o openers.IOpe
 	searchCli := NewSearchCli(h, w, d)
 	app.Commands = append(app.Commands, Search(searchCli)...)
 
-	return &KwkApp{App: app, System: s, Settings: t, Openers: o, Users: u, Dialogues: d, Snippets: a, TemplateWriter: w}
+	return &KwkApp{App: app, System: s, Settings: t, Openers: o, AccountManage: u, Dialogues: d, Snippets: a, TemplateWriter: w}
 }
 
 func (a *KwkApp) Run(args ...string) {

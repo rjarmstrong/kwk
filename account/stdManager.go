@@ -1,4 +1,4 @@
-package users
+package account
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
@@ -13,17 +13,17 @@ const (
 	userDbKey = "user"
 )
 
-type Users struct {
+type StdManager struct {
 	client   usersRpc.UsersRpcClient
 	settings config.Settings
 	headers  *rpc.Headers
 }
 
-func New(conn *grpc.ClientConn, s config.Settings, h *rpc.Headers) *Users {
-	return &Users{client: usersRpc.NewUsersRpcClient(conn), settings: s, headers: h}
+func NewStdManager(conn *grpc.ClientConn, s config.Settings, h *rpc.Headers) *StdManager {
+	return &StdManager{client: usersRpc.NewUsersRpcClient(conn), settings: s, headers: h}
 }
 
-func (u *Users) SignIn(username string, password string) (*models.User, error) {
+func (u *StdManager) SignIn(username string, password string) (*models.User, error) {
 	if res, err := u.client.SignIn(u.headers.GetContext(), &usersRpc.SignInRequest{Username: username, Password: password}); err != nil {
 		return nil, err
 	} else {
@@ -33,7 +33,7 @@ func (u *Users) SignIn(username string, password string) (*models.User, error) {
 	}
 }
 
-func (u *Users) SignUp(email string, username string, password string) (*models.User, error) {
+func (u *StdManager) SignUp(email string, username string, password string) (*models.User, error) {
 	if res, err := u.client.SignUp(u.headers.GetContext(), &usersRpc.SignUpRequest{Username: username, Email: email, Password: password}); err != nil {
 		return nil, err
 	} else {
@@ -43,7 +43,7 @@ func (u *Users) SignUp(email string, username string, password string) (*models.
 	}
 }
 
-func (u *Users) Get() (*models.User, error) {
+func (u *StdManager) Get() (*models.User, error) {
 	user := &models.User{}
 	if err := u.settings.Get(userDbKey, user); err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (u *Users) Get() (*models.User, error) {
 	}
 }
 
-func (u *Users) Signout() error {
+func (u *StdManager) Signout() error {
 	// Implement service call which would be more informational/analytical in nature
 	return nil
 }

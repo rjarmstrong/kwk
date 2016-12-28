@@ -3,7 +3,7 @@ package app
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/config"
-	"bitbucket.com/sharingmachine/kwkcli/users"
+	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	. "github.com/smartystreets/goconvey/convey"
@@ -14,10 +14,10 @@ import (
 func Test_App(t *testing.T) {
 	Convey("ACCOUNT COMMANDS", t, func() {
 		app := CreateAppStub()
-		u := app.Users.(*users.UsersMock)
+		u := app.AccountManage.(*account.ManagerMock)
 		t := app.Settings.(*config.SettingsMock)
-		w := app.TemplateWriter.(*tmpl.MockWriter)
-		d := app.Dialogues.(*dlg.MockDialogue)
+		w := app.TemplateWriter.(*tmpl.WriterMock)
+		d := app.Dialogues.(*dlg.DialogueMock)
 
 		Convey(`Profile`, func() {
 			Convey(`Should run by name`, func() {

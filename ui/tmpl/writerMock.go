@@ -1,9 +1,9 @@
 package tmpl
 
-type MockWriter struct {
+type WriterMock struct {
 	RenderCalledWith []interface{}
 }
 
-func (t *MockWriter) Render(templateName string, data interface{}) {
+func (t *WriterMock) Render(templateName string, data interface{}) {
 	t.RenderCalledWith = []interface{}{templateName, data}
 }

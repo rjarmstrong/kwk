@@ -3,19 +3,19 @@ package app
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/config"
-	"bitbucket.com/sharingmachine/kwkcli/users"
+	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 )
 
 type AccountCli struct {
-	service  users.IUsers
+	service  account.Manager
 	settings config.Settings
 	tmpl.Writer
 	dlg.Dialogue
 }
 
-func NewAccountCli(u users.IUsers, s config.Settings, w tmpl.Writer, d dlg.Dialogue) *AccountCli {
+func NewAccountCli(u account.Manager, s config.Settings, w tmpl.Writer, d dlg.Dialogue) *AccountCli {
 	return &AccountCli{service: u, settings: s, Writer: w, Dialogue: d}
 }
 

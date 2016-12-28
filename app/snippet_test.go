@@ -17,12 +17,12 @@ import (
 func Test_Snippet(t *testing.T) {
 	Convey("SNIPPET CLI", t, func() {
 		app := CreateAppStub()
-		a := app.Snippets.(*snippets.MockService)
+		a := app.Snippets.(*snippets.ServiceMock)
 		o := app.Openers.(*openers.OpenerMock)
-		s := app.System.(*system.MockSystem)
-		d := app.Dialogues.(*dlg.MockDialogue)
-		t := app.Settings.(*settings.Mock)
-		w := app.TemplateWriter.(*tmpl.MockWriter)
+		s := app.System.(*system.SystemMock)
+		d := app.Dialogues.(*dlg.DialogueMock)
+		t := app.Settings.(*config.SettingsMock)
+		w := app.TemplateWriter.(*tmpl.WriterMock)
 
 		Convey(`Command not found`, func() {
 			Convey(`Should call get and open if found`, func() {

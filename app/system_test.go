@@ -11,8 +11,8 @@ import (
 func Test_System(t *testing.T) {
 	Convey("SYSTEM CLI", t, func() {
 		app := CreateAppStub()
-		s := app.System.(*system.MockSystem)
-		w := app.TemplateWriter.(*tmpl.MockWriter)
+		s := app.System.(*system.SystemMock)
+		w := app.TemplateWriter.(*tmpl.WriterMock)
 
 		Convey(`Upgrade`, func() {
 			Convey(`Should run by name`, func() {
