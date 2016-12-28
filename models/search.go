@@ -13,7 +13,7 @@ type SearchResult struct {
 	Highlights  map[string]string
 }
 
-type SearchResponse struct {
+type SearchTermResponse struct {
 	Results []*SearchResult
 	Total   int64
 	Took    int64

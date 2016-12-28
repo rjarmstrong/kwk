@@ -9,17 +9,17 @@ import (
 	"time"
 )
 
-type Rpc struct {
+type RpcService struct {
 	Settings config.Settings
 	client   aliasesRpc.AliasesRpcClient
 	headers  *rpc.Headers
 }
 
 func New(conn *grpc.ClientConn, s config.Settings, h *rpc.Headers) Service {
-	return &Rpc{Settings: s, client: aliasesRpc.NewAliasesRpcClient(conn), headers: h}
+	return &RpcService{Settings: s, client: aliasesRpc.NewAliasesRpcClient(conn), headers: h}
 }
 
-func (a *Rpc) Update(fullKey string, description string) (*models.Snippet, error) {
+func (a *RpcService) Update(fullKey string, description string) (*models.Snippet, error) {
 	if r, err := a.client.Update(a.headers.GetContext(), &aliasesRpc.UpdateRequest{FullKey: fullKey, Description: description}); err != nil {
 		return nil, err
 	} else {
@@ -30,7 +30,7 @@ func (a *Rpc) Update(fullKey string, description string) (*models.Snippet, error
 }
 
 // since unix time in milliseconds
-func (a *Rpc) List(username string, size int64, since int64, tags ...string) (*models.SnippetList, error) {
+func (a *RpcService) List(username string, size int64, since int64, tags ...string) (*models.SnippetList, error) {
 	if res, err := a.client.List(a.headers.GetContext(), &aliasesRpc.ListRequest{Username: username, Since: since, Size: size, Tags: tags}); err != nil {
 		return nil, err
 	} else {
@@ -40,7 +40,7 @@ func (a *Rpc) List(username string, size int64, since int64, tags ...string) (*m
 	}
 }
 
-func (a *Rpc) Get(k *models.KwkKey) (*models.SnippetList, error) {
+func (a *RpcService) Get(k *models.KwkKey) (*models.SnippetList, error) {
 	if res, err := a.client.Get(a.headers.GetContext(), &aliasesRpc.GetRequest{Username: k.Username, FullKey: k.FullKey}); err != nil {
 		return nil, err
 	} else {
@@ -50,12 +50,12 @@ func (a *Rpc) Get(k *models.KwkKey) (*models.SnippetList, error) {
 	}
 }
 
-func (a *Rpc) Delete(fullKey string) error {
+func (a *RpcService) Delete(fullKey string) error {
 	_, err := a.client.Delete(a.headers.GetContext(), &aliasesRpc.DeleteRequest{FullKey: fullKey})
 	return err
 }
 
-func (a *Rpc) Create(uri string, path string) (*models.CreateSnippet, error) {
+func (a *RpcService) Create(uri string, path string) (*models.CreateSnippet, error) {
 	if res, err := a.client.Create(a.headers.GetContext(), &aliasesRpc.CreateRequest{Uri: uri, FullKey: path}); err != nil {
 		return nil, err
 	} else {
@@ -82,7 +82,7 @@ func (a *Rpc) Create(uri string, path string) (*models.CreateSnippet, error) {
 	}
 }
 
-func (a *Rpc) Rename(fullKey string, newFullKey string) (*models.Snippet, string, error) {
+func (a *RpcService) Rename(fullKey string, newFullKey string) (*models.Snippet, string, error) {
 	if res, err := a.client.Rename(a.headers.GetContext(), &aliasesRpc.RenameRequest{FullKey: fullKey, NewFullKey: newFullKey}); err != nil {
 		return nil, "", err
 	} else {
@@ -92,7 +92,7 @@ func (a *Rpc) Rename(fullKey string, newFullKey string) (*models.Snippet, string
 	}
 }
 
-func (a *Rpc) Patch(fullKey string, target string, patch string) (*models.Snippet, error) {
+func (a *RpcService) Patch(fullKey string, target string, patch string) (*models.Snippet, error) {
 	if res, err := a.client.Patch(a.headers.GetContext(), &aliasesRpc.PatchRequest{FullKey: fullKey, Target: target, Patch: patch}); err != nil {
 		return nil, err
 	} else {
@@ -102,7 +102,7 @@ func (a *Rpc) Patch(fullKey string, target string, patch string) (*models.Snippe
 	}
 }
 
-func (a *Rpc) Clone(k *models.KwkKey, newFullKey string) (*models.Snippet, error) {
+func (a *RpcService) Clone(k *models.KwkKey, newFullKey string) (*models.Snippet, error) {
 	if res, err := a.client.Clone(a.headers.GetContext(), &aliasesRpc.CloneRequest{Username: k.Username, FullKey: k.FullKey, NewFullKey: newFullKey}); err != nil {
 		return nil, err
 	} else {
@@ -112,7 +112,7 @@ func (a *Rpc) Clone(k *models.KwkKey, newFullKey string) (*models.Snippet, error
 	}
 }
 
-func (a *Rpc) Tag(fullKey string, tags ...string) (*models.Snippet, error) {
+func (a *RpcService) Tag(fullKey string, tags ...string) (*models.Snippet, error) {
 	if res, err := a.client.Tag(a.headers.GetContext(), &aliasesRpc.TagRequest{FullKey: fullKey, Tags: tags}); err != nil {
 		return nil, err
 	} else {
@@ -122,7 +122,7 @@ func (a *Rpc) Tag(fullKey string, tags ...string) (*models.Snippet, error) {
 	}
 }
 
-func (a *Rpc) UnTag(fullKey string, tags ...string) (*models.Snippet, error) {
+func (a *RpcService) UnTag(fullKey string, tags ...string) (*models.Snippet, error) {
 	if res, err := a.client.UnTag(a.headers.GetContext(), &aliasesRpc.UnTagRequest{FullKey: fullKey, Tags: tags}); err != nil {
 		return nil, err
 	} else {

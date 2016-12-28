@@ -17,7 +17,7 @@ import (
 func Test_Snippet(t *testing.T) {
 	Convey("SNIPPET CLI", t, func() {
 		app := CreateAppStub()
-		a := app.Snippets.(*snippets.Mock)
+		a := app.Snippets.(*snippets.MockService)
 		o := app.Openers.(*openers.OpenerMock)
 		s := app.System.(*system.MockSystem)
 		d := app.Dialogues.(*dlg.MockDialogue)

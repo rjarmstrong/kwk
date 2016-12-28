@@ -14,7 +14,7 @@ import (
 func CreateAppStub() *KwkApp {
 	s := &system.MockSystem{}
 	t := &config.SettingsMock{}
-	a := &snippets.Mock{}
+	a := &snippets.MockService{}
 	o := &openers.OpenerMock{}
 	u := &users.UsersMock{}
 	d := &dlg.MockDialogue{}
