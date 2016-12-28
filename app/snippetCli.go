@@ -38,7 +38,7 @@ func (a *SnippetCli) Share(fullKey string, destination string) {
 			gmail.Snip = "https://mail.google.com/mail/?ui=2&view=cm&fs=1&tf=1&su=&body=http%3A%2F%2Faus.kwk.co%2F" + alias.Username + "%2f" + alias.FullKey
 			a.openers.Open(gmail, []string{})
 		} else {
-			a.Render("alias:notfound", map[string]interface{}{"fullKey": fullKey})
+			a.Render("snippet:notfound", map[string]interface{}{"fullKey": fullKey})
 		}
 	}
 }
@@ -58,7 +58,7 @@ func (a *SnippetCli) Open(fullKey string, args []string) {
 				a.Render("search:beta", res)
 				return
 			}
-			a.Render("alias:notfound", map[string]interface{}{"FullKey": fullKey})
+			a.Render("snippet:notfound", map[string]interface{}{"FullKey": fullKey})
 		}
 	}
 }
@@ -67,24 +67,24 @@ func (a *SnippetCli) New(uri string, fullKey string) {
 	if createAlias, err := a.service.Create(uri, fullKey); err != nil {
 		a.Render("error", err)
 	} else {
-		if createAlias.Alias != nil {
-			if createAlias.Alias.Private {
-				a.Render("alias:newprivate", createAlias.Alias)
+		if createAlias.Snippet != nil {
+			if createAlias.Snippet.Private {
+				a.Render("snippet:newprivate", createAlias.Snippet)
 			} else {
-				a.Render("alias:new", createAlias.Alias)
+				a.Render("snippet:new", createAlias.Snippet)
 			}
-			a.system.CopyToClipboard(createAlias.Alias.FullKey)
+			a.system.CopyToClipboard(createAlias.Snippet.FullKey)
 			//if createAlias.Snippet.Runtime != "url" {
 			//	a.Edit(createAlias.Snippet.FullKey)
 			//}
 		} else {
 			matches := createAlias.TypeMatch.Matches
-			r := a.MultiChoice("alias:chooseruntime", "Choose a type for this alias:", matches)
+			r := a.MultiChoice("snippet:chooseruntime", "Choose a type for this snippet:", matches)
 			winner := r.Value.(models.Match)
 			if winner.Score == -1 {
 				ca, _ := a.service.Create("_", "_")
 				matches = ca.TypeMatch.Matches
-				winner = a.MultiChoice("alias:chooseruntime", "Choose a type for this alias:", matches).Value.(models.Match)
+				winner = a.MultiChoice("snippet:chooseruntime", "Choose a type for this snippet:", matches).Value.(models.Match)
 			}
 			fk := fullKey + "." + winner.Extension
 			a.New(uri, fk)
@@ -97,14 +97,14 @@ func (a *SnippetCli) Edit(fullKey string) {
 		a.Render("error", err)
 	} else {
 		if alias := a.handleMultiResponse(fullKey, list); alias != nil {
-			a.Render("alias:editing", alias)
+			a.Render("snippet:editing", alias)
 			if err := a.openers.Edit(alias); err != nil {
 				a.Render("error", err)
 			} else {
-				a.Render("alias:edited", alias)
+				a.Render("snippet:edited", alias)
 			}
 		} else {
-			a.Render("alias:notfound", &models.Snippet{FullKey: fullKey})
+			a.Render("snippet:notfound", &models.Snippet{FullKey: fullKey})
 		}
 	}
 }
@@ -113,7 +113,7 @@ func (a *SnippetCli) Describe(fullKey string, description string) {
 	if alias, err := a.service.Update(fullKey, description); err != nil {
 		a.Render("error", err)
 	} else {
-		a.Render("alias:updated", alias)
+		a.Render("snippet:updated", alias)
 	}
 }
 
@@ -121,19 +121,19 @@ func (a *SnippetCli) Inspect(fullKey string) {
 	if list, err := a.service.Get(a.getKwkKey(fullKey)); err != nil {
 		a.Render("error", err)
 	} else {
-		a.Render("alias:inspect", list)
+		a.Render("snippet:inspect", list)
 	}
 }
 
 func (a *SnippetCli) Delete(fullKey string) {
 	alias := &models.Snippet{FullKey: fullKey}
-	if r := a.Modal("alias:delete", alias); r.Ok {
+	if r := a.Modal("snippet:delete", alias); r.Ok {
 		if err := a.service.Delete(fullKey); err != nil {
 			a.Render("error", err)
 		}
-		a.Render("alias:deleted", alias)
+		a.Render("snippet:deleted", alias)
 	} else {
-		a.Render("alias:notdeleted", alias)
+		a.Render("snippet:notdeleted", alias)
 	}
 }
 
@@ -142,11 +142,11 @@ func (a *SnippetCli) Cat(fullKey string) {
 		a.Render("error", err)
 	} else {
 		if len(list.Items) == 0 {
-			a.Render("alias:notfound", &models.Snippet{FullKey: fullKey})
+			a.Render("snippet:notfound", &models.Snippet{FullKey: fullKey})
 		} else if len(list.Items) == 1 {
-			a.Render("alias:cat", list.Items[0])
+			a.Render("snippet:cat", list.Items[0])
 		} else {
-			a.Render("alias:ambiguouscat", list)
+			a.Render("snippet:ambiguouscat", list)
 		}
 	}
 }
@@ -155,7 +155,7 @@ func (a *SnippetCli) Patch(fullKey string, target string, patch string) {
 	if alias, err := a.service.Patch(fullKey, target, patch); err != nil {
 		a.Render("error", err)
 	} else {
-		a.Render("alias:patched", alias)
+		a.Render("snippet:patched", alias)
 	}
 }
 
@@ -163,7 +163,7 @@ func (a *SnippetCli) Clone(fullKey string, newFullKey string) {
 	if alias, err := a.service.Clone(a.getKwkKey(fullKey), newFullKey); err != nil {
 		a.Render("error", err)
 	} else {
-		a.Render("alias:cloned", alias)
+		a.Render("snippet:cloned", alias)
 	}
 }
 
@@ -172,11 +172,11 @@ func (a *SnippetCli) Rename(fullKey string, newKey string) {
 		a.Render("error", err)
 	} else {
 		if alias.Private {
-			a.Render("alias:madeprivate", &map[string]string{
+			a.Render("snippet:madeprivate", &map[string]string{
 				"fullKey": originalFullKey,
 			})
 		} else {
-			a.Render("alias:renamed", &map[string]string{
+			a.Render("snippet:renamed", &map[string]string{
 				"fullKey":    originalFullKey,
 				"newFullKey": alias.FullKey,
 			})
@@ -188,7 +188,7 @@ func (a *SnippetCli) Tag(fullKey string, tags ...string) {
 	if alias, err := a.service.Tag(fullKey, tags...); err != nil {
 		a.Render("error", err)
 	} else {
-		a.Render("alias:tag", alias)
+		a.Render("snippet:tag", alias)
 	}
 }
 
@@ -196,7 +196,7 @@ func (a *SnippetCli) UnTag(fullKey string, tags ...string) {
 	if alias, err := a.service.UnTag(fullKey, tags...); err != nil {
 		a.Render("error", err)
 	} else {
-		a.Render("alias:untag", alias)
+		a.Render("snippet:untag", alias)
 	}
 }
 
@@ -228,7 +228,7 @@ func (a *SnippetCli) List(args ...string) {
 		a.Render("error", err)
 	} else {
 		list.Username = username
-		a.Render("alias:list", list)
+		a.Render("snippet:list", list)
 	}
 }
 
@@ -236,7 +236,7 @@ func (a *SnippetCli) handleMultiResponse(fullKey string, list *models.SnippetLis
 	if list.Total == 1 {
 		return &list.Items[0]
 	} else if list.Total > 1 {
-		r := a.MultiChoice("alias:choose", nil, list.Items)
+		r := a.MultiChoice("snippet:choose", nil, list.Items)
 		return r.Value.(*models.Snippet)
 	} else {
 		return nil

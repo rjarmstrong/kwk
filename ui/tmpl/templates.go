@@ -19,27 +19,27 @@ var Templates = map[string]*template.Template{}
 
 func init() {
 	// Aliases
-	add("alias:delete", "Are you sure you want to delete {{.FullKey}}? y/n", nil)
-	add("alias:deleted", "{{.FullKey}} deleted.", nil)
-	add("alias:updated", "Description updated:\n{{ .Description | blue }}", template.FuncMap{"blue": formatBlue})
-	add("alias:notfound", "Snippet: {{.FullKey}} not found\n", nil)
-	add("alias:cloned", "Cloned as {{.Username}}/{{.FullKey | blue}}\n", template.FuncMap{"blue": formatBlue})
-	add("alias:new", "{{.FullKey}} created "+style.OpenLock+"\n", nil)
-	add("alias:newprivate", "{{.FullKey}} created "+style.Lock+"\n", nil)
-	add("alias:cat", "{{.Uri}}", nil)
-	add("alias:edited", "Successfully updated {{ .FullKey | blue }}", template.FuncMap{"blue": formatBlue})
-	add("alias:editing", "{{ \"Editing file in default editor.\" | blue }}\nPlease save and close to continue. Or Ctrl+C to abort.\n", template.FuncMap{"blue": formatBlue})
+	add("snippet:delete", "Are you sure you want to delete {{.FullKey}}? y/n", nil)
+	add("snippet:deleted", "{{.FullKey}} deleted.", nil)
+	add("snippet:updated", "Description updated:\n{{ .Description | blue }}", template.FuncMap{"blue": formatBlue})
+	add("snippet:notfound", "Snippet: {{.FullKey}} not found\n", nil)
+	add("snippet:cloned", "Cloned as {{.Username}}/{{.FullKey | blue}}\n", template.FuncMap{"blue": formatBlue})
+	add("snippet:new", "{{.FullKey}} created "+style.OpenLock+"\n", nil)
+	add("snippet:newprivate", "{{.FullKey}} created "+style.Lock+"\n", nil)
+	add("snippet:cat", "{{.Uri}}", nil)
+	add("snippet:edited", "Successfully updated {{ .FullKey | blue }}", template.FuncMap{"blue": formatBlue})
+	add("snippet:editing", "{{ \"Editing file in default editor.\" | blue }}\nPlease save and close to continue. Or Ctrl+C to abort.\n", template.FuncMap{"blue": formatBlue})
 
-	add("alias:ambiguouscat", "That snippet is ambiguous please run it again with the extension:\n{{range .Items}}{{.FullKey}}\n{{ end }}", nil)
-	add("alias:list", "{{. | listSnippets }}", template.FuncMap{"listSnippets": listSnippets })
-	add("alias:chooseruntime", "{{. | listRuntimes}}", template.FuncMap{"listRuntimes": listRuntimes})
-	add("alias:tag", "{{.FullKey}} tagged.", nil)
-	add("alias:untag", "{{.FullKey}} untagged.", nil)
-	add("alias:renamed", "{{.fullKey}} renamed to {{.newFullKey}}", nil)
-	add("alias:madeprivate", "{{.fullKey | blue }} made private "+style.Lock, template.FuncMap{"blue": formatBlue})
-	add("alias:patched", "{{.FullKey}} patched.", nil)
-	add("alias:notdeleted", "{{.FullKey}} was pardoned.", nil)
-	add("alias:inspect",
+	add("snippet:ambiguouscat", "That snippet is ambiguous please run it again with the extension:\n{{range .Items}}{{.FullKey}}\n{{ end }}", nil)
+	add("snippet:list", "{{. | listSnippets }}", template.FuncMap{"listSnippets": listSnippets })
+	add("snippet:chooseruntime", "{{. | listRuntimes}}", template.FuncMap{"listRuntimes": listRuntimes})
+	add("snippet:tag", "{{.FullKey}} tagged.", nil)
+	add("snippet:untag", "{{.FullKey}} untagged.", nil)
+	add("snippet:renamed", "{{.fullKey}} renamed to {{.newFullKey}}", nil)
+	add("snippet:madeprivate", "{{.fullKey | blue }} made private "+style.Lock, template.FuncMap{"blue": formatBlue})
+	add("snippet:patched", "{{.FullKey}} patched.", nil)
+	add("snippet:notdeleted", "{{.FullKey}} was pardoned.", nil)
+	add("snippet:inspect",
 		"\n{{range .Items}}"+
 			"Name: {{.Username}}/{{.FullKey}}"+
 			"\nRuntime: {{.Runtime}}"+
@@ -227,7 +227,7 @@ func formatBlue(text string) string {
 }
 
 /*
-`	alias:notdeleted
+`	snippet:notdeleted
 	messages := []string{"without a scratch", "uninjured", "intact", "unaffected", "unharmed",
 			"unscathed", "out of danger", "safe and sound", "unblemished", "alive and well"}
 		rnd := time.Now().Nanosecond() % (len(messages) - 1)
@@ -252,7 +252,7 @@ func formatBlue(text string) string {
 		"github.com/olekukonko/tablewriter"
 	"strings"
 	"github.com/dustin/go-humanize"
-		alias:list
+		snippet:list
 		fmt.Print(gui.Colour(gui.LightBlue, "\nkwk.co/" + "rjarmstrong/"))
 			fmt.Printf(gui.Build(102, " ") + "%d of %d records\n\n", len(list.Items), list.Total)
 

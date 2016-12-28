@@ -57,7 +57,7 @@ func Test_Alias(t *testing.T) {
 				app.Run("get", "hello.go")
 				w.Reset()
 				app.Run("inspect", "hello.go")
-				So(w.String(), should.Resemble, "\nAlias: testuser/hello.go\nRuntime: golang\nURI: echo \"hello\"\nVersion: 1\nTags: \nWeb: \x1b[4mhttp://aus.kwk.co/testuser/hello.go\x1b[0m\nDescription: Hi there!\nRun count: 2\n\n")
+				So(w.String(), should.Resemble, "\nsnippet: testuser/hello.go\nRuntime: golang\nURI: echo \"hello\"\nVersion: 1\nTags: \nWeb: \x1b[4mhttp://aus.kwk.co/testuser/hello.go\x1b[0m\nDescription: Hi there!\nRun count: 2\n\n")
 				w.Reset()
 			})
 		})
@@ -120,7 +120,7 @@ func Test_Alias(t *testing.T) {
 				w.Reset()
 
 				app.Run("get", "hello.js")
-				So(w.String(), should.Resemble, "alias: hello.js not found\n")
+				So(w.String(), should.Resemble, "snippet: hello.js not found\n")
 				w.Reset()
 			})
 
@@ -134,7 +134,7 @@ func Test_Alias(t *testing.T) {
 				w.Reset()
 
 				app.Run("get", "hello.js")
-				So(w.String(), should.Resemble, "alias: hello.js not found\n")
+				So(w.String(), should.Resemble, "snippet: hello.js not found\n")
 				w.Reset()
 			})
 

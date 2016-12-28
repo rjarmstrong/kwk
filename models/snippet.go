@@ -45,7 +45,7 @@ type Snippet struct {
 }
 
 type CreateSnippet struct {
-	Alias     *Snippet
+	Snippet   *Snippet
 	TypeMatch *TypeMatch
 }
 

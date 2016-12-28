@@ -63,7 +63,7 @@ func (a *Rpc) Create(uri string, path string) (*models.CreateSnippet, error) {
 		if res.Alias != nil {
 			alias := &models.Snippet{}
 			mapAlias(res.Alias, alias)
-			createAlias.Alias = alias
+			createAlias.Snippet = alias
 		} else {
 			createAlias.TypeMatch = &models.TypeMatch{
 				Matches: []models.Match{},

@@ -25,7 +25,7 @@ func (a *Mock) Create(uri string, fullKey string) (*models.CreateSnippet, error)
 	if fullKey == "" {
 		fullKey = "x5hi23"
 	}
-	return &models.CreateSnippet{Alias: &models.Snippet{FullKey: fullKey}}, nil
+	return &models.CreateSnippet{Snippet: &models.Snippet{FullKey: fullKey}}, nil
 }
 
 func (a *Mock) Update(fullKey string, description string) (*models.Snippet, error) {
