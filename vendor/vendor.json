@@ -3,10 +3,10 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "O3ie9/AJRsjaOz+89xx7iqT47Xk=",
+			"checksumSHA1": "0TO0aaHRn88jHXtHVnU80LLIxLA=",
 			"path": "bitbucket.com/sharingmachine/kwkcli",
-			"revision": "7855d7351097ffed9281d2a41e5d479b9e530b6d",
-			"revisionTime": "2016-12-28T21:36:53Z"
+			"revision": "e1c0877c6968a53ba903e6e4d0dd786cec864f59",
+			"revisionTime": "2016-12-29T01:52:26Z"
 		},
 		{
 			"checksumSHA1": "XRb4s7mBaq4gB1ZFCSImRmQsw2g=",
@@ -69,10 +69,10 @@
 			"revisionTime": "2016-10-31T10:43:57Z"
 		},
 		{
-			"checksumSHA1": "tewA7jXVGCw1zb5mA0BDecWi4iQ=",
+			"checksumSHA1": "L6/CjN/3IdKLxfaBGRPTJ7e62bg=",
 			"path": "github.com/jtolds/gls",
-			"revision": "8ddce2a84170772b95dd5d576c48d517b22cac63",
-			"revisionTime": "2016-01-05T22:08:40Z"
+			"revision": "bb0351aa7eb6f322f32667d51375f26a2bca6628",
+			"revisionTime": "2016-12-28T00:43:38Z"
 		},
 		{
 			"checksumSHA1": "6f60v0GisRirRssO0XIslr/xOaQ=",
