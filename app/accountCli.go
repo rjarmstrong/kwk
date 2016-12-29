@@ -30,9 +30,9 @@ func (c *AccountCli) Get() {
 
 func (c *AccountCli) SignUp() {
 
-	email := c.Field("account:signup:email", nil).Value.(string)
-	username := c.Field("account:signup:username", nil).Value.(string)
-	password := c.Field("account:signup:password", nil).Value.(string)
+	email := c.FormField("account:signup:email", nil).Value.(string)
+	username := c.FormField("account:signup:username", nil).Value.(string)
+	password := c.FormField("account:signup:password", nil).Value.(string)
 
 	if u, err := c.service.SignUp(email, username, password); err != nil {
 		c.Render("error", err)
@@ -46,10 +46,10 @@ func (c *AccountCli) SignUp() {
 
 func (c *AccountCli) SignIn(username string, password string) {
 	if username == "" {
-		username = c.Field("account:usernamefield", nil).Value.(string)
+		username = c.FormField("account:usernamefield", nil).Value.(string)
 	}
 	if password == "" {
-		password = c.Field("account:passwordfield", nil).Value.(string)
+		password = c.FormField("account:passwordfield", nil).Value.(string)
 	}
 	if u, err := c.service.SignIn(username, password); err != nil {
 		c.Render("error", err)

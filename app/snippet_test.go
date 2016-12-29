@@ -10,8 +10,9 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"github.com/smartystreets/assertions/should"
 	. "github.com/smartystreets/goconvey/convey"
-	"testing"
+	"bitbucket.com/sharingmachine/kwkcli/search"
 	"time"
+	"testing"
 )
 
 func Test_Snippet(t *testing.T) {
@@ -20,9 +21,10 @@ func Test_Snippet(t *testing.T) {
 		a := app.Snippets.(*snippets.ServiceMock)
 		o := app.Openers.(*openers.OpenerMock)
 		s := app.System.(*system.SystemMock)
-		d := app.Dialogues.(*dlg.DialogueMock)
+		d := app.Dialogue.(*dlg.DialogueMock)
 		t := app.Settings.(*config.SettingsMock)
 		w := app.TemplateWriter.(*tmpl.WriterMock)
+		h := app.Search.(*search.TermMock)
 
 		Convey(`Command not found`, func() {
 			Convey(`Should call get and open if found`, func() {
@@ -47,19 +49,23 @@ func Test_Snippet(t *testing.T) {
 				d.MultiChoiceResponse = &dlg.DialogueResponse{Value: &a.ReturnItemsForGet[0]}
 				app.App.Run([]string{"[app]", "hola", "arg1", "arg2"})
 				So(a.GetCalledWith, should.Resemble, &models.KwkKey{Username: "rjarmstrong", FullKey: "hola"})
-				So(d.MultiChoiceCalledWith, should.Resemble, []interface{}{"snippet:choose", nil,
-					a.ReturnItemsForGet})
+				So(d.MultiChoiceCalledWith, should.Resemble, []interface{}{"snippet:choose", "Choose the snippet you want to run:", a.ReturnItemsForGet})
 				a.ReturnItemsForGet = nil
 			})
-			Convey(`Should respond if not found`, func() {
+			Convey(`Should suggest if not found`, func() {
 				fullKey := "hola.sh"
 				a.ReturnItemsForGet = []models.Snippet{}
+				results := []*models.SearchResult{}
+				result := &models.SearchResult{Key:"suggestion"}
+				results = append(results, result)
+				h.ReturnForExecute = &models.SearchTermResponse{
+					Total:1,
+					Results:results,
+				}
 				app.App.Run([]string{"[app]", fullKey, "arg1", "arg2"})
 				So(a.GetCalledWith, should.Resemble, &models.KwkKey{FullKey: "hola.sh"})
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:notfound",
-					map[string]interface{}{
-						"fullKey": "hola.sh",
-					}})
+				So(w.RenderCalledWith[0], should.Resemble, "search:alphaSuggest")
+				So(w.RenderCalledWith[1].(*models.SearchTermResponse).Results[0], should.Resemble, result)
 				a.ReturnItemsForGet = nil
 			})
 		})
@@ -252,7 +258,10 @@ func Test_Snippet(t *testing.T) {
 			})
 			Convey(`Should call list and respond with template`, func() {
 				app.App.Run([]string{"[app]", "list", "5", "tag1"})
-				So(a.ListCalledWith, should.Resemble, []interface{}{"", int64(5), time.Now().UnixNano()/1000000*1000, []string{"tag1"}})
+				So(a.ListCalledWith[0], should.Resemble, "")
+				So(a.ListCalledWith[1], should.Resemble, int64(5))
+				So(a.ListCalledWith[2].(int64)/1000, should.Resemble, time.Now().UnixNano()/1000000000)
+				So(a.ListCalledWith[3], should.Resemble, []string{"tag1"})
 				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:list", &models.SnippetList{}})
 			})
 		})

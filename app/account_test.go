@@ -4,7 +4,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/account"
-	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/smartystreets/assertions/should"
@@ -16,8 +15,7 @@ func Test_App(t *testing.T) {
 		app := CreateAppStub()
 		u := app.AccountManage.(*account.ManagerMock)
 		t := app.Settings.(*config.SettingsMock)
-		w := app.TemplateWriter.(*tmpl.WriterMock)
-		d := app.Dialogues.(*dlg.DialogueMock)
+		d := app.Dialogue.(*dlg.DialogueMock)
 
 		Convey(`Profile`, func() {
 			Convey(`Should run by name`, func() {
@@ -65,11 +63,17 @@ func Test_App(t *testing.T) {
 				p2 := app.App.Command("register")
 				So(p2.Name, should.Equal, p.Name)
 			})
-			Convey(`Should call api signup`, func() {
-				app.App.Run([]string{"[app]", "signup", "richard@kwk.co", "richard", "password"})
+			 Convey(`Should call api signup`, func() {
+				d.FieldResponseMap = map[string]interface{}{}
+				d.FieldResponseMap["account:signup:email"] = "richard@kwk.co"
+				d.FieldResponseMap["account:signup:username"] = "richard"
+				d.FieldResponseMap["account:signup:password"] = "password"
+
+				app.App.Run([]string{"[app]", "signup"})
 				So(u.SignupCalledWith[0], should.Equal, "richard@kwk.co")
 				So(u.SignupCalledWith[1], should.Equal, "richard")
 				So(u.SignupCalledWith[2], should.Equal, "password")
+				 d.FieldResponseMap = nil
 			})
 		})
 
@@ -84,18 +88,6 @@ func Test_App(t *testing.T) {
 				app.App.Run([]string{"[app]", "signout"})
 				So(u.SignoutCalled, should.BeTrue)
 				So(t.DeleteCalledWith, should.Resemble, models.ProfileFullKey)
-			})
-		})
-
-		Convey(`cd`, func() {
-			Convey(`Should run by name`, func() {
-				p := app.App.Command("cd")
-				So(p, should.NotBeNil)
-			})
-			Convey(`Should change directory`, func() {
-				app.App.Run([]string{"[app]", "cd", "dillbuck"})
-				So(t.ChangeDirectoryCalledWith, should.Equal, "dillbuck")
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"account:cd", map[string]string{"username": "dillbuck"}})
 			})
 		})
 	})

@@ -14,14 +14,15 @@ import (
 )
 
 type KwkApp struct {
-	App *cli.App
+	App            *cli.App
 	Snippets       snippets.Service
 	System         system.ISystem
 	Settings       config.Settings
 	AccountManage  account.Manager
 	Openers        openers.IOpen
-	Dialogues      dlg.Dialogue
+	Dialogue       dlg.Dialogue
 	TemplateWriter tmpl.Writer
+	Search         search.Term
 }
 
 func New(a snippets.Service, s system.ISystem, t config.Settings, o openers.IOpen, u account.Manager,
@@ -45,7 +46,17 @@ func New(a snippets.Service, s system.ISystem, t config.Settings, o openers.IOpe
 	searchCli := NewSearchCli(h, w, d)
 	app.Commands = append(app.Commands, Search(searchCli)...)
 
-	return &KwkApp{App: app, System: s, Settings: t, Openers: o, AccountManage: u, Dialogues: d, Snippets: a, TemplateWriter: w}
+	return &KwkApp{
+		App: app,
+		System: s,
+		Settings: t,
+		Openers: o,
+		AccountManage: u,
+		Dialogue: d,
+		Snippets: a,
+		TemplateWriter: w,
+		Search:h,
+	}
 }
 
 func (a *KwkApp) Run(args ...string) {

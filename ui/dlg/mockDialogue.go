@@ -6,6 +6,7 @@ type DialogueMock struct {
 	ReturnItem            *DialogueResponse
 	FieldCallHistory      []interface{}
 	FieldResponse         *DialogueResponse
+	FieldResponseMap map[string]interface{}
 	MultiChoiceCalledWith []interface{}
 	MultiChoiceResponse   *DialogueResponse
 }
@@ -16,8 +17,11 @@ func (d *DialogueMock) Modal(templateName string, data interface{}) *DialogueRes
 	return d.ReturnItem
 }
 
-func (d *DialogueMock) Field(templateName string, data interface{}) *DialogueResponse {
+func (d *DialogueMock) FormField(templateName string, data interface{}) *DialogueResponse {
 	d.FieldCallHistory = append(d.FieldCallHistory, []interface{}{templateName, data})
+	if d.FieldResponseMap[templateName] != nil {
+		return &DialogueResponse{Value:d.FieldResponseMap[templateName], Ok:true}
+	}
 	return d.FieldResponse
 }
 

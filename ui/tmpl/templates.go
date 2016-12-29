@@ -32,6 +32,7 @@ func init() {
 
 	add("snippet:ambiguouscat", "That snippet is ambiguous please run it again with the extension:\n{{range .Items}}{{.FullKey}}\n{{ end }}", nil)
 	add("snippet:list", "{{. | listSnippets }}", template.FuncMap{"listSnippets": listSnippets })
+	add("snippet:choose", "{{. | listAmbiguous }}", template.FuncMap{"listAmbiguous": listAmbiguous })
 	add("snippet:chooseruntime", "{{. | listRuntimes}}", template.FuncMap{"listRuntimes": listRuntimes})
 	add("snippet:tag", "{{.FullKey}} tagged.", nil)
 	add("snippet:untag", "{{.FullKey}} untagged.", nil)
@@ -71,7 +72,7 @@ func init() {
 
 	add("search:alpha", "\n\033[7m  \"{{ .Term }}\" found in {{ .Total }} results in {{ .Took }} ms  \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Key | blue }}.{{ .Extension | subdued }}\n{{ . | formatSearchResult}}\n{{end}}", template.FuncMap{"formatSearchResult": alphaSearchResult, "blue": formatBlue, "subdued": formatSubdued})
 
-	add("search:beta", "\n\033[7m Suggestions: \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Key | blue }}.{{ .Extension | subdued }}\n{{end}}\n", template.FuncMap{"blue": formatBlue, "subdued": formatSubdued})
+	add("search:alphaSuggest", "\n\033[7m Suggestions: \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Key | blue }}.{{ .Extension | subdued }}\n{{end}}\n", template.FuncMap{"blue": formatBlue, "subdued": formatSubdued})
 
 	// General
 	add("error", "{{. | printError }}\n", template.FuncMap{"printError": printError})
@@ -112,6 +113,15 @@ func listRuntimes(list []interface{}) string {
 		options = options + fmt.Sprintf("%s %s   ", style.Colour(style.LightBlue, i+1), m.Runtime)
 	}
 	return options
+}
+
+func listAmbiguous(list []models.Snippet) string {
+	var options string
+	for i, v := range list {
+		options = options + fmt.Sprintf("%s %s   ", style.Colour(style.LightBlue, i+1), v.FullKey)
+	}
+	return options
+	return "hola"
 }
 
 func listSnippets(list *models.SnippetList) string {

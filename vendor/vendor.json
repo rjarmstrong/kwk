@@ -3,10 +3,10 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "lp/GLwjZMoK4gs7AAd56w/QJQi8=",
+			"checksumSHA1": "O3ie9/AJRsjaOz+89xx7iqT47Xk=",
 			"path": "bitbucket.com/sharingmachine/kwkcli",
-			"revision": "e5f1df24993406496382e1ad4605e9ad0d4d0f27",
-			"revisionTime": "2016-12-23T03:49:34Z"
+			"revision": "7855d7351097ffed9281d2a41e5d479b9e530b6d",
+			"revisionTime": "2016-12-28T21:36:53Z"
 		},
 		{
 			"checksumSHA1": "XRb4s7mBaq4gB1ZFCSImRmQsw2g=",

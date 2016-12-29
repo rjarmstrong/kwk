@@ -12,6 +12,7 @@ import (
 	"strings"
 	"strconv"
 	"time"
+	"fmt"
 )
 
 type SnippetCli struct {
@@ -55,7 +56,7 @@ func (a *SnippetCli) Open(fullKey string, args []string) {
 			if res, err := a.search.Execute(fullKey); err != nil {
 				a.Render("error", err)
 			} else if res.Total > 0 {
-				a.Render("search:beta", res)
+				a.Render("search:alphaSuggest", res)
 				return
 			}
 			a.Render("snippet:notfound", map[string]interface{}{"FullKey": fullKey})
@@ -236,8 +237,10 @@ func (a *SnippetCli) handleMultiResponse(fullKey string, list *models.SnippetLis
 	if list.Total == 1 {
 		return &list.Items[0]
 	} else if list.Total > 1 {
-		r := a.MultiChoice("snippet:choose", nil, list.Items)
-		return r.Value.(*models.Snippet)
+		fmt.Println(list.Items)
+		r := a.MultiChoice("snippet:choose", "Choose the snippet you want to run:", list.Items)
+		s := r.Value.(*models.Snippet)
+		return s
 	} else {
 		return nil
 	}

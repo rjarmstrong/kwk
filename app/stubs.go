@@ -17,9 +17,9 @@ func CreateAppStub() *KwkApp {
 	a := &snippets.ServiceMock{}
 	o := &openers.OpenerMock{}
 	u := &account.ManagerMock{}
-	d := &dlg.DialogueMock{}
 	w := &tmpl.WriterMock{}
 	h := &search.TermMock{}
+	d := &dlg.DialogueMock{}
 	app := New(a, s, t, o, u, d, w, h)
 	return app
 }

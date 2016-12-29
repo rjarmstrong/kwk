@@ -27,20 +27,20 @@ func (d *StdDialogue) Modal(templateName string, data interface{}) *DialogueResp
 }
 
 func (d *StdDialogue) MultiChoice(templateName string, header interface{}, options interface{}) *DialogueResponse {
-	items := InterfaceSlice(options)
 	fmt.Println(header)
-	d.writer.Render(templateName, items)
+	o := InterfaceSlice(options)
+	d.writer.Render(templateName, options)
 	fmt.Println()
 	value, _, _ := d.reader.ReadLine()
 	// upper and lower contraints
 	if i, err := num.ParseInt(string(value)); err != nil {
 		panic(err)
 	} else {
-		if i > len(items) {
+		if i > len(o) {
 			d.MultiChoice(templateName, header, options)
 		}
 		return &DialogueResponse{
-			Value: items[i-1],
+			Value: o[i-1],
 		}
 	}
 }
@@ -59,7 +59,7 @@ func InterfaceSlice(slice interface{}) []interface{} {
 	return ret
 }
 
-func (d *StdDialogue) Field(templateName string, data interface{}) *DialogueResponse {
+func (d *StdDialogue) FormField(templateName string, data interface{}) *DialogueResponse {
 	d.writer.Render(templateName, data)
 	value, _, err := d.reader.ReadLine()
 	if err != nil {
