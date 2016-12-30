@@ -20,6 +20,9 @@ var build string = "-"
 
 func main() {
 	host := os.Getenv("KWK_HOST")
+	if host == "" {
+		host = "api.kwk.co:8000"
+	}
 	conn := rpc.Conn(host)
 	defer conn.Close()
 
