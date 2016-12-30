@@ -1,0 +1,28 @@
+{
+  "name": "kwk-cli",
+  "version": "RELEASE_VERSION",
+  "description": "Memory for developers",
+  "bin": {
+    "kwk": "bin/kwk",
+    "kwk-cli": "bin/kwk"
+  },
+  "os": [
+    "darwin", "linux", "win64"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/gimanzo/kwk-cli.git"
+  },
+  "author": "Gimanzo",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/gimanzo/kwk-cli/issues"
+  },
+  "dependencies": {
+    "kexec": "^3.0.0"
+  },
+  "homepage": "https://github.com/gimanzo/kwk-cli#readme"
+}

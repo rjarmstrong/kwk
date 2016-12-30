@@ -10,7 +10,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"gopkg.in/urfave/cli.v1"
-	"os"
 )
 
 type KwkApp struct {
@@ -29,7 +28,6 @@ func New(a snippets.Service, s system.ISystem, t config.Settings, o openers.IOpe
 	d dlg.Dialogue, w tmpl.Writer, h search.Term) *KwkApp {
 
 	app := cli.NewApp()
-	os.Setenv(system.APP_VERSION, "0.0.1")
 	//cli.HelpPrinter = system.Help
 
 	accCli := NewAccountCli(u, t, w, d)

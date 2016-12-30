@@ -15,8 +15,10 @@ import (
 	"os"
 )
 
+var version string = "-"
+var build string = "-"
+
 func main() {
-	os.Setenv("version", "v0.0.3")
 	host := os.Getenv("KWK_HOST")
 	conn := rpc.Conn(host)
 	defer conn.Close()
@@ -33,5 +35,6 @@ func main() {
 	ch := search.NewAlphaTerm(conn, t, h)
 
 	kwkApp := app.New(a, s, t, o, u, d, w, ch)
+	kwkApp.App.Version = version + "+" + build
 	kwkApp.App.Run(os.Args)
 }
