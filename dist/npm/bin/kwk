@@ -9,4 +9,4 @@ if [[ ! -e ./binpath.txt ]]; then
 fi
 BINPATH=$(cat ./binpath.txt)
 
-${BINPATH}/kwk-${OS}-${ARCH} $@
+${BINPATH}/kwk-${OS}-${ARCH} "$@"

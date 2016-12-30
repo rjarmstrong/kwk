@@ -2,7 +2,7 @@
 
 set -ef -o pipefail
 
-KWK_VERSION=v1.0.7
+KWK_VERSION=v1.0.8
 BUILD=${BUILDKITE_BUILD_NUMBER}
 
 # TESTING

@@ -19,7 +19,7 @@ var Templates = map[string]*template.Template{}
 
 func init() {
 	// Aliases
-	add("snippet:delete", "Are you sure you want to delete {{.FullKey}}? y/n", nil)
+	add("snippet:delete", "Are you sure you want to delete {{.FullKey}}? [y/n] ", nil)
 	add("snippet:deleted", "{{.FullKey}} deleted.", nil)
 	add("snippet:updated", "Description updated:\n{{ .Description | blue }}", template.FuncMap{"blue": formatBlue})
 	add("snippet:notfound", "Snippet: {{.FullKey}} not found\n", nil)
