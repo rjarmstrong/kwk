@@ -2,8 +2,8 @@
 
 set -ef -o pipefail
 
-KWK_VERSION=v1.0.5
-BUILD=57
+KWK_VERSION=v1.0.6
+BUILD=${BUILDKITE_BUILD_NUMBER}
 
 # TESTING
 go test ./app
