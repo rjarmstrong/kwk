@@ -1,14 +1,12 @@
-#!/usr/bin/env node
+#!/usr/bin/env bash
 
-var path = require('path');
-var kexec = require('kexec');
+OS=$(uname | tr '[:upper:]' '[:lower:]')
+ARCH=amd64
 
-// os and arch restrictions are handled by the package.json
-var os = process.platform;
-var arch = 'amd64';
+# CACHE THE BIN PATH AS NPM SLOWS DOWN CALL TO KWK
+if [[ ! -e ./binpath.txt ]]; then
+    echo $(npm config get prefix)/lib/node_modules/kwk-cli/bin > ./binpath.txt
+fi
+BINPATH=$(cat ./binpath.txt)
 
-// Select the right binary for this platform, then exec it with the original
-// arguments. This is a true exec(3), which will take over the pid, env, and
-// file descriptors.
-var kwkPath = path.join(__dirname, '../bin/kwk-' + os + '-' + arch);
-kexec(kwkPath, process.argv.slice(2));
+/bin/bash -c "${BINPATH}/kwk-${OS}-${ARCH} $@"

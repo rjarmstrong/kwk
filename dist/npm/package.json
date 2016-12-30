@@ -4,7 +4,7 @@
   "description": "Memory for developers",
   "bin": {
     "kwk": "bin/kwk",
-    "kwk-cli": "bin/kwk"
+    "kwkcli": "bin/kwk"
   },
   "os": [
     "darwin", "linux", "win64"
@@ -20,9 +20,6 @@
   "license": "Apache 2.0",
   "bugs": {
     "url": "https://github.com/gimanzo/kwk-cli/issues"
-  },
-  "dependencies": {
-    "kexec": "^3.0.0"
   },
   "homepage": "https://github.com/gimanzo/kwk-cli#readme"
 }
