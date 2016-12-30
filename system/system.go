@@ -98,13 +98,14 @@ func (s *System) GetDirPath(directoryName string) (string, error) {
 
 func (s *System) GetCachePath() string {
 	p := ""
+	u := os.Getenv("USER")
 	if runtime.GOOS == "windows" {
 		// check that other users can't access this
 		p = "%temp%"
 	} else if runtime.GOOS == "linux" {
-		p = "$HOME/.kwk"
+		p = fmt.Sprintf("/%s/.kwk", u)
 	} else {
-		p = fmt.Sprintf("/Users/%s/Library/Caches/kwk", os.Getenv("USER"))
+		p = fmt.Sprintf("/Users/%s/Library/Caches/kwk", u)
 	}
 	if err := os.Mkdir(p, os.ModeDir); err != nil {
 		if os.IsExist(err) {
