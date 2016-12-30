@@ -43,10 +43,10 @@ function compile(){
   sha1sum ${zipped} > ${zipped}.sha1
 }
 
-sed -i '' "s/RELEASE_VERSION/${KWK_VERSION}/" ./main.go
-#compile linux
+sed -i -- "s/RELEASE_VERSION/${KWK_VERSION}/" ./main.go
+compile linux
 compile darwin
-#compile windows
+compile windows
 
 # CREATE NPM
 rm -fr /builds/npm
@@ -54,11 +54,12 @@ mkdir /builds/npm
 
 npm_dir=/builds/npm/${KWK_VERSION}
 mkdir ${npm_dir}
-cp -r ./dist/npm/ ${npm_dir}/
+echo $PWD
+cp -R dist/npm/. ${npm_dir}/
 
 bin_dir=${npm_dir}/bin
-cp -r ${tmp}/ ${bin_dir}/
-sed -i '' "s/RELEASE_VERSION/${KWK_VERSION}/" ${npm_dir}/package.json
+cp -R ${tmp}/. ${bin_dir}/
+sed -i -- "s/RELEASE_VERSION/${KWK_VERSION}/" ${npm_dir}/package.json
 
 tree ${npm_dir}
 
