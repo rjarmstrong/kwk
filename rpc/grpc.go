@@ -1,29 +1,31 @@
 package rpc
 
 import (
-	"crypto/tls"
-	//"google.golang.org/grpc/credentials"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"fmt"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/credentials"
+	"crypto/tls"
+	"os"
 )
 
-//serverAddr  := flag.String("server_addr", "127.0.0.1:7777", "The server address in the format of host:port")
-
 func Conn(serverAddress string) *grpc.ClientConn {
-	// test
-	c := &tls.Config{}
-	c.InsecureSkipVerify = true
-	//cert := credentials.NewTLS(config)
+	var opts []grpc.DialOption
 
-	// production
-	//cert := credentials.NewClientTLSFromCert(nil, "")
-	//grpc.WithTransportCredentials(cert)
+	var trustCerts = false
+	if ok := os.Getenv("TRUST_ALL_CERTS"); ok != "" {
+		trustCerts = true
+	}
+	creds := credentials.NewTLS(&tls.Config{
+		InsecureSkipVerify:trustCerts,
+	})
+	opts = append(opts, grpc.WithTransportCredentials(creds))
 
-	conn, err := grpc.Dial(serverAddress, grpc.WithInsecure())
+	fmt.Println(opts)
+	conn, err := grpc.Dial(serverAddress, opts...)
 	if err != nil {
 		panic(fmt.Sprintf("Failure: %v", err))
 	}
