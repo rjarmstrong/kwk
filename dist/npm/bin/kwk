@@ -2,11 +2,12 @@
 
 OS=$(uname | tr '[:upper:]' '[:lower:]')
 ARCH=amd64
+CACHE=$(dirname $0)/cache.tmp
 
 # CACHE THE BIN PATH AS NPM SLOWS DOWN CALL TO KWK
-if [[ ! -e ./binpath.txt ]]; then
-    echo $(npm config get prefix)/lib/node_modules/kwk-cli/bin > ./binpath.txt
+if [[ ! -e "${CACHE}" ]]; then
+    echo $(npm config get prefix)/lib/node_modules/kwk-cli/bin > "${CACHE}"
 fi
-BINPATH=$(cat ./binpath.txt)
+BIN_PATH=$(cat ${CACHE})
 
-${BINPATH}/kwk-${OS}-${ARCH} "$@"
+${BIN_PATH}/kwk-${OS}-${ARCH} "$@"
