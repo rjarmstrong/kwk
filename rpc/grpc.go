@@ -16,7 +16,7 @@ func GetConn(serverAddress string) *grpc.ClientConn {
 	var opts []grpc.DialOption
 
 	var trustCerts = false
-	if ok := os.Getenv("TRUST_ALL_CERTS"); ok != "" {
+	if ok := os.Getenv("TRUST_ALL_CERTS"); ok != "" && serverAddress == "localhost:8000" {
 		trustCerts = true
 	}
 	creds := credentials.NewTLS(&tls.Config{
