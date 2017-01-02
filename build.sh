@@ -3,7 +3,7 @@
 set -ef -o pipefail
 
 ARCH=amd64
-KWK_VERSION=v1.0.10
+KWK_VERSION=v1.0.11
 
 # TESTING
 go test ./app
