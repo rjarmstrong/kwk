@@ -51,8 +51,8 @@ function compile(){
 
 sed -i -- "s/RELEASE_VERSION/${KWK_VERSION}/" ./main.go
 compile linux
-compile darwin
-compile windows
+#compile darwin
+#compile windows
 
 # CREATE NPM
 npmTemp=${tmp}/npm

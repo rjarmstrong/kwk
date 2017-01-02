@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 KWK_VERSION=v1.0.9
-docker build . --rm -e KWK_VERSION=${KWK_VERSION} -t kwkcli
+docker build . --rm -t kwkcli
 docker run --name kwkcli kwkcli ls
 
 # UPLOAD
