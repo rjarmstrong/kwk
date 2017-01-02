@@ -66,12 +66,17 @@ cp -R ${tmp}/bin/. ${npmTemp}/bin
 sed -i -- "s/RELEASE_VERSION/${KWK_VERSION}/" ${npmTemp}/package.json
 tree ${npmTemp}
 
-# UPLOAD
-# TO COME
-
-# S3
+# CREATE NPM TAR
 echo "CREATING NPM ARCHIVE"
 tar cvzf ${npmPath}/kwk-cli-npm.tar.gz -C ${npmTemp} .
+
+# UPLOAD
+export BUILDKITE_S3_ACCESS_KEY_ID=AKIAJRJBQNMZWLG653WA
+export BUILDKITE_S3_SECRET_ACCESS_KEY=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
+export BUILDKITE_S3_DEFAULT_REGION="us-east-1"
+export BUILDKITE_ARTIFACT_UPLOAD_DESTINATION="s3://kwk-cli/${BUILDKITE_JOB_ID}"
+
+buildkite-agent artifact upload ${releasePath} s3://kwk-cli/${KWK_VERSION}
 
 # CLEAN-UP
 rm -fr ${tmp}
