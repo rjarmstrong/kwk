@@ -56,6 +56,7 @@ func (a *RpcService) Delete(fullKey string) error {
 }
 
 func (a *RpcService) Create(uri string, path string) (*models.CreateSnippet, error) {
+	// encrypt if requested
 	if res, err := a.client.Create(a.headers.GetContext(), &aliasesRpc.CreateRequest{Uri: uri, FullKey: path}); err != nil {
 		return nil, err
 	} else {
@@ -138,6 +139,9 @@ func mapAlias(rpc *aliasesRpc.AliasResponse, model *models.Snippet) {
 	model.Username = rpc.Username
 	model.Key = rpc.Key
 	model.Extension = rpc.Extension
+	// if encrypted, decrypt
+	// if checksum doesn't match then throw warning
+	// check that checksum signature is valid with public key.
 	model.Snip = rpc.Snip
 	model.Version = rpc.SnipVersion
 	model.Runtime = rpc.Runtime
