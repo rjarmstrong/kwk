@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 set -ef -o pipefail
+KWK_VERSION=v1.0.13
 
 ARCH=amd64
-KWK_VERSION=v1.0.11
 
 # TESTING
 go test ./app
