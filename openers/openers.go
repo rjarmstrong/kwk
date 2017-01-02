@@ -71,29 +71,29 @@ func (o *Opener) Open(alias *models.Snippet, args []string) error {
 		}
 	}
 
-	uri := alias.Snip
+	snippet := alias.Snip
 	if alias.Runtime == "url" {
-		o.system.ExecSafe("open", uri)
+		o.system.ExecSafe("open", snippet)
 		return nil
 	}
 	if alias.Runtime == "bash" {
-		args = append([]string{uri}, args...)
+		args = append([]string{snippet}, args...)
 		o.system.ExecSafe("/bin/bash", append([]string{"-c"}, args...)...)
 		return nil
 	}
 	if alias.Runtime == "nodejs" {
-		args = append([]string{uri}, args...)
+		args = append([]string{snippet}, args...)
 		// -r (require flag)
 		o.system.ExecSafe("node", append([]string{"-e"}, args...)...)
 		return nil
 	}
 	if alias.Runtime == "python" {
-		args = append([]string{uri}, args...)
+		args = append([]string{snippet}, args...)
 		o.system.ExecSafe("python", append([]string{"-c"}, args...)...)
 		return nil
 	}
 	if alias.Runtime == "php" {
-		args = append([]string{uri}, args...)
+		args = append([]string{snippet}, args...)
 		o.system.ExecSafe("php", append([]string{"-r"}, args...)...)
 		return nil
 	}
@@ -152,7 +152,7 @@ func (o *Opener) OpenWeb(alias *models.Snippet) {
 	o.system.ExecSafe("osascript", "-e", "activate application \"Google Chrome\"")
 }
 
-func (o *Opener) OpenCovert(uri string) {
-	o.system.ExecSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--incognito", uri)
+func (o *Opener) OpenCovert(snippet string) {
+	o.system.ExecSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--incognito", snippet)
 	o.system.ExecSafe("osascript", "-e", "activate application \"Google Chrome\"")
 }
