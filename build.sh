@@ -3,7 +3,7 @@
 set -ef -o pipefail
 
 ARCH=amd64
-BUILD=${BUILDKITE_BUILD_NUMBER}
+KWK_VERSION=v1.0.10
 
 # TESTING
 go test ./app
@@ -39,7 +39,7 @@ function compile(){
 
   # COMPILE
   binary=${tmp}/bin/${file}
-  env GOOS=${os} GOARCH=${ARCH} go build -ldflags "-X main.version=${KWK_VERSION} -X main.build=${BUILD}" -x -o ${binary}
+  env GOOS=${os} GOARCH=${ARCH} go build -ldflags "-X main.version=${KWK_VERSION} -X main.build=${BUILD_NUMBER}" -x -o ${binary}
 
   # ZIP
   zipped=${binPath}/${file}.tar.gz
@@ -66,7 +66,15 @@ tree ${npmTemp}
 
 # CREATE NPM TAR
 echo "CREATING NPM ARCHIVE"
-tar cvzf ${npmPath}/kwk-cli-npm.tar.gz -C ${npmTemp} .
+npmTar=${npmPath}/kwk-cli-npm.tar.gz
+tar cvzf npmTar -C ${npmTemp} .
+sha1sum ${npmTar} > ${npmTar}.sha1
 
 # CLEAN-UP
 rm -fr ${tmp}
+
+export AWS_ACCESS_KEY_ID=AKIAJRJBQNMZWLG653WA
+export AWS_SECRET_ACCESS_KEY=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
+export DEFAULT_REGION="us-east-1"
+
+aws s3 cp /builds/${KWK_VERSION} s3://kwk-cli/${KWK_VERSION} --recursive --acl public-read
