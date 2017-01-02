@@ -18,7 +18,7 @@ import (
 func main() {
 	os.Setenv("version", "v0.0.3")
 	host := os.Getenv("KWK_HOST")
-	conn := rpc.Conn(host)
+	conn := rpc.GetConn(host)
 	defer conn.Close()
 
 	s := system.New()

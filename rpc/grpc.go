@@ -12,7 +12,7 @@ import (
 	"os"
 )
 
-func Conn(serverAddress string) *grpc.ClientConn {
+func GetConn(serverAddress string) *grpc.ClientConn {
 	var opts []grpc.DialOption
 
 	var trustCerts = false
@@ -24,7 +24,6 @@ func Conn(serverAddress string) *grpc.ClientConn {
 	})
 	opts = append(opts, grpc.WithTransportCredentials(creds))
 
-	fmt.Println(opts)
 	conn, err := grpc.Dial(serverAddress, opts...)
 	if err != nil {
 		panic(fmt.Sprintf("Failure: %v", err))

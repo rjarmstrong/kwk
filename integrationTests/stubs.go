@@ -1,30 +1,29 @@
 package integration
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/app"
-	"bitbucket.com/sharingmachine/kwkcli/rpc"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
-	"bitbucket.com/sharingmachine/kwkcli/gui"
 	"bitbucket.com/sharingmachine/kwkcli/openers"
 	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/system"
+	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
+	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/account"
+	"bitbucket.com/sharingmachine/kwkcli/app"
+	"bitbucket.com/sharingmachine/kwkcli/rpc"
+	"google.golang.org/grpc"
+	"strings"
+	"os/exec"
 	"bufio"
 	"bytes"
 	"fmt"
-	"google.golang.org/grpc"
-	"os/exec"
-	"strings"
-	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
-	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 )
 
 func createApp(conn *grpc.ClientConn, writer *bytes.Buffer, r *bufio.Reader) *app.KwkApp {
 	s := system.New()
-	t := settings.New(s, "settings")
+	t := config.New(s, "settings")
 	h := rpc.NewHeaders(t)
-	u := users.New(conn, t, h)
+	u := account.NewStdManager(conn, t, h)
 	a := snippets.New(conn, t, h)
 	w := tmpl.NewWriter(writer)
 	d := dlg.New(w, r)
@@ -56,7 +55,7 @@ func signup(reader *bytes.Buffer, kwk *app.KwkApp) {
 }
 
 func getApp(reader *bytes.Buffer, writer *bytes.Buffer) *app.KwkApp {
-	conn := rpc.Conn(testHost)
+	conn := rpc.GetConn(testHost)
 	r := bufio.NewReader(reader)
 	return createApp(conn, writer, r)
 }

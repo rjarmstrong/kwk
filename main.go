@@ -23,7 +23,7 @@ func main() {
 	if host == "" {
 		host = "api.kwk.co:8000"
 	}
-	conn := rpc.Conn(host)
+	conn := rpc.GetConn(host)
 	defer conn.Close()
 
 	s := system.New()
