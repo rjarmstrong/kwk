@@ -9,4 +9,6 @@ WORKDIR $GOPATH/src/bitbucket.com/sharingmachine/kwkcli/
 
 RUN ./build.sh
 
+VOLUME /builds
+
 CMD ["/bin/bash"]
