@@ -67,7 +67,7 @@ tree ${npmTemp}
 # CREATE NPM TAR
 echo "CREATING NPM ARCHIVE"
 npmTar=${npmPath}/kwk-cli-npm.tar.gz
-tar cvzf npmTar -C ${npmTemp} .
+tar cvzf ${npmTar} -C ${npmTemp} .
 sha1sum ${npmTar} > ${npmTar}.sha1
 
 # CLEAN-UP
