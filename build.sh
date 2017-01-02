@@ -2,6 +2,9 @@
 
 set -ef -o pipefail
 KWK_VERSION=v1.0.13
+BUILD_NUMBER=$1
+
+echo "**** kwk-cli build ${KWK_VERSION}+${BUILD_NUMBER} *****"
 
 ARCH=amd64
 
@@ -50,7 +53,7 @@ function compile(){
 }
 
 sed -i -- "s/RELEASE_VERSION/${KWK_VERSION}/" ./main.go
-compile linux
+#compile linux
 compile darwin
 #compile windows
 

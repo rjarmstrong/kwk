@@ -11,7 +11,9 @@ RUN curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.
 COPY . $GOPATH/src/bitbucket.com/sharingmachine/kwkcli/
 WORKDIR $GOPATH/src/bitbucket.com/sharingmachine/kwkcli/
 
-RUN ./build.sh
+ARG BUILD_NUMBER
+
+RUN ./build.sh $BUILD_NUMBER
 
 VOLUME /builds
 
