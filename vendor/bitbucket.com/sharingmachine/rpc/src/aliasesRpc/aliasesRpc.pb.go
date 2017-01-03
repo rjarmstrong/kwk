@@ -65,6 +65,27 @@ func (m *CreateRequest) String() string            { return proto.CompactTextStr
 func (*CreateRequest) ProtoMessage()               {}
 func (*CreateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
+func (m *CreateRequest) GetUri() string {
+	if m != nil {
+		return m.Uri
+	}
+	return ""
+}
+
+func (m *CreateRequest) GetFullKey() string {
+	if m != nil {
+		return m.FullKey
+	}
+	return ""
+}
+
+func (m *CreateRequest) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
 type UpdateRequest struct {
 	FullKey     string `protobuf:"bytes,1,opt,name=fullKey" json:"fullKey,omitempty"`
 	Description string `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`
@@ -75,6 +96,20 @@ func (m *UpdateRequest) String() string            { return proto.CompactTextStr
 func (*UpdateRequest) ProtoMessage()               {}
 func (*UpdateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
+func (m *UpdateRequest) GetFullKey() string {
+	if m != nil {
+		return m.FullKey
+	}
+	return ""
+}
+
+func (m *UpdateRequest) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
 type RenameRequest struct {
 	FullKey    string `protobuf:"bytes,1,opt,name=fullKey" json:"fullKey,omitempty"`
 	NewFullKey string `protobuf:"bytes,2,opt,name=newFullKey" json:"newFullKey,omitempty"`
@@ -84,6 +119,20 @@ func (m *RenameRequest) Reset()                    { *m = RenameRequest{} }
 func (m *RenameRequest) String() string            { return proto.CompactTextString(m) }
 func (*RenameRequest) ProtoMessage()               {}
 func (*RenameRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+
+func (m *RenameRequest) GetFullKey() string {
+	if m != nil {
+		return m.FullKey
+	}
+	return ""
+}
+
+func (m *RenameRequest) GetNewFullKey() string {
+	if m != nil {
+		return m.NewFullKey
+	}
+	return ""
+}
 
 type RenameResponse struct {
 	Alias           *AliasResponse `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
@@ -102,6 +151,13 @@ func (m *RenameResponse) GetAlias() *AliasResponse {
 	return nil
 }
 
+func (m *RenameResponse) GetOriginalFullKey() string {
+	if m != nil {
+		return m.OriginalFullKey
+	}
+	return ""
+}
+
 type PatchRequest struct {
 	FullKey string `protobuf:"bytes,1,opt,name=fullKey" json:"fullKey,omitempty"`
 	Target  string `protobuf:"bytes,3,opt,name=target" json:"target,omitempty"`
@@ -112,6 +168,27 @@ func (m *PatchRequest) Reset()                    { *m = PatchRequest{} }
 func (m *PatchRequest) String() string            { return proto.CompactTextString(m) }
 func (*PatchRequest) ProtoMessage()               {}
 func (*PatchRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+
+func (m *PatchRequest) GetFullKey() string {
+	if m != nil {
+		return m.FullKey
+	}
+	return ""
+}
+
+func (m *PatchRequest) GetTarget() string {
+	if m != nil {
+		return m.Target
+	}
+	return ""
+}
+
+func (m *PatchRequest) GetPatch() string {
+	if m != nil {
+		return m.Patch
+	}
+	return ""
+}
 
 type PatchResponse struct {
 	Alias *AliasResponse `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
@@ -156,6 +233,27 @@ func (m *CloneRequest) String() string            { return proto.CompactTextStri
 func (*CloneRequest) ProtoMessage()               {}
 func (*CloneRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
 
+func (m *CloneRequest) GetFullKey() string {
+	if m != nil {
+		return m.FullKey
+	}
+	return ""
+}
+
+func (m *CloneRequest) GetNewFullKey() string {
+	if m != nil {
+		return m.NewFullKey
+	}
+	return ""
+}
+
+func (m *CloneRequest) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
 type CloneResponse struct {
 	Alias *AliasResponse `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
 }
@@ -182,6 +280,27 @@ func (m *TagRequest) Reset()                    { *m = TagRequest{} }
 func (m *TagRequest) String() string            { return proto.CompactTextString(m) }
 func (*TagRequest) ProtoMessage()               {}
 func (*TagRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
+
+func (m *TagRequest) GetFullKey() string {
+	if m != nil {
+		return m.FullKey
+	}
+	return ""
+}
+
+func (m *TagRequest) GetTags() []string {
+	if m != nil {
+		return m.Tags
+	}
+	return nil
+}
+
+func (m *TagRequest) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
 
 type TagResponse struct {
 	Alias *AliasResponse `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
@@ -210,6 +329,27 @@ func (m *UnTagRequest) String() string            { return proto.CompactTextStri
 func (*UnTagRequest) ProtoMessage()               {}
 func (*UnTagRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
 
+func (m *UnTagRequest) GetFullKey() string {
+	if m != nil {
+		return m.FullKey
+	}
+	return ""
+}
+
+func (m *UnTagRequest) GetTags() []string {
+	if m != nil {
+		return m.Tags
+	}
+	return nil
+}
+
+func (m *UnTagRequest) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
 type UnTagResponse struct {
 	Alias *AliasResponse `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
 }
@@ -236,6 +376,20 @@ func (m *GetRequest) String() string            { return proto.CompactTextString
 func (*GetRequest) ProtoMessage()               {}
 func (*GetRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
 
+func (m *GetRequest) GetFullKey() string {
+	if m != nil {
+		return m.FullKey
+	}
+	return ""
+}
+
+func (m *GetRequest) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
 type ListRequest struct {
 	Username string   `protobuf:"bytes,1,opt,name=username" json:"username,omitempty"`
 	Since    int64    `protobuf:"varint,2,opt,name=since" json:"since,omitempty"`
@@ -249,6 +403,41 @@ func (m *ListRequest) String() string            { return proto.CompactTextStrin
 func (*ListRequest) ProtoMessage()               {}
 func (*ListRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
 
+func (m *ListRequest) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *ListRequest) GetSince() int64 {
+	if m != nil {
+		return m.Since
+	}
+	return 0
+}
+
+func (m *ListRequest) GetSize() int64 {
+	if m != nil {
+		return m.Size
+	}
+	return 0
+}
+
+func (m *ListRequest) GetTags() []string {
+	if m != nil {
+		return m.Tags
+	}
+	return nil
+}
+
+func (m *ListRequest) GetRuntimes() []string {
+	if m != nil {
+		return m.Runtimes
+	}
+	return nil
+}
+
 type DeleteRequest struct {
 	FullKey  string `protobuf:"bytes,1,opt,name=fullKey" json:"fullKey,omitempty"`
 	Username string `protobuf:"bytes,2,opt,name=username" json:"username,omitempty"`
@@ -259,6 +448,20 @@ func (m *DeleteRequest) String() string            { return proto.CompactTextStr
 func (*DeleteRequest) ProtoMessage()               {}
 func (*DeleteRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
 
+func (m *DeleteRequest) GetFullKey() string {
+	if m != nil {
+		return m.FullKey
+	}
+	return ""
+}
+
+func (m *DeleteRequest) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
 type DeleteResponse struct {
 	FullKey string `protobuf:"bytes,1,opt,name=fullKey" json:"fullKey,omitempty"`
 }
@@ -267,6 +470,13 @@ func (m *DeleteResponse) Reset()                    { *m = DeleteResponse{} }
 func (m *DeleteResponse) String() string            { return proto.CompactTextString(m) }
 func (*DeleteResponse) ProtoMessage()               {}
 func (*DeleteResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
+
+func (m *DeleteResponse) GetFullKey() string {
+	if m != nil {
+		return m.FullKey
+	}
+	return ""
+}
 
 type CreateAliasResponse struct {
 	Alias     *AliasResponse     `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
@@ -316,6 +526,118 @@ func (m *AliasResponse) String() string            { return proto.CompactTextStr
 func (*AliasResponse) ProtoMessage()               {}
 func (*AliasResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
 
+func (m *AliasResponse) GetSnipId() string {
+	if m != nil {
+		return m.SnipId
+	}
+	return ""
+}
+
+func (m *AliasResponse) GetFullKey() string {
+	if m != nil {
+		return m.FullKey
+	}
+	return ""
+}
+
+func (m *AliasResponse) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *AliasResponse) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+func (m *AliasResponse) GetExtension() string {
+	if m != nil {
+		return m.Extension
+	}
+	return ""
+}
+
+func (m *AliasResponse) GetSnip() string {
+	if m != nil {
+		return m.Snip
+	}
+	return ""
+}
+
+func (m *AliasResponse) GetSnipVersion() int64 {
+	if m != nil {
+		return m.SnipVersion
+	}
+	return 0
+}
+
+func (m *AliasResponse) GetRuntime() string {
+	if m != nil {
+		return m.Runtime
+	}
+	return ""
+}
+
+func (m *AliasResponse) GetTags() []string {
+	if m != nil {
+		return m.Tags
+	}
+	return nil
+}
+
+func (m *AliasResponse) GetCreated() int64 {
+	if m != nil {
+		return m.Created
+	}
+	return 0
+}
+
+func (m *AliasResponse) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *AliasResponse) GetForkedFromFullKey() string {
+	if m != nil {
+		return m.ForkedFromFullKey
+	}
+	return ""
+}
+
+func (m *AliasResponse) GetForkedFromVersion() int64 {
+	if m != nil {
+		return m.ForkedFromVersion
+	}
+	return 0
+}
+
+func (m *AliasResponse) GetPrivate() bool {
+	if m != nil {
+		return m.Private
+	}
+	return false
+}
+
+func (m *AliasResponse) GetCloneCount() int64 {
+	if m != nil {
+		return m.CloneCount
+	}
+	return 0
+}
+
+func (m *AliasResponse) GetRunCount() int64 {
+	if m != nil {
+		return m.RunCount
+	}
+	return 0
+}
+
 type TypeMatchResponse struct {
 	Matches []*MatchResponse `protobuf:"bytes,1,rep,name=matches" json:"matches,omitempty"`
 }
@@ -344,6 +666,34 @@ func (m *MatchResponse) String() string            { return proto.CompactTextStr
 func (*MatchResponse) ProtoMessage()               {}
 func (*MatchResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
 
+func (m *MatchResponse) GetMedia() string {
+	if m != nil {
+		return m.Media
+	}
+	return ""
+}
+
+func (m *MatchResponse) GetRuntime() string {
+	if m != nil {
+		return m.Runtime
+	}
+	return ""
+}
+
+func (m *MatchResponse) GetExtension() string {
+	if m != nil {
+		return m.Extension
+	}
+	return ""
+}
+
+func (m *MatchResponse) GetScore() int64 {
+	if m != nil {
+		return m.Score
+	}
+	return 0
+}
+
 type AliasListResponse struct {
 	Items []*AliasResponse `protobuf:"bytes,1,rep,name=items" json:"items,omitempty"`
 	Total int64            `protobuf:"varint,2,opt,name=total" json:"total,omitempty"`
@@ -361,6 +711,27 @@ func (m *AliasListResponse) GetItems() []*AliasResponse {
 		return m.Items
 	}
 	return nil
+}
+
+func (m *AliasListResponse) GetTotal() int64 {
+	if m != nil {
+		return m.Total
+	}
+	return 0
+}
+
+func (m *AliasListResponse) GetSince() int64 {
+	if m != nil {
+		return m.Since
+	}
+	return 0
+}
+
+func (m *AliasListResponse) GetSize() int64 {
+	if m != nil {
+		return m.Size
+	}
+	return 0
 }
 
 func init() {
@@ -394,7 +765,7 @@ var _ grpc.ClientConn
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion3
+const _ = grpc.SupportPackageIsVersion4
 
 // Client API for AliasesRpc service
 
@@ -754,7 +1125,7 @@ var _AliasesRpc_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: fileDescriptor0,
+	Metadata: "aliasesRpc.proto",
 }
 
 func init() { proto.RegisterFile("aliasesRpc.proto", fileDescriptor0) }

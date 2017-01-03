@@ -47,6 +47,34 @@ func (m *AlphaRequest) String() string            { return proto.CompactTextStri
 func (*AlphaRequest) ProtoMessage()               {}
 func (*AlphaRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
+func (m *AlphaRequest) GetTerm() string {
+	if m != nil {
+		return m.Term
+	}
+	return ""
+}
+
+func (m *AlphaRequest) GetRuntime() string {
+	if m != nil {
+		return m.Runtime
+	}
+	return ""
+}
+
+func (m *AlphaRequest) GetExtension() string {
+	if m != nil {
+		return m.Extension
+	}
+	return ""
+}
+
+func (m *AlphaRequest) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
 type AlphaResponse struct {
 	Results []*AlphaResult `protobuf:"bytes,1,rep,name=results" json:"results,omitempty"`
 	Total   int64          `protobuf:"varint,2,opt,name=total" json:"total,omitempty"`
@@ -63,6 +91,20 @@ func (m *AlphaResponse) GetResults() []*AlphaResult {
 		return m.Results
 	}
 	return nil
+}
+
+func (m *AlphaResponse) GetTotal() int64 {
+	if m != nil {
+		return m.Total
+	}
+	return 0
+}
+
+func (m *AlphaResponse) GetTook() int64 {
+	if m != nil {
+		return m.Took
+	}
+	return 0
 }
 
 type AlphaResult struct {
@@ -90,11 +132,123 @@ func (m *AlphaResult) String() string            { return proto.CompactTextStrin
 func (*AlphaResult) ProtoMessage()               {}
 func (*AlphaResult) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
+func (m *AlphaResult) GetSnipId() string {
+	if m != nil {
+		return m.SnipId
+	}
+	return ""
+}
+
+func (m *AlphaResult) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *AlphaResult) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+func (m *AlphaResult) GetRuntime() string {
+	if m != nil {
+		return m.Runtime
+	}
+	return ""
+}
+
+func (m *AlphaResult) GetFullKey() string {
+	if m != nil {
+		return m.FullKey
+	}
+	return ""
+}
+
+func (m *AlphaResult) GetExtension() string {
+	if m != nil {
+		return m.Extension
+	}
+	return ""
+}
+
+func (m *AlphaResult) GetSnip() string {
+	if m != nil {
+		return m.Snip
+	}
+	return ""
+}
+
+func (m *AlphaResult) GetSnipVersion() int64 {
+	if m != nil {
+		return m.SnipVersion
+	}
+	return 0
+}
+
+func (m *AlphaResult) GetCreated() int64 {
+	if m != nil {
+		return m.Created
+	}
+	return 0
+}
+
+func (m *AlphaResult) GetTags() []string {
+	if m != nil {
+		return m.Tags
+	}
+	return nil
+}
+
 func (m *AlphaResult) GetHighlights() map[string]string {
 	if m != nil {
 		return m.Highlights
 	}
 	return nil
+}
+
+func (m *AlphaResult) GetForkedFromFullKey() string {
+	if m != nil {
+		return m.ForkedFromFullKey
+	}
+	return ""
+}
+
+func (m *AlphaResult) GetForkedFromVersion() int64 {
+	if m != nil {
+		return m.ForkedFromVersion
+	}
+	return 0
+}
+
+func (m *AlphaResult) GetRunCount() int64 {
+	if m != nil {
+		return m.RunCount
+	}
+	return 0
+}
+
+func (m *AlphaResult) GetCloneCount() int64 {
+	if m != nil {
+		return m.CloneCount
+	}
+	return 0
+}
+
+func (m *AlphaResult) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *AlphaResult) GetPrivate() string {
+	if m != nil {
+		return m.Private
+	}
+	return ""
 }
 
 func init() {
@@ -109,7 +263,7 @@ var _ grpc.ClientConn
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion3
+const _ = grpc.SupportPackageIsVersion4
 
 // Client API for SearchRpc service
 
@@ -172,7 +326,7 @@ var _SearchRpc_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: fileDescriptor0,
+	Metadata: "searchRpc.proto",
 }
 
 func init() { proto.RegisterFile("searchRpc.proto", fileDescriptor0) }

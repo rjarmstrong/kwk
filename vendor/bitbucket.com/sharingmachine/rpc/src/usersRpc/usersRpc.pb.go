@@ -48,6 +48,27 @@ func (m *SignUpRequest) String() string            { return proto.CompactTextStr
 func (*SignUpRequest) ProtoMessage()               {}
 func (*SignUpRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
+func (m *SignUpRequest) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *SignUpRequest) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *SignUpRequest) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
+}
+
 type SignInRequest struct {
 	Username string `protobuf:"bytes,1,opt,name=username" json:"username,omitempty"`
 	Password string `protobuf:"bytes,2,opt,name=password" json:"password,omitempty"`
@@ -59,6 +80,27 @@ func (m *SignInRequest) String() string            { return proto.CompactTextStr
 func (*SignInRequest) ProtoMessage()               {}
 func (*SignInRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
+func (m *SignInRequest) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *SignInRequest) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
+}
+
+func (m *SignInRequest) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
 type ListRequest struct {
 	Since int64 `protobuf:"varint,1,opt,name=since" json:"since,omitempty"`
 	Size  int64 `protobuf:"varint,2,opt,name=size" json:"size,omitempty"`
@@ -68,6 +110,20 @@ func (m *ListRequest) Reset()                    { *m = ListRequest{} }
 func (m *ListRequest) String() string            { return proto.CompactTextString(m) }
 func (*ListRequest) ProtoMessage()               {}
 func (*ListRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+
+func (m *ListRequest) GetSince() int64 {
+	if m != nil {
+		return m.Since
+	}
+	return 0
+}
+
+func (m *ListRequest) GetSize() int64 {
+	if m != nil {
+		return m.Size
+	}
+	return 0
+}
 
 type UserListResponse struct {
 	Items []*UserResponse `protobuf:"bytes,1,rep,name=items" json:"items,omitempty"`
@@ -88,6 +144,27 @@ func (m *UserListResponse) GetItems() []*UserResponse {
 	return nil
 }
 
+func (m *UserListResponse) GetTotal() int64 {
+	if m != nil {
+		return m.Total
+	}
+	return 0
+}
+
+func (m *UserListResponse) GetSince() int64 {
+	if m != nil {
+		return m.Since
+	}
+	return 0
+}
+
+func (m *UserListResponse) GetSize() int64 {
+	if m != nil {
+		return m.Size
+	}
+	return 0
+}
+
 type UserResponse struct {
 	Id          string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
 	Username    string `protobuf:"bytes,2,opt,name=username" json:"username,omitempty"`
@@ -104,6 +181,62 @@ func (m *UserResponse) String() string            { return proto.CompactTextStri
 func (*UserResponse) ProtoMessage()               {}
 func (*UserResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
 
+func (m *UserResponse) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *UserResponse) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *UserResponse) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *UserResponse) GetToken() string {
+	if m != nil {
+		return m.Token
+	}
+	return ""
+}
+
+func (m *UserResponse) GetSnipCount() int64 {
+	if m != nil {
+		return m.SnipCount
+	}
+	return 0
+}
+
+func (m *UserResponse) GetRunCount() int64 {
+	if m != nil {
+		return m.RunCount
+	}
+	return 0
+}
+
+func (m *UserResponse) GetCreated() int64 {
+	if m != nil {
+		return m.Created
+	}
+	return 0
+}
+
+func (m *UserResponse) GetClonedCount() int64 {
+	if m != nil {
+		return m.ClonedCount
+	}
+	return 0
+}
+
 func init() {
 	proto.RegisterType((*SignUpRequest)(nil), "usersRpc.SignUpRequest")
 	proto.RegisterType((*SignInRequest)(nil), "usersRpc.SignInRequest")
@@ -118,7 +251,7 @@ var _ grpc.ClientConn
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion3
+const _ = grpc.SupportPackageIsVersion4
 
 // Client API for UsersRpc service
 
@@ -247,7 +380,7 @@ var _UsersRpc_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: fileDescriptor0,
+	Metadata: "usersRpc.proto",
 }
 
 func init() { proto.RegisterFile("usersRpc.proto", fileDescriptor0) }
