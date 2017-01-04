@@ -1,4 +1,4 @@
-package openers
+package cmd
 
 const JavaMain = `
 import java.util.*;

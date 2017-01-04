@@ -1,8 +1,8 @@
-package openers
+package cmd
 
 import "bitbucket.com/sharingmachine/kwkcli/models"
 
-type IOpen interface {
-	Open(alias *models.Snippet, args []string) error
+type Runner interface {
+	Run(alias *models.Snippet, args []string) error
 	Edit(alias *models.Snippet) error
 }

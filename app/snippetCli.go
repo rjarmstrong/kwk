@@ -3,7 +3,7 @@ package app
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
-	"bitbucket.com/sharingmachine/kwkcli/openers"
+	"bitbucket.com/sharingmachine/kwkcli/cmd"
 	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/system"
@@ -18,15 +18,15 @@ import (
 type SnippetCli struct {
 	search   search.Term
 	service  snippets.Service
-	openers  openers.IOpen
+	runner   cmd.Runner
 	system   system.ISystem
 	settings config.Settings
 	dlg.Dialogue
 	tmpl.Writer
 }
 
-func NewSnippetCli(a snippets.Service, o openers.IOpen, s system.ISystem, d dlg.Dialogue, w tmpl.Writer, t config.Settings, search search.Term) *SnippetCli {
-	return &SnippetCli{service: a, openers: o, system: s, Dialogue: d, Writer: w, settings: t, search: search}
+func NewSnippetCli(a snippets.Service, r cmd.Runner, s system.ISystem, d dlg.Dialogue, w tmpl.Writer, t config.Settings, search search.Term) *SnippetCli {
+	return &SnippetCli{service: a, runner: r, system: s, Dialogue: d, Writer: w, settings: t, search: search}
 }
 
 func (a *SnippetCli) Share(fullKey string, destination string) {
@@ -37,21 +37,21 @@ func (a *SnippetCli) Share(fullKey string, destination string) {
 		if alias := a.handleMultiResponse(fullKey, list); alias != nil {
 			gmail := &models.Snippet{Runtime: "url", Extension: "url"}
 			gmail.Snip = "https://mail.google.com/mail/?ui=2&view=cm&fs=1&tf=1&su=&body=http%3A%2F%2Faus.kwk.co%2F" + alias.Username + "%2f" + alias.FullKey
-			a.openers.Open(gmail, []string{})
+			a.runner.Run(gmail, []string{})
 		} else {
 			a.Render("snippet:notfound", map[string]interface{}{"fullKey": fullKey})
 		}
 	}
 }
 
-func (a *SnippetCli) Open(fullKey string, args []string) {
+func (a *SnippetCli) Run(fullKey string, args []string) {
 	k := a.getKwkKey(fullKey)
 	if list, err := a.service.Get(k); err != nil {
 		a.Render("error", err)
 
 	} else {
 		if alias := a.handleMultiResponse(fullKey, list); alias != nil {
-			a.openers.Open(alias, args)
+			a.runner.Run(alias, args)
 		} else {
 			if res, err := a.search.Execute(fullKey); err != nil {
 				a.Render("error", err)
@@ -99,7 +99,7 @@ func (a *SnippetCli) Edit(fullKey string) {
 	} else {
 		if alias := a.handleMultiResponse(fullKey, list); alias != nil {
 			a.Render("snippet:editing", alias)
-			if err := a.openers.Edit(alias); err != nil {
+			if err := a.runner.Edit(alias); err != nil {
 				a.Render("error", err)
 			} else {
 				a.Render("snippet:edited", alias)

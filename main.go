@@ -4,7 +4,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/app"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
-	"bitbucket.com/sharingmachine/kwkcli/openers"
+	"bitbucket.com/sharingmachine/kwkcli/cmd"
 	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/system"
@@ -32,7 +32,7 @@ func main() {
 	u := account.NewStdManager(conn, t, h)
 	a := snippets.New(conn, t, h)
 	w := tmpl.NewWriter(os.Stdout)
-	o := openers.New(s, a, w)
+	o := cmd.NewStdRunner(s, a, w)
 	r := bufio.NewReader(os.Stdin)
 	d := dlg.New(w, r)
 	ch := search.NewAlphaTerm(conn, t, h)

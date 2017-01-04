@@ -3,7 +3,7 @@ package app
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
-	"bitbucket.com/sharingmachine/kwkcli/openers"
+	"bitbucket.com/sharingmachine/kwkcli/cmd"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/system"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
@@ -19,7 +19,7 @@ func Test_Snippet(t *testing.T) {
 	Convey("SNIPPET CLI", t, func() {
 		app := CreateAppStub()
 		a := app.Snippets.(*snippets.ServiceMock)
-		o := app.Openers.(*openers.OpenerMock)
+		r := app.Runner.(*cmd.RunnerMock)
 		s := app.System.(*system.SystemMock)
 		d := app.Dialogue.(*dlg.DialogueMock)
 		t := app.Settings.(*config.SettingsMock)
@@ -27,7 +27,7 @@ func Test_Snippet(t *testing.T) {
 		h := app.Search.(*search.TermMock)
 
 		Convey(`Command not found`, func() {
-			Convey(`Should call get and open if found`, func() {
+			Convey(`Should call 'run' and open if found`, func() {
 				fullKey := "hola.sh"
 				a.ReturnItemsForGet = []models.Snippet{
 					{FullKey: fullKey},
@@ -35,10 +35,10 @@ func Test_Snippet(t *testing.T) {
 				t.GetHydrateWith = &models.User{Username: "rjarmstrong"}
 				app.App.Run([]string{"[app]", fullKey, "covert", "arg2"})
 				So(a.GetCalledWith, should.Resemble, &models.KwkKey{FullKey: fullKey, Username: "rjarmstrong"})
-				So(o.OpenCalledWith, should.Resemble, []interface{}{&a.ReturnItemsForGet[0], []string{"covert", "arg2"}})
+				So(r.OpenCalledWith, should.Resemble, []interface{}{&a.ReturnItemsForGet[0], []string{"covert", "arg2"}})
 				a.ReturnItemsForGet = nil
 			})
-			Convey(`Should call 'get' and prompt if multiple found`, func() {
+			Convey(`Should call 'run' and prompt if multiple found`, func() {
 				fullKey1 := "hola.sh"
 				fullKey2 := "hola.js"
 				a.ReturnItemsForGet = []models.Snippet{
@@ -228,7 +228,7 @@ func Test_Snippet(t *testing.T) {
 				a.ReturnItemsForGet = []models.Snippet{{FullKey: "arrows.js"}}
 				d.MultiChoiceResponse = &dlg.DialogueResponse{Value: a.ReturnItemsForGet[0]}
 				app.App.Run([]string{"[app]", "edit", "arrows.js"})
-				So(o.EditCalledWith, should.Resemble, &a.ReturnItemsForGet[0])
+				So(r.EditCalledWith, should.Resemble, &a.ReturnItemsForGet[0])
 				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:edited", &a.ReturnItemsForGet[0]})
 			})
 			Convey(`Should call edit and respond with error if not exists`, func() {

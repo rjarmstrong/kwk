@@ -1,4 +1,4 @@
-package openers
+package cmd
 
 const PhpVersion = `php -v`
 const RustVersion = `rustc -V`

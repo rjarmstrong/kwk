@@ -1,7 +1,6 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/openers"
 	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/system"
@@ -9,6 +8,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
+	"bitbucket.com/sharingmachine/kwkcli/cmd"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -18,13 +18,13 @@ type KwkApp struct {
 	System         system.ISystem
 	Settings       config.Settings
 	AccountManage  account.Manager
-	Openers        openers.IOpen
+	Runner         cmd.Runner
 	Dialogue       dlg.Dialogue
 	TemplateWriter tmpl.Writer
 	Search         search.Term
 }
 
-func New(a snippets.Service, s system.ISystem, t config.Settings, o openers.IOpen, u account.Manager,
+func New(a snippets.Service, s system.ISystem, t config.Settings, r cmd.Runner, u account.Manager,
 	d dlg.Dialogue, w tmpl.Writer, h search.Term) *KwkApp {
 
 	app := cli.NewApp()
@@ -36,10 +36,10 @@ func New(a snippets.Service, s system.ISystem, t config.Settings, o openers.IOpe
 	sysCli := NewSystemCli(s, u, w)
 	app.Commands = append(app.Commands, System(sysCli)...)
 
-	snipCli := NewSnippetCli(a, o, s, d, w, t, h)
+	snipCli := NewSnippetCli(a, r, s, d, w, t, h)
 	app.Commands = append(app.Commands, Snippets(snipCli)...)
 	app.CommandNotFound = func(c *cli.Context, fullKey string) {
-		snipCli.Open(fullKey, []string(c.Args())[1:])
+		snipCli.Run(fullKey, []string(c.Args())[1:])
 	}
 	searchCli := NewSearchCli(h, w, d)
 	app.Commands = append(app.Commands, Search(searchCli)...)
@@ -48,7 +48,7 @@ func New(a snippets.Service, s system.ISystem, t config.Settings, o openers.IOpe
 		App: app,
 		System: s,
 		Settings: t,
-		Openers: o,
+		Runner: r,
 		AccountManage: u,
 		Dialogue: d,
 		Snippets: a,

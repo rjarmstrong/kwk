@@ -1,4 +1,4 @@
-package openers
+package cmd
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
@@ -14,17 +14,17 @@ const (
 	filecache = "filecache"
 )
 
-type Opener struct {
+type StdRunner struct {
 	snippets snippets.Service
 	system   system.ISystem
 	writer   tmpl.Writer
 }
 
-func New(system system.ISystem, snippets snippets.Service, w tmpl.Writer) *Opener {
-	return &Opener{snippets: snippets, system: system, writer: w}
+func NewStdRunner(system system.ISystem, snippets snippets.Service, w tmpl.Writer) *StdRunner {
+	return &StdRunner{snippets: snippets, system: system, writer: w}
 }
 
-func (o *Opener) Edit(alias *models.Snippet) error {
+func (o *StdRunner) Edit(alias *models.Snippet) error {
 	filePath, err := o.system.WriteToFile(filecache, alias.FullKey, alias.Snip)
 	if err != nil {
 		return err
@@ -59,7 +59,7 @@ func (o *Opener) Edit(alias *models.Snippet) error {
 	}
 }
 
-func (o *Opener) Open(alias *models.Snippet, args []string) error {
+func (o *StdRunner) Run(alias *models.Snippet, args []string) error {
 	if len(args) > 0 {
 		if args[0] == "covert" {
 			o.OpenCovert(alias.Snip)
@@ -147,12 +147,12 @@ func (o *Opener) Open(alias *models.Snippet, args []string) error {
 	return nil
 }
 
-func (o *Opener) OpenWeb(alias *models.Snippet) {
+func (o *StdRunner) OpenWeb(alias *models.Snippet) {
 	o.system.ExecSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", fmt.Sprintf("http://aus.kwk.co/%s/%s", alias.Username, alias.FullKey))
 	o.system.ExecSafe("osascript", "-e", "activate application \"Google Chrome\"")
 }
 
-func (o *Opener) OpenCovert(snippet string) {
+func (o *StdRunner) OpenCovert(snippet string) {
 	o.system.ExecSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--incognito", snippet)
 	o.system.ExecSafe("osascript", "-e", "activate application \"Google Chrome\"")
 }
