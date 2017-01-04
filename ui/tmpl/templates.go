@@ -32,7 +32,7 @@ func init() {
 
 	add("snippet:ambiguouscat", "That snippet is ambiguous please run it again with the extension:\n{{range .Items}}{{.FullKey}}\n{{ end }}", nil)
 	add("snippet:list", "{{. | listSnippets }}", template.FuncMap{"listSnippets": listSnippets })
-	add("snippet:choose", "{{. | listAmbiguous }}", template.FuncMap{"listAmbiguous": listAmbiguous })
+	add("snippet:choose", "{{. | listAmbiguous }}\n", template.FuncMap{"listAmbiguous": listAmbiguous })
 	add("snippet:chooseruntime", "{{. | listRuntimes}}", template.FuncMap{"listRuntimes": listRuntimes})
 	add("snippet:tag", "{{.FullKey}} tagged.", nil)
 	add("snippet:untag", "{{.FullKey}} untagged.", nil)
@@ -122,7 +122,6 @@ func listAmbiguous(list []models.Snippet) string {
 		options = options + fmt.Sprintf("[%s] %s   ", style.Colour(style.LightBlue, i+1), v.FullKey)
 	}
 	return options
-	return "hola"
 }
 
 func listSnippets(list *models.SnippetList) string {

@@ -15,7 +15,7 @@ func Test_App(t *testing.T) {
 		app := CreateAppStub()
 		u := app.AccountManage.(*account.ManagerMock)
 		t := app.Settings.(*config.SettingsMock)
-		d := app.Dialogue.(*dlg.DialogueMock)
+		d := app.Dialogue.(*dlg.DialogMock)
 
 		Convey(`Profile`, func() {
 			Convey(`Should run by name`, func() {
@@ -43,11 +43,11 @@ func Test_App(t *testing.T) {
 				So(u.LoginCalledWith[1], should.Equal, "password")
 			})
 			Convey(`Should call api signin and enter form details`, func() {
-				d.FieldResponse = &dlg.DialogueResponse{Value: "richard"}
+				d.FieldResponse = &dlg.DialogResponse{Value: "richard"}
 				app.App.Run([]string{"[app]", "signin"})
 			})
 			Convey(`Should save details to file when signed in`, func() {
-				d.FieldResponse = &dlg.DialogueResponse{Value: "richard"}
+				d.FieldResponse = &dlg.DialogResponse{Value: "richard"}
 				u.SignInResponse = &models.User{
 					Token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dnZWRJbkFzIjoiYWRtaW4iLCJpYXQiOjE0MjI3Nzk2Mzh9.gzSraSYS8EXBxLN_oWnFSRgCzcmJmMjLiuyu5CSpyHI",
 				}

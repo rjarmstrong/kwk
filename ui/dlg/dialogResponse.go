@@ -1,7 +1,7 @@
 package dlg
 
 // Dialogue Response carries the users input back to the calling code.
-type DialogueResponse struct {
+type DialogResponse struct {
 	Ok    bool
 	Value interface{}
 }

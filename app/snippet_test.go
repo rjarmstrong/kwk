@@ -21,7 +21,7 @@ func Test_Snippet(t *testing.T) {
 		a := app.Snippets.(*snippets.ServiceMock)
 		r := app.Runner.(*cmd.RunnerMock)
 		s := app.System.(*system.SystemMock)
-		d := app.Dialogue.(*dlg.DialogueMock)
+		d := app.Dialogue.(*dlg.DialogMock)
 		t := app.Settings.(*config.SettingsMock)
 		w := app.TemplateWriter.(*tmpl.WriterMock)
 		h := app.Search.(*search.TermMock)
@@ -46,10 +46,10 @@ func Test_Snippet(t *testing.T) {
 					{FullKey: fullKey2},
 				}
 				t.GetHydrateWith = &models.User{Username: "rjarmstrong"}
-				d.MultiChoiceResponse = &dlg.DialogueResponse{Value: &a.ReturnItemsForGet[0]}
+				d.MultiChoiceResponse = &dlg.DialogResponse{Value: a.ReturnItemsForGet[0]}
 				app.App.Run([]string{"[app]", "hola", "arg1", "arg2"})
 				So(a.GetCalledWith, should.Resemble, &models.KwkKey{Username: "rjarmstrong", FullKey: "hola"})
-				So(d.MultiChoiceCalledWith, should.Resemble, []interface{}{"snippet:choose", "Choose the snippet you want to run:", a.ReturnItemsForGet})
+				So(d.MultiChoiceCalledWith, should.Resemble, []interface{}{"snippet:choose", "Multiple matches. Choose a snippet to run:", a.ReturnItemsForGet})
 				a.ReturnItemsForGet = nil
 			})
 			Convey(`Should suggest if not found`, func() {
@@ -147,7 +147,7 @@ func Test_Snippet(t *testing.T) {
 				So(p2.Name, should.Equal, p.Name)
 			})
 			Convey(`Should prompt to delete and then confirm deleted`, func() {
-				d.ReturnItem = &dlg.DialogueResponse{Ok: true}
+				d.ReturnItem = &dlg.DialogResponse{Ok: true}
 				app.App.Run([]string{"[app]", "delete", "arrows.js"})
 				So(a.DeleteCalledWith, should.Equal, "arrows.js")
 				So(d.LastModalCalledWith[0].(string), should.Resemble, "snippet:delete")
@@ -155,7 +155,7 @@ func Test_Snippet(t *testing.T) {
 				d.ReturnItem = nil
 			})
 			Convey(`Should prompt to delete and then confirm not deleted`, func() {
-				d.ReturnItem = &dlg.DialogueResponse{Ok: false}
+				d.ReturnItem = &dlg.DialogResponse{Ok: false}
 				app.App.Run([]string{"[app]", "delete", "arrows.js"})
 				So(d.CallHistory[0].([]interface{})[0], should.Resemble, "snippet:delete")
 				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:notdeleted", data})
@@ -227,7 +227,7 @@ func Test_Snippet(t *testing.T) {
 			})
 			Convey(`Should call edit and respond with template`, func() {
 				a.ReturnItemsForGet = []models.Snippet{{FullKey: "arrows.js"}}
-				d.MultiChoiceResponse = &dlg.DialogueResponse{Value: a.ReturnItemsForGet[0]}
+				d.MultiChoiceResponse = &dlg.DialogResponse{Value: a.ReturnItemsForGet[0]}
 				app.App.Run([]string{"[app]", "edit", "arrows.js"})
 				So(r.EditCalledWith, should.Resemble, &a.ReturnItemsForGet[0])
 				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:edited", &a.ReturnItemsForGet[0]})

@@ -19,13 +19,13 @@ type KwkApp struct {
 	Settings       config.Settings
 	AccountManage  account.Manager
 	Runner         cmd.Runner
-	Dialogue       dlg.Dialogue
+	Dialogue       dlg.Dialog
 	TemplateWriter tmpl.Writer
 	Search         search.Term
 }
 
 func New(a snippets.Service, s system.ISystem, t config.Settings, r cmd.Runner, u account.Manager,
-	d dlg.Dialogue, w tmpl.Writer, h search.Term) *KwkApp {
+	d dlg.Dialog, w tmpl.Writer, h search.Term) *KwkApp {
 
 	app := cli.NewApp()
 	//cli.HelpPrinter = system.Help

@@ -1,46 +1,43 @@
 package dlg
 
 import (
-	"bufio"
-	"fmt"
-	"github.com/siddontang/go/num"
-	"reflect"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
+	"github.com/siddontang/go/num"
 	"github.com/howeyc/gopass"
+	"reflect"
+	"bufio"
 )
 
-func New(w tmpl.Writer, reader *bufio.Reader) *StdDialogue {
-	return &StdDialogue{writer: w, reader: reader}
+func New(w tmpl.Writer, reader *bufio.Reader) *StdDialog {
+	return &StdDialog{writer: w, reader: reader}
 }
 
 // StdDialogue is the default dialogue type.
-type StdDialogue struct {
+type StdDialog struct {
 	writer tmpl.Writer
 	reader *bufio.Reader
 }
 
-func (d *StdDialogue) Modal(templateName string, data interface{}) *DialogueResponse {
+func (d *StdDialog) Modal(templateName string, data interface{}) *DialogResponse {
 	d.writer.Render(templateName, data)
 	yesNo, _, _ := d.reader.ReadRune()
-	return &DialogueResponse{
+	return &DialogResponse{
 		Ok: string(yesNo) == "y",
 	}
 }
 
-func (d *StdDialogue) MultiChoice(templateName string, header interface{}, options interface{}) *DialogueResponse {
+func (d *StdDialog) MultiChoice(templateName string, header interface{}, options interface{}) *DialogResponse {
 	d.writer.Render("dialog:header", header)
 	o := InterfaceSlice(options)
 	d.writer.Render(templateName, options)
-	fmt.Println()
 	value, _, _ := d.reader.ReadLine()
-	// upper and lower contraints
 	if i, err := num.ParseInt(string(value)); err != nil {
 		panic(err)
 	} else {
 		if i > len(o) {
 			d.MultiChoice(templateName, header, options)
 		}
-		return &DialogueResponse{
+		return &DialogResponse{
 			Value: o[i-1],
 		}
 	}
@@ -60,7 +57,7 @@ func InterfaceSlice(slice interface{}) []interface{} {
 	return ret
 }
 
-func (d *StdDialogue) FormField(templateName string, data interface{}, mask bool) *DialogueResponse {
+func (d *StdDialog) FormField(templateName string, data interface{}, mask bool) *DialogResponse {
 	d.writer.Render(templateName, data)
 	var value []byte
 	var err error
@@ -73,7 +70,7 @@ func (d *StdDialogue) FormField(templateName string, data interface{}, mask bool
 		panic(err.Error())
 	}
 	//d.reader.Reset(nil)
-	return &DialogueResponse{
+	return &DialogResponse{
 		Value: string(value),
 	}
 }

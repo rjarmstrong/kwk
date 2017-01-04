@@ -10,11 +10,11 @@ import (
 type SearchCli struct {
 	service search.Term
 	tmpl.Writer
-	dlg.Dialogue
+	dlg.Dialog
 }
 
-func NewSearchCli(search search.Term, w tmpl.Writer, d dlg.Dialogue) *SearchCli {
-	return &SearchCli{service: search, Writer: w, Dialogue: d}
+func NewSearchCli(search search.Term, w tmpl.Writer, d dlg.Dialog) *SearchCli {
+	return &SearchCli{service: search, Writer: w, Dialog: d}
 }
 
 func (c *SearchCli) Search(args ...string) {

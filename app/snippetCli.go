@@ -1,10 +1,6 @@
 package app
 
 import (
-	"strconv"
-	"strings"
-	"time"
-
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/models"
@@ -13,6 +9,9 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/system"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
+	"strconv"
+	"strings"
+	"time"
 )
 
 type SnippetCli struct {
@@ -21,12 +20,12 @@ type SnippetCli struct {
 	runner   cmd.Runner
 	system   system.ISystem
 	settings config.Settings
-	dlg.Dialogue
+	dlg.Dialog
 	tmpl.Writer
 }
 
-func NewSnippetCli(a snippets.Service, r cmd.Runner, s system.ISystem, d dlg.Dialogue, w tmpl.Writer, t config.Settings, search search.Term) *SnippetCli {
-	return &SnippetCli{service: a, runner: r, system: s, Dialogue: d, Writer: w, settings: t, search: search}
+func NewSnippetCli(a snippets.Service, r cmd.Runner, s system.ISystem, d dlg.Dialog, w tmpl.Writer, t config.Settings, search search.Term) *SnippetCli {
+	return &SnippetCli{service: a, runner: r, system: s, Dialog: d, Writer: w, settings: t, search: search}
 }
 
 func (a *SnippetCli) Share(fullKey string, destination string) {
