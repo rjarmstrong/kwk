@@ -65,6 +65,7 @@ func init() {
 	add("account:signedin", "Welcome back {{.Username}}!\n", nil)
 	add("account:signedout", "And you're signed out.\n", nil)
 	add("account:profile", "You are: {{.Username}}!\n", nil)
+	add("dialog:header", "{{.| blue }}\n", template.FuncMap{"blue": formatBlue})
 
 	add("account:signup:email", "What's your email? ", nil)
 	add("account:signup:username", "Choose a great username: ", nil)
@@ -118,7 +119,7 @@ func listRuntimes(list []interface{}) string {
 func listAmbiguous(list []models.Snippet) string {
 	var options string
 	for i, v := range list {
-		options = options + fmt.Sprintf("%s %s   ", style.Colour(style.LightBlue, i+1), v.FullKey)
+		options = options + fmt.Sprintf("[%s] %s   ", style.Colour(style.LightBlue, i+1), v.FullKey)
 	}
 	return options
 	return "hola"

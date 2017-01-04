@@ -28,7 +28,7 @@ func (d *StdDialogue) Modal(templateName string, data interface{}) *DialogueResp
 }
 
 func (d *StdDialogue) MultiChoice(templateName string, header interface{}, options interface{}) *DialogueResponse {
-	fmt.Println(header)
+	d.writer.Render("dialog:header", header)
 	o := InterfaceSlice(options)
 	d.writer.Render(templateName, options)
 	fmt.Println()
