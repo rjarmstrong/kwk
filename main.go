@@ -19,9 +19,9 @@ var version string = "-"
 var build string = "-"
 
 func main() {
-	host := os.Getenv("KWK_HOST")
+	host := os.Getenv("API_HOST")
 	if host == "" {
-		host = "api.kwk.co:8000"
+		host = "api.kwk.co:443"
 	}
 	conn := rpc.GetConn(host)
 	defer conn.Close()
