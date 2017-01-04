@@ -8,7 +8,7 @@ func Accounts(a *AccountCli) []cli.Command {
 	c := []cli.Command{
 		{
 			Name:    "profile",
-			Aliases: []string{"me"},
+			Aliases: []string{"me", "whoami"},
 			Action: func(c *cli.Context) error {
 				a.Get()
 				return nil
