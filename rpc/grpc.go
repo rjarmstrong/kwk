@@ -64,10 +64,10 @@ func GetConn(serverAddress string) *grpc.ClientConn {
 		InsecureSkipVerify:trustCerts,
 		ClientSessionCache:tls.NewLRUClientSessionCache(-1),
 		PreferServerCipherSuites:false,
+		CipherSuites:[]uint16{tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305, tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305},
 		DynamicRecordSizingDisabled:false,
 		MinVersion:tls.VersionTLS12,
 		SessionTicketsDisabled:false,
-
 	})
 	opts = append(opts, grpc.WithTransportCredentials(creds))
 
