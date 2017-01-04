@@ -32,7 +32,6 @@ func init() {
 
 	add("snippet:ambiguouscat", "That snippet is ambiguous please run it again with the extension:\n{{range .Items}}{{.FullKey}}\n{{ end }}", nil)
 	add("snippet:list", "{{. | listSnippets }}", template.FuncMap{"listSnippets": listSnippets })
-	add("snippet:choose", "{{. | listAmbiguous }}\n", template.FuncMap{"listAmbiguous": listAmbiguous })
 	add("snippet:chooseruntime", "{{. | listRuntimes}}", template.FuncMap{"listRuntimes": listRuntimes})
 	add("snippet:tag", "{{.FullKey}} tagged.", nil)
 	add("snippet:untag", "{{.FullKey}} untagged.", nil)
@@ -66,6 +65,7 @@ func init() {
 	add("account:signedout", "And you're signed out.\n", nil)
 	add("account:profile", "You are: {{.Username}}!\n", nil)
 	add("dialog:header", "{{.| blue }}\n", template.FuncMap{"blue": formatBlue})
+	add("dialog:choose", "{{. | multiChoice }}\n", template.FuncMap{"multiChoice": multiChoice })
 
 	add("account:signup:email", "What's your email? ", nil)
 	add("account:signup:username", "Choose a great username: ", nil)
@@ -76,7 +76,8 @@ func init() {
 	add("search:alphaSuggest", "\n\033[7m Suggestions: \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Key | blue }}.{{ .Extension | subdued }}\n{{end}}\n", template.FuncMap{"blue": formatBlue, "subdued": formatSubdued})
 
 	// General
-	add("error", "{{. | printError }}\n", template.FuncMap{"printError": printError})
+	add("error", "{{. | printError | yellow }}\n", template.FuncMap{"printError": printError, "yellow" : formatYellow})
+
 }
 
 func printError(err error) string {
@@ -116,7 +117,7 @@ func listRuntimes(list []interface{}) string {
 	return options
 }
 
-func listAmbiguous(list []models.Snippet) string {
+func multiChoice(list []models.Snippet) string {
 	var options string
 	for i, v := range list {
 		options = options + fmt.Sprintf("[%s] %s   ", style.Colour(style.LightBlue, i+1), v.FullKey)
@@ -234,6 +235,10 @@ func formatSubdued(text string) string {
 
 func formatBlue(text string) string {
 	return style.Colour(style.LightBlue, text)
+}
+
+func formatYellow(text string) string {
+	return style.Colour(style.Yellow, text)
 }
 
 /*

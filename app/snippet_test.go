@@ -49,7 +49,7 @@ func Test_Snippet(t *testing.T) {
 				d.MultiChoiceResponse = &dlg.DialogResponse{Value: a.ReturnItemsForGet[0]}
 				app.App.Run([]string{"[app]", "hola", "arg1", "arg2"})
 				So(a.GetCalledWith, should.Resemble, &models.KwkKey{Username: "rjarmstrong", FullKey: "hola"})
-				So(d.MultiChoiceCalledWith, should.Resemble, []interface{}{"snippet:choose", "Multiple matches. Choose a snippet to run:", a.ReturnItemsForGet})
+				So(d.MultiChoiceCalledWith, should.Resemble, []interface{}{"dialog:choose", "Multiple matches. Choose a snippet to run:", a.ReturnItemsForGet})
 				a.ReturnItemsForGet = nil
 			})
 			Convey(`Should suggest if not found`, func() {

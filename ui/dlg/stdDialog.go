@@ -30,16 +30,13 @@ func (d *StdDialog) MultiChoice(templateName string, header interface{}, options
 	d.writer.Render("dialog:header", header)
 	o := InterfaceSlice(options)
 	d.writer.Render(templateName, options)
-	value, _, _ := d.reader.ReadLine()
-	if i, err := num.ParseInt(string(value)); err != nil {
-		panic(err)
-	} else {
-		if i > len(o) {
-			d.MultiChoice(templateName, header, options)
-		}
-		return &DialogResponse{
-			Value: o[i-1],
-		}
+	input, _, _ := d.reader.ReadLine()
+	i, err := num.ParseInt(string(input))
+	if i > len(o)  || err != nil {
+		return d.MultiChoice(templateName, "Please choose a number.", options)
+	}
+	return &DialogResponse{
+		Value: o[i - 1],
 	}
 }
 

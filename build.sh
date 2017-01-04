@@ -10,6 +10,7 @@ ARCH=amd64
 
 # TESTING
 go test ./app
+go test ./ui/dlg
 
 # PREP OUTPUT
 releasePath=/builds/${KWK_VERSION}

@@ -236,7 +236,7 @@ func (a *SnippetCli) handleMultiResponse(fullKey string, list *models.SnippetLis
 	if list.Total == 1 {
 		return &list.Items[0]
 	} else if list.Total > 1 {
-		r := a.MultiChoice("snippet:choose", "Multiple matches. Choose a snippet to run:", list.Items)
+		r := a.MultiChoice("dialog:choose", "Multiple matches. Choose a snippet to run:", list.Items)
 		s := r.Value.(models.Snippet)
 		return &s
 	} else {
