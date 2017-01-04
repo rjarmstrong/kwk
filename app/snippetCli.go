@@ -1,18 +1,18 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/models"
-	"bitbucket.com/sharingmachine/kwkcli/snippets"
+	"strconv"
+	"strings"
+	"time"
+
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
-	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/config"
+	"bitbucket.com/sharingmachine/kwkcli/models"
+	"bitbucket.com/sharingmachine/kwkcli/search"
+	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/system"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
-	"strings"
-	"strconv"
-	"time"
-	"fmt"
 )
 
 type SnippetCli struct {
@@ -237,7 +237,6 @@ func (a *SnippetCli) handleMultiResponse(fullKey string, list *models.SnippetLis
 	if list.Total == 1 {
 		return &list.Items[0]
 	} else if list.Total > 1 {
-		fmt.Println(list.Items)
 		r := a.MultiChoice("snippet:choose", "Choose the snippet you want to run:", list.Items)
 		s := r.Value.(*models.Snippet)
 		return s

@@ -26,7 +26,7 @@ func Test_Snippet(t *testing.T) {
 		w := app.TemplateWriter.(*tmpl.WriterMock)
 		h := app.Search.(*search.TermMock)
 
-		Convey(`Command not found`, func() {
+		Convey(`Snippet Running`, func() {
 			Convey(`Should call 'run' and open if found`, func() {
 				fullKey := "hola.sh"
 				a.ReturnItemsForGet = []models.Snippet{
@@ -70,8 +70,8 @@ func Test_Snippet(t *testing.T) {
 			})
 		})
 
-		Convey(`New`, func() {
-			Convey(`Should run by name`, func() {
+		Convey(`New/Create/Save`, func() {
+			Convey(`Create and Save should be equivalent`, func() {
 				p := app.App.Command("new")
 				So(p, should.NotBeNil)
 				p2 := app.App.Command("create")
@@ -164,7 +164,7 @@ func Test_Snippet(t *testing.T) {
 		})
 
 		Convey(`Cat`, func() {
-			Convey(`Should run by name`, func() {
+			Convey(`Should test equivalent cmd names`, func() {
 				p := app.App.Command("cat")
 				So(p, should.NotBeNil)
 				p2 := app.App.Command("raw")
@@ -183,6 +183,7 @@ func Test_Snippet(t *testing.T) {
 				app.App.Run([]string{"[app]", "cat", "arrows.js"})
 				So(a.GetCalledWith, should.Resemble, &models.KwkKey{FullKey: "arrows.js"})
 				So(w.RenderCalledWith[0].(string), should.Resemble, "snippet:cat")
+				So(w.RenderCalledWith[1].(models.Snippet).FullKey, should.Resemble, "arrows.js")
 			})
 		})
 

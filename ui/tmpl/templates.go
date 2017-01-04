@@ -26,7 +26,7 @@ func init() {
 	add("snippet:cloned", "Cloned as {{.Username}}/{{.FullKey | blue}}\n", template.FuncMap{"blue": formatBlue})
 	add("snippet:new", "{{.FullKey}} created "+style.OpenLock+"\n", nil)
 	add("snippet:newprivate", "{{.FullKey}} created "+style.Lock+"\n", nil)
-	add("snippet:cat", "{{.Uri}}", nil)
+	add("snippet:cat", "{{.Snip | blue}}", template.FuncMap{"blue": formatBlue})
 	add("snippet:edited", "Successfully updated {{ .FullKey | blue }}", template.FuncMap{"blue": formatBlue})
 	add("snippet:editing", "{{ \"Editing file in default editor.\" | blue }}\nPlease save and close to continue. Or Ctrl+C to abort.\n", template.FuncMap{"blue": formatBlue})
 
