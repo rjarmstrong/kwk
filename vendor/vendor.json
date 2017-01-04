@@ -69,6 +69,12 @@
 			"revisionTime": "2016-10-31T10:43:57Z"
 		},
 		{
+			"checksumSHA1": "lJDwzzEBuS9sjxVOSsq7+rvw+cA=",
+			"path": "github.com/howeyc/gopass",
+			"revision": "f5387c492211eb133053880d23dfae62aa14123d",
+			"revisionTime": "2016-10-03T13:09:00Z"
+		},
+		{
 			"checksumSHA1": "L6/CjN/3IdKLxfaBGRPTJ7e62bg=",
 			"path": "github.com/jtolds/gls",
 			"revision": "bb0351aa7eb6f322f32667d51375f26a2bca6628",

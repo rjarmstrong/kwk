@@ -6,6 +6,7 @@ import (
 	"github.com/siddontang/go/num"
 	"reflect"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
+	"github.com/howeyc/gopass"
 )
 
 func New(w tmpl.Writer, reader *bufio.Reader) *StdDialogue {
@@ -59,9 +60,15 @@ func InterfaceSlice(slice interface{}) []interface{} {
 	return ret
 }
 
-func (d *StdDialogue) FormField(templateName string, data interface{}) *DialogueResponse {
+func (d *StdDialogue) FormField(templateName string, data interface{}, mask bool) *DialogueResponse {
 	d.writer.Render(templateName, data)
-	value, _, err := d.reader.ReadLine()
+	var value []byte
+	var err error
+	if mask {
+		value, err = gopass.GetPasswdMasked()
+	} else {
+		value, _, err = d.reader.ReadLine()
+	}
 	if err != nil {
 		panic(err.Error())
 	}
