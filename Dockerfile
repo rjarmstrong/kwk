@@ -1,4 +1,4 @@
-FROM golang:1.7.4
+FROM golang:1.8beta2
 
 RUN apt-get update; apt-get install tree -y; apt-get install zip -y
 
