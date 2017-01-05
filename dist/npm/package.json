@@ -7,7 +7,7 @@
     "kwkcli": "bin/kwk"
   },
   "os": [
-    "darwin", "linux", "win64"
+    "darwin", "linux", "win32"
   ],
   "cpu": [
     "x64"
