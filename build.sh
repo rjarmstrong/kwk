@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -ef -o pipefail
-KWK_VERSION=v1.0.18
+KWK_VERSION=v1.0.19
 BUILD_NUMBER=$1
 
 echo "**** kwk-cli build ${KWK_VERSION}+${BUILD_NUMBER} *****"
