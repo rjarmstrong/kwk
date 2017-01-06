@@ -3,6 +3,11 @@ package tmpl
 type WriterMock struct {
 	RenderCalledWith []interface{}
 	RenderCallCount int
+	RenderErrCalledWith error
+}
+
+func (t *WriterMock) HandleErr(error error) {
+	t.RenderErrCalledWith = error
 }
 
 func (t *WriterMock) Render(templateName string, data interface{}) {

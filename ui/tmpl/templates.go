@@ -7,9 +7,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	_ "github.com/olekukonko/tablewriter"
 	"bitbucket.com/sharingmachine/kwkcli/ui/style"
-	"google.golang.org/grpc"
 	"text/template"
-	"encoding/json"
 	"strings"
 	"bytes"
 	"fmt"
@@ -19,26 +17,26 @@ var Templates = map[string]*template.Template{}
 
 func init() {
 	// Aliases
-	add("snippet:delete", "Are you sure you want to delete {{.FullKey}}? [y/n] ", nil)
-	add("snippet:deleted", "{{.FullKey}} deleted.", nil)
-	add("snippet:updated", "Description updated:\n{{ .Description | blue }}", template.FuncMap{"blue": formatBlue})
-	add("snippet:notfound", "Snippet: {{.FullKey}} not found\n", nil)
-	add("snippet:cloned", "Cloned as {{.Username}}/{{.FullKey | blue}}\n", template.FuncMap{"blue": formatBlue})
-	add("snippet:new", "{{.FullKey}} created "+style.OpenLock+"\n", nil)
-	add("snippet:newprivate", "{{.FullKey}} created "+style.Lock+"\n", nil)
-	add("snippet:cat", "{{.Snip | blue}}", template.FuncMap{"blue": formatBlue})
-	add("snippet:edited", "Successfully updated {{ .FullKey | blue }}", template.FuncMap{"blue": formatBlue})
-	add("snippet:editing", "{{ \"Editing file in default editor.\" | blue }}\nPlease save and close to continue. Or Ctrl+C to abort.\n", template.FuncMap{"blue": formatBlue})
+	add("snippet:delete", "Are you sure you want to delete {{.FullKey | yellow }}? [y/n] ", template.FuncMap{"yellow": yellow})
+	add("snippet:deleted", "{{.FullKey | blue }} deleted.", template.FuncMap{"blue": blue})
+	add("snippet:updated", "Description updated:\n{{ .Description | blue }}", template.FuncMap{"blue": blue})
+	add("snippet:notfound", "Snippet: {{.FullKey | blue }} not found\n", template.FuncMap{"blue": blue})
+	add("snippet:cloned", "Cloned as {{.Username}}/{{.FullKey | blue}}\n", template.FuncMap{"blue": blue})
+	add("snippet:new", "{{.FullKey | blue }} created "+style.OpenLock+"\n", template.FuncMap{"blue": blue})
+	add("snippet:newprivate", "{{.FullKey | blue }} created "+style.Lock+"\n", template.FuncMap{"blue": blue})
+	add("snippet:cat", "{{.Snip | blue}}", template.FuncMap{"blue": blue})
+	add("snippet:edited", "Successfully updated {{ .FullKey | blue }}", template.FuncMap{"blue": blue})
+	add("snippet:editing", "{{ \"Editing file in default editor.\" | blue }}\nPlease save and close to continue. Or Ctrl+C to abort.\n", template.FuncMap{"blue": blue})
 
-	add("snippet:ambiguouscat", "That snippet is ambiguous please run it again with the extension:\n{{range .Items}}{{.FullKey}}\n{{ end }}", nil)
+	add("snippet:ambiguouscat", "That snippet is ambiguous please run it again with the extension:\n{{range .Items}}{{.FullKey | blue }}\n{{ end }}", template.FuncMap{"blue": blue})
 	add("snippet:list", "{{. | listSnippets }}", template.FuncMap{"listSnippets": listSnippets })
 	add("snippet:chooseruntime", "{{. | listRuntimes}}", template.FuncMap{"listRuntimes": listRuntimes})
-	add("snippet:tag", "{{.FullKey}} tagged.", nil)
-	add("snippet:untag", "{{.FullKey}} untagged.", nil)
-	add("snippet:renamed", "{{.fullKey}} renamed to {{.newFullKey}}", nil)
-	add("snippet:madeprivate", "{{.fullKey | blue }} made private "+style.Lock, template.FuncMap{"blue": formatBlue})
-	add("snippet:patched", "{{.FullKey}} patched.", nil)
-	add("snippet:notdeleted", "{{.FullKey}} was pardoned.", nil)
+	add("snippet:tag", "{{.FullKey | blue }} tagged.", template.FuncMap{"blue": blue})
+	add("snippet:untag", "{{.FullKey | blue }} untagged.", template.FuncMap{"blue": blue})
+	add("snippet:renamed", "{{.fullKey | blue }} renamed to {{.newFullKey | blue }}", template.FuncMap{"blue": blue})
+	add("snippet:madeprivate", "{{.fullKey | blue }} made private "+style.Lock, template.FuncMap{"blue": blue})
+	add("snippet:patched", "{{.FullKey | blue }} patched.", template.FuncMap{"blue": blue})
+	add("snippet:notdeleted", "{{.FullKey | blue }} was pardoned.", template.FuncMap{"blue": blue})
 	add("snippet:inspect",
 		"\n{{range .Items}}"+
 			"Name: {{.Username}}/{{.FullKey}}"+
@@ -54,50 +52,34 @@ func init() {
 
 	// System
 	add("system:upgraded", "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n   Successfully upgraded!  \n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", nil)
-	add("system:version", "kwk {{.version}}'\n", nil)
-
+	add("system:version", "kwk {{.version}}'\n",  template.FuncMap{"blue": blue})
 	// Account
-	add("account:signedup", "Welcome to kwk {{.Username}}! You're signed in already.\n", nil)
-	add("account:notloggedin", "You are not logged in please log in: kwk login <username> <password>\n", nil)
-	add("account:usernamefield", "Your Kwk Username: ", nil)
-	add("account:passwordfield", "Your Password: ", nil)
-	add("account:signedin", "Welcome back {{.Username}}!\n", nil)
-	add("account:signedout", "And you're signed out.\n", nil)
-	add("account:profile", "You are: {{.Username}}!\n", nil)
-	add("dialog:header", "{{.| blue }}\n", template.FuncMap{"blue": formatBlue})
-	add("dialog:choose", "{{. | multiChoice }}\n", template.FuncMap{"multiChoice": multiChoice })
+	add("account:signedup", "Welcome to kwk {{.Username}}! You're signed in already.\n", template.FuncMap{"blue": blue})
+	addColor("account:usernamefield", "Your Kwk Username: ", blue)
+	addColor("account:passwordfield", "Your Password: ", blue)
+	add("account:signedin", "Welcome back {{.Username | blue }}!\n", template.FuncMap{"blue": blue})
+	addColor("account:signedout", "And you're signed out.\n", blue)
+	add("account:profile", "You are: {{.Username | blue}}!\n", template.FuncMap{"blue": blue})
 
-	add("account:signup:email", "What's your email? ", nil)
-	add("account:signup:username", "Choose a great username: ", nil)
-	add("account:signup:password", "And enter a password (1 num, 1 cap, 8 chars): ", nil)
+	add("dialog:choose", "{{. | multiChoice }}\n", template.FuncMap{"multiChoice": multiChoice})
+	add("dialog:header", "{{.| blue }}\n", template.FuncMap{"blue": blue})
 
-	add("search:alpha", "\n\033[7m  \"{{ .Term }}\" found in {{ .Total }} results in {{ .Took }} ms  \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Key | blue }}.{{ .Extension | subdued }}\n{{ . | formatSearchResult}}\n{{end}}", template.FuncMap{"formatSearchResult": alphaSearchResult, "blue": formatBlue, "subdued": formatSubdued})
+	addColor("account:signup:email", "What's your email? ", blue)
+	addColor("account:signup:username", "Choose a great username: ", blue)
+	addColor("account:signup:password", "And enter a password (1 num, 1 cap, 8 chars): ", blue)
 
-	add("search:alphaSuggest", "\n\033[7m Suggestions: \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Key | blue }}.{{ .Extension | subdued }}\n{{end}}\n", template.FuncMap{"blue": formatBlue, "subdued": formatSubdued})
+	add("search:alpha", "\n\033[7m  \"{{ .Term }}\" found in {{ .Total }} results in {{ .Took }} ms  \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Key | blue }}.{{ .Extension | subdued }}\n{{ . | formatSearchResult}}\n{{end}}", template.FuncMap{"formatSearchResult": alphaSearchResult, "blue": blue, "subdued": subdued})
+	add("search:alphaSuggest", "\n\033[7m Suggestions: \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Key | blue }}.{{ .Extension | subdued }}\n{{end}}\n", template.FuncMap{"blue": blue, "subdued": subdued})
 
-	// General
-	add("error", "{{. | printError | yellow }}\n", template.FuncMap{"printError": printError, "yellow" : formatYellow})
+	// errors
+	add("validation:title", "{{. | yellow }}\n", template.FuncMap{"yellow" : yellow})
+	add("validation:multi-line", " - {{. | yellow }}\n", template.FuncMap{"yellow" : yellow})
+	add("validation:one-line", "/!\\ {{. | yellow }}\n", template.FuncMap{"yellow" : yellow})
 
-}
-
-func printError(err error) string {
-	e := new(models.Error)
-	eString := strings.Replace(grpc.ErrorDesc(err), "\nError: ", "", -1)
-	errBytes := []byte(eString)
-	if e2 := json.Unmarshal(errBytes, e); e2 != nil {
-		if eString == "Forbidden" {
-			return render("account:notloggedin", nil)
-		} else {
-			return eString
-		}
-	}
-	return e.Message
-}
-
-func render(name string, value interface{}) string {
-	buf := new(bytes.Buffer)
-	Templates[name].Execute(buf, value)
-	return strings.Replace(buf.String(), "\n", "", -1)
+	add("api:not-authenticated", "{{ \"Please login to continue: kwk login\" | yellow }}\n", template.FuncMap{"yellow" : yellow})
+	add("error", "{{. | yellow }}\n", template.FuncMap{"yellow" : yellow})
+	add("api:not-available", "{{ \"kwk is down, please try again in a bit.\" | yellow }}\n", template.FuncMap{"yellow" : yellow})
+	add("api:exists", "{{ \"That item already exists.\" | yellow }}\n", template.FuncMap{"yellow" : yellow})
 }
 
 func add(name string, templateText string, funcMap template.FuncMap) {
@@ -106,6 +88,10 @@ func add(name string, templateText string, funcMap template.FuncMap) {
 		t.Funcs(funcMap)
 	}
 	Templates[name] = template.Must(t.Parse(templateText))
+}
+
+func addColor(name string, text string, color ColorFunc){
+	add(name, fmt.Sprintf("{{ %q | color }}", text), template.FuncMap{"color": color})
 }
 
 func listRuntimes(list []interface{}) string {
@@ -159,7 +145,7 @@ func listSnippets(list *models.SnippetList) string {
 			snip = style.Colour(style.Subdued, `<private>`)
 		} else {
 			name = style.Colour(style.LightBlue, v.Key) + style.Colour(style.Subdued, "."+v.Extension)
-			snip = fmt.Sprintf("%s", formatUri(v.Snip))
+			snip = fmt.Sprintf("%s", uri(v.Snip))
 		}
 
 		tbl.Append([]string{
@@ -180,20 +166,6 @@ func listSnippets(list *models.SnippetList) string {
 	fmt.Fprint(buf, "\n\n")
 
 	return buf.String()
-}
-
-func formatUri(uri string) string {
-	uri = strings.Replace(uri, "https://", "", 1)
-	uri = strings.Replace(uri, "http://", "", 1)
-	uri = strings.Replace(uri, "www.", "", 1)
-	uri = strings.Replace(uri, "\n", " ", -1)
-	if len(uri) >= 40 {
-		uri = uri[0:10] + style.Colour(style.Subdued, "...") + uri[len(uri)-30:]
-	}
-	if uri == "" {
-		uri = "<empty>"
-	}
-	return uri
 }
 
 func alphaSearchResult(result models.SearchResult) string {
@@ -229,97 +201,30 @@ type SearchResultLine struct {
 	Line string
 }
 
-func formatSubdued(text string) string {
-	return style.Colour(style.Subdued, text)
-}
+type ColorFunc func (text string) string
 
-func formatBlue(text string) string {
+func blue(text string) string {
 	return style.Colour(style.LightBlue, text)
 }
 
-func formatYellow(text string) string {
+func yellow(text string) string {
 	return style.Colour(style.Yellow, text)
 }
 
-/*
-`	snippet:notdeleted
-	messages := []string{"without a scratch", "uninjured", "intact", "unaffected", "unharmed",
-			"unscathed", "out of danger", "safe and sound", "unblemished", "alive and well"}
-		rnd := time.Now().Nanosecond() % (len(messages) - 1)
-		fmt.Printf("'%s' is %s.\n", fullKey, messages[rnd])
-	`,
-	account:profile
-	fmt.Println("~~~~~~ Your Profile ~~~~~~~~~")
-		fmt.Println(gui.Build(2, gui.Space) + gui.Build(11, "~") + gui.Build(2, gui.Space))
-		fmt.Println(gui.Build(6, gui.Space) + gui.Build(3, gui.UBlock) + gui.Build(6, gui.Space))
-		fmt.Println(gui.Build(5, gui.Space) + gui.Build(5, gui.UBlock) + gui.Build(5, gui.Space))
-		fmt.Println(gui.Build(6, gui.Space) + gui.Build(3, gui.UBlock) + gui.Build(6, gui.Space))
-		fmt.Println(gui.Build(3, gui.Space) + gui.Build(9, gui.UBlock) + gui.Build(3, gui.Space))
-		fmt.Println(gui.Build(3, gui.Space) + gui.Build(9, gui.UBlock) + gui.Build(3, gui.Space))
-		fmt.Println(gui.Build(3, gui.Space) + gui.Build(9, gui.UBlock) + gui.Build(3, gui.Space))
-		fmt.Println(gui.Build(2, gui.Space) + gui.Build(11, "~") + gui.Build(2, gui.Space))
+func subdued(text string) string {
+	return style.Colour(style.Subdued, text)
+}
 
-		fmt.Printf("Email:      %v\n", u.Email)
-		fmt.Printf("Username:   %v\n", u.Username)
-		fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-
-
-		"github.com/olekukonko/tablewriter"
-	"strings"
-	"github.com/dustin/go-humanize"
-		snippet:list
-		fmt.Print(gui.Colour(gui.LightBlue, "\nkwk.co/" + "rjarmstrong/"))
-			fmt.Printf(gui.Build(102, " ") + "%d of %d records\n\n", len(list.Items), list.Total)
-
-			tbl := tablewriter.NewWriter(os.Stdout)
-			tbl.SetHeader([]string{"Snippet", "Version", "URI", "Tags", ""})
-			tbl.SetAutoWrapText(false)
-			tbl.SetBorder(false)
-			tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
-			tbl.SetCenterSeparator("")
-			tbl.SetColumnSeparator("")
-			tbl.SetAutoFormatHeaders(false)
-			tbl.SetHeaderLine(true)
-			tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
-
-			for _, v := range list.Items {
-				v.Uri = strings.Replace(v.Uri, "https://", "", 1)
-				v.Uri = strings.Replace(v.Uri, "http://", "", 1)
-				v.Uri = strings.Replace(v.Uri, "www.", "", 1)
-				v.Uri = strings.Replace(v.Uri, "\n", " ", -1)
-				if len(v.Uri) >= 40 {
-					v.Uri = v.Uri[0:10] + gui.Colour(gui.Subdued, "...") + v.Uri[len(v.Uri) - 30:len(v.Uri)]
-				}
-
-				var tags = []string{}
-				for _, v := range v.Tags {
-					if v == "error" {
-						tags = append(tags, gui.Colour(gui.Pink, v))
-					} else {
-						tags = append(tags, v)
-					}
-
-				}
-
-				tbl.Append([]string{
-					gui.Colour(gui.LightBlue, v.Key) + gui.Colour(gui.Subdued, "." + v.Extension),
-					fmt.Sprintf("%d", v.Version),
-					fmt.Sprintf("%s", v.Uri),
-					strings.Join(tags, ", "),
-					humanize.Time(v.Created),
-				})
-
-			}
-			tbl.Render()
-
-			if len(list.Items) == 0 {
-				fmt.Println(gui.Colour(gui.Yellow, "No records on this page! Use a lower page number.\n"))
-			} else {
-				//gui.Colour(gui.Subdued, nextcmd)
-				//nextcmd := fmt.Sprintf("For next page run: kwk list %v", 2)
-			}
-			if list.Size != 0 {
-				fmt.Printf("\n %d of %d pages", list.Page, (list.Total / list.Size) + 1)
-			}
-			fmt.Print("\n\n")
-*/
+func uri(text string) string {
+	text = strings.Replace(text, "https://", "", 1)
+	text = strings.Replace(text, "http://", "", 1)
+	text = strings.Replace(text, "www.", "", 1)
+	text = strings.Replace(text, "\n", " ", -1)
+	if len(text) >= 40 {
+		text = text[0:10] + style.Colour(style.Subdued, "...") + text[len(text)-30:]
+	}
+	if text == "" {
+		text = "<empty>"
+	}
+	return text
+}

@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"path"
 	"runtime"
+	"log"
 )
 
 const (
@@ -24,6 +25,15 @@ func New() ISystem {
 }
 
 type System struct {
+}
+
+func NewLogger() (*os.File, *log.Logger) {
+	f, err := os.OpenFile(path.Join(GetCachePath(), "kwk.log"), os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
+	if err != nil {
+		panic(err)
+	}
+	logger := log.New(f, "> ", log.LstdFlags)
+	return f, logger
 }
 
 func (s *System) ExecSafe(name string, arg ...string) io.ReadCloser {
@@ -91,12 +101,12 @@ func (s *System) Delete(directoryName string, fullKey string) error {
 }
 
 func (s *System) GetDirPath(directoryName string) (string, error) {
-	dir := path.Join(s.GetCachePath(), directoryName)
+	dir := path.Join(GetCachePath(), directoryName)
 	err := s.UpsertDirectory(dir)
 	return dir, err
 }
 
-func (s *System) GetCachePath() string {
+func GetCachePath() string {
 	p := ""
 	u := os.Getenv("USER")
 	if runtime.GOOS == "windows" {

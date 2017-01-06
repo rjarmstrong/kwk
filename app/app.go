@@ -10,6 +10,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
 	"gopkg.in/urfave/cli.v1"
+	"bitbucket.com/sharingmachine/kwkcli/rpc"
 )
 
 type KwkApp struct {
@@ -22,10 +23,11 @@ type KwkApp struct {
 	Dialogue       dlg.Dialog
 	TemplateWriter tmpl.Writer
 	Search         search.Term
+	Api 		rpc.Sys
 }
 
 func New(a snippets.Service, s system.ISystem, t config.Settings, r cmd.Runner, u account.Manager,
-	d dlg.Dialog, w tmpl.Writer, h search.Term) *KwkApp {
+	d dlg.Dialog, w tmpl.Writer, h search.Term, api rpc.Sys) *KwkApp {
 
 	app := cli.NewApp()
 	//cli.HelpPrinter = system.Help
@@ -33,7 +35,7 @@ func New(a snippets.Service, s system.ISystem, t config.Settings, r cmd.Runner, 
 	accCli := NewAccountCli(u, t, w, d)
 	app.Commands = append(app.Commands, Accounts(accCli)...)
 
-	sysCli := NewSystemCli(s, u, w)
+	sysCli := NewSystemCli(s, api, u, w)
 	app.Commands = append(app.Commands, System(sysCli)...)
 
 	snipCli := NewSnippetCli(a, r, s, d, w, t, h)
@@ -54,6 +56,7 @@ func New(a snippets.Service, s system.ISystem, t config.Settings, r cmd.Runner, 
 		Snippets: a,
 		TemplateWriter: w,
 		Search:h,
+		Api:api,
 	}
 }
 

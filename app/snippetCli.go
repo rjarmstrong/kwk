@@ -31,7 +31,7 @@ func NewSnippetCli(a snippets.Service, r cmd.Runner, s system.ISystem, d dlg.Dia
 func (a *SnippetCli) Share(fullKey string, destination string) {
 	k := a.getKwkKey(fullKey)
 	if list, err := a.service.Get(k); err != nil {
-		a.Render("error", err)
+		a.HandleErr(err)
 	} else {
 		if alias := a.handleMultiResponse(fullKey, list); alias != nil {
 			gmail := &models.Snippet{Runtime: "url", Extension: "url"}
@@ -46,14 +46,13 @@ func (a *SnippetCli) Share(fullKey string, destination string) {
 func (a *SnippetCli) Run(fullKey string, args []string) {
 	k := a.getKwkKey(fullKey)
 	if list, err := a.service.Get(k); err != nil {
-		a.Render("error", err)
-
+		a.HandleErr(err)
 	} else {
 		if alias := a.handleMultiResponse(fullKey, list); alias != nil {
 			a.runner.Run(alias, args)
 		} else {
 			if res, err := a.search.Execute(fullKey); err != nil {
-				a.Render("error", err)
+				a.HandleErr(err)
 			} else if res.Total > 0 {
 				a.Render("search:alphaSuggest", res)
 				return
@@ -65,7 +64,7 @@ func (a *SnippetCli) Run(fullKey string, args []string) {
 
 func (a *SnippetCli) New(uri string, fullKey string) {
 	if createAlias, err := a.service.Create(uri, fullKey); err != nil {
-		a.Render("error", err)
+		a.HandleErr(err)
 	} else {
 		if createAlias.Snippet != nil {
 			if createAlias.Snippet.Private {
@@ -94,12 +93,12 @@ func (a *SnippetCli) New(uri string, fullKey string) {
 
 func (a *SnippetCli) Edit(fullKey string) {
 	if list, err := a.service.Get(a.getKwkKey(fullKey)); err != nil {
-		a.Render("error", err)
+		a.HandleErr(err)
 	} else {
 		if alias := a.handleMultiResponse(fullKey, list); alias != nil {
 			a.Render("snippet:editing", alias)
 			if err := a.runner.Edit(alias); err != nil {
-				a.Render("error", err)
+				a.HandleErr(err)
 			} else {
 				a.Render("snippet:edited", alias)
 			}
@@ -111,7 +110,7 @@ func (a *SnippetCli) Edit(fullKey string) {
 
 func (a *SnippetCli) Describe(fullKey string, description string) {
 	if alias, err := a.service.Update(fullKey, description); err != nil {
-		a.Render("error", err)
+		a.HandleErr(err)
 	} else {
 		a.Render("snippet:updated", alias)
 	}
@@ -119,7 +118,7 @@ func (a *SnippetCli) Describe(fullKey string, description string) {
 
 func (a *SnippetCli) Inspect(fullKey string) {
 	if list, err := a.service.Get(a.getKwkKey(fullKey)); err != nil {
-		a.Render("error", err)
+		a.HandleErr(err)
 	} else {
 		a.Render("snippet:inspect", list)
 	}
@@ -129,7 +128,7 @@ func (a *SnippetCli) Delete(fullKey string) {
 	alias := &models.Snippet{FullKey: fullKey}
 	if r := a.Modal("snippet:delete", alias); r.Ok {
 		if err := a.service.Delete(fullKey); err != nil {
-			a.Render("error", err)
+			a.HandleErr(err)
 		}
 		a.Render("snippet:deleted", alias)
 	} else {
@@ -139,7 +138,7 @@ func (a *SnippetCli) Delete(fullKey string) {
 
 func (a *SnippetCli) Cat(fullKey string) {
 	if list, err := a.service.Get(a.getKwkKey(fullKey)); err != nil {
-		a.Render("error", err)
+		a.HandleErr(err)
 	} else {
 		if len(list.Items) == 0 {
 			a.Render("snippet:notfound", &models.Snippet{FullKey: fullKey})
@@ -153,7 +152,7 @@ func (a *SnippetCli) Cat(fullKey string) {
 
 func (a *SnippetCli) Patch(fullKey string, target string, patch string) {
 	if alias, err := a.service.Patch(fullKey, target, patch); err != nil {
-		a.Render("error", err)
+		a.HandleErr(err)
 	} else {
 		a.Render("snippet:patched", alias)
 	}
@@ -161,7 +160,7 @@ func (a *SnippetCli) Patch(fullKey string, target string, patch string) {
 
 func (a *SnippetCli) Clone(fullKey string, newFullKey string) {
 	if alias, err := a.service.Clone(a.getKwkKey(fullKey), newFullKey); err != nil {
-		a.Render("error", err)
+		a.HandleErr(err)
 	} else {
 		a.Render("snippet:cloned", alias)
 	}
@@ -169,7 +168,7 @@ func (a *SnippetCli) Clone(fullKey string, newFullKey string) {
 
 func (a *SnippetCli) Rename(fullKey string, newKey string) {
 	if alias, originalFullKey, err := a.service.Rename(fullKey, newKey); err != nil {
-		a.Render("error", err)
+		a.HandleErr(err)
 	} else {
 		if alias.Private {
 			a.Render("snippet:madeprivate", &map[string]string{
@@ -186,7 +185,7 @@ func (a *SnippetCli) Rename(fullKey string, newKey string) {
 
 func (a *SnippetCli) Tag(fullKey string, tags ...string) {
 	if alias, err := a.service.Tag(fullKey, tags...); err != nil {
-		a.Render("error", err)
+		a.HandleErr(err)
 	} else {
 		a.Render("snippet:tag", alias)
 	}
@@ -194,7 +193,7 @@ func (a *SnippetCli) Tag(fullKey string, tags ...string) {
 
 func (a *SnippetCli) UnTag(fullKey string, tags ...string) {
 	if alias, err := a.service.UnTag(fullKey, tags...); err != nil {
-		a.Render("error", err)
+		a.HandleErr(err)
 	} else {
 		a.Render("snippet:untag", alias)
 	}
@@ -225,7 +224,7 @@ func (a *SnippetCli) List(args ...string) {
 		}
 	}
 	if list, err := a.service.List(username, size, int64(time.Now().Unix()*1000), tags...); err != nil {
-		a.Render("error", err)
+		a.HandleErr(err)
 	} else {
 		list.Username = username
 		a.Render("snippet:list", list)

@@ -19,11 +19,14 @@ var version string = "-"
 var build string = "-"
 
 func main() {
+	f, l := system.NewLogger()
+	defer f.Close()
+
 	host := os.Getenv("API_HOST")
 	if host == "" {
 		host = "api.kwk.co:443"
 	}
-	conn := rpc.GetConn(host)
+	conn := rpc.GetConn(host, l)
 	defer conn.Close()
 
 	s := system.New()
@@ -36,8 +39,9 @@ func main() {
 	r := bufio.NewReader(os.Stdin)
 	d := dlg.New(w, r)
 	ch := search.NewAlphaTerm(conn, t, h)
+	api := rpc.New(conn, h)
 
-	kwkApp := app.New(a, s, t, o, u, d, w, ch)
+	kwkApp := app.New(a, s, t, o, u, d, w, ch, api)
 	kwkApp.App.Version = version + "+" + build
 	kwkApp.App.Run(os.Args)
 }

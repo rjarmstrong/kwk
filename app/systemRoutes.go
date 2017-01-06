@@ -21,6 +21,22 @@ func System(s *SystemCli) []cli.Command {
 				return nil
 			},
 		},
+		{
+			Name:    "apperr",
+			Aliases: []string{},
+			Action: func(c *cli.Context) error {
+				s.TestAppErr()
+				return nil
+			},
+		},
+		{
+			Name:    "transerr",
+			Aliases: []string{},
+			Action: func(c *cli.Context) error {
+				s.TestTransErr()
+				return nil
+			},
+		},
 	}
 	return c
 }

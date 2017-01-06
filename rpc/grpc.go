@@ -3,14 +3,16 @@ package rpc
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/config"
-	"fmt"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/credentials"
 	"crypto/tls"
-	"os"
 	"crypto/x509"
+	"google.golang.org/grpc/grpclog"
+	"os"
+	"fmt"
+	"log"
 )
 
 // /etc/ssl/certs/COMODO_RSA_Certification_Authority.pem
@@ -49,7 +51,7 @@ QOhTsiedSrnAdyGN/4fy3ryM7xfft0kL0fJuMAsaDk527RH89elWsn2/x20Kk4yl
 NVOFBkpdn627G190
 -----END CERTIFICATE-----`
 
-func GetConn(serverAddress string) *grpc.ClientConn {
+func GetConn(serverAddress string, logger *log.Logger) *grpc.ClientConn {
 	var opts []grpc.DialOption
 
 	var trustCerts = false
@@ -60,16 +62,18 @@ func GetConn(serverAddress string) *grpc.ClientConn {
 	pool := x509.NewCertPool()
 	pool.AppendCertsFromPEM([]byte(cert))
 	creds := credentials.NewTLS(&tls.Config{
-		RootCAs:pool,
-		InsecureSkipVerify:trustCerts,
-		ClientSessionCache:tls.NewLRUClientSessionCache(-1),
-		PreferServerCipherSuites:false,
-		CipherSuites:[]uint16{tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305, tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305},
+		RootCAs:                    pool,
+		InsecureSkipVerify:         trustCerts,
+		ClientSessionCache:         tls.NewLRUClientSessionCache(-1),
+		PreferServerCipherSuites:   false,
+		CipherSuites:               []uint16{tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305, tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305},
 		DynamicRecordSizingDisabled:false,
-		MinVersion:tls.VersionTLS12,
-		SessionTicketsDisabled:false,
+		MinVersion:                 tls.VersionTLS12,
+		SessionTicketsDisabled:     false,
 	})
 	opts = append(opts, grpc.WithTransportCredentials(creds))
+	opts = append(opts, grpc.WithUnaryInterceptor(errorInterceptor))
+	grpclog.SetLogger(logger)
 
 	conn, err := grpc.Dial(serverAddress, opts...)
 	if err != nil {
@@ -77,6 +81,8 @@ func GetConn(serverAddress string) *grpc.ClientConn {
 	}
 	return conn
 }
+
+//
 
 func NewHeaders(t config.Settings) *Headers {
 	return &Headers{settings: t}
@@ -99,27 +105,10 @@ func (i *Headers) GetContext() context.Context {
 	}
 }
 
-/*
-func handleResponse(path string, i interface{}, r *http.Response) {
-	switch {
-	case r.StatusCode == http.StatusBadRequest :
-		if i != nil {
-			system.PrettyPrint(i)
-		} else {
-			fmt.Println(r.StatusCode)
-		}
-	case r.StatusCode == http.StatusForbidden :
-		fmt.Println("Sign in please: 'kwk signin <username> <password>'")
-	case r.StatusCode == http.StatusNotFound :
-		fmt.Println(path + " not found.")
-	case r.StatusCode != http.StatusOK :
-		fmt.Println(r)
-		fmt.Println(r.StatusCode)
+func errorInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+	err := invoker(ctx, method, req, reply, cc, opts...)
+	if err != nil {
+		return models.ParseGrpcErr(err)
 	}
+	return nil
 }
-
-if e != nil {
-		fmt.Print("kwk server is unavailable, please try again later or tweet us @kwklinks.")
-		return
-	}
-*/

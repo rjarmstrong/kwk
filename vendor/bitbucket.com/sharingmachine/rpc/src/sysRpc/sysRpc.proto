@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.kwk.service.search";
+option java_outer_classname = "SearchRpc";
+
+package sysRpc;
+
+service SysRpc {
+    rpc GetApiInfo (InfoRequest) returns (InfoResponse) {}
+    rpc TestTransportError (ErrorRequest) returns (ErrorResponse) {}
+    rpc TestAppError (ErrorRequest) returns (ErrorResponse) {}
+}
+
+message InfoRequest {
+    string clientVersion = 1;
+}
+
+message InfoResponse {
+    string version = 1;
+    string build = 2;
+    string clientSupported = 3;
+    string dc = 4;
+}
+
+message ErrorRequest {
+}
+
+message ErrorResponse {
+}
