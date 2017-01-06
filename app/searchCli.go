@@ -20,7 +20,7 @@ func NewSearchCli(search search.Term, w tmpl.Writer, d dlg.Dialog) *SearchCli {
 func (c *SearchCli) Search(args ...string) {
 	term := strings.Join(args, " ")
 	if res, err := c.service.Execute(term); err != nil {
-		c.Render("error", err)
+		c.HandleErr(err)
 	} else {
 		res.Term = term
 		c.Render("search:alpha", res)

@@ -54,7 +54,7 @@ func init() {
 	add("system:upgraded", "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n   Successfully upgraded!  \n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", nil)
 	add("system:version", "kwk {{.version}}'\n",  template.FuncMap{"blue": blue})
 	// Account
-	add("account:signedup", "Welcome to kwk {{.Username}}! You're signed in already.\n", template.FuncMap{"blue": blue})
+	add("account:signedup", "Welcome to kwk {{.Username | blue }}\n! You're signed in already.\n", template.FuncMap{"blue": blue})
 	addColor("account:usernamefield", "Your Kwk Username: ", blue)
 	addColor("account:passwordfield", "Your Password: ", blue)
 	add("account:signedin", "Welcome back {{.Username | blue }}!\n", template.FuncMap{"blue": blue})
@@ -73,12 +73,12 @@ func init() {
 
 	// errors
 	add("validation:title", "{{. | yellow }}\n", template.FuncMap{"yellow" : yellow})
-	add("validation:multi-line", " - {{. | yellow }}\n", template.FuncMap{"yellow" : yellow})
-	add("validation:one-line", "/!\\ {{. | yellow }}\n", template.FuncMap{"yellow" : yellow})
+	add("validation:multi-line", " - {{ .Desc | yellow }}\n", template.FuncMap{"yellow" : yellow})
+	add("validation:one-line", fmt.Sprintf("{{ %q | yellow }}  ", style.Warning) + "{{ .Desc | yellow }}\n", template.FuncMap{"yellow" : yellow})
 
 	add("api:not-authenticated", "{{ \"Please login to continue: kwk login\" | yellow }}\n", template.FuncMap{"yellow" : yellow})
-	add("error", "{{. | yellow }}\n", template.FuncMap{"yellow" : yellow})
-	add("api:not-available", "{{ \"kwk is down, please try again in a bit.\" | yellow }}\n", template.FuncMap{"yellow" : yellow})
+	addColor("api:error", style.Fire + "  We have a code RED error. \n- To report type: kwk upload-errors \n- You can also try to upgrade: npm update kwkcli -g\n", red)
+	addColor("api:not-available", style.Ambulance + "  Kwk is DOWN! Please try again in a bit.\n", yellow)
 	add("api:exists", "{{ \"That item already exists.\" | yellow }}\n", template.FuncMap{"yellow" : yellow})
 }
 
@@ -209,6 +209,10 @@ func blue(text string) string {
 
 func yellow(text string) string {
 	return style.Colour(style.Yellow, text)
+}
+
+func red(text string) string {
+	return style.Colour(style.Red, text)
 }
 
 func subdued(text string) string {

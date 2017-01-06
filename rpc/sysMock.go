@@ -10,7 +10,7 @@ func (*SysMock) GetApiInfo() (*models.InfoResponse, error) {
 	panic("implement me")
 }
 
-func (*SysMock) TestAppError() (error) {
+func (*SysMock) TestAppError(bool) (error) {
 	panic("implement me")
 }
 

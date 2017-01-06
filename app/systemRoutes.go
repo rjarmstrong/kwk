@@ -25,7 +25,7 @@ func System(s *SystemCli) []cli.Command {
 			Name:    "apperr",
 			Aliases: []string{},
 			Action: func(c *cli.Context) error {
-				s.TestAppErr()
+				s.TestAppErr(c.Args().First() == "multi")
 				return nil
 			},
 		},

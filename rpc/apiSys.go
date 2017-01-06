@@ -26,8 +26,10 @@ func (s *ApiSys) GetApiInfo() (*models.InfoResponse, error) {
 	}
 }
 
-func (s *ApiSys) TestAppError() (error) {
-	if _, err := s.client.TestAppError(s.headers.GetContext(), &sysRpc.ErrorRequest{}); err != nil {
+func (s *ApiSys) TestAppError(multi bool) (error) {
+	request := &sysRpc.ErrorRequest{}
+	request.Multi = multi
+	if _, err := s.client.TestAppError(s.headers.GetContext(), request); err != nil {
 		return err
 	} else {
 		return nil

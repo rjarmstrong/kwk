@@ -42,16 +42,15 @@ func ParseGrpcErr(e error) error {
 
 type ClientErr struct {
 	TransportCode codes.Code
-	Messages      []Msg
+	Msgs          []Msg
 	Title         string
 }
 
 func (e ClientErr) Error() string {
-	return fmt.Sprintf("%d %s\n%v+", e.TransportCode, e.Title, e.Messages)
+	return fmt.Sprintf("%d %s\n%v+", e.TransportCode, e.Title, e.Msgs)
 }
 
 type Msg struct {
 	Code   Code
 	Desc   string
-	Target string
 }

@@ -20,7 +20,7 @@ func NewSystemCli(s system.ISystem, r rpc.Sys, u account.Manager, w tmpl.Writer)
 
 func (c *SystemCli) Upgrade() {
 	if err := c.service.Upgrade(); err != nil {
-		c.Render("error", err)
+		c.HandleErr(err)
 	} else {
 		c.Render("system:upgraded", nil)
 	}
@@ -35,8 +35,8 @@ func (c *SystemCli) GetVersion() {
 	}
 }
 
-func (c *SystemCli) TestAppErr() {
-	c.HandleErr(c.rpc.TestAppError())
+func (c *SystemCli) TestAppErr(multi bool) {
+	c.HandleErr(c.rpc.TestAppError(multi))
 }
 
 func (c *SystemCli) TestTransErr() {

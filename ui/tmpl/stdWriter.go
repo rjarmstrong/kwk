@@ -36,7 +36,7 @@ func (w *StdWriter) HandleErr(err error) {
 	}
 	switch e.TransportCode {
 	case codes.InvalidArgument:
-		for _, v := range e.Messages {
+		for _, v := range e.Msgs {
 			if o := getDescOverride(v.Code); o != "" {
 				v.Desc = o
 			}
@@ -44,10 +44,13 @@ func (w *StdWriter) HandleErr(err error) {
 		if e.Title != "" {
 			w.Render("validation:title", e.Title)
 		}
-		if len(e.Messages) > 1 {
-			w.Render("validation:multi-line", e.Messages)
-		} else if len(e.Messages) == 1 {
-			w.Render("validation:one-line", e.Messages[0])
+		if len(e.Msgs) > 1 {
+			for _, v := range e.Msgs {
+				w.Render("validation:multi-line", v)
+			}
+
+		} else if len(e.Msgs) == 1 {
+			w.Render("validation:one-line", e.Msgs[0])
 		} else {
 			panic(e)
 		}

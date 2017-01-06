@@ -35,7 +35,7 @@ func (c *AccountCli) SignUp() {
 	password := c.FormField("account:signup:password", nil, true).Value.(string)
 
 	if u, err := c.service.SignUp(email, username, password); err != nil {
-		c.Render("error", err)
+		c.HandleErr(err)
 	} else {
 		if len(u.Token) > 50 {
 			c.settings.Upsert(models.ProfileFullKey, u)
@@ -52,7 +52,7 @@ func (c *AccountCli) SignIn(username string, password string) {
 		password = c.FormField("account:passwordfield", nil, true).Value.(string)
 	}
 	if u, err := c.service.SignIn(username, password); err != nil {
-		c.Render("error", err)
+		c.HandleErr(err)
 	} else {
 		if len(u.Token) > 50 {
 			c.settings.Upsert(models.ProfileFullKey, u)
@@ -63,7 +63,7 @@ func (c *AccountCli) SignIn(username string, password string) {
 
 func (c *AccountCli) SignOut() {
 	if err := c.service.Signout(); err != nil {
-		c.Render("error", err)
+		c.HandleErr(err)
 		return
 	}
 	if err := c.settings.Delete(models.ProfileFullKey); err != nil {

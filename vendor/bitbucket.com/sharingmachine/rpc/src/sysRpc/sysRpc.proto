@@ -24,6 +24,7 @@ message InfoResponse {
 }
 
 message ErrorRequest {
+    bool multi = 1;
 }
 
 message ErrorResponse {
