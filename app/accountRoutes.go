@@ -16,7 +16,7 @@ func Accounts(a *AccountCli) []cli.Command {
 		},
 		{
 			Name:    "signin",
-			Aliases: []string{"login"},
+			Aliases: []string{"login", "switch", "cd"},
 			Action: func(c *cli.Context) error {
 				a.SignIn(c.Args().Get(0), c.Args().Get(1))
 				return nil
