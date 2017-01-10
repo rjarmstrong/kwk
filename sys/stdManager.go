@@ -74,7 +74,7 @@ func (s *StdManager) UpsertDirectory(dir string) error {
 
 func (s *StdManager) WriteToFile(directoryName string, fullKey string, uri string) (string, error) {
 	dirPath, err := s.GetDirPath(directoryName)
-	filePath := path.Join(dirPath, sanitize.Name(fullKey))
+	filePath := path.Join(dirPath, fullKey, sanitize.Name(fullKey))
 	err = ioutil.WriteFile(filePath, []byte(uri), 0666)
 	return filePath, err
 }
