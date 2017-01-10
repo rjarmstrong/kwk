@@ -7,7 +7,7 @@ type SysMock struct {
 }
 
 func (*SysMock) GetApiInfo() (*models.InfoResponse, error) {
-	panic("implement me")
+	return &models.InfoResponse{}, nil
 }
 
 func (*SysMock) TestAppError(bool) (error) {

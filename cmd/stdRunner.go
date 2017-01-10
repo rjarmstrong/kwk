@@ -3,8 +3,8 @@ package cmd
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
-	"bitbucket.com/sharingmachine/kwkcli/system"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
+	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"os"
 	"time"
 	"fmt"
@@ -16,21 +16,21 @@ const (
 
 type StdRunner struct {
 	snippets snippets.Service
-	system   system.ISystem
+	system   sys.Manager
 	writer   tmpl.Writer
 }
 
-func NewStdRunner(system system.ISystem, snippets snippets.Service, w tmpl.Writer) *StdRunner {
-	return &StdRunner{snippets: snippets, system: system, writer: w}
+func NewStdRunner(s sys.Manager, ss snippets.Service, w tmpl.Writer) *StdRunner {
+	return &StdRunner{snippets: ss, system: s, writer: w}
 }
 
-func (o *StdRunner) Edit(alias *models.Snippet) error {
-	filePath, err := o.system.WriteToFile(filecache, alias.FullKey, alias.Snip)
+func (r *StdRunner) Edit(alias *models.Snippet) error {
+	filePath, err := r.system.WriteToFile(filecache, alias.FullName, alias.Snip)
 	if err != nil {
 		return err
 	}
 	fi, _ := os.Stat(filePath)
-	o.system.ExecSafe("open", filePath)
+	r.system.ExecSafe("open", filePath)
 	edited := false
 	for edited == false {
 		if fi2, _ := os.Stat(filePath); fi2.ModTime().UnixNano() > fi.ModTime().UnixNano() {
@@ -41,16 +41,16 @@ func (o *StdRunner) Edit(alias *models.Snippet) error {
 	}
 
 	closer := func() {
-		o.system.ExecSafe("osascript", "-e",
-			fmt.Sprintf("tell application %q to close (every window whose name is \"%s.%s\")", "XCode", alias.Key, alias.Extension))
-		o.system.ExecSafe("osascript", "-e", "tell application \"iTerm2\" to activate")
+		r.system.ExecSafe("osascript", "-e",
+			fmt.Sprintf("tell application %q to close (every window whose name is \"%s.%s\")", "XCode", alias.Name, alias.Extension))
+		r.system.ExecSafe("osascript", "-e", "tell application \"iTerm2\" to activate")
 	}
 
-	if text, err := o.system.ReadFromFile(filecache, alias.FullKey); err != nil {
+	if text, err := r.system.ReadFromFile(filecache, alias.FullName); err != nil {
 		closer()
 		return err
 	} else {
-		if alias, err = o.snippets.Patch(alias.FullKey, alias.Snip, text); err != nil {
+		if alias, err = r.snippets.Patch(alias.FullName, alias.Snip, text); err != nil {
 			closer()
 			return err
 		}
@@ -59,49 +59,49 @@ func (o *StdRunner) Edit(alias *models.Snippet) error {
 	}
 }
 
-func (o *StdRunner) Run(alias *models.Snippet, args []string) error {
+func (r *StdRunner) Run(alias *models.Snippet, args []string) error {
 	if len(args) > 0 {
 		if args[0] == "covert" {
-			o.OpenCovert(alias.Snip)
+			r.OpenCovert(alias.Snip)
 			return nil
 		}
 		if args[0] == "web" {
-			o.OpenWeb(alias)
+			r.OpenWeb(alias)
 			return nil
 		}
 	}
 
 	snippet := alias.Snip
 	if alias.Runtime == "url" {
-		o.system.ExecSafe("open", snippet)
+		r.system.ExecSafe("open", snippet)
 		return nil
 	}
 	if alias.Runtime == "bash" {
 		args = append([]string{snippet}, args...)
-		o.system.ExecSafe("/bin/bash", append([]string{"-c"}, args...)...)
+		r.system.ExecSafe("/bin/bash", append([]string{"-c"}, args...)...)
 		return nil
 	}
 	if alias.Runtime == "nodejs" {
 		args = append([]string{snippet}, args...)
 		// -r (require flag)
-		o.system.ExecSafe("node", append([]string{"-e"}, args...)...)
+		r.system.ExecSafe("node", append([]string{"-e"}, args...)...)
 		return nil
 	}
 	if alias.Runtime == "python" {
 		args = append([]string{snippet}, args...)
-		o.system.ExecSafe("python", append([]string{"-c"}, args...)...)
+		r.system.ExecSafe("python", append([]string{"-c"}, args...)...)
 		return nil
 	}
 	if alias.Runtime == "php" {
 		args = append([]string{snippet}, args...)
-		o.system.ExecSafe("php", append([]string{"-r"}, args...)...)
+		r.system.ExecSafe("php", append([]string{"-r"}, args...)...)
 		return nil
 	}
 	if alias.Runtime == "csharp" {
 		return nil
 	}
 	if alias.Runtime == "applescript" {
-		o.system.ExecSafe("osascript", append([]string{"-e"}, args...)...)
+		r.system.ExecSafe("osascript", append([]string{"-e"}, args...)...)
 	}
 	if alias.Runtime == "golang" {
 		// check if file exists
@@ -147,12 +147,12 @@ func (o *StdRunner) Run(alias *models.Snippet, args []string) error {
 	return nil
 }
 
-func (o *StdRunner) OpenWeb(alias *models.Snippet) {
-	o.system.ExecSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", fmt.Sprintf("http://aus.kwk.co/%s/%s", alias.Username, alias.FullKey))
-	o.system.ExecSafe("osascript", "-e", "activate application \"Google Chrome\"")
+func (r *StdRunner) OpenWeb(alias *models.Snippet) {
+	r.system.ExecSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", fmt.Sprintf("http://aus.kwk.co/%s/%s", alias.Username, alias.FullName))
+	r.system.ExecSafe("osascript", "-e", "activate application \"Google Chrome\"")
 }
 
-func (o *StdRunner) OpenCovert(snippet string) {
-	o.system.ExecSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--incognito", snippet)
-	o.system.ExecSafe("osascript", "-e", "activate application \"Google Chrome\"")
+func (r *StdRunner) OpenCovert(snippet string) {
+	r.system.ExecSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--incognito", snippet)
+	r.system.ExecSafe("osascript", "-e", "activate application \"Google Chrome\"")
 }

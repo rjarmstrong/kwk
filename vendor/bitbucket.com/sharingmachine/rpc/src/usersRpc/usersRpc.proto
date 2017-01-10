@@ -7,9 +7,9 @@ option java_outer_classname = "UsersRpc";
 package usersRpc;
 
 service UsersRpc {
-    rpc SignIn (SignInRequest) returns (UserResponse) {}
-    rpc SignUp (SignUpRequest) returns (UserResponse) {}
-    rpc List (ListRequest) returns(UserListResponse) {}
+    rpc SignIn (SignInRequest) returns (User) {}
+    rpc SignUp (SignUpRequest) returns (User) {}
+    rpc List (ListRequest) returns(ListResponse) {}
 }
 
 message SignUpRequest {
@@ -22,6 +22,7 @@ message SignInRequest {
     string username = 1;
     string password = 2;
     string email = 3;
+    string key = 4;
 }
 
 message ListRequest {
@@ -29,14 +30,14 @@ message ListRequest {
     int64 size = 2;
 }
 
-message UserListResponse {
-    repeated UserResponse items = 1;
+message ListResponse {
+    repeated User items = 1;
     int64 total = 2;
     int64 since = 3;
     int64 size = 4;
 }
 
-message UserResponse {
+message User {
     string id = 1;
     string username = 2;
     string email = 3;

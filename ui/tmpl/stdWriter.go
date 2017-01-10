@@ -36,17 +36,17 @@ func (w *StdWriter) HandleErr(err error) {
 	}
 	switch e.TransportCode {
 	case codes.InvalidArgument:
-		for _, v := range e.Msgs {
-			if o := getDescOverride(v.Code); o != "" {
-				v.Desc = o
-			}
-		}
 		if e.Title != "" {
 			w.Render("validation:title", e.Title)
 		}
+		for i, m := range e.Msgs {
+			if o := getDescOverride(m.Code); o != "" {
+				e.Msgs[i].Desc = o
+			}
+		}
 		if len(e.Msgs) > 1 {
-			for _, v := range e.Msgs {
-				w.Render("validation:multi-line", v)
+			for _, m := range e.Msgs {
+				w.Render("validation:multi-line", m)
 			}
 
 		} else if len(e.Msgs) == 1 {
@@ -73,6 +73,7 @@ func (w *StdWriter) HandleErr(err error) {
 }
 
 var overrides = map[models.Code]string{
+	models.Code_MultipleSnippetsFound: "Multiple snippets found with that name",
 	models.Code_InvalidPassword: "Password must have one upper, one lower and one numeric",
 	models.Code_InvalidUsername: "Username must be bl",
 	models.Code_EmailTaken:      "That email has been taken",

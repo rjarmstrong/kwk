@@ -7,44 +7,43 @@ const (
 	TokenHeaderName = "token"
 )
 
-type KwkKey struct {
+type Alias struct {
 	Username string `json:"username" schema:"username"`
 	FullKey  string `json:"fullKey" schema:"fullKey"`
 }
 
 type SnippetList struct {
-	Username string  `json:"username"`
-	Items    []Snippet `json:"items"`
-	Total    int64   `json:"total"`
+	Username string
+	Items    []Snippet
+	Total    int64
 	Since    time.Time
 	Size     int64
 }
 
 type Snippet struct {
-	Id string `json:"id"`
+	Id string
 
-	FullKey   string `json:"fullKey"`
-	Username  string `json:"username"`
-	Key       string `json:"key"`
-	Extension string `json:"extension"`
+	FullName  string
+	Username  string
+	Name      string
+	Extension string
 
-	Snip    string    `json:"uri"`
-	Version int64     `json:"version"`
-	Runtime string    `json:"runtime"`
-	Media   string    `json:"media"`
-	Tags    []string  `json:"tags"`
-	Created time.Time `json:"created"`
-	Updated time.Time `json:"updated"`
+	Snip    string
+	Version int64
+	Runtime string
+	Media   string
+	Tags    []string
+	Created time.Time
 
-	Description       string
-	ForkedFromFullKey string
-	ForkedFromVersion int64
-	Private           bool
-	CloneCount        int64
-	RunCount          int64
+	Description        string
+	ClonedFromFullName string
+	ClonedFromVersion  int64
+	Private            bool
+	CloneCount         int64
+	RunCount           int64
 }
 
-type CreateSnippet struct {
+type CreateSnippetRequest struct {
 	Snippet   *Snippet
 	TypeMatch *TypeMatch
 }
@@ -55,7 +54,5 @@ type TypeMatch struct {
 
 type Match struct {
 	Score     int64
-	Media     string
-	Runtime   string
 	Extension string
 }

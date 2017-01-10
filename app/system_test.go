@@ -1,17 +1,17 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/system"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"github.com/smartystreets/assertions/should"
 	. "github.com/smartystreets/goconvey/convey"
+	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"testing"
 )
 
 func Test_System(t *testing.T) {
 	Convey("SYSTEM CLI", t, func() {
 		app := CreateAppStub()
-		s := app.System.(*system.SystemMock)
+		s := app.System.(*sys.ManagerMock)
 		w := app.TemplateWriter.(*tmpl.WriterMock)
 
 		Convey(`Upgrade`, func() {
@@ -34,7 +34,8 @@ func Test_System(t *testing.T) {
 				app.App.Run([]string{"[app]", "version"})
 				So(s.VersionCalled, should.BeTrue)
 				So(w.RenderCalledWith, should.Resemble, []interface{}{"system:version", map[string]string{
-					"version": "0.0.1",
+					"apiVersion": "+",
+					"cliVersion": "0.0.1",
 				}})
 			})
 		})

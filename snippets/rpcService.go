@@ -4,34 +4,35 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
 	"bitbucket.com/sharingmachine/kwkcli/config"
-	"bitbucket.com/sharingmachine/rpc/src/aliasesRpc"
+	"bitbucket.com/sharingmachine/rpc/src/snipsRpc"
 	"google.golang.org/grpc"
 	"time"
+	"fmt"
 )
 
 type RpcService struct {
 	Settings config.Settings
-	client   aliasesRpc.AliasesRpcClient
+	client   snipsRpc.SnipsRpcClient
 	headers  *rpc.Headers
 }
 
 func New(conn *grpc.ClientConn, s config.Settings, h *rpc.Headers) Service {
-	return &RpcService{Settings: s, client: aliasesRpc.NewAliasesRpcClient(conn), headers: h}
+	return &RpcService{Settings: s, client: snipsRpc.NewSnipsRpcClient(conn), headers: h}
 }
 
 func (a *RpcService) Update(fullKey string, description string) (*models.Snippet, error) {
-	if r, err := a.client.Update(a.headers.GetContext(), &aliasesRpc.UpdateRequest{FullKey: fullKey, Description: description}); err != nil {
+	if r, err := a.client.Update(a.headers.GetContext(), &snipsRpc.UpdateRequest{FullName: fullKey, Description: description}); err != nil {
 		return nil, err
 	} else {
 		m := &models.Snippet{}
-		mapAlias(r.Alias, m)
+		mapSnip(r.Snip, m)
 		return m, nil
 	}
 }
 
 // since unix time in milliseconds
 func (a *RpcService) List(username string, size int64, since int64, tags ...string) (*models.SnippetList, error) {
-	if res, err := a.client.List(a.headers.GetContext(), &aliasesRpc.ListRequest{Username: username, Since: since, Size: size, Tags: tags}); err != nil {
+	if res, err := a.client.List(a.headers.GetContext(), &snipsRpc.ListRequest{Username: username, Since: since, Size: size, Tags: tags}); err != nil {
 		return nil, err
 	} else {
 		list := &models.SnippetList{}
@@ -40,8 +41,8 @@ func (a *RpcService) List(username string, size int64, since int64, tags ...stri
 	}
 }
 
-func (a *RpcService) Get(k *models.KwkKey) (*models.SnippetList, error) {
-	if res, err := a.client.Get(a.headers.GetContext(), &aliasesRpc.GetRequest{Username: k.Username, FullKey: k.FullKey}); err != nil {
+func (a *RpcService) Get(k *models.Alias) (*models.SnippetList, error) {
+	if res, err := a.client.Get(a.headers.GetContext(), &snipsRpc.GetRequest{Username: k.Username, FullName: k.FullKey}); err != nil {
 		return nil, err
 	} else {
 		list := &models.SnippetList{}
@@ -51,117 +52,115 @@ func (a *RpcService) Get(k *models.KwkKey) (*models.SnippetList, error) {
 }
 
 func (a *RpcService) Delete(fullKey string) error {
-	_, err := a.client.Delete(a.headers.GetContext(), &aliasesRpc.DeleteRequest{FullKey: fullKey})
+	_, err := a.client.Delete(a.headers.GetContext(), &snipsRpc.DeleteRequest{FullName: fullKey})
 	return err
 }
 
-func (a *RpcService) Create(uri string, path string) (*models.CreateSnippet, error) {
+func (a *RpcService) Create(snip string, path string) (*models.CreateSnippetRequest, error) {
 	// encrypt if requested
-	if res, err := a.client.Create(a.headers.GetContext(), &aliasesRpc.CreateRequest{Uri: uri, FullKey: path}); err != nil {
+	fmt.Println(snip, path)
+	if res, err := a.client.Create(a.headers.GetContext(), &snipsRpc.CreateRequest{Snip: snip, FullName: path}); err != nil {
 		return nil, err
 	} else {
-		createAlias := &models.CreateSnippet{}
-		if res.Alias != nil {
-			alias := &models.Snippet{}
-			mapAlias(res.Alias, alias)
-			createAlias.Snippet = alias
+		cs := &models.CreateSnippetRequest{}
+		if res.Snip != nil {
+			snip := &models.Snippet{}
+			mapSnip(res.Snip, snip)
+			cs.Snippet = snip
 		} else {
-			createAlias.TypeMatch = &models.TypeMatch{
+			cs.TypeMatch = &models.TypeMatch{
 				Matches: []models.Match{},
 			}
 			for _, v := range res.TypeMatch.Matches {
 				m := models.Match{
 					Extension: v.Extension,
-					Media:     v.Media,
-					Runtime:   v.Runtime,
 					Score:     v.Score,
 				}
-				createAlias.TypeMatch.Matches = append(createAlias.TypeMatch.Matches, m)
+				cs.TypeMatch.Matches = append(cs.TypeMatch.Matches, m)
 			}
 		}
-		return createAlias, nil
+		return cs, nil
 	}
 }
 
-func (a *RpcService) Rename(fullKey string, newFullKey string) (*models.Snippet, string, error) {
-	if res, err := a.client.Rename(a.headers.GetContext(), &aliasesRpc.RenameRequest{FullKey: fullKey, NewFullKey: newFullKey}); err != nil {
+func (a *RpcService) Rename(fullKey string, newFullName string) (*models.Snippet, string, error) {
+	if res, err := a.client.Rename(a.headers.GetContext(), &snipsRpc.RenameRequest{FullName: fullKey, NewFullName: newFullName}); err != nil {
 		return nil, "", err
 	} else {
-		alias := &models.Snippet{}
-		mapAlias(res.Alias, alias)
-		return alias, res.OriginalFullKey, nil
+		snip := &models.Snippet{}
+		mapSnip(res.Snip, snip)
+		return snip, res.OriginalFullName, nil
 	}
 }
 
 func (a *RpcService) Patch(fullKey string, target string, patch string) (*models.Snippet, error) {
-	if res, err := a.client.Patch(a.headers.GetContext(), &aliasesRpc.PatchRequest{FullKey: fullKey, Target: target, Patch: patch}); err != nil {
+	if res, err := a.client.Patch(a.headers.GetContext(), &snipsRpc.PatchRequest{FullName: fullKey, Target: target, Patch: patch}); err != nil {
 		return nil, err
 	} else {
-		alias := &models.Snippet{}
-		mapAlias(res.Alias, alias)
-		return alias, nil
+		snip := &models.Snippet{}
+		mapSnip(res.Snip, snip)
+		return snip, nil
 	}
 }
 
-func (a *RpcService) Clone(k *models.KwkKey, newFullKey string) (*models.Snippet, error) {
-	if res, err := a.client.Clone(a.headers.GetContext(), &aliasesRpc.CloneRequest{Username: k.Username, FullKey: k.FullKey, NewFullKey: newFullKey}); err != nil {
+func (a *RpcService) Clone(k *models.Alias, newFullName string) (*models.Snippet, error) {
+	if res, err := a.client.Clone(a.headers.GetContext(), &snipsRpc.CloneRequest{Username: k.Username, FullName: k.FullKey, NewFullName: newFullName}); err != nil {
 		return nil, err
 	} else {
-		alias := &models.Snippet{}
-		mapAlias(res.Alias, alias)
-		return alias, nil
+		snip := &models.Snippet{}
+		mapSnip(res.Snip, snip)
+		return snip, nil
 	}
 }
 
 func (a *RpcService) Tag(fullKey string, tags ...string) (*models.Snippet, error) {
-	if res, err := a.client.Tag(a.headers.GetContext(), &aliasesRpc.TagRequest{FullKey: fullKey, Tags: tags}); err != nil {
+	if res, err := a.client.Tag(a.headers.GetContext(), &snipsRpc.TagRequest{FullName: fullKey, Tags: tags}); err != nil {
 		return nil, err
 	} else {
-		alias := &models.Snippet{}
-		mapAlias(res.Alias, alias)
-		return alias, nil
+		snip := &models.Snippet{}
+		mapSnip(res.Snip, snip)
+		return snip, nil
 	}
 }
 
 func (a *RpcService) UnTag(fullKey string, tags ...string) (*models.Snippet, error) {
-	if res, err := a.client.UnTag(a.headers.GetContext(), &aliasesRpc.UnTagRequest{FullKey: fullKey, Tags: tags}); err != nil {
+	if res, err := a.client.UnTag(a.headers.GetContext(), &snipsRpc.UnTagRequest{FullName: fullKey, Tags: tags}); err != nil {
 		return nil, err
 	} else {
-		alias := &models.Snippet{}
-		mapAlias(res.Alias, alias)
-		return alias, nil
+		snip := &models.Snippet{}
+		mapSnip(res.Snip, snip)
+		return snip, nil
 	}
 }
 
-func mapAlias(rpc *aliasesRpc.AliasResponse, model *models.Snippet) {
+func mapSnip(rpc *snipsRpc.Snip, model *models.Snippet) {
 	model.Id = rpc.SnipId
-	model.FullKey = rpc.FullKey
+	model.FullName = rpc.FullName
 	model.Username = rpc.Username
-	model.Key = rpc.Key
+	model.Name = rpc.Name
 	model.Extension = rpc.Extension
 	// if encrypted, decrypt
 	// if checksum doesn't match then throw warning
 	// check that checksum signature is valid with public key.
 	model.Snip = rpc.Snip
 	model.Version = rpc.SnipVersion
-	model.Runtime = rpc.Runtime
 	model.Tags = rpc.Tags
 	model.Created = time.Unix(rpc.Created/1000, 0)
 	model.Description = rpc.Description
-	model.ForkedFromFullKey = rpc.ForkedFromFullKey
-	model.ForkedFromVersion = rpc.ForkedFromVersion
+	model.ClonedFromFullName = rpc.ClonedFromFullName
+	model.ClonedFromVersion = rpc.ClonedFromVersion
 	model.Private = rpc.Private
 	model.RunCount = rpc.RunCount
 	model.CloneCount = rpc.CloneCount
 }
 
-func mapSnippetList(rpc *aliasesRpc.AliasListResponse, model *models.SnippetList) {
+func mapSnippetList(rpc *snipsRpc.ListResponse, model *models.SnippetList) {
 	model.Total = rpc.Total
 	model.Since = time.Unix(rpc.Since/1000, 0)
 	model.Size = rpc.Size
 	for _, v := range rpc.Items {
 		item := &models.Snippet{}
-		mapAlias(v, item)
+		mapSnip(v, item)
 		model.Items = append(model.Items, *item)
 	}
 }

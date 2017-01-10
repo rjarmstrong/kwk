@@ -1,30 +1,31 @@
-package system
+package sys
 
 import (
-	"bytes"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"github.com/atotto/clipboard"
 	"github.com/kennygrant/sanitize"
-	"io"
+	"github.com/atotto/clipboard"
+	"encoding/json"
 	"io/ioutil"
-	"os"
-	"os/exec"
-	"path"
 	"runtime"
+	"os/exec"
+	"bytes"
+	"errors"
+	"path"
 	"log"
+	"fmt"
+	"io"
+	"os"
 )
 
 const (
 	APP_VERSION = "APP_VERSION"
 )
 
-func New() ISystem {
-	return &System{}
+func New() Manager {
+	return &StdManager{}
 }
 
-type System struct {
+// StdManager is the default sys.Manager
+type StdManager struct {
 }
 
 func NewLogger() (*os.File, *log.Logger) {
@@ -36,7 +37,7 @@ func NewLogger() (*os.File, *log.Logger) {
 	return f, logger
 }
 
-func (s *System) ExecSafe(name string, arg ...string) io.ReadCloser {
+func (s *StdManager) ExecSafe(name string, arg ...string) io.ReadCloser {
 	cmd := exec.Command(name, arg...)
 	cmd.Stdin = os.Stdin
 	out, _ := cmd.StdoutPipe()
@@ -57,7 +58,7 @@ func PrettyPrint(obj interface{}) {
 	fmt.Print("\n\n")
 }
 
-func (s *System) UpsertDirectory(dir string) error {
+func (s *StdManager) UpsertDirectory(dir string) error {
 	ok, err := s.Exists(dir)
 	if ok {
 		return nil
@@ -71,14 +72,14 @@ func (s *System) UpsertDirectory(dir string) error {
 	return nil
 }
 
-func (s *System) WriteToFile(directoryName string, fullKey string, uri string) (string, error) {
+func (s *StdManager) WriteToFile(directoryName string, fullKey string, uri string) (string, error) {
 	dirPath, err := s.GetDirPath(directoryName)
 	filePath := path.Join(dirPath, sanitize.Name(fullKey))
 	err = ioutil.WriteFile(filePath, []byte(uri), 0666)
 	return filePath, err
 }
 
-func (s *System) ReadFromFile(directoryName string, fullKey string) (string, error) {
+func (s *StdManager) ReadFromFile(directoryName string, fullKey string) (string, error) {
 	dirPath, err := s.GetDirPath(directoryName)
 	if err != nil {
 		return "", err
@@ -91,7 +92,7 @@ func (s *System) ReadFromFile(directoryName string, fullKey string) (string, err
 	return string(bts), err
 }
 
-func (s *System) Delete(directoryName string, fullKey string) error {
+func (s *StdManager) Delete(directoryName string, fullKey string) error {
 	dirPath, err := s.GetDirPath(directoryName)
 	if err != nil {
 		return err
@@ -100,7 +101,7 @@ func (s *System) Delete(directoryName string, fullKey string) error {
 	return os.RemoveAll(fp)
 }
 
-func (s *System) GetDirPath(directoryName string) (string, error) {
+func (s *StdManager) GetDirPath(directoryName string) (string, error) {
 	dir := path.Join(GetCachePath(), directoryName)
 	err := s.UpsertDirectory(dir)
 	return dir, err
@@ -126,7 +127,7 @@ func GetCachePath() string {
 	return p
 }
 
-func (s *System) Exists(path string) (bool, error) {
+func (s *StdManager) Exists(path string) (bool, error) {
 	if _, err := os.Stat(path); err != nil {
 		if os.IsNotExist(err) {
 			return false, nil
@@ -137,7 +138,7 @@ func (s *System) Exists(path string) (bool, error) {
 	return true, nil
 }
 
-func (s *System) GetVersion() (string, error) {
+func (s *StdManager) GetVersion() (string, error) {
 	if v := os.Getenv(APP_VERSION); v == "" {
 		return "", errors.New(APP_VERSION + " has not been set.")
 	} else {
@@ -145,7 +146,7 @@ func (s *System) GetVersion() (string, error) {
 	}
 }
 
-func (s *System) Upgrade() error {
+func (s *StdManager) Upgrade() error {
 	distributionUri := "/Volumes/development/go/src/bitbucket.com/sharingmachine/kwkcli/kwkcli"
 	installPath := "/usr/local/bin/kwk"
 	//download in future
@@ -155,7 +156,7 @@ func (s *System) Upgrade() error {
 // CopyFile copies a file from src to dst. If src and dst files exist, and are
 // the same, then return success. Otherise, attempt to create a hard link
 // between the two files. If that fail, copy the file contents from src to dst.
-func (s *System) CopyFile(src, dst string) (err error) {
+func (s *StdManager) CopyFile(src, dst string) (err error) {
 	sfi, err := os.Stat(src)
 	if err != nil {
 		return
@@ -212,6 +213,6 @@ func copyFileContents(src, dst string) (err error) {
 	return
 }
 
-func (s *System) CopyToClipboard(input string) error {
+func (s *StdManager) CopyToClipboard(input string) error {
 	return clipboard.WriteAll(input)
 }

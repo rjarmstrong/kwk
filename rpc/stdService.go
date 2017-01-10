@@ -7,26 +7,26 @@ import (
 	"google.golang.org/grpc"
 )
 
-type ApiSys struct {
+type stdService struct {
 	Settings config.Settings
 	client   sysRpc.SysRpcClient
 	headers  *Headers
 }
 
 
-func New(conn *grpc.ClientConn, h *Headers) *ApiSys {
-	return &ApiSys{client: sysRpc.NewSysRpcClient(conn), headers: h}
+func New(conn *grpc.ClientConn, h *Headers) *stdService {
+	return &stdService{client: sysRpc.NewSysRpcClient(conn), headers: h}
 }
 
-func (s *ApiSys) GetApiInfo() (*models.InfoResponse, error) {
-	if _, err := s.client.GetApiInfo(s.headers.GetContext(), &sysRpc.InfoRequest{}); err != nil {
+func (s *stdService) GetApiInfo() (*models.InfoResponse, error) {
+	if r, err := s.client.GetApiInfo(s.headers.GetContext(), &sysRpc.InfoRequest{}); err != nil {
 		return nil, err
 	} else {
-		return &models.InfoResponse{}, nil
+		return &models.InfoResponse{Build:r.Build, Version:r.Version, Revision: r.Revision}, nil
 	}
 }
 
-func (s *ApiSys) TestAppError(multi bool) (error) {
+func (s *stdService) TestAppError(multi bool) (error) {
 	request := &sysRpc.ErrorRequest{}
 	request.Multi = multi
 	if _, err := s.client.TestAppError(s.headers.GetContext(), request); err != nil {
@@ -36,7 +36,7 @@ func (s *ApiSys) TestAppError(multi bool) (error) {
 	}
 }
 
-func (s *ApiSys) TestTransportError() (error) {
+func (s *stdService) TestTransportError() (error) {
 	if _, err := s.client.TestTransportError(s.headers.GetContext(), &sysRpc.ErrorRequest{}); err != nil {
 		return err
 	} else {

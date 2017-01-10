@@ -1,25 +1,26 @@
 package main
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/app"
-	"bitbucket.com/sharingmachine/kwkcli/rpc"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
-	"bitbucket.com/sharingmachine/kwkcli/cmd"
 	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/config"
-	"bitbucket.com/sharingmachine/kwkcli/system"
 	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
+	"bitbucket.com/sharingmachine/kwkcli/app"
+	"bitbucket.com/sharingmachine/kwkcli/rpc"
+	"bitbucket.com/sharingmachine/kwkcli/cmd"
+	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bufio"
 	"os"
 )
 
 var version string = "-"
+
 var build string = "-"
 
 func main() {
-	f, l := system.NewLogger()
+	f, l := sys.NewLogger()
 	defer f.Close()
 
 	host := os.Getenv("API_HOST")
@@ -29,7 +30,7 @@ func main() {
 	conn := rpc.GetConn(host, l)
 	defer conn.Close()
 
-	s := system.New()
+	s := sys.New()
 	t := config.New(s, "settings")
 	h := rpc.NewHeaders(t)
 	u := account.NewStdManager(conn, t, h)

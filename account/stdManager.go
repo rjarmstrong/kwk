@@ -57,7 +57,7 @@ func (u *StdManager) Signout() error {
 	return nil
 }
 
-func mapUser(rpc *usersRpc.UserResponse, model *models.User) {
+func mapUser(rpc *usersRpc.User, model *models.User) {
 	model.Id = rpc.Id
 	model.Username = rpc.Username
 	model.Email = rpc.Email

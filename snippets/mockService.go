@@ -3,7 +3,7 @@ package snippets
 import "bitbucket.com/sharingmachine/kwkcli/models"
 
 type ServiceMock struct {
-	GetCalledWith     *models.KwkKey
+	GetCalledWith     *models.Alias
 	RenameCalledWith  []string
 	CreateCalledWith  []string
 	ReturnItemsForGet []models.Snippet
@@ -15,17 +15,17 @@ type ServiceMock struct {
 	ListCalledWith    []interface{}
 }
 
-func (a *ServiceMock) Get(k *models.KwkKey) (*models.SnippetList, error) {
+func (a *ServiceMock) Get(k *models.Alias) (*models.SnippetList, error) {
 	a.GetCalledWith = k
 	return &models.SnippetList{Items: a.ReturnItemsForGet, Total: int64(len(a.ReturnItemsForGet))}, nil
 }
 
-func (a *ServiceMock) Create(uri string, fullKey string) (*models.CreateSnippet, error) {
+func (a *ServiceMock) Create(uri string, fullKey string) (*models.CreateSnippetRequest, error) {
 	a.CreateCalledWith = []string{uri, fullKey}
 	if fullKey == "" {
 		fullKey = "x5hi23"
 	}
-	return &models.CreateSnippet{Snippet: &models.Snippet{FullKey: fullKey}}, nil
+	return &models.CreateSnippetRequest{Snippet: &models.Snippet{FullName: fullKey}}, nil
 }
 
 func (a *ServiceMock) Update(fullKey string, description string) (*models.Snippet, error) {
@@ -34,12 +34,12 @@ func (a *ServiceMock) Update(fullKey string, description string) (*models.Snippe
 
 func (a *ServiceMock) Rename(fullKey string, newFullKey string) (*models.Snippet, string, error) {
 	a.RenameCalledWith = []string{fullKey, newFullKey}
-	return &models.Snippet{FullKey: newFullKey}, fullKey, nil
+	return &models.Snippet{FullName: newFullKey}, fullKey, nil
 }
 
 func (a *ServiceMock) Patch(fullKey string, target string, patch string) (*models.Snippet, error) {
 	a.PatchCalledWith = []string{fullKey, target, patch}
-	return &models.Snippet{FullKey: fullKey, Snip: patch}, nil
+	return &models.Snippet{FullName: fullKey, Snip: patch}, nil
 }
 
 func (a *ServiceMock) Delete(fullKey string) error {
@@ -47,7 +47,7 @@ func (a *ServiceMock) Delete(fullKey string) error {
 	return nil
 }
 
-func (a *ServiceMock) Clone(k *models.KwkKey, newKey string) (*models.Snippet, error) {
+func (a *ServiceMock) Clone(k *models.Alias, newKey string) (*models.Snippet, error) {
 	a.CloneCalledWith = []interface{}{k, newKey}
 	return &models.Snippet{}, nil
 }

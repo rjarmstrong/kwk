@@ -1,17 +1,17 @@
 package config
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/system"
+	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"encoding/json"
 )
 
 type FileSettings struct {
 	DirectoryName string
-	System        system.ISystem
+	System        sys.Manager
 }
 
-func New(system system.ISystem, directoryName string) *FileSettings {
-	return &FileSettings{DirectoryName: directoryName, System: system}
+func New(s sys.Manager, directoryName string) *FileSettings {
+	return &FileSettings{DirectoryName: directoryName, System: s}
 }
 
 func (s *FileSettings) Upsert(key string, value interface{}) error {

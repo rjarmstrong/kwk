@@ -3,10 +3,10 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "KvDzdtsJASht+JDCxpcMQm8o73w=",
-			"path": "bitbucket.com/sharingmachine/rpc/src/aliasesRpc",
-			"revision": "e7cd2c54963b8335506639ac192bb1c116d8f68e",
-			"revisionTime": "2017-01-03T01:23:32Z"
+			"checksumSHA1": "d2s8938gFN5/NQLc+mwvZd/LfAs=",
+			"path": "bitbucket.com/sharingmachine/rpc/src/messageRpc",
+			"revision": "d6bcc3193fbee620c1cf1ffaf769229e05f30dc3",
+			"revisionTime": "2017-01-09T07:49:36Z"
 		},
 		{
 			"checksumSHA1": "3TIlhM8Q3r1UBm9mvVEvas325mk=",
@@ -15,16 +15,28 @@
 			"revisionTime": "2017-01-03T01:23:32Z"
 		},
 		{
-			"checksumSHA1": "o1D+mXBZNhxaGJgk2sN1WbIHoFk=",
-			"path": "bitbucket.com/sharingmachine/rpc/src/sysRpc",
-			"revision": "22dfd761bb82afa8d0f21890d82dde35fff5f32e",
-			"revisionTime": "2017-01-06T01:28:19Z"
-		},
-		{
-			"checksumSHA1": "p1ng5kDoTnqYpPSSJHgp4ksEM+k=",
-			"path": "bitbucket.com/sharingmachine/rpc/src/usersRpc",
+			"checksumSHA1": "KvDzdtsJASht+JDCxpcMQm8o73w=",
+			"path": "bitbucket.com/sharingmachine/rpc/src/snipsRpc",
 			"revision": "e7cd2c54963b8335506639ac192bb1c116d8f68e",
 			"revisionTime": "2017-01-03T01:23:32Z"
+		},
+		{
+			"checksumSHA1": "SvrrNQdYp+yWkAr3mCKYHoe48vA=",
+			"path": "bitbucket.com/sharingmachine/rpc/src/snipsRpc",
+			"revision": "d6bcc3193fbee620c1cf1ffaf769229e05f30dc3",
+			"revisionTime": "2017-01-09T07:49:36Z"
+		},
+		{
+			"checksumSHA1": "O+zYmZ6/MWGry9cIJmO5rDmokrE=",
+			"path": "bitbucket.com/sharingmachine/rpc/src/sysRpc",
+			"revision": "d6bcc3193fbee620c1cf1ffaf769229e05f30dc3",
+			"revisionTime": "2017-01-09T07:49:36Z"
+		},
+		{
+			"checksumSHA1": "lpVO2gl5d3FlIPWrRgMbzqnIFv0=",
+			"path": "bitbucket.com/sharingmachine/rpc/src/usersRpc",
+			"revision": "d6bcc3193fbee620c1cf1ffaf769229e05f30dc3",
+			"revisionTime": "2017-01-09T07:49:36Z"
 		},
 		{
 			"checksumSHA1": "SNSgdp5ShDZ57VZqBkQ0PXJCJIM=",

@@ -1,91 +1,91 @@
 syntax = "proto3";
 
 option java_multiple_files = true;
-option java_package = "io.kwk.service.aliases";
-option java_outer_classname = "AliasesRpc";
+option java_package = "io.kwk.service.snips";
+option java_outer_classname = "SnipsRpc";
 
-package aliasesRpc;
+package snipsRpc;
 
-service AliasesRpc {
-    rpc Create (CreateRequest) returns (CreateAliasResponse) {}
+service SnipsRpc {
+    rpc Create (CreateRequest) returns (CreateResponse) {}
     rpc Update (UpdateRequest) returns (UpdateResponse) {}
     rpc Rename (RenameRequest) returns (RenameResponse) {}
     rpc Patch (PatchRequest) returns (PatchResponse) {}
     rpc Clone (CloneRequest) returns(CloneResponse) {}
     rpc Tag (TagRequest) returns(TagResponse) {}
     rpc UnTag (UnTagRequest) returns(UnTagResponse) {}
-    rpc Get (GetRequest) returns(AliasListResponse) {}
-    rpc List (ListRequest) returns(AliasListResponse) {}
+    rpc Get (GetRequest) returns(ListResponse) {}
+    rpc List (ListRequest) returns(ListResponse) {}
     rpc Delete (DeleteRequest) returns(DeleteResponse) {}
 }
 
 message CreateRequest {
-    string uri = 1;
-    string fullKey = 2;
+    string snip = 1;
+    string fullName = 2;
     string description = 3;
 }
 
 message UpdateRequest {
-    string fullKey = 1;
+    string fullName = 1;
     string description = 2;
 }
 
 message RenameRequest {
-    string fullKey = 1;
-    string newFullKey = 2;
+    string fullName = 1;
+    string newFullName = 2;
 }
 
 message RenameResponse {
-    AliasResponse alias = 1;
-    string originalFullKey = 2;
+    Snip snip = 1;
+    string originalFullName = 2;
 }
 
 message PatchRequest {
-    string fullKey = 1;
+    string fullName = 1;
     string target = 3;
     string patch = 2;
 }
 
 message PatchResponse {
-    AliasResponse alias = 1;
+    Snip snip = 1;
 }
 
 message UpdateResponse {
-    AliasResponse alias = 1;
+    Snip snip = 1;
 }
 
 message CloneRequest {
-    string fullKey = 1;
-    string newFullKey = 2;
+    string fullName = 1;
+    string newFullName = 2;
     string username = 3;
 }
 
 message CloneResponse {
-    AliasResponse alias = 1;
+    Snip snip = 1;
 }
 
 message TagRequest {
-    string fullKey = 1;
+    string fullName = 1;
     repeated string tags = 2;
     string username = 3;
 }
 
 message TagResponse {
-    AliasResponse alias = 1;
+    Snip snip = 1;
 }
 
 message UnTagRequest {
-    string fullKey = 1;
+    string fullName = 1;
     repeated string tags = 2;
     string username = 3;
 }
 
 message UnTagResponse {
-    AliasResponse alias = 1;
+    Snip snip = 1;
 }
 
 message GetRequest {
-    string fullKey = 1;
+    string fullName = 1;
     string username = 2;
 }
 
@@ -94,40 +94,43 @@ message ListRequest {
     int64 since = 2;
     int64 size = 3;
     repeated string tags=4;
-    repeated string runtimes=5;
+    repeated string extensions=5;
 }
 
 message DeleteRequest {
-    string fullKey = 1;
+    string fullName = 1;
     string username = 2;
 }
 
 message DeleteResponse {
-    string fullKey = 1;
+    string fullName = 1;
 }
 
-message CreateAliasResponse {
-    AliasResponse alias = 1;
+message CreateResponse {
+    Snip snip = 1;
     TypeMatchResponse typeMatch = 2;
 }
 
-message AliasResponse {
+message Snip {
     string snipId = 1;
-    string fullKey = 2;
+    string fullName = 2;
     string username = 3;
-    string key = 4;
-    string extension = 6;
-    string snip = 7;
-    int64 snipVersion = 8;
-    string runtime = 9;
-    repeated string tags = 11;
-    int64 created = 13;
-    string description = 14;
-    string forkedFromFullKey = 15;
-    int64 forkedFromVersion = 16;
-    bool private = 17;
-    int64 cloneCount = 18;
-    int64 runCount = 19;
+    string name = 4;
+    string extension = 5;
+    string snip = 6;
+    int64 snipVersion = 7;
+    repeated string tags = 8;
+    int64 created = 9;
+    string description = 10;
+    string clonedFromFullName = 11;
+    int64 clonedFromVersion = 12;
+    bool private = 13;
+    int64 cloneCount = 14;
+    int64 runCount = 15;
+    string snipChecksum = 16;
+    string snipSignature = 17;
+    bool encrypted = 18;
+    string algorithm = 19;
 }
 
 message TypeMatchResponse {
@@ -135,14 +138,12 @@ message TypeMatchResponse {
 }
 
 message MatchResponse {
-    string media = 1;
-    string runtime = 2;
-    string extension = 3;
-    int64 score = 4;
+    string extension = 1;
+    int64 score = 2;
 }
 
-message AliasListResponse {
-    repeated AliasResponse items = 1;
+message ListResponse {
+    repeated Snip items = 1;
     int64 total = 2;
     int64 since = 3;
     int64 size = 4;

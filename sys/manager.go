@@ -1,8 +1,9 @@
-package system
+package sys
 
 import "io"
 
-type ISystem interface {
+// Manager deals with all interactions with the local OS.
+type Manager interface {
 	Upgrade() error
 	GetVersion() (string, error)
 	Exists(path string) (bool, error)

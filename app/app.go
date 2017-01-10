@@ -3,31 +3,31 @@ package app
 import (
 	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/config"
-	"bitbucket.com/sharingmachine/kwkcli/system"
 	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
-	"gopkg.in/urfave/cli.v1"
+	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
+	"gopkg.in/urfave/cli.v1"
 )
 
 type KwkApp struct {
 	App            *cli.App
 	Snippets       snippets.Service
-	System         system.ISystem
+	System         sys.Manager
 	Settings       config.Settings
 	AccountManage  account.Manager
 	Runner         cmd.Runner
 	Dialogue       dlg.Dialog
 	TemplateWriter tmpl.Writer
 	Search         search.Term
-	Api 		rpc.Sys
+	Api 		rpc.Service
 }
 
-func New(a snippets.Service, s system.ISystem, t config.Settings, r cmd.Runner, u account.Manager,
-	d dlg.Dialog, w tmpl.Writer, h search.Term, api rpc.Sys) *KwkApp {
+func New(a snippets.Service, s sys.Manager, t config.Settings, r cmd.Runner, u account.Manager,
+	d dlg.Dialog, w tmpl.Writer, h search.Term, api rpc.Service) *KwkApp {
 
 	app := cli.NewApp()
 	//cli.HelpPrinter = system.Help

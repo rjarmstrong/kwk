@@ -13,9 +13,9 @@ const (
 	Code_Unspecified Code = 0
 	// Snippets
 	Code_NoTags                 Code = 3000
-	Code_NewFullKeyEmpty        Code = 3001
-	Code_FullKeyExistsWhenClone Code = 3002
-	Code_MultipleSnippetsFound  Code = 3003
+	Code_NewFullKeyEmpty        Code = 3010
+	Code_FullKeyExistsWhenClone Code = 3020
+	Code_MultipleSnippetsFound  Code = 3030
 
 	// Users
 	Code_WrongCreds      Code = 4001

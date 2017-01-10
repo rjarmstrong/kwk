@@ -21,6 +21,7 @@ message InfoResponse {
     string build = 2;
     string clientSupported = 3;
     string dc = 4;
+    string revision = 5;
 }
 
 message ErrorRequest {

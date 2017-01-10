@@ -2,7 +2,7 @@ package rpc
 
 import "bitbucket.com/sharingmachine/kwkcli/models"
 
-type Sys interface {
+type Service interface {
 	GetApiInfo() (*models.InfoResponse, error)
 	TestAppError(multi bool) (error)
 	TestTransportError() (error)

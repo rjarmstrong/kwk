@@ -17,44 +17,42 @@ var Templates = map[string]*template.Template{}
 
 func init() {
 	// Aliases
-	add("snippet:delete", "Are you sure you want to delete {{.FullKey | yellow }}? [y/n] ", template.FuncMap{"yellow": yellow})
-	add("snippet:deleted", "{{.FullKey | blue }} deleted.", template.FuncMap{"blue": blue})
+	add("snippet:delete", "Are you sure you want to delete {{.FullName | yellow }}? [y/n] ", template.FuncMap{"yellow": yellow})
+	add("snippet:deleted", "{{.FullName | blue }} deleted.", template.FuncMap{"blue": blue})
 	add("snippet:updated", "Description updated:\n{{ .Description | blue }}", template.FuncMap{"blue": blue})
-	add("snippet:notfound", "Snippet: {{.FullKey | blue }} not found\n", template.FuncMap{"blue": blue})
-	add("snippet:cloned", "Cloned as {{.Username}}/{{.FullKey | blue}}\n", template.FuncMap{"blue": blue})
-	add("snippet:new", "{{.FullKey | blue }} created "+style.OpenLock+"\n", template.FuncMap{"blue": blue})
-	add("snippet:newprivate", "{{.FullKey | blue }} created "+style.Lock+"\n", template.FuncMap{"blue": blue})
+	addColor("api:not-found", "Not found\n", blue)
+	add("snippet:cloned", "Cloned as {{.Username}}/{{.FullName | blue}}\n", template.FuncMap{"blue": blue})
+	add("snippet:new", "{{.FullName | blue }} created "+style.OpenLock+"\n", template.FuncMap{"blue": blue})
+	add("snippet:newprivate", "{{.FullName | blue }} created "+style.Lock+"\n", template.FuncMap{"blue": blue})
 	add("snippet:cat", "{{.Snip | blue}}", template.FuncMap{"blue": blue})
-	add("snippet:edited", "Successfully updated {{ .FullKey | blue }}", template.FuncMap{"blue": blue})
+	add("snippet:edited", "Successfully updated {{ .FullName | blue }}", template.FuncMap{"blue": blue})
 	add("snippet:editing", "{{ \"Editing file in default editor.\" | blue }}\nPlease save and close to continue. Or Ctrl+C to abort.\n", template.FuncMap{"blue": blue})
 
-	add("snippet:ambiguouscat", "That snippet is ambiguous please run it again with the extension:\n{{range .Items}}{{.FullKey | blue }}\n{{ end }}", template.FuncMap{"blue": blue})
+	add("snippet:ambiguouscat", "That snippet is ambiguous please run it again with the extension:\n{{range .Items}}{{.FullName | blue }}\n{{ end }}", template.FuncMap{"blue": blue})
 	add("snippet:list", "{{. | listSnippets }}", template.FuncMap{"listSnippets": listSnippets })
-	add("snippet:chooseruntime", "{{. | listRuntimes}}", template.FuncMap{"listRuntimes": listRuntimes})
-	add("snippet:tag", "{{.FullKey | blue }} tagged.", template.FuncMap{"blue": blue})
-	add("snippet:untag", "{{.FullKey | blue }} untagged.", template.FuncMap{"blue": blue})
-	add("snippet:renamed", "{{.fullKey | blue }} renamed to {{.newFullKey | blue }}", template.FuncMap{"blue": blue})
-	add("snippet:madeprivate", "{{.fullKey | blue }} made private "+style.Lock, template.FuncMap{"blue": blue})
-	add("snippet:patched", "{{.FullKey | blue }} patched.", template.FuncMap{"blue": blue})
-	add("snippet:notdeleted", "{{.FullKey | blue }} was pardoned.", template.FuncMap{"blue": blue})
+	add("snippet:tag", "{{.FullName | blue }} tagged.", template.FuncMap{"blue": blue})
+	add("snippet:untag", "{{.FullName | blue }} untagged.", template.FuncMap{"blue": blue})
+	add("snippet:renamed", "{{.fullName | blue }} renamed to {{.newFullName | blue }}", template.FuncMap{"blue": blue})
+	add("snippet:madeprivate", "{{.fullName | blue }} made private "+style.Lock, template.FuncMap{"blue": blue})
+	add("snippet:patched", "{{.FullName | blue }} patched.", template.FuncMap{"blue": blue})
+	add("snippet:notdeleted", "{{.FullName | blue }} was NOT deleted.", template.FuncMap{"blue": blue})
 	add("snippet:inspect",
 		"\n{{range .Items}}"+
-			"Name: {{.Username}}/{{.FullKey}}"+
-			"\nRuntime: {{.Runtime}}"+
-			"\nSnippet: {{.Uri}}"+
+			"Full name: {{.Username}}/{{.FullName}}"+
+			"\nSnippet: {{.Snip}}"+
 			"\nVersion: {{.Version}}"+
 			"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+
-			"\nWeb: \033[4mhttp://aus.kwk.co/{{.Username}}/{{.FullKey}}\033[0m"+
+			"\nWeb: \033[4mhttp://www.kwk.co/{{.Username}}/{{.FullName}}\033[0m"+
 			"\nDescription: {{.Description}}"+
 			"\nRun count: {{.RunCount}}"+
-			"\nClone count: {{.ForkCount}}"+
+			"\nClone count: {{.CloneCount}}"+
 			"\n{{ end }}\n\n", nil)
 
 	// System
 	add("system:upgraded", "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n   Successfully upgraded!  \n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", nil)
-	add("system:version", "kwk {{.version}}'\n",  template.FuncMap{"blue": blue})
+	add("system:version", "kwk version:\n CLI: {{ .cliVersion | blue}}\n API: {{ .apiVersion | blue}}\n",  template.FuncMap{"blue": blue})
 	// Account
-	add("account:signedup", "Welcome to kwk {{.Username | blue }}\n! You're signed in already.\n", template.FuncMap{"blue": blue})
+	add("account:signedup", "Welcome to kwk {{.Username | blue }}!\n You're signed in already.\n", template.FuncMap{"blue": blue})
 	addColor("account:usernamefield", "Your Kwk Username: ", blue)
 	addColor("account:passwordfield", "Your Password: ", blue)
 	add("account:signedin", "Welcome back {{.Username | blue }}!\n", template.FuncMap{"blue": blue})
@@ -74,7 +72,7 @@ func init() {
 	// errors
 	add("validation:title", "{{. | yellow }}\n", template.FuncMap{"yellow" : yellow})
 	add("validation:multi-line", " - {{ .Desc | yellow }}\n", template.FuncMap{"yellow" : yellow})
-	add("validation:one-line", fmt.Sprintf("{{ %q | yellow }}  ", style.Warning) + "{{ .Desc | yellow }}\n", template.FuncMap{"yellow" : yellow})
+	add("validation:one-line", style.Warning + "  {{ .Desc | yellow }} {{ .Code | yellow }}\n", template.FuncMap{"yellow" : yellow})
 
 	add("api:not-authenticated", "{{ \"Please login to continue: kwk login\" | yellow }}\n", template.FuncMap{"yellow" : yellow})
 	addColor("api:error", style.Fire + "  We have a code RED error. \n- To report type: kwk upload-errors \n- You can also try to upgrade: npm update kwkcli -g\n", red)
@@ -94,19 +92,10 @@ func addColor(name string, text string, color ColorFunc){
 	add(name, fmt.Sprintf("{{ %q | color }}", text), template.FuncMap{"color": color})
 }
 
-func listRuntimes(list []interface{}) string {
-	var options string
-	for i, v := range list {
-		m := v.(models.Match)
-		options = options + fmt.Sprintf("%s %s   ", style.Colour(style.LightBlue, i+1), m.Runtime)
-	}
-	return options
-}
-
 func multiChoice(list []models.Snippet) string {
 	var options string
 	for i, v := range list {
-		options = options + fmt.Sprintf("[%s] %s   ", style.Colour(style.LightBlue, i+1), v.FullKey)
+		options = options + fmt.Sprintf("[%s] %s   ", style.Colour(style.LightBlue, i+1), v.FullName)
 	}
 	return options
 }
@@ -141,10 +130,10 @@ func listSnippets(list *models.SnippetList) string {
 		var snip string
 		var name string
 		if v.Private {
-			name = style.Colour(style.Subdued, "."+v.Key+"."+v.Extension)
+			name = style.Colour(style.Subdued, "."+v.Name+"."+v.Extension)
 			snip = style.Colour(style.Subdued, `<private>`)
 		} else {
-			name = style.Colour(style.LightBlue, v.Key) + style.Colour(style.Subdued, "."+v.Extension)
+			name = style.Colour(style.LightBlue, v.Name) + style.Colour(style.Subdued, "."+v.Extension)
 			snip = fmt.Sprintf("%s", uri(v.Snip))
 		}
 
