@@ -4,6 +4,7 @@ const (
 	OS_DARWIN = `darwin`
 	OS_LINUX = `linux`
 	OS_WINDOWS = `windows`
+	KWK_TESTMODE = `KWK_TESTMODE`
 )
 
 type Manager interface {

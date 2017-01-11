@@ -27,7 +27,7 @@ func init() {
 	add("snippet:newprivate", "{{.FullName | blue }} created "+style.Lock+"\n", template.FuncMap{"blue": blue})
 	add("snippet:cat", "{{.Snip | blue}}", template.FuncMap{"blue": blue})
 	add("snippet:edited", "Successfully updated {{ .FullName | blue }}", template.FuncMap{"blue": blue})
-	add("snippet:editing", "{{ \"Editing file in default editor.\" | blue }}\nPlease save and close to continue. Or Ctrl+C to abort.\n", template.FuncMap{"blue": blue})
+	add("snippet:editing", "{{ \"Editing... \" | blue }}\nPlease edit file and save.\n - NB: After saving, no changes will be saved until running kwk edit <name> again.\n - Ctrl+C to abort.\n", template.FuncMap{"blue": blue})
 
 	add("snippet:ambiguouscat", "That snippet is ambiguous please run it again with the extension:\n{{range .Items}}{{.FullName | blue }}\n{{ end }}", template.FuncMap{"blue": blue})
 	add("snippet:list", "{{. | listSnippets }}", template.FuncMap{"listSnippets": listSnippets })
