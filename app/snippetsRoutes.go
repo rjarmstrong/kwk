@@ -48,7 +48,7 @@ func Snippets(s *SnippetCli) []cli.Command {
 		},
 		{
 			Name:    "clone",
-			Aliases: []string{},
+			Aliases: []string{"cp", "copy"},
 			Action: func(c *cli.Context) error {
 				s.Clone(c.Args().First(), c.Args().Get(1))
 				return nil
