@@ -13,6 +13,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bufio"
 	"os"
+	"runtime/pprof"
 )
 
 var version string = "-"
@@ -22,6 +23,7 @@ var build string = "-"
 func main() {
 	f, l := sys.NewLogger()
 	defer f.Close()
+	//profile().Close()
 
 	host := os.Getenv("API_HOST")
 	if host == "" {
@@ -45,4 +47,16 @@ func main() {
 	kwkApp := app.New(a, s, t, o, u, d, w, ch, api)
 	kwkApp.App.Version = version + "+" + build
 	kwkApp.App.Run(os.Args)
+}
+
+func profile() *os.File  {
+	var cpuprofile = "kwkprofile"
+	f, err := os.Create(cpuprofile)
+	if err != nil {
+		panic( err)
+	}
+	if err := pprof.StartCPUProfile(f); err != nil {
+		panic(err)
+	}
+	return f
 }
