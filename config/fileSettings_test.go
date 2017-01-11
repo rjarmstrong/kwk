@@ -2,7 +2,7 @@ package config
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
-	"bitbucket.com/sharingmachine/kwkcli/system"
+	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"github.com/smartystreets/assertions/should"
 	. "github.com/smartystreets/goconvey/convey"
 	"os"
@@ -12,7 +12,7 @@ import (
 func Test_System(t *testing.T) {
 	Convey("FileSettings test", t, func() {
 		Convey(`Should create, update, delete and get a setting`, func() {
-			sys := system.New()
+			sys := sys.New()
 			s := New(sys, "test_settings")
 			key := "user"
 			expected := models.User{

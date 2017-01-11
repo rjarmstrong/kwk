@@ -20,11 +20,7 @@ func NewSystemCli(s sys.Manager, r rpc.Service, u account.Manager, w tmpl.Writer
 }
 
 func (c *SystemCli) Upgrade() {
-	if err := c.service.Upgrade(); err != nil {
-		c.HandleErr(err)
-	} else {
-		c.Render("system:upgraded", nil)
-	}
+	panic("not implemented")
 }
 
 func (c *SystemCli) GetVersion() {

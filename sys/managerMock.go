@@ -1,16 +1,13 @@
 package sys
 
-import "io"
-
 type ManagerMock struct {
-	UpgradeCalled             bool
 	VersionCalled             bool
 	CopyToClipboardCalledWith string
 }
 
-func (m *ManagerMock) Upgrade() error {
-	m.UpgradeCalled = true
-	return nil
+
+func (*ManagerMock) FileExists(subDirName string, fullName string, incHoldingDir bool) (bool, error) {
+	panic("implement me")
 }
 
 func (m *ManagerMock) GetVersion() (string, error) {
@@ -33,15 +30,9 @@ func (m *ManagerMock) CopyFile(src, dst string) error {
 func (m *ManagerMock) Delete(directoryName string, fullKey string) error {
 	return nil
 }
-func (m *ManagerMock) WriteToFile(directoryName string, fullKey string, uri string) (string, error) {
+func (m *ManagerMock) WriteToFile(subDirName string, fullName string, snippet string, incHoldingDir bool) (string, error) {
 	return "", nil
 }
-func (m *ManagerMock) ReadFromFile(directoryName string, fullKey string) (string, error) {
+func (m *ManagerMock) ReadFromFile(subDirName string, fullName string, incHoldingDir bool) (string, error) {
 	return "", nil
-}
-func (m *ManagerMock) GetDirPath(directoryName string) (string, error) {
-	return "", nil
-}
-func (m *ManagerMock) ExecSafe(name string, arg ...string) io.ReadCloser {
-	return nil
 }

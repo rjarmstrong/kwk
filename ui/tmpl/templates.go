@@ -11,6 +11,7 @@ import (
 	"strings"
 	"bytes"
 	"fmt"
+	"encoding/json"
 )
 
 var Templates = map[string]*template.Template{}
@@ -220,4 +221,12 @@ func uri(text string) string {
 		text = "<empty>"
 	}
 	return text
+}
+
+
+func PrettyPrint(obj interface{}) {
+	fmt.Println("")
+	p, _ := json.MarshalIndent(obj, "", "  ")
+	fmt.Print(string(p))
+	fmt.Print("\n\n")
 }

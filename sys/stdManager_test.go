@@ -35,18 +35,18 @@ func Test_System(t *testing.T) {
 			So(err, should.BeNil)
 		})
 
-		Convey(`Should write and read from file`, func() {
-			dir := "test_dir"
-			uri := "git status"
-			path, err := s.GetDirPath(dir)
-			fullKey := "test.bash"
-			p, err := s.WriteToFile(dir, fullKey, uri)
-			So(err, ShouldBeNil)
-			So(p, should.Equal, fmt.Sprintf("/Users/%s/Library/Caches/kwk/%s/%s", os.Getenv("USER"), dir, fullKey))
-			txt, err := s.ReadFromFile(dir, fullKey)
-			So(txt, should.Equal, uri)
-			err = os.RemoveAll(path)
-			So(err, ShouldBeNil)
-		})
+		//Convey(`Should write and read from file`, func() {
+		//	dir := "test_dir"
+		//	uri := "git status"
+		//	path, err := s.GetDirPath(dir)
+		//	fullKey := "test.bash"
+		//	p, err := s.WriteToFile(dir, fullKey, uri)
+		//	So(err, ShouldBeNil)
+		//	So(p, should.Equal, fmt.Sprintf("/Users/%s/Library/Caches/kwk/%s/%s", os.Getenv("USER"), dir, fullKey))
+		//	txt, err := s.ReadFromFile(dir, fullKey)
+		//	So(txt, should.Equal, uri)
+		//	err = os.RemoveAll(path)
+		//	So(err, ShouldBeNil)
+		//})
 	})
 }

@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"fmt"
 )
 
 type SnippetCli struct {
@@ -49,7 +50,9 @@ func (a *SnippetCli) Run(fullKey string, args []string) {
 		a.HandleErr(err)
 	} else {
 		if alias := a.handleMultiResponse(fullKey, list); alias != nil {
-			a.runner.Run(alias, args)
+			if err = a.runner.Run(alias, args); err != nil {
+				fmt.Println(err)
+			}
 		} else {
 			if res, err := a.search.Execute(fullKey); err != nil {
 				a.HandleErr(err)
@@ -217,7 +220,7 @@ func (a *SnippetCli) List(args ...string) {
 	}
 	if username == "" {
 		if err := a.settings.Get(models.ProfileFullKey, u); err != nil {
-			a.Render("account:notloggedin", nil)
+			a.Render("api:not-authenticated", nil)
 			return
 		} else {
 			username = u.Username
@@ -246,7 +249,7 @@ func (a *SnippetCli) handleMultiResponse(fullKey string, list *models.SnippetLis
 func (a *SnippetCli) getKwkKey(fullKey string) *models.Alias {
 	u := &models.User{}
 	if err := a.settings.Get(models.ProfileFullKey, u); err != nil {
-		a.Render("account:notloggedin", nil)
+		a.Render("api:not-authenticated", nil)
 		return nil
 	}
 	k := &models.Alias{}

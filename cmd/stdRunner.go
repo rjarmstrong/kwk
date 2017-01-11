@@ -2,16 +2,25 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
-
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"gopkg.in/yaml.v2"
 	"strings"
+	"runtime"
+	"io"
+	"os/exec"
+	"bytes"
+)
+
+const (
+	CONF_PATH       = "conf"
+	ENV_PATH       = "env"
+	FILE_CACHE_PATH = "filecache"
+	ENV_USERNAME    = "env"
 )
 
 type StdRunner struct {
@@ -24,17 +33,13 @@ func NewStdRunner(s sys.Manager, ss snippets.Service, w tmpl.Writer) *StdRunner 
 	return &StdRunner{snippets: ss, system: s, writer: w}
 }
 
-func (r *StdRunner) cacheFile(fullName string, snip string) (string, error) {
-	return r.system.WriteToFile(filecache, fullName, snip)
-}
-
-func (r *StdRunner) Edit(alias *models.Snippet) error {
-	filePath, err := r.cacheFile(alias.FullName, alias.Snip)
+func (r *StdRunner) Edit(s *models.Snippet) error {
+	filePath, err := r.system.WriteToFile(FILE_CACHE_PATH, s.FullName, s.Snip, true)
 	if err != nil {
 		return err
 	}
 	fi, _ := os.Stat(filePath)
-	r.system.ExecSafe("open", filePath)
+	execSafe("open", filePath)
 	edited := false
 	for edited == false {
 		if fi2, _ := os.Stat(filePath); fi2.ModTime().UnixNano() > fi.ModTime().UnixNano() {
@@ -45,16 +50,16 @@ func (r *StdRunner) Edit(alias *models.Snippet) error {
 	}
 
 	closer := func() {
-		r.system.ExecSafe("osascript", "-e",
-			fmt.Sprintf("tell application %q to close (every window whose name is \"%s.%s\")", "XCode", alias.Name, alias.Extension))
-		r.system.ExecSafe("osascript", "-e", "tell application \"iTerm2\" to activate")
+		execSafe("osascript", "-e",
+			fmt.Sprintf("tell application %q to close (every window whose name is \"%s.%s\")", "XCode", s.Name, s.Extension))
+		execSafe("osascript", "-e", "tell application \"iTerm2\" to activate")
 	}
 
-	if text, err := r.system.ReadFromFile(filecache, alias.FullName); err != nil {
+	if text, err := r.system.ReadFromFile(FILE_CACHE_PATH, s.FullName, true); err != nil {
 		closer()
 		return err
 	} else {
-		if alias, err = r.snippets.Patch(alias.FullName, alias.Snip, text); err != nil {
+		if s, err = r.snippets.Patch(s.FullName, s.Snip, text); err != nil {
 			closer()
 			return err
 		}
@@ -62,10 +67,6 @@ func (r *StdRunner) Edit(alias *models.Snippet) error {
 		return nil
 	}
 }
-
-const (
-	filecache = "filecache"
-)
 
 func getSection(yml *yaml.MapSlice, name string) (yaml.MapSlice, []string) {
 	for _, v := range *yml {
@@ -84,13 +85,29 @@ func getSection(yml *yaml.MapSlice, name string) (yaml.MapSlice, []string) {
 	return nil, nil
 }
 
-func getRunnersSection() (*yaml.MapSlice, error) {
-	f, err := ioutil.ReadFile("./cmd/config.yml")
-	if err != nil {
-		fmt.Print(err)
+func (r *StdRunner) getRunnerEnv() (*yaml.MapSlice, error) {
+	envFullName := fmt.Sprintf("%s-%s.yml", runtime.GOOS, runtime.GOARCH)
+	var env string
+	if ok, _ := r.system.FileExists(ENV_PATH, envFullName, false); !ok {
+		fmt.Println("getting remote")
+		if l, err := r.snippets.Get(&models.Alias{FullKey:envFullName, Username:ENV_USERNAME}); err != nil {
+			return nil, err
+		} else {
+			env = l.Items[0].Snip
+			if _, err := r.system.WriteToFile(ENV_PATH, envFullName,  env,false); err != nil {
+				return nil, err
+			}
+		}
+	} else {
+		if e, err := r.system.ReadFromFile(ENV_PATH, envFullName, false); err != nil {
+			return nil, err
+		} else {
+			// necessary because of variable hiding
+			env = e
+		}
 	}
 	c := &yaml.MapSlice{}
-	if err := yaml.Unmarshal(f, c); err != nil {
+	if err := yaml.Unmarshal([]byte(env), c); err != nil {
 		return nil, err
 	}
 	rs, _ := getSection(c, "runners")
@@ -101,7 +118,7 @@ func getRunnersSection() (*yaml.MapSlice, error) {
 }
 
 func (r *StdRunner) Run(s *models.Snippet, args []string) error {
-	rs, err := getRunnersSection()
+	rs, err := r.getRunnerEnv()
 	if err != nil {
 		return err
 	}
@@ -113,7 +130,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 		panic("no default")
 	}
 	if comp != nil {
-		if filePath, err := r.cacheFile(s.FullName, s.Snip); err != nil {
+		if filePath, err := r.system.WriteToFile(FILE_CACHE_PATH, s.FullName, s.Snip, true); err != nil {
 			return err
 		} else {
 			_, compile := getSection(&comp, "compile")
@@ -124,17 +141,17 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 					compile[i] = strings.Replace(compile[i], "$NAME", strings.Replace(filePath, "."+s.Extension, "", -1), -1)
 				}
 				fmt.Println("compile", compile)
-				r.system.ExecSafe(compile[0], compile[1:]...).Close()
+				execSafe(compile[0], compile[1:]...).Close()
 			}
 			_, run := getSection(&comp, "run")
 			for i := range run {
 				run[i] = strings.Replace(run[i], "$FULL_NAME", filePath, -1)
-				run[i] = strings.Replace(run[i], "$NAME", strings.Replace(filePath, "." + s.Extension, "", -1), -1)
+				run[i] = strings.Replace(run[i], "$NAME", strings.Replace(filePath, "."+s.Extension, "", -1), -1)
 			}
 
 			//fmt.Println("run", run)
 			run = append(run, args...)
-			r.system.ExecSafe(run[0], run[1:]...).Close()
+			execSafe(run[0], run[1:]...).Close()
 		}
 	} else {
 		//fmt.Println(runner)
@@ -143,17 +160,31 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 		}
 		interp = append(interp, args...)
 		//fmt.Println(runner)
-		r.system.ExecSafe(interp[0], interp[1:]...).Close()
+		execSafe(interp[0], interp[1:]...).Close()
 	}
 	return nil
 }
 
+func execSafe(name string, arg ...string) io.ReadCloser {
+	c := exec.Command(name, arg...)
+	c.Stdin = os.Stdin
+	out, _ := c.StdoutPipe()
+	var stderr bytes.Buffer
+	c.Stdout = os.Stdout
+	c.Stderr = &stderr
+	err := c.Run()
+	if err != nil {
+		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
+	}
+	return out
+}
+
 func (r *StdRunner) OpenWeb(alias *models.Snippet) {
-	r.system.ExecSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", fmt.Sprintf("https://www.kwk.co/%s/%s", alias.Username, alias.FullName))
-	r.system.ExecSafe("osascript", "-e", "activate application \"Google Chrome\"")
+	execSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", fmt.Sprintf("https://www.kwk.co/%s/%s", alias.Username, alias.FullName))
+	execSafe("osascript", "-e", "activate application \"Google Chrome\"")
 }
 
 func (r *StdRunner) OpenCovert(snippet string) {
-	r.system.ExecSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--incognito", snippet)
-	r.system.ExecSafe("osascript", "-e", "activate application \"Google Chrome\"")
+	execSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--incognito", snippet)
+	execSafe("osascript", "-e", "activate application \"Google Chrome\"")
 }
