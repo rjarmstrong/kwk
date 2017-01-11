@@ -14,6 +14,8 @@ import (
 	"io"
 	"os/exec"
 	"bytes"
+	"io/ioutil"
+
 )
 
 const (
@@ -39,7 +41,10 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 		return err
 	}
 	fi, _ := os.Stat(filePath)
+	// replace with configured editor
 	execSafe("open", filePath)
+
+	// Will this work in headless mode? I think so, but need to check thread locking.
 	edited := false
 	for edited == false {
 		if fi2, _ := os.Stat(filePath); fi2.ModTime().UnixNano() > fi.ModTime().UnixNano() {
@@ -50,15 +55,23 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	}
 
 	closer := func() {
-		execSafe("osascript", "-e",
-			fmt.Sprintf("tell application %q to close (every window whose name is \"%s.%s\")", "XCode", s.Name, s.Extension))
-		execSafe("osascript", "-e", "tell application \"iTerm2\" to activate")
+		if runtime.GOOS == sys.OS_DARWIN {
+			execSafe("osascript", "-e",
+				fmt.Sprintf("tell application %q to close (every window whose name is \"%s.%s\")", "XCode", s.Name, s.Extension))
+			// This assumes we are using iTerm, we'll have to get the active shell (echo $TERM_PROGRAM on Mac)
+			execSafe("osascript", "-e", "tell application \"iTerm2\" to activate")
+		} else if runtime.GOOS == sys.OS_WINDOWS {
+			//	// How will this work on:
+			//	- windows https://technet.microsoft.com/en-us/library/ee176882.aspx
+		}
 	}
 
 	if text, err := r.system.ReadFromFile(FILE_CACHE_PATH, s.FullName, true); err != nil {
+		// if there was an error close the application anyway
 		closer()
 		return err
 	} else {
+		// else save and close the app
 		if s, err = r.snippets.Patch(s.FullName, s.Snip, text); err != nil {
 			closer()
 			return err
@@ -85,27 +98,36 @@ func getSection(yml *yaml.MapSlice, name string) (yaml.MapSlice, []string) {
 	return nil, nil
 }
 
-func (r *StdRunner) getRunnerEnv() (*yaml.MapSlice, error) {
+func (r *StdRunner) getEnv() (string, error) {
 	envFullName := fmt.Sprintf("%s-%s.yml", runtime.GOOS, runtime.GOARCH)
-	var env string
 	if ok, _ := r.system.FileExists(ENV_PATH, envFullName, false); !ok {
 		fmt.Println("getting remote")
 		if l, err := r.snippets.Get(&models.Alias{FullKey:envFullName, Username:ENV_USERNAME}); err != nil {
-			return nil, err
+			return "", err
 		} else {
-			env = l.Items[0].Snip
+			env := l.Items[0].Snip
 			if _, err := r.system.WriteToFile(ENV_PATH, envFullName,  env,false); err != nil {
-				return nil, err
+				return "", err
 			}
+			return env, nil
 		}
 	} else {
 		if e, err := r.system.ReadFromFile(ENV_PATH, envFullName, false); err != nil {
-			return nil, err
+			return "", err
 		} else {
-			// necessary because of variable hiding
-			env = e
+			return e, nil
 		}
 	}
+}
+
+func (r *StdRunner) getRunnerEnv() (*yaml.MapSlice, error) {
+	//env, err := r.getEnv()
+	b, err := ioutil.ReadFile("./cmd/testEnv.yml")
+	env := string(b)
+	if err != nil {
+		return nil, err
+	}
+
 	c := &yaml.MapSlice{}
 	if err := yaml.Unmarshal([]byte(env), c); err != nil {
 		return nil, err

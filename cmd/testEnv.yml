@@ -34,7 +34,9 @@ runners:
 apps:
   webstorm: ["open", "-a", "webstorm", "$DIR_NAME"]
   textedit: ["open", "-e", "$FULL_NAME"]
-  vi: ["vi", "$FULL_NAME" ]
+  vim: ["vi", "$FULL_NAME" ]
+  emacs: ["emacs", "$FULL_NAME" ]
+  nano: ["emacs", "$FULL_NAME" ]
   default: ["open", "-t", "$FULL_NAME"]
 editors:
   sh:
