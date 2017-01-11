@@ -99,9 +99,20 @@ func getSection(yml *yaml.MapSlice, name string) (yaml.MapSlice, []string) {
 }
 
 func (r *StdRunner) getEnv() (string, error) {
+	if os.Getenv("KWK_TESTMODE") != "" {
+		testEnv := "./cmd/testEnv.yml"
+		// TODO: use log
+		fmt.Println(">> Running with:", testEnv, " <<")
+		b, err := ioutil.ReadFile(testEnv)
+		return string(b), nil
+		if err != nil {
+			return "", err
+		}
+	}
 	envFullName := fmt.Sprintf("%s-%s.yml", runtime.GOOS, runtime.GOARCH)
 	if ok, _ := r.system.FileExists(ENV_PATH, envFullName, false); !ok {
-		fmt.Println("getting remote")
+		// TODO: use log
+		fmt.Println(">> No local env.yml getting remote. <<")
 		if l, err := r.snippets.Get(&models.Alias{FullKey:envFullName, Username:ENV_USERNAME}); err != nil {
 			return "", err
 		} else {
@@ -120,14 +131,11 @@ func (r *StdRunner) getEnv() (string, error) {
 	}
 }
 
-func (r *StdRunner) getRunnerEnv() (*yaml.MapSlice, error) {
-	//env, err := r.getEnv()
-	b, err := ioutil.ReadFile("./cmd/testEnv.yml")
-	env := string(b)
+func (r *StdRunner) getRunners() (*yaml.MapSlice, error) {
+	env, err := r.getEnv()
 	if err != nil {
 		return nil, err
 	}
-
 	c := &yaml.MapSlice{}
 	if err := yaml.Unmarshal([]byte(env), c); err != nil {
 		return nil, err
@@ -140,7 +148,7 @@ func (r *StdRunner) getRunnerEnv() (*yaml.MapSlice, error) {
 }
 
 func (r *StdRunner) Run(s *models.Snippet, args []string) error {
-	rs, err := r.getRunnerEnv()
+	rs, err := r.getRunners()
 	if err != nil {
 		return err
 	}
