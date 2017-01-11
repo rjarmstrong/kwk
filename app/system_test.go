@@ -19,10 +19,6 @@ func Test_System(t *testing.T) {
 				p := app.App.Command("upgrade")
 				So(p, should.NotBeNil)
 			})
-			Convey(`Should call upgrade`, func() {
-				app.App.Run([]string{"[app]", "upgrade"})
-				So(s.UpgradeCalled, should.BeTrue)
-			})
 		})
 
 		Convey(`Version`, func() {
