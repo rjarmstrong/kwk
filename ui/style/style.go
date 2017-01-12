@@ -27,9 +27,11 @@ const (
 	Lock               = "\xF0\x9F\x94\x92"
 	OpenLock           = "\xF0\x9F\x94\x93"
 	Warning            = "\xE2\x9A\xA0"
-	Fire		   = "\xF0\x9F\x94\xA5"
-	Tick		   = "\xE2\x9C\x93"
-	Ambulance	   = "\xF0\x9F\x9A\x91"
+	Fire               = "\xF0\x9F\x94\xA5"
+	Tick               = "\xE2\x9C\x93"
+	Ambulance          = "\xF0\x9F\x9A\x91"
+	Glasses            = "\xF0\x9F\x91\x93"
+	InfoDeskPerson     = "\xF0\x9F\x92\x81"
 )
 
 func Build(quant int, unicode string) string {

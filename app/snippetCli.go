@@ -30,7 +30,7 @@ func NewSnippetCli(a snippets.Service, r cmd.Runner, s sys.Manager, d dlg.Dialog
 }
 
 func (a *SnippetCli) Share(fullKey string, destination string) {
-	k := a.getKwkKey(fullKey)
+	k := a.getAbsAlias(fullKey)
 	if list, err := a.service.Get(k); err != nil {
 		a.HandleErr(err)
 	} else {
@@ -44,8 +44,17 @@ func (a *SnippetCli) Share(fullKey string, destination string) {
 	}
 }
 
+func (s *SnippetCli) SetEnv(fullName string) {
+	a := s.getAbsAlias(fullName)
+	if _, err := s.runner.SetEnv(a); err != nil {
+		panic(err)
+	} else {
+		s.Render("env:changed", fullName)
+	}
+}
+
 func (a *SnippetCli) Run(fullKey string, args []string) {
-	k := a.getKwkKey(fullKey)
+	k := a.getAbsAlias(fullKey)
 	if list, err := a.service.Get(k); err != nil {
 		a.HandleErr(err)
 	} else {
@@ -95,7 +104,7 @@ func (a *SnippetCli) New(uri string, fullKey string) {
 }
 
 func (a *SnippetCli) Edit(fullKey string) {
-	if list, err := a.service.Get(a.getKwkKey(fullKey)); err != nil {
+	if list, err := a.service.Get(a.getAbsAlias(fullKey)); err != nil {
 		a.HandleErr(err)
 	} else {
 		if alias := a.handleMultiResponse(fullKey, list); alias != nil {
@@ -120,7 +129,7 @@ func (a *SnippetCli) Describe(fullKey string, description string) {
 }
 
 func (a *SnippetCli) Inspect(fullKey string) {
-	if list, err := a.service.Get(a.getKwkKey(fullKey)); err != nil {
+	if list, err := a.service.Get(a.getAbsAlias(fullKey)); err != nil {
 		a.HandleErr(err)
 	} else {
 		a.Render("snippet:inspect", list)
@@ -140,7 +149,7 @@ func (a *SnippetCli) Delete(fullKey string) {
 }
 
 func (a *SnippetCli) Cat(fullKey string) {
-	if list, err := a.service.Get(a.getKwkKey(fullKey)); err != nil {
+	if list, err := a.service.Get(a.getAbsAlias(fullKey)); err != nil {
 		a.HandleErr(err)
 	} else {
 		if len(list.Items) == 0 {
@@ -162,7 +171,7 @@ func (a *SnippetCli) Patch(fullKey string, target string, patch string) {
 }
 
 func (a *SnippetCli) Clone(fullKey string, newFullKey string) {
-	if alias, err := a.service.Clone(a.getKwkKey(fullKey), newFullKey); err != nil {
+	if alias, err := a.service.Clone(a.getAbsAlias(fullKey), newFullKey); err != nil {
 		a.HandleErr(err)
 	} else {
 		a.Render("snippet:cloned", alias)
@@ -246,7 +255,7 @@ func (a *SnippetCli) handleMultiResponse(fullKey string, list *models.SnippetLis
 	}
 }
 
-func (a *SnippetCli) getKwkKey(fullKey string) *models.Alias {
+func (a *SnippetCli) getAbsAlias(fullKey string) *models.Alias {
 	u := &models.User{}
 	if err := a.settings.Get(models.ProfileFullKey, u); err != nil {
 		a.Render("api:not-authenticated", nil)

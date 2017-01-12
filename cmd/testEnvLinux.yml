@@ -16,9 +16,6 @@ runners:
   scala:
     compile: ["scalac", "-d", "$DIR", "$FULL_NAME"]
     run: ["scala", "$NAME"]
-  cs: #c sharp (dotnet core) Under development
-    compile: ["dotnet", "restore", "/Volumes/development/go/src/bitbucket.com/sharingmachine/kwkcli/dotnet/project.json"]
-    run: ["dotnet", "run", "--project", "/Volumes/development/go/src/bitbucket.com/sharingmachine/kwkcli/dotnet/project.json", "$FULL_NAME",]
   go: #golang
     run: ["go", "run", "$FULL_NAME"]
   rs: #rust
@@ -33,19 +30,16 @@ runners:
   yml: ["echo", "$SNIP"]
   default: ["echo", "$SNIP"]
 apps:
-  webstorm: ["open", "-a", "webstorm", "$DIR"]
-  textedit: ["open", "-e", "$FULL_NAME"]
-  vscode: ["open", "-a", "Visual Studio Code", "$DIR"]
-  vim: ["vi", "$FULL_NAME" ]
+  vim: ["vi", "$FULL_NAME"]
   emacs: ["emacs", "$FULL_NAME" ]
   nano: ["nano", "$FULL_NAME" ]
-  default: ["open", "-t", "$FULL_NAME"]
+  default: ["vi", "$FULL_NAME"]
 editors:
 #  Specify one app for each file type to edit.
 #  sh: [vim]
-#  go: [gogland]
-#  py: [vscode]
-#  url: [textedit]
+#  go: [emacs]
+#  py: [nano]
+#  url: [vim]
   default: ["vim"]
 security: #https://gist.github.com/pmarreck/5388643
   encrypt: []

@@ -63,6 +63,8 @@ func init() {
 	add("dialog:choose", "{{. | multiChoice }}\n", template.FuncMap{"multiChoice": multiChoice})
 	add("dialog:header", "{{.| blue }}\n", template.FuncMap{"blue": blue})
 
+	add("env:changed", style.InfoDeskPerson + "  {{ \"env.yml\" | blue }} set to: {{.| blue }}\n", template.FuncMap{"blue": blue})
+
 	addColor("account:signup:email", "What's your email? ", blue)
 	addColor("account:signup:username", "Choose a great username: ", blue)
 	addColor("account:signup:password", "And enter a password (1 num, 1 cap, 8 chars): ", blue)

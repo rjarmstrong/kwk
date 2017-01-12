@@ -136,6 +136,13 @@ func Snippets(s *SnippetCli) []cli.Command {
 				return nil
 			},
 		},
+		{
+			Name: "set-env",
+			Action: func(c *cli.Context) error {
+				s.SetEnv(c.Args().First())
+				return nil
+			},
+		},
 	}
 	return c
 }

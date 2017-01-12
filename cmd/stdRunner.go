@@ -21,8 +21,8 @@ import (
 const (
 	CONF_PATH       = "conf"
 	ENV_PATH        = "env"
+	ENV_NAME        = "env.yml"
 	FILE_CACHE_PATH = "filecache"
-	ENV_USERNAME    = "env"
 )
 
 type StdRunner struct {
@@ -93,6 +93,20 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	}
 }
 
+func (r *StdRunner) SetEnv(a *models.Alias) (string, error) {
+	// download snippet
+	if l, err := r.snippets.Get(&models.Alias{FullKey: a.FullKey, Username:a.Username}); err != nil {
+		return "", err
+	} else {
+		env := l.Items[0].Snip
+		// Need to create a setting called 'current env' e.g. currentEnv: 'richard/amd-64.yml'
+		if _, err := r.system.WriteToFile(ENV_PATH, ENV_NAME, env, false); err != nil {
+			return "", err
+		}
+		return env, nil
+	}
+}
+
 func (r *StdRunner) getEnv() (string, error) {
 	if os.Getenv(sys.KWK_TESTMODE) != "" {
 		testEnv := "./cmd/testEnv.yml"
@@ -104,22 +118,15 @@ func (r *StdRunner) getEnv() (string, error) {
 			return "", err
 		}
 	}
-	envFullName := fmt.Sprintf("%s-%s.yml", runtime.GOOS, runtime.GOARCH)
 	// TODO: check yml version is compatible with this build else force upgrade.
-	if ok, _ := r.system.FileExists(ENV_PATH, envFullName, false); !ok {
+	if ok, _ := r.system.FileExists(ENV_PATH, ENV_NAME, false); !ok {
 		// TODO: use log
 		fmt.Println(">> No local env.yml getting remote. <<")
-		if l, err := r.snippets.Get(&models.Alias{FullKey:envFullName, Username:ENV_USERNAME}); err != nil {
-			return "", err
-		} else {
-			env := l.Items[0].Snip
-			if _, err := r.system.WriteToFile(ENV_PATH, envFullName, env, false); err != nil {
-				return "", err
-			}
-			return env, nil
-		}
+		var defaultEnv = fmt.Sprintf("%s-%s.yml", runtime.GOOS, runtime.GOARCH)
+		a := &models.Alias{FullKey:defaultEnv, Username:"env"}
+		return r.SetEnv(a)
 	} else {
-		if e, err := r.system.ReadFromFile(ENV_PATH, envFullName, false); err != nil {
+		if e, err := r.system.ReadFromFile(ENV_PATH, ENV_NAME, false); err != nil {
 			return "", err
 		} else {
 			return e, nil
