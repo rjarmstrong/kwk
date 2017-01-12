@@ -208,9 +208,10 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 				execSafe(compile[0], compile[1:]...).Close()
 			}
 			_, run := getSubSection(&comp, "run")
-			replaceVariables(&compile, filePath, s)
+			replaceVariables(&run, filePath, s)
 
-			//fmt.Println("run", run)
+			// TODO: ADD TO LOG
+			fmt.Println("run", run)
 			run = append(run, args...)
 			execSafe(run[0], run[1:]...).Close()
 		}
