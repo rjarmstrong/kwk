@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"os"
 	"os/user"
-	"time"
 )
 
 const (
@@ -53,9 +52,7 @@ func (s *StdManager) ReadFromFile(subDirName string, fullName string, incHolding
 			return "", err
 		}
 	} else {
-		fmt.Println("after:", time.Unix(after, 0), "mod time:", fi.ModTime())
 		if after == 0 || after < int64(fi.ModTime().Unix()) {
-			fmt.Println("reading file")
 			bts, err := ioutil.ReadFile(fp)
 			return string(bts), err
 		} else {
