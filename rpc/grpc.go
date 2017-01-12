@@ -94,7 +94,7 @@ type Headers struct {
 
 func (i *Headers) GetContext() context.Context {
 	u := &models.User{}
-	if err := i.settings.Get(models.ProfileFullKey, u); err != nil {
+	if err := i.settings.Get(models.ProfileFullKey, u, 0); err != nil {
 		return context.Background()
 	} else {
 		ctx := metadata.NewContext(

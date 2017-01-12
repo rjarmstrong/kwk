@@ -78,7 +78,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 		}
 	}
 
-	if text, err := r.system.ReadFromFile(FILE_CACHE_PATH, s.FullName, true); err != nil {
+	if text, err := r.system.ReadFromFile(FILE_CACHE_PATH, s.FullName, true, 0); err != nil {
 		// if there was an error close the application anyway
 		closer()
 		return err
@@ -126,7 +126,7 @@ func (r *StdRunner) getEnv() (string, error) {
 		a := &models.Alias{FullKey:defaultEnv, Username:"env"}
 		return r.SetEnv(a)
 	} else {
-		if e, err := r.system.ReadFromFile(ENV_PATH, ENV_NAME, false); err != nil {
+		if e, err := r.system.ReadFromFile(ENV_PATH, ENV_NAME, false, 0); err != nil {
 			return "", err
 		} else {
 			return e, nil

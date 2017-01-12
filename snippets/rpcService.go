@@ -20,52 +20,53 @@ func New(conn *grpc.ClientConn, s config.Settings, h *rpc.Headers) Service {
 	return &RpcService{Settings: s, client: snipsRpc.NewSnipsRpcClient(conn), headers: h}
 }
 
-func (a *RpcService) Update(fullKey string, description string) (*models.Snippet, error) {
-	if r, err := a.client.Update(a.headers.GetContext(), &snipsRpc.UpdateRequest{FullName: fullKey, Description: description}); err != nil {
+func (r *RpcService) Update(fullKey string, description string) (*models.Snippet, error) {
+	if res, err := r.client.Update(r.headers.GetContext(), &snipsRpc.UpdateRequest{FullName: fullKey, Description: description}); err != nil {
 		return nil, err
 	} else {
 		m := &models.Snippet{}
-		mapSnip(r.Snip, m)
+		mapSnip(res.Snip, m)
 		return m, nil
 	}
 }
 
 // since unix time in milliseconds
-func (a *RpcService) List(username string, size int64, since int64, tags ...string) (*models.SnippetList, error) {
-	if res, err := a.client.List(a.headers.GetContext(), &snipsRpc.ListRequest{Username: username, Since: since, Size: size, Tags: tags}); err != nil {
+func (r *RpcService) List(username string, size int64, since int64, tags ...string) (*models.SnippetList, error) {
+	if res, err := r.client.List(r.headers.GetContext(), &snipsRpc.ListRequest{Username: username, Since: since, Size: size, Tags: tags}); err != nil {
 		return nil, err
 	} else {
 		list := &models.SnippetList{}
-		mapSnippetList(res, list)
+		r.mapSnippetList(res, list)
 		return list, nil
 	}
 }
 
-func (a *RpcService) Get(k *models.Alias) (*models.SnippetList, error) {
-	if res, err := a.client.Get(a.headers.GetContext(), &snipsRpc.GetRequest{Username: k.Username, FullName: k.FullKey}); err != nil {
+func (r *RpcService) Get(k *models.Alias) (*models.SnippetList, error) {
+	if res, err := r.client.Get(r.headers.GetContext(), &snipsRpc.GetRequest{Username: k.Username, FullName: k.FullKey}); err != nil {
 		return nil, err
 	} else {
 		list := &models.SnippetList{}
-		mapSnippetList(res, list)
+		r.mapSnippetList(res, list)
 		return list, nil
 	}
 }
 
-func (a *RpcService) Delete(fullKey string) error {
-	_, err := a.client.Delete(a.headers.GetContext(), &snipsRpc.DeleteRequest{FullName: fullKey})
+func (r *RpcService) Delete(fullKey string) error {
+	_, err := r.client.Delete(r.headers.GetContext(), &snipsRpc.DeleteRequest{FullName: fullKey})
 	return err
 }
 
-func (a *RpcService) Create(snip string, path string) (*models.CreateSnippetRequest, error) {
+func (r *RpcService) Create(snip string, path string) (*models.CreateSnippetRequest, error) {
 	// encrypt if requested
 	fmt.Println(snip, path)
-	if res, err := a.client.Create(a.headers.GetContext(), &snipsRpc.CreateRequest{Snip: snip, FullName: path}); err != nil {
+	if res, err := r.client.Create(r.headers.GetContext(), &snipsRpc.CreateRequest{Snip: snip, FullName: path}); err != nil {
 		return nil, err
 	} else {
 		cs := &models.CreateSnippetRequest{}
 		if res.Snip != nil {
 			snip := &models.Snippet{}
 			mapSnip(res.Snip, snip)
+			r.CacheSnip(snip)
 			cs.Snippet = snip
 		} else {
 			cs.TypeMatch = &models.TypeMatch{
@@ -83,8 +84,8 @@ func (a *RpcService) Create(snip string, path string) (*models.CreateSnippetRequ
 	}
 }
 
-func (a *RpcService) Rename(fullKey string, newFullName string) (*models.Snippet, string, error) {
-	if res, err := a.client.Rename(a.headers.GetContext(), &snipsRpc.RenameRequest{FullName: fullKey, NewFullName: newFullName}); err != nil {
+func (r *RpcService) Rename(fullKey string, newFullName string) (*models.Snippet, string, error) {
+	if res, err := r.client.Rename(r.headers.GetContext(), &snipsRpc.RenameRequest{FullName: fullKey, NewFullName: newFullName}); err != nil {
 		return nil, "", err
 	} else {
 		snip := &models.Snippet{}
@@ -93,8 +94,8 @@ func (a *RpcService) Rename(fullKey string, newFullName string) (*models.Snippet
 	}
 }
 
-func (a *RpcService) Patch(fullKey string, target string, patch string) (*models.Snippet, error) {
-	if res, err := a.client.Patch(a.headers.GetContext(), &snipsRpc.PatchRequest{FullName: fullKey, Target: target, Patch: patch}); err != nil {
+func (r *RpcService) Patch(fullKey string, target string, patch string) (*models.Snippet, error) {
+	if res, err := r.client.Patch(r.headers.GetContext(), &snipsRpc.PatchRequest{FullName: fullKey, Target: target, Patch: patch}); err != nil {
 		return nil, err
 	} else {
 		snip := &models.Snippet{}
@@ -103,8 +104,8 @@ func (a *RpcService) Patch(fullKey string, target string, patch string) (*models
 	}
 }
 
-func (a *RpcService) Clone(k *models.Alias, newFullName string) (*models.Snippet, error) {
-	if res, err := a.client.Clone(a.headers.GetContext(), &snipsRpc.CloneRequest{Username: k.Username, FullName: k.FullKey, NewFullName: newFullName}); err != nil {
+func (r *RpcService) Clone(k *models.Alias, newFullName string) (*models.Snippet, error) {
+	if res, err := r.client.Clone(r.headers.GetContext(), &snipsRpc.CloneRequest{Username: k.Username, FullName: k.FullKey, NewFullName: newFullName}); err != nil {
 		return nil, err
 	} else {
 		snip := &models.Snippet{}
@@ -113,8 +114,8 @@ func (a *RpcService) Clone(k *models.Alias, newFullName string) (*models.Snippet
 	}
 }
 
-func (a *RpcService) Tag(fullKey string, tags ...string) (*models.Snippet, error) {
-	if res, err := a.client.Tag(a.headers.GetContext(), &snipsRpc.TagRequest{FullName: fullKey, Tags: tags}); err != nil {
+func (r *RpcService) Tag(fullKey string, tags ...string) (*models.Snippet, error) {
+	if res, err := r.client.Tag(r.headers.GetContext(), &snipsRpc.TagRequest{FullName: fullKey, Tags: tags}); err != nil {
 		return nil, err
 	} else {
 		snip := &models.Snippet{}
@@ -123,8 +124,8 @@ func (a *RpcService) Tag(fullKey string, tags ...string) (*models.Snippet, error
 	}
 }
 
-func (a *RpcService) UnTag(fullKey string, tags ...string) (*models.Snippet, error) {
-	if res, err := a.client.UnTag(a.headers.GetContext(), &snipsRpc.UnTagRequest{FullName: fullKey, Tags: tags}); err != nil {
+func (r *RpcService) UnTag(fullKey string, tags ...string) (*models.Snippet, error) {
+	if res, err := r.client.UnTag(r.headers.GetContext(), &snipsRpc.UnTagRequest{FullName: fullKey, Tags: tags}); err != nil {
 		return nil, err
 	} else {
 		snip := &models.Snippet{}
@@ -154,13 +155,28 @@ func mapSnip(rpc *snipsRpc.Snip, model *models.Snippet) {
 	model.CloneCount = rpc.CloneCount
 }
 
-func mapSnippetList(rpc *snipsRpc.ListResponse, model *models.SnippetList) {
+const LATEST_SNIPPET = "latest-snippet.json"
+
+func (r *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.SnippetList) {
 	model.Total = rpc.Total
 	model.Since = time.Unix(rpc.Since/1000, 0)
 	model.Size = rpc.Size
+	ns := &models.Snippet{}
+	r.Settings.Get(LATEST_SNIPPET, ns, time.Now().Unix()-10)
+	exists := false
 	for _, v := range rpc.Items {
 		item := &models.Snippet{}
 		mapSnip(v, item)
 		model.Items = append(model.Items, *item)
+		if item.Id == ns.Id {
+			exists = true
+		}
 	}
+	if !exists && ns.Name != "" {
+		model.Items = append([]models.Snippet{*ns}, model.Items...)
+	}
+}
+
+func (r *RpcService) CacheSnip(s *models.Snippet) {
+	r.Settings.Upsert(LATEST_SNIPPET, *s)
 }

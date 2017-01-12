@@ -45,7 +45,7 @@ func (u *StdManager) SignUp(email string, username string, password string) (*mo
 
 func (u *StdManager) Get() (*models.User, error) {
 	user := &models.User{}
-	if err := u.settings.Get(userDbKey, user); err != nil {
+	if err := u.settings.Get(userDbKey, user, 0); err != nil {
 		return nil, err
 	} else {
 		return user, nil

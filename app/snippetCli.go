@@ -228,7 +228,7 @@ func (a *SnippetCli) List(args ...string) {
 		}
 	}
 	if username == "" {
-		if err := a.settings.Get(models.ProfileFullKey, u); err != nil {
+		if err := a.settings.Get(models.ProfileFullKey, u, 0); err != nil {
 			a.Render("api:not-authenticated", nil)
 			return
 		} else {
@@ -257,7 +257,7 @@ func (a *SnippetCli) handleMultiResponse(fullKey string, list *models.SnippetLis
 
 func (a *SnippetCli) getAbsAlias(fullKey string) *models.Alias {
 	u := &models.User{}
-	if err := a.settings.Get(models.ProfileFullKey, u); err != nil {
+	if err := a.settings.Get(models.ProfileFullKey, u, 0); err != nil {
 		a.Render("api:not-authenticated", nil)
 		return nil
 	}

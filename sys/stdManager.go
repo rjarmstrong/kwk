@@ -42,13 +42,24 @@ func (s *StdManager) WriteToFile(subDirName string, fullName string, snippet str
 	return fp, err
 }
 
-func (s *StdManager) ReadFromFile(subDirName string, fullName string, incHoldingDir bool) (string, error) {
+func (s *StdManager) ReadFromFile(subDirName string, fullName string, incHoldingDir bool, fresherThan int64) (string, error) {
 	fp := s.getFilePath(subDirName, fullName, incHoldingDir)
-	if ok, _ := s.FileExists(subDirName, fullName, incHoldingDir); !ok {
-		return "", errors.New("Not found.")
+	if fi, err := os.Stat(fp); err != nil {
+		if os.IsNotExist(err) {
+			// TODO: PUT IN STANDARD ERROR
+			return "", errors.New("Not found.")
+		} else {
+			return "", err
+		}
+	} else {
+		if fresherThan == 0 || fresherThan < int64(fi.ModTime().Second()) {
+			bts, err := ioutil.ReadFile(fp)
+			return string(bts), err
+		} else {
+			return "", errors.New("Not found. (Expired)")
+		}
+
 	}
-	bts, err := ioutil.ReadFile(fp)
-	return string(bts), err
 }
 
 func (s *StdManager) FileExists(subDirName string, fullName string, incHoldingDir bool) (bool, error) {

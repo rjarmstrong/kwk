@@ -33,6 +33,6 @@ func (m *ManagerMock) Delete(directoryName string, fullKey string) error {
 func (m *ManagerMock) WriteToFile(subDirName string, fullName string, snippet string, incHoldingDir bool) (string, error) {
 	return "", nil
 }
-func (m *ManagerMock) ReadFromFile(subDirName string, fullName string, incHoldingDir bool) (string, error) {
+func (m *ManagerMock) ReadFromFile(subDirName string, fullName string, incHoldingDir bool, fresherThan int64) (string, error) {
 	return "", nil
 }

@@ -26,7 +26,7 @@ func (s *SettingsMock) Delete(fullKey string) error {
 	return nil
 }
 
-func (s *SettingsMock) Get(fullKey string, input interface{}) error {
+func (s *SettingsMock) Get(fullKey string, input interface{}, fresherThan int64) error {
 	s.GetCalledWith = []interface{}{fullKey, input}
 	if s.GetHydrateWith != nil {
 		v1 := reflect.ValueOf(input).Elem()

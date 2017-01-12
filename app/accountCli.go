@@ -21,7 +21,7 @@ func NewAccountCli(u account.Manager, s config.Settings, w tmpl.Writer, d dlg.Di
 
 func (c *AccountCli) Get() {
 	u := &models.User{}
-	if err := c.settings.Get(models.ProfileFullKey, u); err != nil {
+	if err := c.settings.Get(models.ProfileFullKey, u, 0); err != nil {
 		c.Render("api:not-authenticated", nil)
 	} else {
 		c.Render("account:profile", u)

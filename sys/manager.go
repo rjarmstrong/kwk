@@ -15,5 +15,5 @@ type Manager interface {
 	Delete(subDirName string, fullName string) error
 	FileExists(subDirName string, fullName string, incHoldingDir bool) (bool, error)
 	WriteToFile(subDirName string, fullName string, snippet string, incHoldingDir bool) (string, error)
-	ReadFromFile(subDirName string, fullName string, incHoldingDir bool) (string, error)
+	ReadFromFile(subDirName string, fullName string, incHoldingDir bool, fresherThan int64) (string, error)
 }

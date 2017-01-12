@@ -22,8 +22,8 @@ func (s *FileSettings) Upsert(key string, value interface{}) error {
 	return err
 }
 
-func (s *FileSettings) Get(key string, value interface{}) error {
-	if str, err := s.System.ReadFromFile(s.DirectoryName, key, false); err != nil {
+func (s *FileSettings) Get(key string, value interface{}, fresherThan int64) error {
+	if str, err := s.System.ReadFromFile(s.DirectoryName, key, false, fresherThan); err != nil {
 		return err
 	} else {
 		return json.Unmarshal([]byte(str), value)
