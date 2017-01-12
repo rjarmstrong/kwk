@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"os"
 	"os/user"
+	"time"
 )
 
 const (
@@ -42,7 +43,7 @@ func (s *StdManager) WriteToFile(subDirName string, fullName string, snippet str
 	return fp, err
 }
 
-func (s *StdManager) ReadFromFile(subDirName string, fullName string, incHoldingDir bool, fresherThan int64) (string, error) {
+func (s *StdManager) ReadFromFile(subDirName string, fullName string, incHoldingDir bool, after int64) (string, error) {
 	fp := s.getFilePath(subDirName, fullName, incHoldingDir)
 	if fi, err := os.Stat(fp); err != nil {
 		if os.IsNotExist(err) {
@@ -52,7 +53,9 @@ func (s *StdManager) ReadFromFile(subDirName string, fullName string, incHolding
 			return "", err
 		}
 	} else {
-		if fresherThan == 0 || fresherThan < int64(fi.ModTime().Second()) {
+		fmt.Println("after:", time.Unix(after, 0), "mod time:", fi.ModTime())
+		if after == 0 || after < int64(fi.ModTime().Unix()) {
+			fmt.Println("reading file")
 			bts, err := ioutil.ReadFile(fp)
 			return string(bts), err
 		} else {

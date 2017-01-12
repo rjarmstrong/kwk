@@ -162,6 +162,8 @@ func (r *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.Sn
 	model.Since = time.Unix(rpc.Since/1000, 0)
 	model.Size = rpc.Size
 	ns := &models.Snippet{}
+	// TODO: Monitor eventual consistency and tweak cache duration.
+	// Test with: go build;./kwkcli new "dong1" zing.sh;./kwkcli ls;sleep 11;./kwkcli ls;
 	r.Settings.Get(LATEST_SNIPPET, ns, time.Now().Unix()-10)
 	exists := false
 	for _, v := range rpc.Items {
@@ -178,5 +180,6 @@ func (r *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.Sn
 }
 
 func (r *RpcService) CacheSnip(s *models.Snippet) {
+	fmt.Println(s)
 	r.Settings.Upsert(LATEST_SNIPPET, *s)
 }
