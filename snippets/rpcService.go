@@ -180,6 +180,5 @@ func (r *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.Sn
 }
 
 func (r *RpcService) CacheSnip(s *models.Snippet) {
-	fmt.Println(s)
 	r.Settings.Upsert(LATEST_SNIPPET, *s)
 }
