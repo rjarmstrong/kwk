@@ -13,6 +13,7 @@ import (
 	"os"
 	"fmt"
 	"log"
+	"time"
 )
 
 // /etc/ssl/certs/COMODO_RSA_Certification_Authority.pem
@@ -65,14 +66,17 @@ func GetConn(serverAddress string, logger *log.Logger) *grpc.ClientConn {
 		RootCAs:                    pool,
 		InsecureSkipVerify:         trustCerts,
 		ClientSessionCache:         tls.NewLRUClientSessionCache(-1),
-		PreferServerCipherSuites:   false,
-		CipherSuites:               []uint16{tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305, tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305},
+		PreferServerCipherSuites:   true,
+		CipherSuites:               []uint16{ tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305 },
 		DynamicRecordSizingDisabled:false,
 		MinVersion:                 tls.VersionTLS12,
 		SessionTicketsDisabled:     false,
+		CurvePreferences:[]tls.CurveID{ tls.X25519 },
 	})
 	opts = append(opts, grpc.WithTransportCredentials(creds))
 	opts = append(opts, grpc.WithUnaryInterceptor(errorInterceptor))
+	opts = append(opts, grpc.WithTimeout(time.Second*10))
+	opts = append(opts, grpc.WithBlock())
 	grpclog.SetLogger(logger)
 
 	conn, err := grpc.Dial(serverAddress, opts...)
