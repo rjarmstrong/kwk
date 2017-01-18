@@ -23,16 +23,12 @@ func (c *SystemCli) Upgrade() {
 	panic("not implemented")
 }
 
-func (c *SystemCli) GetVersion() {
-	cliV, err := c.service.GetVersion()
-	if err != nil {
-		c.HandleErr(err)
-	}
+func (c *SystemCli) GetVersion(cliVersion string) {
 	apiV, err := c.rpc.GetApiInfo(); if err != nil {
 		c.HandleErr(err)
 	}
 	c.Render("system:version", map[string]string{
-		"cliVersion": cliV,
+		"cliVersion": cliVersion,
 		"apiVersion": fmt.Sprintf("%s+%s", apiV.Version, apiV.Build),
 	})
 }

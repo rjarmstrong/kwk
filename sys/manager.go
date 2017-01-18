@@ -8,7 +8,6 @@ const (
 )
 
 type Manager interface {
-	GetVersion() (string, error)
 	CopyToClipboard(input string) error
 	Exists(path string) (bool, error)
 

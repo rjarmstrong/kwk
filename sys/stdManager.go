@@ -15,7 +15,6 @@ import (
 )
 
 const (
-	APP_VERSION = "APP_VERSION"
 	FILE_PERMISSION = 0700
 )
 
@@ -76,14 +75,6 @@ func (s *StdManager) Exists(fullPath string) (bool, error) {
 		}
 	}
 	return true, nil
-}
-
-func (s *StdManager) GetVersion() (string, error) {
-	if v := os.Getenv(APP_VERSION); v == "" {
-		return "", errors.New(APP_VERSION + " has not been set.")
-	} else {
-		return v, nil
-	}
 }
 
 func (s *StdManager) CopyToClipboard(input string) error {
