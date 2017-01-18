@@ -67,11 +67,8 @@ func GetConn(serverAddress string, logger *log.Logger) *grpc.ClientConn {
 		InsecureSkipVerify:         trustCerts,
 		ClientSessionCache:         tls.NewLRUClientSessionCache(-1),
 		PreferServerCipherSuites:   true,
-		CipherSuites:               []uint16{ tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305 },
 		DynamicRecordSizingDisabled:false,
-		MinVersion:                 tls.VersionTLS12,
 		SessionTicketsDisabled:     false,
-		CurvePreferences:[]tls.CurveID{ tls.X25519 },
 	})
 	opts = append(opts, grpc.WithTransportCredentials(creds))
 	opts = append(opts, grpc.WithUnaryInterceptor(errorInterceptor))
@@ -110,6 +107,7 @@ func (i *Headers) GetContext() context.Context {
 }
 
 func errorInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+	fmt.Printf("%+v \n\n %+v", method, req)
 	err := invoker(ctx, method, req, reply, cc, opts...)
 	if err != nil {
 		return models.ParseGrpcErr(err)
