@@ -107,7 +107,6 @@ func (i *Headers) GetContext() context.Context {
 }
 
 func errorInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-	fmt.Printf("%+v \n\n %+v", method, req)
 	err := invoker(ctx, method, req, reply, cc, opts...)
 	if err != nil {
 		return models.ParseGrpcErr(err)

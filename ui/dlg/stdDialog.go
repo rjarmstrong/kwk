@@ -18,12 +18,16 @@ type StdDialog struct {
 	reader *bufio.Reader
 }
 
-func (d *StdDialog) Modal(templateName string, data interface{}) *DialogResponse {
+func (d *StdDialog) Modal(templateName string, data interface{}, autoYes bool) *DialogResponse {
+	r := &DialogResponse{}
+	if autoYes {
+		r.Ok = true
+		return r
+	}
 	d.writer.Render(templateName, data)
 	yesNo, _, _ := d.reader.ReadRune()
-	return &DialogResponse{
-		Ok: string(yesNo) == "y",
-	}
+	r.Ok = string(yesNo) == "y"
+	return r
 }
 
 func (d *StdDialog) MultiChoice(templateName string, header interface{}, options interface{}) *DialogResponse {

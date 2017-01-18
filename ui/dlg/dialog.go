@@ -4,7 +4,7 @@ package dlg
 type Dialog interface {
 
 	// Modal creates a yes/no prompt with a given template and data.
-	Modal(templateName string, data interface{}) *DialogResponse
+	Modal(templateName string, data interface{}, autoYes bool) *DialogResponse
 
 	// FormField renders a prompt with a templated label to take user input.
 	FormField(templateName string, data interface{}, mask bool) *DialogResponse

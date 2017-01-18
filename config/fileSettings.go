@@ -10,10 +10,13 @@ import (
 type FileSettings struct {
 	DirectoryName string
 	System        sys.Manager
+	Flags *Flags
 }
 
-func New(s sys.Manager, subDirName string) *FileSettings {
-	return &FileSettings{DirectoryName: subDirName, System: s}
+func NewFileSettings(s sys.Manager, subDirName string) Settings {
+	// TODO: Fetch Load configs from disk or fetch them and unmarshall into flags
+	// https://github.com/urfave/cli
+	return &FileSettings{DirectoryName: subDirName, System: s, Flags:&Flags{}}
 }
 
 func (s *FileSettings) Upsert(key string, value interface{}) error {
@@ -32,4 +35,8 @@ func (s *FileSettings) Get(key string, value interface{}, fresherThan int64) err
 
 func (s *FileSettings) Delete(key string) error {
 	return s.System.Delete(s.DirectoryName, key)
+}
+
+func (s *FileSettings) GetFlags() *Flags {
+	return s.Flags
 }

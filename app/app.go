@@ -10,7 +10,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
-	"gopkg.in/urfave/cli.v1"
+	"github.com/urfave/cli"
 )
 
 type KwkApp struct {
@@ -23,14 +23,28 @@ type KwkApp struct {
 	Dialogue       dlg.Dialog
 	TemplateWriter tmpl.Writer
 	Search         search.Term
-	Api 		rpc.Service
+	Api 	       rpc.Service
 }
 
 func New(a snippets.Service, s sys.Manager, t config.Settings, r cmd.Runner, u account.Manager,
 	d dlg.Dialog, w tmpl.Writer, h search.Term, api rpc.Service) *KwkApp {
 
 	app := cli.NewApp()
+	f := t.GetFlags()
 	//cli.HelpPrinter = system.Help
+	app.Flags = []cli.Flag {
+		cli.BoolFlag{
+			Name: "yes, y",
+			Usage: "Automatically accept yes is modal dialogs.",
+			Destination:&f.AutoYes,
+		},
+		cli.BoolFlag{
+			Name: "covert, x",
+			Usage: "Open browser in covert mode.",
+			Destination:&f.Covert,
+		},
+	}
+
 
 	accCli := NewAccountCli(u, t, w, d)
 	app.Commands = append(app.Commands, Accounts(accCli)...)

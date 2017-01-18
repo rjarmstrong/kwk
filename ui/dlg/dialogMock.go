@@ -11,8 +11,8 @@ type DialogMock struct {
 	MultiChoiceResponse   *DialogResponse
 }
 
-func (d *DialogMock) Modal(templateName string, data interface{}) *DialogResponse {
-	d.LastModalCalledWith = []interface{}{templateName, data}
+func (d *DialogMock) Modal(templateName string, data interface{}, autoYes bool) *DialogResponse {
+	d.LastModalCalledWith = []interface{}{templateName, data, autoYes}
 	d.CallHistory = append(d.CallHistory, d.LastModalCalledWith)
 	return d.ReturnItem
 }

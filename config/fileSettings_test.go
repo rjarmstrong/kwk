@@ -13,7 +13,7 @@ func Test_System(t *testing.T) {
 	Convey("FileSettings test", t, func() {
 		Convey(`Should create, update, delete and get a setting`, func() {
 			sys := sys.New()
-			s := New(sys, "test_settings")
+			s := NewFileSettings(sys, "test_settings")
 			key := "user"
 			expected := models.User{
 				Email: "richard@kwk.co",

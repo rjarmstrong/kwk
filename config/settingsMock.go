@@ -40,3 +40,7 @@ func (s *SettingsMock) Upsert(dir string, data interface{}) error {
 	s.UpsertCalledWith = []interface{}{dir, data}
 	return nil
 }
+
+func (s *SettingsMock) GetFlags() *Flags {
+	panic("Not implemented")
+}

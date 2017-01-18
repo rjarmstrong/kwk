@@ -25,7 +25,7 @@ func (r *RpcService) Update(fullKey string, description string) (*models.Snippet
 		return nil, err
 	} else {
 		m := &models.Snippet{}
-		mapSnip(res.Snip, m)
+		r.mapSnip(res.Snip, m, true)
 		return m, nil
 	}
 }
@@ -51,8 +51,11 @@ func (r *RpcService) Get(k *models.Alias) (*models.SnippetList, error) {
 	}
 }
 
-func (r *RpcService) Delete(fullKey string) error {
-	_, err := r.client.Delete(r.headers.GetContext(), &snipsRpc.DeleteRequest{FullName: fullKey})
+func (r *RpcService) Delete(fullName string) error {
+	_, err := r.client.Delete(r.headers.GetContext(), &snipsRpc.DeleteRequest{FullName: fullName})
+	//if err != nil {
+	//	r.Settings.Upsert(DELETED_SNIPPET, )
+	//}
 	return err
 }
 
@@ -65,8 +68,7 @@ func (r *RpcService) Create(snip string, path string) (*models.CreateSnippetRequ
 		cs := &models.CreateSnippetRequest{}
 		if res.Snip != nil {
 			snip := &models.Snippet{}
-			mapSnip(res.Snip, snip)
-			r.CacheSnip(snip)
+			r.mapSnip(res.Snip, snip, true)
 			cs.Snippet = snip
 		} else {
 			cs.TypeMatch = &models.TypeMatch{
@@ -89,7 +91,7 @@ func (r *RpcService) Rename(fullKey string, newFullName string) (*models.Snippet
 		return nil, "", err
 	} else {
 		snip := &models.Snippet{}
-		mapSnip(res.Snip, snip)
+		r.mapSnip(res.Snip, snip, true)
 		return snip, res.OriginalFullName, nil
 	}
 }
@@ -99,7 +101,7 @@ func (r *RpcService) Patch(fullKey string, target string, patch string) (*models
 		return nil, err
 	} else {
 		snip := &models.Snippet{}
-		mapSnip(res.Snip, snip)
+		r.mapSnip(res.Snip, snip, true)
 		return snip, nil
 	}
 }
@@ -109,7 +111,7 @@ func (r *RpcService) Clone(k *models.Alias, newFullName string) (*models.Snippet
 		return nil, err
 	} else {
 		snip := &models.Snippet{}
-		mapSnip(res.Snip, snip)
+		r.mapSnip(res.Snip, snip, true)
 		return snip, nil
 	}
 }
@@ -119,7 +121,7 @@ func (r *RpcService) Tag(fullKey string, tags ...string) (*models.Snippet, error
 		return nil, err
 	} else {
 		snip := &models.Snippet{}
-		mapSnip(res.Snip, snip)
+		r.mapSnip(res.Snip, snip, true)
 		return snip, nil
 	}
 }
@@ -129,12 +131,15 @@ func (r *RpcService) UnTag(fullKey string, tags ...string) (*models.Snippet, err
 		return nil, err
 	} else {
 		snip := &models.Snippet{}
-		mapSnip(res.Snip, snip)
+		r.mapSnip(res.Snip, snip, true)
 		return snip, nil
 	}
 }
 
-func mapSnip(rpc *snipsRpc.Snip, model *models.Snippet) {
+/*
+  cache will add the snippet to the local cache to deal with eventual consistency user experience.
+ */
+func (r *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache bool) {
 	model.Id = rpc.SnipId
 	model.FullName = rpc.FullName
 	model.Username = rpc.Username
@@ -153,32 +158,34 @@ func mapSnip(rpc *snipsRpc.Snip, model *models.Snippet) {
 	model.Private = rpc.Private
 	model.RunCount = rpc.RunCount
 	model.CloneCount = rpc.CloneCount
+	if cache {
+		r.Settings.Upsert(LATEST_SNIPPET, model)
+	}
 }
 
 const LATEST_SNIPPET = "latest-snippet.json"
+const DELETED_SNIPPET = "deleted-snippet.json"
 
 func (r *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.SnippetList) {
 	model.Total = rpc.Total
 	model.Since = time.Unix(rpc.Since/1000, 0)
 	model.Size = rpc.Size
-	ns := &models.Snippet{}
+	newSnip := &models.Snippet{}
 	// TODO: Monitor eventual consistency and tweak cache duration.
 	// Test with: go build;./kwkcli new "dong1" zing.sh;./kwkcli ls;sleep 11;./kwkcli ls;
-	r.Settings.Get(LATEST_SNIPPET, ns, time.Now().Unix()-10)
-	exists := false
+	r.Settings.Get(LATEST_SNIPPET, newSnip, time.Now().Unix()-10)
+	isInList := false
 	for _, v := range rpc.Items {
 		item := &models.Snippet{}
-		mapSnip(v, item)
+		r.mapSnip(v, item, false)
 		model.Items = append(model.Items, *item)
-		if item.Id == ns.Id {
-			exists = true
+		if item.Id == newSnip.Id {
+			isInList = true
 		}
 	}
-	if !exists && ns.Name != "" {
-		model.Items = append([]models.Snippet{*ns}, model.Items...)
+	if !isInList && newSnip.Name != "" {
+		// TODO: add to logger
+		fmt.Println("Adding from cache")
+		model.Items = append([]models.Snippet{*newSnip}, model.Items...)
 	}
-}
-
-func (r *RpcService) CacheSnip(s *models.Snippet) {
-	r.Settings.Upsert(LATEST_SNIPPET, *s)
 }

@@ -11,9 +11,10 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
+	"runtime/pprof"
 	"bufio"
 	"os"
-	"runtime/pprof"
+	"fmt"
 )
 
 var version string = "-"
@@ -33,7 +34,7 @@ func main() {
 	defer conn.Close()
 
 	s := sys.New()
-	t := config.New(s, "settings")
+	t := config.NewFileSettings(s, "settings")
 	h := rpc.NewHeaders(t)
 	u := account.NewStdManager(conn, t, h)
 	a := snippets.New(conn, t, h)
@@ -47,6 +48,7 @@ func main() {
 	kwkApp := app.New(a, s, t, o, u, d, w, ch, api)
 	kwkApp.App.Version = version + "+" + build
 	kwkApp.App.Run(os.Args)
+	fmt.Printf("Flags: %+v", t.GetFlags())
 }
 
 func profile() *os.File  {

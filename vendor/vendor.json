@@ -171,6 +171,12 @@
 			"revisionTime": "2016-09-28T20:55:23Z"
 		},
 		{
+			"checksumSHA1": "jm802xmRmtkUSVCED5SiDwIe0Jo=",
+			"path": "github.com/urfave/cli",
+			"revision": "168c95418e66e019fe17b8f4f5c45aa62ff80e23",
+			"revisionTime": "2016-08-01T03:09:57Z"
+		},
+		{
 			"checksumSHA1": "HpfYVaB8VI/Q4dS6I78I1iWaIT4=",
 			"path": "golang.org/x/crypto/ssh/terminal",
 			"revision": "f6b343c37ca80bfa8ea539da67a0b621f84fab1d",
@@ -301,12 +307,6 @@
 			"path": "google.golang.org/grpc/transport",
 			"revision": "c8105071640ef29fce843ed96983e864bb18eb0e",
 			"revisionTime": "2016-12-29T00:41:21Z"
-		},
-		{
-			"checksumSHA1": "hi6sSeRj+oyvsd+VqeSW4x9ET4U=",
-			"path": "gopkg.in/urfave/cli.v1",
-			"revision": "1efa31f08b9333f1bd4882d61f9d668a70cd902e",
-			"revisionTime": "2016-06-28T05:30:56Z"
 		},
 		{
 			"checksumSHA1": "yV+2de12Q/t09hBGYGKEOFr1/zc=",
