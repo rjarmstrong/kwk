@@ -7,11 +7,11 @@ import (
 	"github.com/olekukonko/tablewriter"
 	_ "github.com/olekukonko/tablewriter"
 	"bitbucket.com/sharingmachine/kwkcli/ui/style"
+	"encoding/json"
 	"text/template"
 	"strings"
 	"bytes"
 	"fmt"
-	"encoding/json"
 )
 
 var Templates = map[string]*template.Template{}
@@ -132,9 +132,12 @@ func listSnippets(list *models.SnippetList) string {
 
 		var snip string
 		var name string
-		if v.Private {
+		if v.Private && !v.IsConfig() {
 			name = style.Colour(style.Subdued, "."+v.Name+"."+v.Extension)
 			snip = style.Colour(style.Subdued, `<private>`)
+		} else if v.IsConfig() {
+			name = style.Colour(style.Yellow, getConfigName(v.Name)) + style.Colour(style.Subdued, "."+v.Extension)
+			snip = fmt.Sprintf("%s", uri(v.Snip))
 		} else {
 			name = style.Colour(style.LightBlue, v.Name) + style.Colour(style.Subdued, "."+v.Extension)
 			snip = fmt.Sprintf("%s", uri(v.Snip))
@@ -158,6 +161,10 @@ func listSnippets(list *models.SnippetList) string {
 	fmt.Fprint(buf, "\n\n")
 
 	return buf.String()
+}
+
+func getConfigName(name string) string {
+	return "." + strings.Split(name, "_")[1]
 }
 
 func alphaSearchResult(result models.SearchResult) string {

@@ -48,7 +48,7 @@ func main() {
 	kwkApp := app.New(a, s, t, o, u, d, w, ch, api)
 	kwkApp.App.Version = version + "+" + build
 	kwkApp.App.Run(os.Args)
-	fmt.Printf("Flags: %+v", t.GetFlags())
+	fmt.Printf("Prefs: %+v", t.GetPrefs())
 }
 
 func profile() *os.File  {

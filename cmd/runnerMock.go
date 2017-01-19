@@ -7,10 +7,6 @@ type RunnerMock struct {
 	EditCalledWith *models.Snippet
 }
 
-func (*RunnerMock) SetEnv(a *models.Alias) (string, error) {
-	panic("implement me")
-}
-
 func (o *RunnerMock) Run(alias *models.Snippet, args []string) error {
 	o.OpenCalledWith = []interface{}{alias, args}
 	return nil

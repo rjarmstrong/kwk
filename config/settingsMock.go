@@ -41,6 +41,6 @@ func (s *SettingsMock) Upsert(dir string, data interface{}) error {
 	return nil
 }
 
-func (s *SettingsMock) GetFlags() *Flags {
-	panic("Not implemented")
+func (s *SettingsMock) GetPrefs() *Preferences {
+	return &Preferences{}
 }

@@ -44,15 +44,6 @@ func (s *SnippetCli) Share(fullKey string, destination string) {
 	}
 }
 
-func (s *SnippetCli) SetEnv(fullName string) {
-	a := s.getAbsAlias(fullName)
-	if _, err := s.runner.SetEnv(a); err != nil {
-		panic(err)
-	} else {
-		s.Render("env:changed", fullName)
-	}
-}
-
 func (s *SnippetCli) Run(fullKey string, args []string) {
 	k := s.getAbsAlias(fullKey)
 	if list, err := s.service.Get(k); err != nil {
@@ -84,10 +75,6 @@ func (s *SnippetCli) New(uri string, fullKey string) {
 			} else {
 				s.Render("snippet:new", createAlias.Snippet)
 			}
-			s.system.CopyToClipboard(createAlias.Snippet.FullName)
-			//if createAlias.Snippet.Runtime != "url" {
-			//	a.Edit(createAlias.Snippet.FullKey)
-			//}
 		} else {
 			matches := createAlias.TypeMatch.Matches
 			r := s.MultiChoice("snippet:chooseruntime", "Choose a type for this snippet:", matches)
@@ -104,6 +91,14 @@ func (s *SnippetCli) New(uri string, fullKey string) {
 }
 
 func (s *SnippetCli) Edit(fullKey string) {
+	// TODO: ENCAPSULATE
+	if fullKey == "env" || fullKey == "prefs" {
+		fullKey += ".yml"
+	}
+	if fullKey == "env.yml" || fullKey == "prefs.yml" {
+		fullKey = models.GetHostConfigName(fullKey)
+	}
+
 	if list, err := s.service.Get(s.getAbsAlias(fullKey)); err != nil {
 		s.HandleErr(err)
 	} else {
@@ -138,7 +133,7 @@ func (s *SnippetCli) Inspect(fullKey string) {
 
 func (s *SnippetCli) Delete(fullKey string) {
 	alias := &models.Snippet{FullName: fullKey}
-	if r := s.Modal("snippet:delete", alias, s.settings.GetFlags().AutoYes); r.Ok {
+	if r := s.Modal("snippet:delete", alias, s.settings.GetPrefs().AutoYes); r.Ok {
 		if err := s.service.Delete(fullKey); err != nil {
 			s.HandleErr(err)
 		}

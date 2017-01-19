@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+	"os"
+	"fmt"
+)
 
 const (
 	ProfileFullKey  = "profile.json"
@@ -41,6 +45,18 @@ type Snippet struct {
 	Private            bool
 	CloneCount         int64
 	RunCount           int64
+}
+
+func (s *Snippet) IsConfig() bool {
+	return s.FullName == GetHostConfigName("env.yml") || s.FullName == GetHostConfigName("prefs.yml")
+}
+
+func GetHostConfigName(fullName string) string {
+	if h, err := os.Hostname(); err != nil {
+		panic(err)
+	} else {
+		return fmt.Sprintf(".%s_%s", h, fullName)
+	}
 }
 
 type CreateSnippetRequest struct {

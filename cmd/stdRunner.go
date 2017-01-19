@@ -6,7 +6,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
 	"strings"
 	"runtime"
 	"os/exec"
@@ -16,12 +15,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"google.golang.org/grpc/codes"
 )
 
 const (
-	CONF_PATH       = "conf"
-	ENV_PATH        = "env"
-	ENV_NAME        = "env.yml"
 	FILE_CACHE_PATH = "filecache"
 )
 
@@ -93,40 +90,31 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	}
 }
 
-func (r *StdRunner) SetEnv(a *models.Alias) (string, error) {
-	// download snippet
-	if l, err := r.snippets.Get(&models.Alias{FullKey: a.FullKey, Username:a.Username}); err != nil {
-		return "", err
-	} else {
-		env := l.Items[0].Snip
-		// Need to create a setting called 'current env' e.g. currentEnv: 'richard/amd-64.yml'
-		if _, err := r.system.WriteToFile(ENV_PATH, ENV_NAME, env, false); err != nil {
-			return "", err
-		}
-		return env, nil
-	}
-}
 
-func (r *StdRunner) getEnv() (string, error) {
-	if os.Getenv(sys.KWK_TESTMODE) != "" {
-		testEnv := "./cmd/testEnv.yml"
-		// TODO: use log
-		fmt.Println(">> Running with:", testEnv, " <<")
-		b, err := ioutil.ReadFile(testEnv)
-		return string(b), nil
-		if err != nil {
-			return "", err
-		}
-	}
+type GetDefaultConf func () (string, error)
+
+//func DefaultPrefs() (string, error){
+//	return config.NewPreferences()
+//}
+
+
+func (r *StdRunner) getConfig(fullName string, getDefault GetDefaultConf) (string, error) {
 	// TODO: check yml version is compatible with this build else force upgrade.
-	if ok, _ := r.system.FileExists(ENV_PATH, ENV_NAME, false); !ok {
-		// TODO: use log
-		fmt.Println(">> No local env.yml getting remote. <<")
-		var defaultEnv = fmt.Sprintf("%s-%s.yml", runtime.GOOS, runtime.GOARCH)
-		a := &models.Alias{FullKey:defaultEnv, Username:"env"}
-		return r.SetEnv(a)
+
+	hostConfigName := models.GetHostConfigName(fullName)
+	if ok, _ := r.system.FileExists(FILE_CACHE_PATH, hostConfigName, true); !ok {
+		hostAlias := &models.Alias{FullKey: hostConfigName}
+		if l, err := r.snippets.Get(&models.Alias{FullKey: hostAlias.FullKey, Username:"richard"}); err != nil {
+			if err.(*models.ClientErr).TransportCode == codes.NotFound {
+				return getDefault()
+			} else {
+				return "", err
+			}
+		} else {
+			return l.Items[0].Snip, nil
+		}
 	} else {
-		if e, err := r.system.ReadFromFile(ENV_PATH, ENV_NAME, false, 0); err != nil {
+		if e, err := r.system.ReadFromFile(FILE_CACHE_PATH, hostConfigName, true, 0); err != nil {
 			return "", err
 		} else {
 			return e, nil
@@ -135,7 +123,28 @@ func (r *StdRunner) getEnv() (string, error) {
 }
 
 func (r *StdRunner) getSection(name string) (*yaml.MapSlice, error) {
-	env, err := r.getEnv()
+	getDefault := func() (string, error){
+		defaultEnv := fmt.Sprintf("%s-%s.yml", runtime.GOOS, runtime.GOARCH)
+		defaultAlias := &models.Alias{FullKey:defaultEnv, Username:"env"}
+		if snip, err := r.snippets.Clone(defaultAlias, models.GetHostConfigName("env.yml")); err != nil {
+			return "", err
+		} else {
+			return snip.Snip, nil
+		}
+	}
+
+	//if os.Getenv(sys.KWK_TESTMODE) != "" {
+	//	testEnv := "./cmd/testEnv.yml"
+	//	// TODO: use log
+	//	fmt.Println(">> Running with:", testEnv, " <<")
+	//	b, err := ioutil.ReadFile(testEnv)
+	//	return string(b), nil
+	//	if err != nil {
+	//		return "", err
+	//	}
+	//}
+
+	env, err := r.getConfig("env.yml", getDefault)
 	if err != nil {
 		return nil, err
 	}

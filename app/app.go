@@ -30,18 +30,38 @@ func New(a snippets.Service, s sys.Manager, t config.Settings, r cmd.Runner, u a
 	d dlg.Dialog, w tmpl.Writer, h search.Term, api rpc.Service) *KwkApp {
 
 	app := cli.NewApp()
-	f := t.GetFlags()
+	p := t.GetPrefs()
 	//cli.HelpPrinter = system.Help
 	app.Flags = []cli.Flag {
 		cli.BoolFlag{
 			Name: "yes, y",
 			Usage: "Automatically accept yes is modal dialogs.",
-			Destination:&f.AutoYes,
+			Destination:&p.AutoYes,
 		},
 		cli.BoolFlag{
 			Name: "covert, x",
 			Usage: "Open browser in covert mode.",
-			Destination:&f.Covert,
+			Destination:&p.Covert,
+		},
+		cli.BoolFlag{
+			Name: "global, g",
+			Usage: "Searches all users public snippets plus your private ones.",
+			Destination:&p.Global,
+		},
+		cli.BoolFlag{
+			Name: "quiet, q",
+			Usage: "Just display full names when listing.",
+			Destination:&p.Quiet,
+		},
+		cli.BoolFlag{
+			Name: "encrypt, e",
+			Usage: "When creating a new snippet encrypt.",
+			Destination:&p.Encrypt,
+		},
+		cli.BoolFlag{
+			Name: "decrypt, d",
+			Usage: "When viewing a snippet decrypt if necc.",
+			Destination:&p.Decrypt,
 		},
 	}
 
