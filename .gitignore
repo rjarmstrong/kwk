@@ -23,7 +23,7 @@ _testmain.go
 *.exe
 *.test
 *.prof
-cli
+
 report.xml
 main
 kwk-cli
