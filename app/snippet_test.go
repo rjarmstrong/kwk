@@ -9,7 +9,6 @@ import (
 	"github.com/smartystreets/assertions/should"
 	. "github.com/smartystreets/goconvey/convey"
 	"bitbucket.com/sharingmachine/kwkcli/search"
-	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
 	"testing"
 	"time"
@@ -20,7 +19,6 @@ func Test_Snippet(t *testing.T) {
 		app := CreateAppStub()
 		a := app.Snippets.(*snippets.ServiceMock)
 		r := app.Runner.(*cmd.RunnerMock)
-		s := app.System.(*sys.ManagerMock)
 		d := app.Dialogue.(*dlg.DialogMock)
 		t := app.Settings.(*config.SettingsMock)
 		w := app.TemplateWriter.(*tmpl.WriterMock)
