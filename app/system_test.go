@@ -1,39 +1,20 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
-	"github.com/smartystreets/assertions/should"
-	. "github.com/smartystreets/goconvey/convey"
-	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"testing"
 )
 
 func Test_System(t *testing.T) {
-	Convey("SYSTEM CLI", t, func() {
-		app := CreateAppStub()
-		s := app.System.(*sys.ManagerMock)
-		w := app.TemplateWriter.(*tmpl.WriterMock)
-
-		Convey(`Upgrade`, func() {
-			Convey(`Should run by name`, func() {
-				p := app.App.Command("upgrade")
-				So(p, should.NotBeNil)
-			})
-		})
-
-		Convey(`Version`, func() {
-			Convey(`Should run by name`, func() {
-				p := app.App.Command("version")
-				So(p, should.NotBeNil)
-			})
-			Convey(`Should get version and call writer print`, func() {
-				app.App.Run([]string{"[app]", "version"})
-				So(s.VersionCalled, should.BeTrue)
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"system:version", map[string]string{
-					"apiVersion": "+",
-					"cliVersion": "0.0.1",
-				}})
-			})
-		})
-	})
+	//Convey("SYSTEM CLI", t, func() {
+	//	app := CreateAppStub()
+	//	s := app.System.(*sys.ManagerMock)
+	//	w := app.TemplateWriter.(*tmpl.WriterMock)
+	//
+	//	Convey(`Upgrade`, func() {
+	//		Convey(`Should run by name`, func() {
+	//			p := app.App.Command("upgrade")
+	//			So(p, should.NotBeNil)
+	//		})
+	//	})
+	//})
 }
