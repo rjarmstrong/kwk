@@ -83,14 +83,12 @@ func Test_Snippet(t *testing.T) {
 				fullKey := "hola.sh"
 				app.App.Run([]string{"[app]", "new", "echo hola", fullKey})
 				So(a.CreateCalledWith, should.Resemble, []string{"echo hola", fullKey})
-				So(s.CopyToClipboardCalledWith, should.Equal, fullKey)
 				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:new", &models.Snippet{FullName: fullKey}})
 			})
 			Convey(`Should call create, save to clip board and respond with template WITHOUT a fullKey`, func() {
 				app.App.Run([]string{"[app]", "new", "echo hola"})
 				So(a.CreateCalledWith, should.Resemble, []string{"echo hola", ""})
 				mockKey := "x5hi23"
-				So(s.CopyToClipboardCalledWith, should.Equal, mockKey)
 				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:new", &models.Snippet{FullName: mockKey}})
 			})
 		})
