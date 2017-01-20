@@ -170,7 +170,6 @@ func (a *App) Setup() {
 // to the proper flag/args combination
 func (a *App) Run(arguments []string) (err error) {
 	a.Setup()
-
 	// parse flags
 	set := flagSet(a.Name, a.Flags)
 	set.SetOutput(ioutil.Discard)

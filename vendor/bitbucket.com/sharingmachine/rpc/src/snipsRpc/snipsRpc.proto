@@ -7,22 +7,33 @@ option java_outer_classname = "SnipsRpc";
 package snipsRpc;
 
 service SnipsRpc {
-    rpc Create (CreateRequest) returns (CreateResponse) {}
-    rpc Update (UpdateRequest) returns (UpdateResponse) {}
-    rpc Rename (RenameRequest) returns (RenameResponse) {}
-    rpc Patch (PatchRequest) returns (PatchResponse) {}
-    rpc Clone (CloneRequest) returns(CloneResponse) {}
-    rpc Tag (TagRequest) returns(TagResponse) {}
-    rpc UnTag (UnTagRequest) returns(UnTagResponse) {}
-    rpc Get (GetRequest) returns(ListResponse) {}
-    rpc List (ListRequest) returns(ListResponse) {}
-    rpc Delete (DeleteRequest) returns(DeleteResponse) {}
+    rpc Create (CreateRequest) returns (CreateResponse) {
+    }
+    rpc Update (UpdateRequest) returns (UpdateResponse) {
+    }
+    rpc Rename (RenameRequest) returns (RenameResponse) {
+    }
+    rpc Patch (PatchRequest) returns (PatchResponse) {
+    }
+    rpc Clone (CloneRequest) returns (CloneResponse) {
+    }
+    rpc Tag (TagRequest) returns (TagResponse) {
+    }
+    rpc UnTag (UnTagRequest) returns (UnTagResponse) {
+    }
+    rpc Get (GetRequest) returns (ListResponse) {
+    }
+    rpc List (ListRequest) returns (ListResponse) {
+    }
+    rpc Delete (DeleteRequest) returns (DeleteResponse) {
+    }
 }
 
 message CreateRequest {
     string snip = 1;
     string fullName = 2;
     string description = 3;
+    Role role = 4;
 }
 
 message UpdateRequest {
@@ -93,8 +104,9 @@ message ListRequest {
     string username = 1;
     int64 since = 2;
     int64 size = 3;
-    repeated string tags=4;
-    repeated string extensions=5;
+    repeated string tags = 4;
+    repeated string extensions = 5;
+    bool all = 6;
 }
 
 message DeleteRequest {
@@ -131,6 +143,13 @@ message Snip {
     string snipSignature = 17;
     bool encrypted = 18;
     string algorithm = 19;
+    Role role = 20;
+}
+
+enum Role {
+    Standard = 0;
+    Preferences = 1;
+    Environment = 2;
 }
 
 message TypeMatchResponse {

@@ -31,8 +31,8 @@ func (r *RpcService) Update(fullKey string, description string) (*models.Snippet
 }
 
 // since unix time in milliseconds
-func (r *RpcService) List(username string, size int64, since int64, tags ...string) (*models.SnippetList, error) {
-	if res, err := r.client.List(r.headers.GetContext(), &snipsRpc.ListRequest{Username: username, Since: since, Size: size, Tags: tags}); err != nil {
+func (r *RpcService) List(l *models.ListParams) (*models.SnippetList, error) {
+	if res, err := r.client.List(r.headers.GetContext(), &snipsRpc.ListRequest{Username: l.Username, Since: l.Since, Size: l.Size, Tags: l.Tags, All:l.All}); err != nil {
 		return nil, err
 	} else {
 		list := &models.SnippetList{}
@@ -59,13 +59,13 @@ func (r *RpcService) Delete(fullName string) error {
 	return err
 }
 
-func (r *RpcService) Create(snip string, path string) (*models.CreateSnippetRequest, error) {
+func (r *RpcService) Create(snip string, path string, role models.SnipRole) (*models.CreateSnippetResponse, error) {
 	// encrypt if requested
 	fmt.Println(snip, path)
-	if res, err := r.client.Create(r.headers.GetContext(), &snipsRpc.CreateRequest{Snip: snip, FullName: path}); err != nil {
+	if res, err := r.client.Create(r.headers.GetContext(), &snipsRpc.CreateRequest{Snip: snip, FullName: path, Role: snipsRpc.Role(role)}); err != nil {
 		return nil, err
 	} else {
-		cs := &models.CreateSnippetRequest{}
+		cs := &models.CreateSnippetResponse{}
 		if res.Snip != nil {
 			snip := &models.Snippet{}
 			r.mapSnip(res.Snip, snip, true)
@@ -158,6 +158,7 @@ func (r *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache bo
 	model.Private = rpc.Private
 	model.RunCount = rpc.RunCount
 	model.CloneCount = rpc.CloneCount
+	model.Role = models.SnipRole(rpc.Role)
 	if cache {
 		r.Settings.Upsert(LATEST_SNIPPET, model)
 	}

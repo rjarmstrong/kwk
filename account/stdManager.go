@@ -9,10 +9,6 @@ import (
 	"time"
 )
 
-const (
-	userDbKey = "user"
-)
-
 type StdManager struct {
 	client   usersRpc.UsersRpcClient
 	settings config.Settings
@@ -45,11 +41,21 @@ func (u *StdManager) SignUp(email string, username string, password string) (*mo
 
 func (u *StdManager) Get() (*models.User, error) {
 	user := &models.User{}
-	if err := u.settings.Get(userDbKey, user, 0); err != nil {
+	if err := u.settings.Get(models.ProfileFullKey, user, 0); err != nil {
 		return nil, err
 	} else {
 		return user, nil
 	}
+}
+
+func (u *StdManager) HasValidCredentials() bool {
+	if user, err := u.Get(); err != nil {
+		return false
+	} else if user != nil {
+		// TODO: Check jwt expiry
+		return true
+	}
+	return false
 }
 
 func (u *StdManager) Signout() error {

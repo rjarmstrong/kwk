@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"runtime"
 )
 
 // /etc/ssl/certs/COMODO_RSA_Certification_Authority.pem
@@ -98,9 +99,10 @@ func (i *Headers) GetContext() context.Context {
 	if err := i.settings.Get(models.ProfileFullKey, u, 0); err != nil {
 		return context.Background()
 	} else {
+		hostname, _ := os.Hostname()
 		ctx := metadata.NewContext(
 			context.Background(),
-			metadata.Pairs(models.TokenHeaderName, u.Token),
+			metadata.Pairs(models.TokenHeaderName, u.Token, "hostname", hostname, "os", runtime.GOOS),
 		)
 		return ctx
 	}

@@ -33,3 +33,7 @@ func (a *ManagerMock) Signout() error {
 	a.SignoutCalled = true
 	return nil
 }
+
+func (u *ManagerMock) HasValidCredentials() bool {
+	return false
+}

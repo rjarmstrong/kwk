@@ -3,9 +3,13 @@ package cmd
 import (
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
+	"bitbucket.com/sharingmachine/kwkcli/config"
+	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
+	"google.golang.org/grpc/codes"
 	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"strings"
 	"runtime"
 	"os/exec"
@@ -15,21 +19,24 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"google.golang.org/grpc/codes"
 )
 
 const (
 	FILE_CACHE_PATH = "filecache"
+	PREFS_SUFFIX = "prefs.yml"
+	ENV_SUFFIX = "env.yml"
 )
 
 type StdRunner struct {
 	snippets snippets.Service
+	account  account.Manager
 	system   sys.Manager
 	writer   tmpl.Writer
+	settings config.Settings
 }
 
-func NewStdRunner(s sys.Manager, ss snippets.Service, w tmpl.Writer) *StdRunner {
-	return &StdRunner{snippets: ss, system: s, writer: w}
+func NewStdRunner(s sys.Manager, ss snippets.Service, w tmpl.Writer, a account.Manager, t config.Settings) *StdRunner {
+	return &StdRunner{snippets: ss, system: s, writer: w, account:a, settings: t}
 }
 
 func (r *StdRunner) Edit(s *models.Snippet) error {
@@ -90,27 +97,63 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	}
 }
 
+func (r *StdRunner) LoadPreferences() *config.PersistedPrefs {
+	getDefault := func() (string, error) {
+		dp := config.DefaultPrefs()
+		b, err := yaml.Marshal(dp.PersistedPrefs)
+		if err != nil {
+			panic(err)
+		}
+		if r.account.HasValidCredentials() {
+			if _, err := r.snippets.Create(string(b), models.GetHostConfigFullName(PREFS_SUFFIX), models.RolePreferences); err != nil {
+				return "", err
+			}
+		}
+		return string(b), nil
+	}
+	if c, err := r.GetConfig(PREFS_SUFFIX, getDefault); err != nil {
+		panic(err)
+	} else {
+		pp := &config.PersistedPrefs{}
+		if err := yaml.Unmarshal([]byte(c), pp); err != nil {
+			panic(err)
+		} else {
+			return pp
+		}
 
-type GetDefaultConf func () (string, error)
+	}
+}
 
-//func DefaultPrefs() (string, error){
-//	return config.NewPreferences()
-//}
+func (r *StdRunner) GetConfig(fullName string, getDefault GetDefaultConf) (string, error) {
+	if os.Getenv(sys.KWK_TESTMODE) != "" && fullName == "env.yml" {
+		testEnv := "./cmd/testEnv.yml"
+		// TODO: use log
+		fmt.Println(">> Running with:", testEnv, " <<")
+		b, err := ioutil.ReadFile(testEnv)
+		return string(b), nil
+		if err != nil {
+			return "", err
+		}
+	}
 
-
-func (r *StdRunner) getConfig(fullName string, getDefault GetDefaultConf) (string, error) {
 	// TODO: check yml version is compatible with this build else force upgrade.
 
-	hostConfigName := models.GetHostConfigName(fullName)
+	hostConfigName := models.GetHostConfigFullName(fullName)
 	if ok, _ := r.system.FileExists(FILE_CACHE_PATH, hostConfigName, true); !ok {
 		hostAlias := &models.Alias{FullKey: hostConfigName}
 		if l, err := r.snippets.Get(&models.Alias{FullKey: hostAlias.FullKey, Username:"richard"}); err != nil {
 			if err.(*models.ClientErr).TransportCode == codes.NotFound {
-				return getDefault()
+				if conf, err := getDefault(); err != nil {
+					return "", err
+				} else {
+					_, err := r.system.WriteToFile(FILE_CACHE_PATH, hostConfigName, conf, true)
+					return conf, err
+				}
 			} else {
 				return "", err
 			}
 		} else {
+			r.system.WriteToFile(FILE_CACHE_PATH, hostConfigName, l.Items[0].Snip, true)
 			return l.Items[0].Snip, nil
 		}
 	} else {
@@ -123,28 +166,17 @@ func (r *StdRunner) getConfig(fullName string, getDefault GetDefaultConf) (strin
 }
 
 func (r *StdRunner) getSection(name string) (*yaml.MapSlice, error) {
-	getDefault := func() (string, error){
+	getDefault := func() (string, error) {
 		defaultEnv := fmt.Sprintf("%s-%s.yml", runtime.GOOS, runtime.GOARCH)
 		defaultAlias := &models.Alias{FullKey:defaultEnv, Username:"env"}
-		if snip, err := r.snippets.Clone(defaultAlias, models.GetHostConfigName("env.yml")); err != nil {
+		if snip, err := r.snippets.Clone(defaultAlias, models.GetHostConfigFullName(ENV_SUFFIX)); err != nil {
 			return "", err
 		} else {
 			return snip.Snip, nil
 		}
 	}
 
-	//if os.Getenv(sys.KWK_TESTMODE) != "" {
-	//	testEnv := "./cmd/testEnv.yml"
-	//	// TODO: use log
-	//	fmt.Println(">> Running with:", testEnv, " <<")
-	//	b, err := ioutil.ReadFile(testEnv)
-	//	return string(b), nil
-	//	if err != nil {
-	//		return "", err
-	//	}
-	//}
-
-	env, err := r.getConfig("env.yml", getDefault)
+	env, err := r.GetConfig(ENV_SUFFIX, getDefault)
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +236,11 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 	if err != nil {
 		return err
 	}
-	comp, interp := getSubSection(rs, s.Extension)
+	yamlKey := s.Extension
+	if r.settings.GetPrefs().Covert {
+		yamlKey += "-covert"
+	}
+	comp, interp := getSubSection(rs, yamlKey)
 	if comp != nil {
 		if filePath, err := r.system.WriteToFile(FILE_CACHE_PATH, s.FullName, s.Snip, true); err != nil {
 			return err
@@ -250,12 +286,12 @@ func execSafe(name string, arg ...string) io.ReadCloser {
 	return out
 }
 
-func (r *StdRunner) OpenWeb(alias *models.Snippet) {
-	execSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", fmt.Sprintf("https://www.kwk.co/%s/%s", alias.Username, alias.FullName))
-	execSafe("osascript", "-e", "activate application \"Google Chrome\"")
-}
+//func (r *StdRunner) OpenWeb(alias *models.Snippet) {
+//	execSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", fmt.Sprintf("https://www.kwk.co/%s/%s", alias.Username, alias.FullName))
+//	execSafe("osascript", "-e", "activate application \"Google Chrome\"")
+//}
 
-func (r *StdRunner) OpenCovert(snippet string) {
-	execSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--incognito", snippet)
-	execSafe("osascript", "-e", "activate application \"Google Chrome\"")
-}
+//func (r *StdRunner) OpenCovert(snippet string) {
+//	execSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--incognito", snippet)
+//	execSafe("osascript", "-e", "activate application \"Google Chrome\"")
+//}

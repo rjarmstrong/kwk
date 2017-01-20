@@ -44,3 +44,7 @@ func (s *SettingsMock) Upsert(dir string, data interface{}) error {
 func (s *SettingsMock) GetPrefs() *Preferences {
 	return &Preferences{}
 }
+
+func (s *SettingsMock) SetPersistedPrefs(pp *PersistedPrefs) {
+
+}

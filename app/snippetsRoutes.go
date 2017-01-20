@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/urfave/cli"
+	"fmt"
 )
 
 func Snippets(s *SnippetCli) []cli.Command {
@@ -81,7 +82,15 @@ func Snippets(s *SnippetCli) []cli.Command {
 		{
 			Name:    "delete",
 			Aliases: []string{"rm"},
+			Flags: []cli.Flag {
+				cli.BoolFlag{
+					Name: "yes, y",
+					Usage: "Automatically accept yes is modal dialogs.",
+				},
+			},
 			Action: func(c *cli.Context) error {
+				autoYes := c.Bool("yes")
+				fmt.Println(autoYes)
 				s.Delete(c.Args().First())
 				return nil
 			},
@@ -107,7 +116,15 @@ func Snippets(s *SnippetCli) []cli.Command {
 		{
 			Name:    "list",
 			Aliases: []string{"ls"},
+			Flags: []cli.Flag {
+				cli.BoolFlag{
+					Name: "all, a",
+					Usage: "List all snippets.",
+				},
+			},
 			Action: func(c *cli.Context) error {
+				all := c.Bool("all")
+				s.settings.GetPrefs().ListAll = all
 				s.List([]string(c.Args())...)
 				return nil
 			},

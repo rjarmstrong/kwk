@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"os"
 	"os/user"
+	"bitbucket.com/sharingmachine/kwkcli/models"
+	"google.golang.org/grpc/codes"
 )
 
 const (
@@ -46,7 +48,7 @@ func (s *StdManager) ReadFromFile(subDirName string, fullName string, incHolding
 	if fi, err := os.Stat(fp); err != nil {
 		if os.IsNotExist(err) {
 			// TODO: PUT IN STANDARD ERROR
-			return "", errors.New("Not found.")
+			return "", &models.ClientErr{TransportCode:codes.NotFound}
 		} else {
 			return "", err
 		}

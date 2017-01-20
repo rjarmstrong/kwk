@@ -30,39 +30,24 @@ func New(a snippets.Service, s sys.Manager, t config.Settings, r cmd.Runner, u a
 	d dlg.Dialog, w tmpl.Writer, h search.Term, api rpc.Service) *KwkApp {
 
 	app := cli.NewApp()
-	p := t.GetPrefs()
 	//cli.HelpPrinter = system.Help
 	app.Flags = []cli.Flag {
 		cli.BoolFlag{
-			Name: "yes, y",
-			Usage: "Automatically accept yes is modal dialogs.",
-			Destination:&p.AutoYes,
-		},
-		cli.BoolFlag{
 			Name: "covert, x",
 			Usage: "Open browser in covert mode.",
-			Destination:&p.Covert,
 		},
-		cli.BoolFlag{
-			Name: "global, g",
-			Usage: "Searches all users public snippets plus your private ones.",
-			Destination:&p.Global,
-		},
-		cli.BoolFlag{
-			Name: "quiet, q",
-			Usage: "Just display full names when listing.",
-			Destination:&p.Quiet,
-		},
-		cli.BoolFlag{
-			Name: "encrypt, e",
-			Usage: "When creating a new snippet encrypt.",
-			Destination:&p.Encrypt,
-		},
-		cli.BoolFlag{
-			Name: "decrypt, d",
-			Usage: "When viewing a snippet decrypt if necc.",
-			Destination:&p.Decrypt,
-		},
+		//cli.BoolFlag{
+		//	Name: "global, g",
+		//	Usage: "Searches all users public snippets plus your private ones.",
+		//},
+		//cli.BoolFlag{
+		//	Name: "encrypt, e",
+		//	Usage: "When creating a new snippet encrypt.",
+		//},
+		//cli.BoolFlag{
+		//	Name: "decrypt, d",
+		//	Usage: "When viewing a snippet decrypt if necc.",
+		//},
 	}
 
 
@@ -75,6 +60,8 @@ func New(a snippets.Service, s sys.Manager, t config.Settings, r cmd.Runner, u a
 	snipCli := NewSnippetCli(a, r, s, d, w, t, h)
 	app.Commands = append(app.Commands, Snippets(snipCli)...)
 	app.CommandNotFound = func(c *cli.Context, fullKey string) {
+		covert := c.Bool("covert")
+		t.GetPrefs().Covert = covert
 		snipCli.Run(fullKey, []string(c.Args())[1:])
 	}
 	searchCli := NewSearchCli(h, w, d)

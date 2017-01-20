@@ -12,7 +12,7 @@ type ServiceMock struct {
 	CloneCalledWith   []interface{}
 	TagCalledWith     map[string][]string
 	UnTagCalledWith   map[string][]string
-	ListCalledWith    []interface{}
+	ListCalledWith    *models.ListParams
 }
 
 func (a *ServiceMock) Get(k *models.Alias) (*models.SnippetList, error) {
@@ -20,12 +20,12 @@ func (a *ServiceMock) Get(k *models.Alias) (*models.SnippetList, error) {
 	return &models.SnippetList{Items: a.ReturnItemsForGet, Total: int64(len(a.ReturnItemsForGet))}, nil
 }
 
-func (a *ServiceMock) Create(uri string, fullKey string) (*models.CreateSnippetRequest, error) {
+func (a *ServiceMock) Create(uri string, fullKey string, role models.SnipRole) (*models.CreateSnippetResponse, error) {
 	a.CreateCalledWith = []string{uri, fullKey}
 	if fullKey == "" {
 		fullKey = "x5hi23"
 	}
-	return &models.CreateSnippetRequest{Snippet: &models.Snippet{FullName: fullKey}}, nil
+	return &models.CreateSnippetResponse{Snippet: &models.Snippet{FullName: fullKey}}, nil
 }
 
 func (a *ServiceMock) Update(fullKey string, description string) (*models.Snippet, error) {
@@ -66,7 +66,7 @@ func (a *ServiceMock) UnTag(fullKey string, tag ...string) (*models.Snippet, err
 	return &models.Snippet{}, nil
 }
 
-func (a *ServiceMock) List(username string, size int64, since int64, tags ...string) (*models.SnippetList, error) {
-	a.ListCalledWith = []interface{}{username, size, since, tags}
+func (a *ServiceMock) List(l *models.ListParams) (*models.SnippetList, error) {
+	a.ListCalledWith = l
 	return &models.SnippetList{}, nil
 }

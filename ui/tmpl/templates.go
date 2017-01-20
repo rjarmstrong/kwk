@@ -38,20 +38,11 @@ func init() {
 	add("snippet:patched", "{{.FullName | blue }} patched.", template.FuncMap{"blue": blue})
 	add("snippet:notdeleted", "{{.FullName | blue }} was NOT deleted.", template.FuncMap{"blue": blue})
 	add("snippet:inspect",
-		"\n{{range .Items}}"+
-			"Full name: {{.Username}}/{{.FullName}}"+
-			"\nSnippet: {{.Snip}}"+
-			"\nVersion: {{.Version}}"+
-			"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+
-			"\nWeb: \033[4mhttp://www.kwk.co/{{.Username}}/{{.FullName}}\033[0m"+
-			"\nDescription: {{.Description}}"+
-			"\nRun count: {{.RunCount}}"+
-			"\nClone count: {{.CloneCount}}"+
-			"\n{{ end }}\n\n", nil)
+		"\n{{range .Items}}"+"Full name: {{.Username}}/{{.FullName}}"+"\nSnippet: {{.Snip}}"+"\nVersion: {{.Version}}"+"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+"\nWeb: \033[4mhttp://www.kwk.co/{{.Username}}/{{.FullName}}\033[0m"+"\nDescription: {{.Description}}"+"\nRun count: {{.RunCount}}"+"\nClone count: {{.CloneCount}}"+"\n{{ end }}\n\n", nil)
 
 	// System
 	add("system:upgraded", "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n   Successfully upgraded!  \n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", nil)
-	add("system:version", "kwk version:\n CLI: {{ .cliVersion | blue}}\n API: {{ .apiVersion | blue}}\n",  template.FuncMap{"blue": blue})
+	add("system:version", "kwk version:\n CLI: {{ .cliVersion | blue}}\n API: {{ .apiVersion | blue}}\n", template.FuncMap{"blue": blue})
 	// Account
 	add("account:signedup", "Welcome to kwk {{.Username | blue }}!\n You're signed in already.\n", template.FuncMap{"blue": blue})
 	addColor("account:usernamefield", "Your Kwk Username: ", blue)
@@ -63,7 +54,7 @@ func init() {
 	add("dialog:choose", "{{. | multiChoice }}\n", template.FuncMap{"multiChoice": multiChoice})
 	add("dialog:header", "{{.| blue }}\n", template.FuncMap{"blue": blue})
 
-	add("env:changed", style.InfoDeskPerson + "  {{ \"env.yml\" | blue }} set to: {{.| blue }}\n", template.FuncMap{"blue": blue})
+	add("env:changed", style.InfoDeskPerson+"  {{ \"env.yml\" | blue }} set to: {{.| blue }}\n", template.FuncMap{"blue": blue})
 
 	addColor("account:signup:email", "What's your email? ", blue)
 	addColor("account:signup:username", "Choose a great username: ", blue)
@@ -73,14 +64,14 @@ func init() {
 	add("search:alphaSuggest", "\n\033[7m Suggestions: \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Key | blue }}.{{ .Extension | subdued }}\n{{end}}\n", template.FuncMap{"blue": blue, "subdued": subdued})
 
 	// errors
-	add("validation:title", "{{. | yellow }}\n", template.FuncMap{"yellow" : yellow})
-	add("validation:multi-line", " - {{ .Desc | yellow }}\n", template.FuncMap{"yellow" : yellow})
-	add("validation:one-line", style.Warning + "  {{ .Desc | yellow }} {{ .Code | yellow }}\n", template.FuncMap{"yellow" : yellow})
+	add("validation:title", "{{. | yellow }}\n", template.FuncMap{"yellow": yellow})
+	add("validation:multi-line", " - {{ .Desc | yellow }}\n", template.FuncMap{"yellow": yellow})
+	add("validation:one-line", style.Warning+"  {{ .Desc | yellow }} {{ .Code | yellow }}\n", template.FuncMap{"yellow": yellow})
 
-	add("api:not-authenticated", "{{ \"Please login to continue: kwk login\" | yellow }}\n", template.FuncMap{"yellow" : yellow})
-	addColor("api:error", style.Fire + "  We have a code RED error. \n- To report type: kwk upload-errors \n- You can also try to upgrade: npm update kwkcli -g\n", red)
-	addColor("api:not-available", style.Ambulance + "  Kwk is DOWN! Please try again in a bit.\n", yellow)
-	add("api:exists", "{{ \"That item already exists.\" | yellow }}\n", template.FuncMap{"yellow" : yellow})
+	add("api:not-authenticated", "{{ \"Please login to continue: kwk login\" | yellow }}\n", template.FuncMap{"yellow": yellow})
+	addColor("api:error", style.Fire+"  We have a code RED error. \n- To report type: kwk upload-errors \n- You can also try to upgrade: npm update kwkcli -g\n", red)
+	addColor("api:not-available", style.Ambulance+"  Kwk is DOWN! Please try again in a bit.\n", yellow)
+	add("api:exists", "{{ \"That item already exists.\" | yellow }}\n", template.FuncMap{"yellow": yellow})
 }
 
 func add(name string, templateText string, funcMap template.FuncMap) {
@@ -91,7 +82,7 @@ func add(name string, templateText string, funcMap template.FuncMap) {
 	Templates[name] = template.Must(t.Parse(templateText))
 }
 
-func addColor(name string, text string, color ColorFunc){
+func addColor(name string, text string, color ColorFunc) {
 	add(name, fmt.Sprintf("{{ %q | color }}", text), template.FuncMap{"color": color})
 }
 
@@ -127,19 +118,22 @@ func listSnippets(list *models.SnippetList) string {
 			} else {
 				tags = append(tags, v)
 			}
-
 		}
 
 		var snip string
 		var name string
-		if v.Private && !v.IsConfig() {
-			name = style.Colour(style.Subdued, "."+v.Name+"."+v.Extension)
-			snip = style.Colour(style.Subdued, `<private>`)
-		} else if v.IsConfig() {
-			name = style.Colour(style.Yellow, getConfigName(v.Name)) + style.Colour(style.Subdued, "."+v.Extension)
-			snip = fmt.Sprintf("%s", uri(v.Snip))
+
+		name = style.Colour(style.LightBlue, v.Name) + style.Colour(style.Subdued, "."+v.Extension)
+		if v.Private {
+			name = style.Colour(style.Subdued, ".") + name
+			if v.Role == models.RolePreferences {
+				snip = style.Colour(style.Subdued, `<Local Preferences>`)
+			} else if v.Role == models.RoleEnvironment {
+				snip = style.Colour(style.Subdued, `<Local Environment>`)
+			} else {
+				snip = style.Colour(style.Subdued, `<Private>`)
+			}
 		} else {
-			name = style.Colour(style.LightBlue, v.Name) + style.Colour(style.Subdued, "."+v.Extension)
 			snip = fmt.Sprintf("%s", uri(v.Snip))
 		}
 
@@ -200,7 +194,7 @@ type SearchResultLine struct {
 	Line string
 }
 
-type ColorFunc func (text string) string
+type ColorFunc func(text string) string
 
 func blue(text string) string {
 	return style.Colour(style.LightBlue, text)
@@ -224,14 +218,13 @@ func uri(text string) string {
 	text = strings.Replace(text, "www.", "", 1)
 	text = strings.Replace(text, "\n", " ", -1)
 	if len(text) >= 40 {
-		text = text[0:10] + style.Colour(style.Subdued, "...") + text[len(text)-30:]
+		text = text[0:10] + style.Colour(style.Subdued, "...") + text[len(text) - 30:]
 	}
 	if text == "" {
 		text = "<empty>"
 	}
 	return text
 }
-
 
 func PrettyPrint(obj interface{}) {
 	fmt.Println("")

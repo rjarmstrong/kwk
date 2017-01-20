@@ -7,4 +7,5 @@ type Manager interface {
 	SignUp(email string, username string, password string) (*models.User, error)
 	Get() (*models.User, error)
 	Signout() error
+	HasValidCredentials() bool
 }

@@ -15,6 +15,8 @@ message AlphaRequest {
     string runtime = 2;
     string extension = 3;
     string username = 4;
+    bool all = 5; // Search all snippets including private.
+    bool global = 6; // Search everyones snippets.
 }
 
 message AlphaResponse {

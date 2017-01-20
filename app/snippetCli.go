@@ -66,39 +66,32 @@ func (s *SnippetCli) Run(fullKey string, args []string) {
 }
 
 func (s *SnippetCli) New(uri string, fullKey string) {
-	if createAlias, err := s.service.Create(uri, fullKey); err != nil {
+	if createAlias, err := s.service.Create(uri, fullKey, models.RoleStandard); err != nil {
 		s.HandleErr(err)
 	} else {
-		if createAlias.Snippet != nil {
+		///if createAlias.Snippet != nil {
 			if createAlias.Snippet.Private {
 				s.Render("snippet:newprivate", createAlias.Snippet)
 			} else {
 				s.Render("snippet:new", createAlias.Snippet)
 			}
-		} else {
-			matches := createAlias.TypeMatch.Matches
-			r := s.MultiChoice("snippet:chooseruntime", "Choose a type for this snippet:", matches)
-			winner := r.Value.(models.Match)
-			if winner.Score == -1 {
-				ca, _ := s.service.Create("_", "_")
-				matches = ca.TypeMatch.Matches
-				winner = s.MultiChoice("snippet:chooseruntime", "Choose a type for this snippet:", matches).Value.(models.Match)
-			}
-			fk := fullKey + "." + winner.Extension
-			s.New(uri, fk)
-		}
+		// TODO: Add similarity prompt here
+		//} else {
+		//	matches := createAlias.TypeMatch.Matches
+		//	r := s.MultiChoice("snippet:chooseruntime", "Choose a type for this snippet:", matches)
+		//	winner := r.Value.(models.Match)
+		//	if winner.Score == -1 {
+		//		ca, _ := s.service.Create("_", "_", models.RoleStandard)
+		//		matches = ca.TypeMatch.Matches
+		//		winner = s.MultiChoice("snippet:chooseruntime", "Choose a type for this snippet:", matches).Value.(models.Match)
+		//	}
+		//	fk := fullKey + "." + winner.Extension
+		//	s.New(uri, fk)
+		//}
 	}
 }
 
 func (s *SnippetCli) Edit(fullKey string) {
-	// TODO: ENCAPSULATE
-	if fullKey == "env" || fullKey == "prefs" {
-		fullKey += ".yml"
-	}
-	if fullKey == "env.yml" || fullKey == "prefs.yml" {
-		fullKey = models.GetHostConfigName(fullKey)
-	}
-
 	if list, err := s.service.Get(s.getAbsAlias(fullKey)); err != nil {
 		s.HandleErr(err)
 	} else {
@@ -230,7 +223,8 @@ func (s *SnippetCli) List(args ...string) {
 			username = u.Username
 		}
 	}
-	if list, err := s.service.List(username, size, int64(time.Now().Unix()*1000), tags...); err != nil {
+	p := &models.ListParams{Username:username, Size:size, Since:int64(time.Now().Unix()*1000), Tags:tags, All:s.settings.GetPrefs().ListAll}
+	if list, err := s.service.List(p); err != nil {
 		s.HandleErr(err)
 	} else {
 		list.Username = username

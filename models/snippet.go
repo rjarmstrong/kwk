@@ -45,13 +45,18 @@ type Snippet struct {
 	Private            bool
 	CloneCount         int64
 	RunCount           int64
+	Role               SnipRole
 }
 
-func (s *Snippet) IsConfig() bool {
-	return s.FullName == GetHostConfigName("env.yml") || s.FullName == GetHostConfigName("prefs.yml")
-}
+type SnipRole int32
 
-func GetHostConfigName(fullName string) string {
+const (
+	RoleStandard    SnipRole = 0
+	RolePreferences SnipRole = 1
+	RoleEnvironment SnipRole = 2
+)
+
+func GetHostConfigFullName(fullName string) string {
 	if h, err := os.Hostname(); err != nil {
 		panic(err)
 	} else {
@@ -59,7 +64,7 @@ func GetHostConfigName(fullName string) string {
 	}
 }
 
-type CreateSnippetRequest struct {
+type CreateSnippetResponse struct {
 	Snippet   *Snippet
 	TypeMatch *TypeMatch
 }
@@ -71,4 +76,12 @@ type TypeMatch struct {
 type Match struct {
 	Score     int64
 	Extension string
+}
+
+type ListParams struct {
+	All bool
+	Username string
+	Size int64
+	Since int64
+	Tags []string
 }

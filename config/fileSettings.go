@@ -3,6 +3,7 @@ package config
 import (
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"encoding/json"
+//	"fmt"
 )
 
 // FileSettings is an abstraction over the file system which
@@ -14,9 +15,7 @@ type FileSettings struct {
 }
 
 func NewFileSettings(s sys.Manager, subDirName string) Settings {
-	// TODO: Fetch Load configs from disk or fetch them and unmarshall into flags
-	// https://github.com/urfave/cli
-	return &FileSettings{DirectoryName: subDirName, System: s, Prefs:NewPreferences()}
+	return &FileSettings{DirectoryName: subDirName, System: s, Prefs:DefaultPrefs()}
 }
 
 func (s *FileSettings) Upsert(key string, value interface{}) error {
@@ -39,4 +38,8 @@ func (s *FileSettings) Delete(key string) error {
 
 func (s *FileSettings) GetPrefs() *Preferences {
 	return s.Prefs
+}
+
+func (s *FileSettings) SetPersistedPrefs(pp *PersistedPrefs) {
+	s.Prefs.PersistedPrefs = *pp
 }

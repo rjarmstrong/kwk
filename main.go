@@ -39,7 +39,7 @@ func main() {
 	u := account.NewStdManager(conn, t, h)
 	a := snippets.New(conn, t, h)
 	w := tmpl.NewWriter(os.Stdout)
-	o := cmd.NewStdRunner(s, a, w)
+	o := cmd.NewStdRunner(s, a, w, u, t)
 	r := bufio.NewReader(os.Stdin)
 	d := dlg.New(w, r)
 	ch := search.NewAlphaTerm(conn, t, h)
@@ -47,6 +47,8 @@ func main() {
 
 	kwkApp := app.New(a, s, t, o, u, d, w, ch, api)
 	kwkApp.App.Version = version + "+" + build
+
+	t.SetPersistedPrefs(o.LoadPreferences())
 	kwkApp.App.Run(os.Args)
 	fmt.Printf("Prefs: %+v", t.GetPrefs())
 }
