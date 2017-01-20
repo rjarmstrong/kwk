@@ -2,14 +2,9 @@ package cmd
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
-	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
-	"bitbucket.com/sharingmachine/kwkcli/config"
-	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
-	"google.golang.org/grpc/codes"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
 	"strings"
 	"runtime"
 	"os/exec"
@@ -21,39 +16,31 @@ import (
 	"os"
 )
 
-const (
-	FILE_CACHE_PATH = "filecache"
-	PREFS_SUFFIX = "prefs.yml"
-	ENV_SUFFIX = "env.yml"
-)
-
 type StdRunner struct {
 	snippets snippets.Service
-	account  account.Manager
 	system   sys.Manager
-	writer   tmpl.Writer
-	settings config.Settings
+	conf models.ConfigStore
 }
 
-func NewStdRunner(s sys.Manager, ss snippets.Service, w tmpl.Writer, a account.Manager, t config.Settings) *StdRunner {
-	return &StdRunner{snippets: ss, system: s, writer: w, account:a, settings: t}
+func NewStdRunner(s sys.Manager, ss snippets.Service, conf models.ConfigStore) *StdRunner {
+	return &StdRunner{snippets: ss, system: s,  conf: conf}
 }
 
 func (r *StdRunner) Edit(s *models.Snippet) error {
 	//TODO: if we pull out the env from getSection we can improve speed
-	a, err := r.getSection("apps")
-	eRoot, err := r.getSection("editors")
+	a, err := r.getEnvSection("apps")
+	eRoot, err := r.getEnvSection("editors")
 
 	if err != nil {
 		return err
 	}
-	_, candidates := getSubSection(eRoot, s.Extension)
+	_, candidates := r.conf.GetSubSection(eRoot, s.Extension)
 	if len(candidates) != 1 {
 		return errors.New("No editors have been specified for " + s.Extension + " . And default editor is not specified.")
 	}
-	_, cli := getSubSection(a, candidates[0])
+	_, cli := r.conf.GetSubSection(a, candidates[0])
 
-	filePath, err := r.system.WriteToFile(FILE_CACHE_PATH, s.FullName, s.Snip, true)
+	filePath, err := r.system.WriteToFile(models.SNIP_CACHE_PATH, s.FullName, s.Snip, true)
 	if err != nil {
 		return err
 	}
@@ -82,7 +69,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 		}
 	}
 
-	if text, err := r.system.ReadFromFile(FILE_CACHE_PATH, s.FullName, true, 0); err != nil {
+	if text, err := r.system.ReadFromFile(models.SNIP_CACHE_PATH, s.FullName, true, 0); err != nil {
 		// if there was an error close the application anyway
 		closer()
 		return err
@@ -97,162 +84,29 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	}
 }
 
-func (r *StdRunner) LoadPreferences() *config.PersistedPrefs {
-	getDefault := func() (string, error) {
-		dp := config.DefaultPrefs()
-		b, err := yaml.Marshal(dp.PersistedPrefs)
-		if err != nil {
-			panic(err)
-		}
-		if r.account.HasValidCredentials() {
-			if _, err := r.snippets.Create(string(b), models.GetHostConfigFullName(PREFS_SUFFIX), models.RolePreferences); err != nil {
-				return "", err
-			}
-		}
-		return string(b), nil
-	}
-	if c, err := r.GetConfig(PREFS_SUFFIX, getDefault); err != nil {
-		panic(err)
-	} else {
-		pp := &config.PersistedPrefs{}
-		if err := yaml.Unmarshal([]byte(c), pp); err != nil {
-			panic(err)
-		} else {
-			return pp
-		}
-
-	}
-}
-
-func (r *StdRunner) GetConfig(fullName string, getDefault GetDefaultConf) (string, error) {
-	if os.Getenv(sys.KWK_TESTMODE) != "" && fullName == "env.yml" {
-		testEnv := "./cmd/testEnv.yml"
-		// TODO: use log
-		fmt.Println(">> Running with:", testEnv, " <<")
-		b, err := ioutil.ReadFile(testEnv)
-		return string(b), nil
-		if err != nil {
-			return "", err
-		}
-	}
-
-	// TODO: check yml version is compatible with this build else force upgrade.
-
-	hostConfigName := models.GetHostConfigFullName(fullName)
-	if ok, _ := r.system.FileExists(FILE_CACHE_PATH, hostConfigName, true); !ok {
-		hostAlias := &models.Alias{FullKey: hostConfigName}
-		if l, err := r.snippets.Get(&models.Alias{FullKey: hostAlias.FullKey, Username:"richard"}); err != nil {
-			if err.(*models.ClientErr).TransportCode == codes.NotFound {
-				if conf, err := getDefault(); err != nil {
-					return "", err
-				} else {
-					_, err := r.system.WriteToFile(FILE_CACHE_PATH, hostConfigName, conf, true)
-					return conf, err
-				}
-			} else {
-				return "", err
-			}
-		} else {
-			r.system.WriteToFile(FILE_CACHE_PATH, hostConfigName, l.Items[0].Snip, true)
-			return l.Items[0].Snip, nil
-		}
-	} else {
-		if e, err := r.system.ReadFromFile(FILE_CACHE_PATH, hostConfigName, true, 0); err != nil {
-			return "", err
-		} else {
-			return e, nil
-		}
-	}
-}
-
-func (r *StdRunner) getSection(name string) (*yaml.MapSlice, error) {
-	getDefault := func() (string, error) {
-		defaultEnv := fmt.Sprintf("%s-%s.yml", runtime.GOOS, runtime.GOARCH)
-		defaultAlias := &models.Alias{FullKey:defaultEnv, Username:"env"}
-		if snip, err := r.snippets.Clone(defaultAlias, models.GetHostConfigFullName(ENV_SUFFIX)); err != nil {
-			return "", err
-		} else {
-			return snip.Snip, nil
-		}
-	}
-
-	env, err := r.GetConfig(ENV_SUFFIX, getDefault)
-	if err != nil {
-		return nil, err
-	}
-	c := &yaml.MapSlice{}
-	if err := yaml.Unmarshal([]byte(env), c); err != nil {
-		return nil, err
-	}
-	rs, _ := getSubSection(c, name)
-	if rs == nil {
-		return nil, errors.New(fmt.Sprintf("No %s section in env.yml", name))
-	}
-	return &rs, nil
-}
-
-func getSubSection(yml *yaml.MapSlice, name string) (yaml.MapSlice, []string) {
-	f := func(yml *yaml.MapSlice, name string) (yaml.MapSlice, []string) {
-		for _, v := range *yml {
-			if v.Key == name {
-				if slice, ok := v.Value.(yaml.MapSlice); ok {
-					return slice, nil
-				}
-				if _, ok := v.Value.([]interface{}); ok {
-					items := []string{}
-					for _, v2 := range v.Value.([]interface{}) {
-						items = append(items, v2.(string))
-					}
-					return nil, items
-				}
-				return nil, []string{v.Value.(string)}
-			}
-		}
-		return nil, nil
-	}
-	if sub, bottom := f(yml, name); sub == nil && bottom == nil {
-		return f(yml, "default")
-	} else {
-		return sub, bottom
-	}
-}
-
-/*
- 	$FULL_NAME = full name of the snippet e.g. `hello.js`
- 	$NAME = name excluding extension e.g. `hello`
- 	$DIR = directory of the snippet on disk. Useful when editing a file in a directory structure or when compilation needs it.
- 	$CLASS_NAME = for java and scala these will be the class name in the snippet. Used when attempting to run the compiled file.
- */
-func replaceVariables(cliArgs *[]string, filePath string, s *models.Snippet) {
-	for i := range *cliArgs {
-		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$FULL_NAME", filePath, -1)
-		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$DIR", strings.Replace(filePath, s.FullName, "", -1), -1)
-		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$NAME", strings.Replace(filePath, "."+s.Extension, "", -1), -1)
-	}
-}
 
 func (r *StdRunner) Run(s *models.Snippet, args []string) error {
-	rs, err := r.getSection("runners")
+	rs, err := r.getEnvSection("runners")
 	if err != nil {
 		return err
 	}
 	yamlKey := s.Extension
-	if r.settings.GetPrefs().Covert {
+	if r.conf.Prefs().Covert {
 		yamlKey += "-covert"
 	}
-	comp, interp := getSubSection(rs, yamlKey)
+	comp, interp := r.conf.GetSubSection(rs, yamlKey)
 	if comp != nil {
-		if filePath, err := r.system.WriteToFile(FILE_CACHE_PATH, s.FullName, s.Snip, true); err != nil {
+		if filePath, err := r.system.WriteToFile(models.SNIP_CACHE_PATH, s.FullName, s.Snip, true); err != nil {
 			return err
 		} else {
-			_, compile := getSubSection(&comp, "compile")
+			_, compile := r.conf.GetSubSection(&comp, "compile")
 			if compile != nil {
 				replaceVariables(&compile, filePath, s)
 				// TODO: ADD TO LOG
 				fmt.Println("compile", compile)
 				execSafe(compile[0], compile[1:]...).Close()
 			}
-			_, run := getSubSection(&comp, "run")
+			_, run := r.conf.GetSubSection(&comp, "run")
 			replaceVariables(&run, filePath, s)
 
 			// TODO: ADD TO LOG
@@ -286,12 +140,24 @@ func execSafe(name string, arg ...string) io.ReadCloser {
 	return out
 }
 
-//func (r *StdRunner) OpenWeb(alias *models.Snippet) {
-//	execSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", fmt.Sprintf("https://www.kwk.co/%s/%s", alias.Username, alias.FullName))
-//	execSafe("osascript", "-e", "activate application \"Google Chrome\"")
-//}
+func (r *StdRunner) getEnvSection(name string) (*yaml.MapSlice, error) {
+	rs, _ := r.conf.GetSubSection(r.conf.Env(), name)
+	if rs == nil {
+		return nil, errors.New(fmt.Sprintf("No %s section in env.yml", name))
+	}
+	return &rs, nil
+}
 
-//func (r *StdRunner) OpenCovert(snippet string) {
-//	execSafe("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--incognito", snippet)
-//	execSafe("osascript", "-e", "activate application \"Google Chrome\"")
-//}
+/*
+ 	$FULL_NAME = full name of the snippet e.g. `hello.js`
+ 	$NAME = name excluding extension e.g. `hello`
+ 	$DIR = directory of the snippet on disk. Useful when editing a file in a directory structure or when compilation needs it.
+ 	$CLASS_NAME = for java and scala these will be the class name in the snippet. Used when attempting to run the compiled file.
+ */
+func replaceVariables(cliArgs *[]string, filePath string, s *models.Snippet) {
+	for i := range *cliArgs {
+		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$FULL_NAME", filePath, -1)
+		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$DIR", strings.Replace(filePath, s.FullName, "", -1), -1)
+		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$NAME", strings.Replace(filePath, "."+s.Extension, "", -1), -1)
+	}
+}

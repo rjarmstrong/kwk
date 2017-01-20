@@ -90,7 +90,9 @@ func Snippets(s *SnippetCli) []cli.Command {
 			},
 			Action: func(c *cli.Context) error {
 				autoYes := c.Bool("yes")
-				fmt.Println(autoYes)
+				if autoYes {
+					s.settings.GetPrefs().AutoYes = true
+				}
 				s.Delete(c.Args().First())
 				return nil
 			},
@@ -124,7 +126,9 @@ func Snippets(s *SnippetCli) []cli.Command {
 			},
 			Action: func(c *cli.Context) error {
 				all := c.Bool("all")
-				s.settings.GetPrefs().ListAll = all
+				if all {
+					s.settings.GetPrefs().ListAll = true
+				}
 				s.List([]string(c.Args())...)
 				return nil
 			},

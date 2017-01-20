@@ -16,6 +16,10 @@ type Alias struct {
 	FullKey  string `json:"fullKey" schema:"fullKey"`
 }
 
+// GetDefaultConf is used to resolve configuration
+// that has not been downloaded for this host.
+type GetConf func() (string, error)
+
 type SnippetList struct {
 	Username string
 	Items    []Snippet
@@ -55,14 +59,6 @@ const (
 	RolePreferences SnipRole = 1
 	RoleEnvironment SnipRole = 2
 )
-
-func GetHostConfigFullName(fullName string) string {
-	if h, err := os.Hostname(); err != nil {
-		panic(err)
-	} else {
-		return fmt.Sprintf(".%s_%s", h, fullName)
-	}
-}
 
 type CreateSnippetResponse struct {
 	Snippet   *Snippet

@@ -14,7 +14,6 @@ import (
 	"runtime/pprof"
 	"bufio"
 	"os"
-	"fmt"
 )
 
 var version string = "-"
@@ -48,9 +47,14 @@ func main() {
 	kwkApp := app.New(a, s, t, o, u, d, w, ch, api)
 	kwkApp.App.Version = version + "+" + build
 
-	t.SetPersistedPrefs(o.LoadPreferences())
+	configure(o, t)
 	kwkApp.App.Run(os.Args)
-	fmt.Printf("Prefs: %+v", t.GetPrefs())
+}
+
+
+func configure(r *cmd.StdRunner, t config.Settings) {
+	t.SetPersistedPrefs(r.LoadPreferences())
+	t.GetEnv()
 }
 
 func profile() *os.File  {

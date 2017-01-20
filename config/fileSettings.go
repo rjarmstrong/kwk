@@ -3,7 +3,7 @@ package config
 import (
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"encoding/json"
-//	"fmt"
+	//	"fmt"
 )
 
 // FileSettings is an abstraction over the file system which
@@ -43,3 +43,24 @@ func (s *FileSettings) GetPrefs() *Preferences {
 func (s *FileSettings) SetPersistedPrefs(pp *PersistedPrefs) {
 	s.Prefs.PersistedPrefs = *pp
 }
+
+//func (s *FileSettings) GetEnv() *yaml.MapSlice {
+//	getDefault := func() (string, error) {
+//		defaultEnv := fmt.Sprintf("%s-%s.yml", runtime.GOOS, runtime.GOARCH)
+//		defaultAlias := &models.Alias{FullKey:defaultEnv, Username:"env"}
+//		if snip, err := r.snippets.Clone(defaultAlias, models.GetHostConfigFullName(ENV_SUFFIX)); err != nil {
+//			return "", err
+//		} else {
+//			return snip.Snip, nil
+//		}
+//	}
+//
+//	env, err := r.GetConfig(ENV_SUFFIX, getDefault)
+//	if err != nil {
+//		return nil, err
+//	}
+//	c := &yaml.MapSlice{}
+//	if err := yaml.Unmarshal([]byte(env), c); err != nil {
+//		return nil, err
+//	}
+//}
