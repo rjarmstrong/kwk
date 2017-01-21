@@ -25,14 +25,17 @@ func NewPrefsResolvers(s snippets.Service, sys sys.Manager, a account.Manager) R
 }
 
 func (p *PrefsResolvers) Anon() (string, error) {
+	//fmt.Println("GETTING ANON")
 	return p.Default()
 }
 
 func (p *PrefsResolvers) Local() (string, error) {
+	//fmt.Println("GETTING LOCAL")
 	return p.system.ReadFromFile(SNIP_CACHE_PATH, p.hostConfigName, true, 0)
 }
 
 func (p *PrefsResolvers) Own() (string, error) {
+	//fmt.Println("GETTING OWN")
 	if u, err := p.account.Get(); err != nil {
 		return "", err
 	} else {
@@ -48,12 +51,15 @@ func (p *PrefsResolvers) Own() (string, error) {
 }
 
 func (p *PrefsResolvers) Default() (string, error) {
+	//fmt.Println("GETTING DEFAULT")
 	dp := DefaultPrefs()
 	if b, err := yaml.Marshal(dp.PersistedPrefs); err != nil {
 		return "", err
 	} else {
-		if _, err := p.snippets.Create(string(b), p.hostConfigName, models.RolePreferences); err != nil {
-			return "", err
+		if p.account.HasValidCredentials() {
+			if _, err := p.snippets.Create(string(b), p.hostConfigName, models.RolePreferences); err != nil {
+				return "", err
+			}
 		}
 		return string(b), nil
 	}

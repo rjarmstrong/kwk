@@ -7,6 +7,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
+	"bitbucket.com/sharingmachine/kwkcli/setup"
 	"bitbucket.com/sharingmachine/kwkcli/app"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
@@ -33,28 +34,24 @@ func main() {
 	defer conn.Close()
 
 	s := sys.New()
-	t := config.NewFileSettings(s, "settings")
+	t := config.NewJsonSettings(s, "settings")
 	h := rpc.NewHeaders(t)
 	u := account.NewStdManager(conn, t, h)
-	a := snippets.New(conn, t, h)
+	ss := snippets.New(conn, t, h)
 	w := tmpl.NewWriter(os.Stdout)
-	o := cmd.NewStdRunner(s, a, w, u, t)
+
+	su := setup.NewConfigProvider(ss, s, u)
+	o := cmd.NewStdRunner(s, ss, su)
 	r := bufio.NewReader(os.Stdin)
 	d := dlg.New(w, r)
 	ch := search.NewAlphaTerm(conn, t, h)
 	api := rpc.New(conn, h)
 
-	kwkApp := app.New(a, s, t, o, u, d, w, ch, api)
+	kwkApp := app.New(ss, s, t, o, u, d, w, ch, api, su)
 	kwkApp.App.Version = version + "+" + build
 
-	configure(o, t)
+	su.Preload()
 	kwkApp.App.Run(os.Args)
-}
-
-
-func configure(r *cmd.StdRunner, t config.Settings) {
-	t.SetPersistedPrefs(r.LoadPreferences())
-	t.GetEnv()
 }
 
 func profile() *os.File  {

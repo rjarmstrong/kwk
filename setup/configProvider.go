@@ -48,6 +48,7 @@ func (cs *ConfigProvider) Prefs() *Preferences {
 	}
 	if c, err := cs.GetConfig(cs.prefsResolvers); err != nil {
 		panic(err)
+
 	} else {
 		cs.prefs = &Preferences{PersistedPrefs:PersistedPrefs{}}
 		if err := yaml.Unmarshal([]byte(c), cs.prefs); err != nil {
