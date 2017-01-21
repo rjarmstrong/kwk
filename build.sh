@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 set -ef -o pipefail
-KWK_VERSION=v1.0.28
+KWK_VERSION=v1.0.29
 BUILD_NUMBER=$1
 
-echo "**** kwk-cli build ${KWK_VERSION}+${BUILD_NUMBER} *****"
+echo "\n\n\n**** kwk-cli build ${KWK_VERSION}+${BUILD_NUMBER} *****\n\n\n"
 
 ARCH=amd64
 
