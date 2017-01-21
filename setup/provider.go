@@ -36,14 +36,13 @@ type ProviderMock struct {
 }
 
 func (ProviderMock) Env() *yaml.MapSlice {
-	panic("implement me")
+	return &yaml.MapSlice{}
 }
 
 func (ProviderMock) Prefs() *Preferences {
-	panic("implement me")
+	return DefaultPrefs()
 }
 
 func (ProviderMock) Preload() {
-	panic("implement me")
 }
 
