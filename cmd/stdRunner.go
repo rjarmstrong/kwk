@@ -3,6 +3,8 @@ package cmd
 import (
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/models"
+	"bitbucket.com/sharingmachine/kwkcli/setup"
+	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"gopkg.in/yaml.v2"
 	"strings"
@@ -19,11 +21,12 @@ import (
 type StdRunner struct {
 	snippets snippets.Service
 	system   sys.Manager
-	conf models.ConfigStore
+	settings config.Persister
+	setup setup.Provider
 }
 
-func NewStdRunner(s sys.Manager, ss snippets.Service, conf models.ConfigStore) *StdRunner {
-	return &StdRunner{snippets: ss, system: s,  conf: conf}
+func NewStdRunner(s sys.Manager, ss snippets.Service, setup setup.Provider) *StdRunner {
+	return &StdRunner{snippets: ss, system: s,  setup: setup}
 }
 
 func (r *StdRunner) Edit(s *models.Snippet) error {
@@ -34,13 +37,13 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	if err != nil {
 		return err
 	}
-	_, candidates := r.conf.GetSubSection(eRoot, s.Extension)
+	_, candidates := getSubSection(eRoot, s.Extension)
 	if len(candidates) != 1 {
 		return errors.New("No editors have been specified for " + s.Extension + " . And default editor is not specified.")
 	}
-	_, cli := r.conf.GetSubSection(a, candidates[0])
+	_, cli := getSubSection(a, candidates[0])
 
-	filePath, err := r.system.WriteToFile(models.SNIP_CACHE_PATH, s.FullName, s.Snip, true)
+	filePath, err := r.system.WriteToFile(setup.SNIP_CACHE_PATH, s.FullName, s.Snip, true)
 	if err != nil {
 		return err
 	}
@@ -69,7 +72,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 		}
 	}
 
-	if text, err := r.system.ReadFromFile(models.SNIP_CACHE_PATH, s.FullName, true, 0); err != nil {
+	if text, err := r.system.ReadFromFile(setup.SNIP_CACHE_PATH, s.FullName, true, 0); err != nil {
 		// if there was an error close the application anyway
 		closer()
 		return err
@@ -91,22 +94,22 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 		return err
 	}
 	yamlKey := s.Extension
-	if r.conf.Prefs().Covert {
+	if r.setup.Prefs().Covert {
 		yamlKey += "-covert"
 	}
-	comp, interp := r.conf.GetSubSection(rs, yamlKey)
+	comp, interp := getSubSection(rs, yamlKey)
 	if comp != nil {
-		if filePath, err := r.system.WriteToFile(models.SNIP_CACHE_PATH, s.FullName, s.Snip, true); err != nil {
+		if filePath, err := r.system.WriteToFile(setup.SNIP_CACHE_PATH, s.FullName, s.Snip, true); err != nil {
 			return err
 		} else {
-			_, compile := r.conf.GetSubSection(&comp, "compile")
+			_, compile := getSubSection(&comp, "compile")
 			if compile != nil {
 				replaceVariables(&compile, filePath, s)
 				// TODO: ADD TO LOG
 				fmt.Println("compile", compile)
 				execSafe(compile[0], compile[1:]...).Close()
 			}
-			_, run := r.conf.GetSubSection(&comp, "run")
+			_, run := getSubSection(&comp, "run")
 			replaceVariables(&run, filePath, s)
 
 			// TODO: ADD TO LOG
@@ -141,7 +144,7 @@ func execSafe(name string, arg ...string) io.ReadCloser {
 }
 
 func (r *StdRunner) getEnvSection(name string) (*yaml.MapSlice, error) {
-	rs, _ := r.conf.GetSubSection(r.conf.Env(), name)
+	rs, _ := getSubSection(r.setup.Env(), name)
 	if rs == nil {
 		return nil, errors.New(fmt.Sprintf("No %s section in env.yml", name))
 	}
@@ -159,5 +162,31 @@ func replaceVariables(cliArgs *[]string, filePath string, s *models.Snippet) {
 		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$FULL_NAME", filePath, -1)
 		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$DIR", strings.Replace(filePath, s.FullName, "", -1), -1)
 		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$NAME", strings.Replace(filePath, "."+s.Extension, "", -1), -1)
+	}
+}
+
+func getSubSection(yml *yaml.MapSlice, name string) (yaml.MapSlice, []string) {
+	f := func(yml *yaml.MapSlice, name string) (yaml.MapSlice, []string) {
+		for _, v := range *yml {
+			if v.Key == name {
+				if slice, ok := v.Value.(yaml.MapSlice); ok {
+					return slice, nil
+				}
+				if _, ok := v.Value.([]interface{}); ok {
+					items := []string{}
+					for _, v2 := range v.Value.([]interface{}) {
+						items = append(items, v2.(string))
+					}
+					return nil, items
+				}
+				return nil, []string{v.Value.(string)}
+			}
+		}
+		return nil, nil
+	}
+	if sub, bottom := f(yml, name); sub == nil && bottom == nil {
+		return f(yml, "default")
+	} else {
+		return sub, bottom
 	}
 }

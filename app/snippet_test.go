@@ -20,7 +20,7 @@ func Test_Snippet(t *testing.T) {
 		a := app.Snippets.(*snippets.ServiceMock)
 		r := app.Runner.(*cmd.RunnerMock)
 		d := app.Dialogue.(*dlg.DialogMock)
-		t := app.Settings.(*config.SettingsMock)
+		t := app.Settings.(*config.PersisterMock)
 		w := app.TemplateWriter.(*tmpl.WriterMock)
 		h := app.Search.(*search.TermMock)
 

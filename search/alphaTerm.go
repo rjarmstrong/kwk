@@ -13,7 +13,7 @@ type AlphaTerm struct {
 	headers *rpc.Headers
 }
 
-func NewAlphaTerm(conn *grpc.ClientConn, s config.Settings, h *rpc.Headers) Term {
+func NewAlphaTerm(conn *grpc.ClientConn, s config.Persister, h *rpc.Headers) Term {
 	return &AlphaTerm{client: searchRpc.NewSearchRpcClient(conn), headers: h}
 }
 

@@ -8,7 +8,7 @@ import (
 )
 
 type stdService struct {
-	Settings config.Settings
+	Settings config.Persister
 	client   sysRpc.SysRpcClient
 	headers  *Headers
 }

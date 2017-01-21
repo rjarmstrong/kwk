@@ -21,7 +21,7 @@ import (
 
 func createApp(conn *grpc.ClientConn, writer *bytes.Buffer, r *bufio.Reader) *app.KwkApp {
 	s := system.New()
-	t := config.NewFileSettings(s, "settings")
+	t := config.NewJsonSettings(s, "settings")
 	h := rpc.NewHeaders(t)
 	u := account.NewStdManager(conn, t, h)
 	a := snippets.New(conn, t, h)

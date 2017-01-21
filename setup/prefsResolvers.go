@@ -1,0 +1,60 @@
+package setup
+
+import (
+	"bitbucket.com/sharingmachine/kwkcli/snippets"
+	"bitbucket.com/sharingmachine/kwkcli/account"
+	"bitbucket.com/sharingmachine/kwkcli/models"
+	"bitbucket.com/sharingmachine/kwkcli/sys"
+	"gopkg.in/yaml.v2"
+)
+
+type PrefsResolvers struct {
+	snippets snippets.Service
+	system         sys.Manager
+	account        account.Manager
+	hostConfigName string
+}
+
+func NewPrefsResolvers(s snippets.Service, sys sys.Manager, a account.Manager) Resolvers {
+	return &PrefsResolvers{
+		hostConfigName:GetHostConfigFullName("prefs.yml"),
+		snippets:s,
+		system:sys,
+		account:a,
+	}
+}
+
+func (p *PrefsResolvers) Anon() (string, error) {
+	return p.Default()
+}
+
+func (p *PrefsResolvers) Local() (string, error) {
+	return p.system.ReadFromFile(SNIP_CACHE_PATH, p.hostConfigName, true, 0)
+}
+
+func (p *PrefsResolvers) Own() (string, error) {
+	if u, err := p.account.Get(); err != nil {
+		return "", err
+	} else {
+		if l, err := p.snippets.Get(&models.Alias{FullKey: p.hostConfigName, Username: u.Username }); err != nil {
+			return "", err
+		} else {
+			if _, err := p.system.WriteToFile(SNIP_CACHE_PATH, p.hostConfigName, l.Items[0].Snip, true); err != nil {
+				return "", err
+			}
+			return l.Items[0].Snip, nil
+		}
+	}
+}
+
+func (p *PrefsResolvers) Default() (string, error) {
+	dp := DefaultPrefs()
+	if b, err := yaml.Marshal(dp.PersistedPrefs); err != nil {
+		return "", err
+	} else {
+		if _, err := p.snippets.Create(string(b), p.hostConfigName, models.RolePreferences); err != nil {
+			return "", err
+		}
+		return string(b), nil
+	}
+}

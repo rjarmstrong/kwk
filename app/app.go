@@ -11,13 +11,14 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
 	"github.com/urfave/cli"
+	"bitbucket.com/sharingmachine/kwkcli/setup"
 )
 
 type KwkApp struct {
 	App            *cli.App
 	Snippets       snippets.Service
 	System         sys.Manager
-	Settings       config.Settings
+	Settings       config.Persister
 	AccountManage  account.Manager
 	Runner         cmd.Runner
 	Dialogue       dlg.Dialog
@@ -26,8 +27,8 @@ type KwkApp struct {
 	Api 	       rpc.Service
 }
 
-func New(a snippets.Service, s sys.Manager, t config.Settings, r cmd.Runner, u account.Manager,
-	d dlg.Dialog, w tmpl.Writer, h search.Term, api rpc.Service) *KwkApp {
+func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u account.Manager,
+	d dlg.Dialog, w tmpl.Writer, h search.Term, api rpc.Service, su setup.Provider) *KwkApp {
 
 	app := cli.NewApp()
 	//cli.HelpPrinter = system.Help
@@ -57,11 +58,11 @@ func New(a snippets.Service, s sys.Manager, t config.Settings, r cmd.Runner, u a
 	sysCli := NewSystemCli(s, api, u, w)
 	app.Commands = append(app.Commands, System(sysCli)...)
 
-	snipCli := NewSnippetCli(a, r, s, d, w, t, h)
+	snipCli := NewSnippetCli(a, r, s, d, w, t, h, su)
 	app.Commands = append(app.Commands, Snippets(snipCli)...)
 	app.CommandNotFound = func(c *cli.Context, fullKey string) {
 		covert := c.Bool("covert")
-		t.GetPrefs().Covert = covert
+		su.Prefs().Covert = covert
 		snipCli.Run(fullKey, []string(c.Args())[1:])
 	}
 	searchCli := NewSearchCli(h, w, d)

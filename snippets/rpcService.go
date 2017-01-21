@@ -11,12 +11,12 @@ import (
 )
 
 type RpcService struct {
-	Settings config.Settings
+	Settings config.Persister
 	client   snipsRpc.SnipsRpcClient
 	headers  *rpc.Headers
 }
 
-func New(conn *grpc.ClientConn, s config.Settings, h *rpc.Headers) Service {
+func New(conn *grpc.ClientConn, s config.Persister, h *rpc.Headers) Service {
 	return &RpcService{Settings: s, client: snipsRpc.NewSnipsRpcClient(conn), headers: h}
 }
 

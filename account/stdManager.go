@@ -11,11 +11,11 @@ import (
 
 type StdManager struct {
 	client   usersRpc.UsersRpcClient
-	settings config.Settings
+	settings config.Persister
 	headers  *rpc.Headers
 }
 
-func NewStdManager(conn *grpc.ClientConn, s config.Settings, h *rpc.Headers) *StdManager {
+func NewStdManager(conn *grpc.ClientConn, s config.Persister, h *rpc.Headers) *StdManager {
 	return &StdManager{client: usersRpc.NewUsersRpcClient(conn), settings: s, headers: h}
 }
 

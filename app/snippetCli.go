@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 	"fmt"
+	"bitbucket.com/sharingmachine/kwkcli/setup"
 )
 
 type SnippetCli struct {
@@ -20,13 +21,14 @@ type SnippetCli struct {
 	service  snippets.Service
 	runner   cmd.Runner
 	system   sys.Manager
-	settings config.Settings
+	settings config.Persister
+	su 	  setup.Provider
 	dlg.Dialog
 	tmpl.Writer
 }
 
-func NewSnippetCli(a snippets.Service, r cmd.Runner, s sys.Manager, d dlg.Dialog, w tmpl.Writer, t config.Settings, search search.Term) *SnippetCli {
-	return &SnippetCli{service: a, runner: r, system: s, Dialog: d, Writer: w, settings: t, search: search}
+func NewSnippetCli(a snippets.Service, r cmd.Runner, s sys.Manager, d dlg.Dialog, w tmpl.Writer, t config.Persister, search search.Term, su setup.Provider) *SnippetCli {
+	return &SnippetCli{service: a, runner: r, system: s, Dialog: d, Writer: w, settings: t, search: search, su: su}
 }
 
 func (s *SnippetCli) Share(fullKey string, destination string) {
@@ -126,7 +128,7 @@ func (s *SnippetCli) Inspect(fullKey string) {
 
 func (s *SnippetCli) Delete(fullKey string) {
 	alias := &models.Snippet{FullName: fullKey}
-	if r := s.Modal("snippet:delete", alias, s.settings.GetPrefs().AutoYes); r.Ok {
+	if r := s.Modal("snippet:delete", alias, s.su.Prefs().AutoYes); r.Ok {
 		if err := s.service.Delete(fullKey); err != nil {
 			s.HandleErr(err)
 		}
@@ -223,7 +225,7 @@ func (s *SnippetCli) List(args ...string) {
 			username = u.Username
 		}
 	}
-	p := &models.ListParams{Username:username, Size:size, Since:int64(time.Now().Unix()*1000), Tags:tags, All:s.settings.GetPrefs().ListAll}
+	p := &models.ListParams{Username:username, Size:size, Since:int64(time.Now().Unix()*1000), Tags:tags, All:s.su.Prefs().ListAll}
 	if list, err := s.service.List(p); err != nil {
 		s.HandleErr(err)
 	} else {

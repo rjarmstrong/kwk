@@ -2,7 +2,6 @@ package app
 
 import (
 	"github.com/urfave/cli"
-	"fmt"
 )
 
 func Snippets(s *SnippetCli) []cli.Command {
@@ -91,7 +90,7 @@ func Snippets(s *SnippetCli) []cli.Command {
 			Action: func(c *cli.Context) error {
 				autoYes := c.Bool("yes")
 				if autoYes {
-					s.settings.GetPrefs().AutoYes = true
+					s.su.Prefs().AutoYes = true
 				}
 				s.Delete(c.Args().First())
 				return nil
@@ -127,7 +126,7 @@ func Snippets(s *SnippetCli) []cli.Command {
 			Action: func(c *cli.Context) error {
 				all := c.Bool("all")
 				if all {
-					s.settings.GetPrefs().ListAll = true
+					s.su.Prefs().ListAll = true
 				}
 				s.List([]string(c.Args())...)
 				return nil

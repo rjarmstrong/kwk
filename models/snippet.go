@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-	"os"
-	"fmt"
 )
 
 const (
@@ -15,10 +13,6 @@ type Alias struct {
 	Username string `json:"username" schema:"username"`
 	FullKey  string `json:"fullKey" schema:"fullKey"`
 }
-
-// GetDefaultConf is used to resolve configuration
-// that has not been downloaded for this host.
-type GetConf func() (string, error)
 
 type SnippetList struct {
 	Username string

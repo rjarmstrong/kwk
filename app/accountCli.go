@@ -10,12 +10,12 @@ import (
 
 type AccountCli struct {
 	service  account.Manager
-	settings config.Settings
+	settings config.Persister
 	tmpl.Writer
 	dlg.Dialog
 }
 
-func NewAccountCli(u account.Manager, s config.Settings, w tmpl.Writer, d dlg.Dialog) *AccountCli {
+func NewAccountCli(u account.Manager, s config.Persister, w tmpl.Writer, d dlg.Dialog) *AccountCli {
 	return &AccountCli{service: u, settings: s, Writer: w, Dialog: d}
 }
 

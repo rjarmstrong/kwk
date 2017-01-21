@@ -86,12 +86,12 @@ func GetConn(serverAddress string, logger *log.Logger) *grpc.ClientConn {
 
 //
 
-func NewHeaders(t config.Settings) *Headers {
+func NewHeaders(t config.Persister) *Headers {
 	return &Headers{settings: t}
 }
 
 type Headers struct {
-	settings config.Settings
+	settings config.Persister
 }
 
 func (i *Headers) GetContext() context.Context {

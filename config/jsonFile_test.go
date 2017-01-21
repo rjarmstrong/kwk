@@ -9,11 +9,11 @@ import (
 	"testing"
 )
 
-func Test_System(t *testing.T) {
-	Convey("FileSettings test", t, func() {
+func Test_JsonFile(t *testing.T) {
+	Convey("JsonFile test", t, func() {
 		Convey(`Should create, update, delete and get a setting`, func() {
 			sys := sys.New()
-			s := NewFileSettings(sys, "test_settings")
+			s := NewJsonSettings(sys, "test_settings")
 			key := "user"
 			expected := models.User{
 				Email: "richard@kwk.co",

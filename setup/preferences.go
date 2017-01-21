@@ -1,4 +1,4 @@
-package config
+package setup
 
 func DefaultPrefs() *Preferences {
 	p := &Preferences{
