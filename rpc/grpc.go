@@ -87,16 +87,16 @@ func GetConn(serverAddress string, logger *log.Logger) *grpc.ClientConn {
 //
 
 func NewHeaders(t config.Persister) *Headers {
-	return &Headers{settings: t}
+	return &Headers{persister: t}
 }
 
 type Headers struct {
-	settings config.Persister
+	persister config.Persister
 }
 
 func (i *Headers) GetContext() context.Context {
 	u := &models.User{}
-	if err := i.settings.Get(models.ProfileFullKey, u, 0); err != nil {
+	if err := i.persister.Get(models.ProfileFullKey, u, 0); err != nil {
 		return context.Background()
 	} else {
 		hostname, _ := os.Hostname()

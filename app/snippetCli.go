@@ -32,8 +32,11 @@ func NewSnippetCli(a snippets.Service, r cmd.Runner, s sys.Manager, d dlg.Dialog
 }
 
 func (s *SnippetCli) Share(fullKey string, destination string) {
-	k := s.getAbsAlias(fullKey)
-	if list, err := s.service.Get(k); err != nil {
+	alias := s.getAbsAlias(fullKey)
+	if alias == nil {
+		return
+	}
+	if list, err := s.service.Get(alias); err != nil {
 		s.HandleErr(err)
 	} else {
 		if alias := s.handleMultiResponse(fullKey, list); alias != nil {
@@ -48,6 +51,9 @@ func (s *SnippetCli) Share(fullKey string, destination string) {
 
 func (s *SnippetCli) Run(fullKey string, args []string) {
 	k := s.getAbsAlias(fullKey)
+	if k == nil {
+		return
+	}
 	if list, err := s.service.Get(k); err != nil {
 		s.HandleErr(err)
 	} else {
@@ -94,7 +100,11 @@ func (s *SnippetCli) New(uri string, fullKey string) {
 }
 
 func (s *SnippetCli) Edit(fullKey string) {
-	if list, err := s.service.Get(s.getAbsAlias(fullKey)); err != nil {
+	alias := s.getAbsAlias(fullKey)
+	if alias == nil {
+		return
+	}
+	if list, err := s.service.Get(alias); err != nil {
 		s.HandleErr(err)
 	} else {
 		if alias := s.handleMultiResponse(fullKey, list); alias != nil {
@@ -119,7 +129,11 @@ func (s *SnippetCli) Describe(fullKey string, description string) {
 }
 
 func (s *SnippetCli) Inspect(fullKey string) {
-	if list, err := s.service.Get(s.getAbsAlias(fullKey)); err != nil {
+	alias := s.getAbsAlias(fullKey)
+	if alias == nil {
+		return
+	}
+	if list, err := s.service.Get(alias); err != nil {
 		s.HandleErr(err)
 	} else {
 		s.Render("snippet:inspect", list)
@@ -139,7 +153,11 @@ func (s *SnippetCli) Delete(fullKey string) {
 }
 
 func (s *SnippetCli) Cat(fullKey string) {
-	if list, err := s.service.Get(s.getAbsAlias(fullKey)); err != nil {
+	alias := s.getAbsAlias(fullKey)
+	if alias == nil {
+		return
+	}
+	if list, err := s.service.Get(alias); err != nil {
 		s.HandleErr(err)
 	} else {
 		if len(list.Items) == 0 {
@@ -161,7 +179,11 @@ func (s *SnippetCli) Patch(fullKey string, target string, patch string) {
 }
 
 func (s *SnippetCli) Clone(fullKey string, newFullKey string) {
-	if alias, err := s.service.Clone(s.getAbsAlias(fullKey), newFullKey); err != nil {
+	alias := s.getAbsAlias(fullKey)
+	if alias == nil {
+		return
+	}
+	if alias, err := s.service.Clone(alias, newFullKey); err != nil {
 		s.HandleErr(err)
 	} else {
 		s.Render("snippet:cloned", alias)
