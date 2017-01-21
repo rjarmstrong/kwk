@@ -100,6 +100,9 @@ func (s *SnippetCli) New(uri string, fullKey string) {
 }
 
 func (s *SnippetCli) Edit(fullKey string) {
+	if fullKey == "env" || fullKey == "prefs" {
+		fullKey = setup.GetHostConfigFullName(fullKey + ".yml")
+	}
 	alias := s.getAbsAlias(fullKey)
 	if alias == nil {
 		return
