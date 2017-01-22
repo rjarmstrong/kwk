@@ -127,9 +127,9 @@ func listSnippets(list *models.SnippetList) string {
 		if v.Private {
 			name = style.Colour(style.Subdued, ".") + name
 			if v.Role == models.RolePreferences {
-				snip = style.Colour(style.Subdued, `<Local Preferences>`)
+				snip = style.Colour(style.Yellow, `Local prefs: Shrtct: 'kwk edit prefs'`)
 			} else if v.Role == models.RoleEnvironment {
-				snip = style.Colour(style.Subdued, `<Local Environment>`)
+				snip = style.Colour(style.Yellow, `Runtime env. Shrtct: 'kwk edit env'`)
 			} else {
 				snip = style.Colour(style.Subdued, `<Private>`)
 			}

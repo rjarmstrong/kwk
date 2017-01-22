@@ -17,6 +17,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"bitbucket.com/sharingmachine/kwkcli/setup"
 )
 
 func createApp(conn *grpc.ClientConn, writer *bytes.Buffer, r *bufio.Reader) *app.KwkApp {
@@ -24,7 +25,8 @@ func createApp(conn *grpc.ClientConn, writer *bytes.Buffer, r *bufio.Reader) *ap
 	t := config.NewJsonSettings(s, "settings")
 	h := rpc.NewHeaders(t)
 	u := account.NewStdManager(conn, t, h)
-	a := snippets.New(conn, t, h)
+	su := setup.NewConfigProvider()
+	a := snippets.New(conn, t, h, su)
 	w := tmpl.NewWriter(writer)
 	d := dlg.New(w, r)
 	o := openers.New(s, a, w)

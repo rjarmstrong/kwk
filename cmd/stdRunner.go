@@ -119,6 +119,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 		}
 	} else {
 		//fmt.Println(runner)
+		// TODO: MULTI-STEP
 		for i, v := range interp {
 			interp[i] = strings.Replace(v, "$SNIP", s.Snip, -1)
 		}

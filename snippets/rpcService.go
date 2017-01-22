@@ -11,13 +11,13 @@ import (
 )
 
 type RpcService struct {
-	Settings config.Persister
-	client   snipsRpc.SnipsRpcClient
-	headers  *rpc.Headers
+	persister config.Persister
+	client    snipsRpc.SnipsRpcClient
+	headers   *rpc.Headers
 }
 
 func New(conn *grpc.ClientConn, s config.Persister, h *rpc.Headers) Service {
-	return &RpcService{Settings: s, client: snipsRpc.NewSnipsRpcClient(conn), headers: h}
+	return &RpcService{persister: s, client: snipsRpc.NewSnipsRpcClient(conn), headers: h}
 }
 
 func (r *RpcService) Update(fullKey string, description string) (*models.Snippet, error) {
@@ -160,7 +160,7 @@ func (r *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache bo
 	model.CloneCount = rpc.CloneCount
 	model.Role = models.SnipRole(rpc.Role)
 	if cache {
-		r.Settings.Upsert(LATEST_SNIPPET, model)
+		r.persister.Upsert(LATEST_SNIPPET, model)
 	}
 }
 
@@ -174,7 +174,7 @@ func (r *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.Sn
 	newSnip := &models.Snippet{}
 	// TODO: Monitor eventual consistency and tweak cache duration.
 	// Test with: go build;./kwkcli new "dong1" zing.sh;./kwkcli ls;sleep 11;./kwkcli ls;
-	r.Settings.Get(LATEST_SNIPPET, newSnip, time.Now().Unix()-10)
+	r.persister.Get(LATEST_SNIPPET, newSnip, time.Now().Unix()-10)
 	isInList := false
 	for _, v := range rpc.Items {
 		item := &models.Snippet{}
