@@ -36,7 +36,7 @@ func (r *RpcService) List(l *models.ListParams) (*models.SnippetList, error) {
 		return nil, err
 	} else {
 		list := &models.SnippetList{}
-		r.mapSnippetList(res, list)
+		r.mapSnippetList(res, list, true)
 		return list, nil
 	}
 }
@@ -46,7 +46,7 @@ func (r *RpcService) Get(k *models.Alias) (*models.SnippetList, error) {
 		return nil, err
 	} else {
 		list := &models.SnippetList{}
-		r.mapSnippetList(res, list)
+		r.mapSnippetList(res, list, false)
 		return list, nil
 	}
 }
@@ -167,7 +167,7 @@ func (r *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache bo
 const LATEST_SNIPPET = "latest-snippet.json"
 const DELETED_SNIPPET = "deleted-snippet.json"
 
-func (r *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.SnippetList) {
+func (r *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.SnippetList, isList bool) {
 	model.Total = rpc.Total
 	model.Since = time.Unix(rpc.Since/1000, 0)
 	model.Size = rpc.Size
@@ -184,7 +184,7 @@ func (r *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.Sn
 			isInList = true
 		}
 	}
-	if !isInList && newSnip.Name != "" {
+	if isList && !isInList && newSnip.Name != "" {
 		// TODO: add to logger
 		fmt.Println("Adding from cache")
 		model.Items = append([]models.Snippet{*newSnip}, model.Items...)

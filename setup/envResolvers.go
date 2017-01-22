@@ -21,9 +21,9 @@ type EnvResolvers struct {
 func NewEnvResolvers(s snippets.Service, sys sys.Manager, a account.Manager) Resolvers {
 	return &EnvResolvers{
 		hostConfigName:GetHostConfigFullName("env.yml"),
-		snippets:s,
-		system:sys,
-		account:a,
+		snippets:      s,
+		system:        sys,
+		account:       a,
 	}
 }
 
@@ -51,15 +51,23 @@ func (e *EnvResolvers) Own() (string, error) {
 }
 
 func (e *EnvResolvers) Default() (string, error) {
+	if env, err := e.Fallback(); err != nil {
+		return "", err
+	} else {
+		if _, err := e.system.WriteToFile(SNIP_CACHE_PATH, e.hostConfigName, env, true); err != nil {
+			return "", err
+		} else {
+			return env, nil
+		}
+	}
+}
+
+func (e *EnvResolvers) Fallback() (string, error) {
 	defaultEnv := fmt.Sprintf("%s-%s.yml", runtime.GOOS, runtime.GOARCH)
 	defaultAlias := &models.Alias{FullKey:defaultEnv, Username:"env"}
 	if snip, err := e.snippets.Clone(defaultAlias, e.hostConfigName); err != nil {
 		return "", err
 	} else {
-		if _, err := e.system.WriteToFile(SNIP_CACHE_PATH, e.hostConfigName, snip.Snip, true); err != nil {
-			return "", err
-		} else {
-			return snip.Snip, nil
-		}
+		return snip.Snip, nil
 	}
 }

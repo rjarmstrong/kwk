@@ -15,6 +15,11 @@ func DefaultPrefs() *Preferences {
 	return p
 }
 
+type PreferencesHolder struct {
+	KwkPrefs    string
+	Preferences PersistedPrefs
+}
+
 // Preferences is a container for file and flag preferences.
 type Preferences struct {
 	PersistedPrefs

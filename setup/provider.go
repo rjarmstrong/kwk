@@ -29,6 +29,7 @@ type Resolvers interface{
 	Local() (string, error)
 	Own() (string, error)
 	Default() (string, error)
+	Fallback() (string, error)
 }
 
 type ProviderMock struct {

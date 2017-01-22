@@ -5,6 +5,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"gopkg.in/yaml.v2"
+	"fmt"
 )
 
 type ConfigProvider struct {
@@ -51,12 +52,25 @@ func (cs *ConfigProvider) Prefs() *Preferences {
 
 	} else {
 		cs.prefs = &Preferences{PersistedPrefs:PersistedPrefs{}}
-		if err := yaml.Unmarshal([]byte(c), cs.prefs); err != nil {
-			panic(err)
-		} else {
-			return cs.prefs
+		parse := func(p string) (*Preferences, error) {
+			ph := &PreferencesHolder{}
+			if err := yaml.Unmarshal([]byte(p), ph); err != nil {
+				return nil, err
+			} else {
+				cs.prefs.PersistedPrefs = ph.Preferences
+				return cs.prefs, nil
+			}
 		}
-
+		if res, err := parse(c); err != nil {
+			// TODO: USE TEMPLATE WRITER
+			fmt.Println("Invalid kwk *prefs.yml detected. `kwk edit prefs` to fix.")
+			// The fallback is expected not to fail parsing
+			fb, _ := cs.prefsResolvers.Fallback()
+			res, _ = parse(fb)
+			return res
+		} else {
+			return res
+		}
 	}
 }
 

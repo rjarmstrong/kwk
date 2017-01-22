@@ -52,15 +52,23 @@ func (p *PrefsResolvers) Own() (string, error) {
 
 func (p *PrefsResolvers) Default() (string, error) {
 	//fmt.Println("GETTING DEFAULT")
-	dp := DefaultPrefs()
-	if b, err := yaml.Marshal(dp.PersistedPrefs); err != nil {
+	if prefs, err := p.Fallback(); err != nil {
 		return "", err
 	} else {
 		if p.account.HasValidCredentials() {
-			if _, err := p.snippets.Create(string(b), p.hostConfigName, models.RolePreferences); err != nil {
+			if _, err := p.snippets.Create(prefs, p.hostConfigName, models.RolePreferences); err != nil {
 				return "", err
 			}
 		}
+		return prefs, nil
+	}
+}
+
+func (p *PrefsResolvers) Fallback() (string, error) {
+	ph := &PreferencesHolder{KwkPrefs:"v1", Preferences:DefaultPrefs().PersistedPrefs }
+	if b, err := yaml.Marshal(ph); err != nil {
+		return "", err
+	} else {
 		return string(b), nil
 	}
 }
