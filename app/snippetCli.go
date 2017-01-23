@@ -49,27 +49,30 @@ func (s *SnippetCli) Share(fullKey string, destination string) {
 	}
 }
 
-func (s *SnippetCli) Run(fullKey string, args []string) {
-	k := s.getAbsAlias(fullKey)
+func (s *SnippetCli) Run(fullName string, args []string) {
+	k := s.getAbsAlias(fullName)
 	if k == nil {
 		return
 	}
-	if list, err := s.service.Get(k); err != nil {
-		if res, err := s.search.Execute(fullKey); err != nil {
+	suggest := func(fn string) {
+		if res, err := s.search.Execute(fn); err != nil {
 			s.HandleErr(err)
 		} else if res.Total > 0 {
 			s.Render("search:alphaSuggest", res)
 			return
 		}
-		s.Render("snippet:notfound", map[string]interface{}{"FullKey": fullKey})
+	}
+
+	if list, err := s.service.Get(k); err != nil {
+		suggest(fullName)
 	} else {
-		if alias := s.handleMultiResponse(fullKey, list); alias != nil {
+		if alias := s.handleMultiResponse(fullName, list); alias != nil {
 			if err = s.runner.Run(alias, args); err != nil {
 				//TODO: Move to template
 				fmt.Println(err)
 			}
 		} else {
-			s.Render("snippet:notfound", map[string]interface{}{"FullKey": fullKey})
+			suggest(fullName)
 		}
 	}
 }
