@@ -150,6 +150,7 @@ enum Role {
     Standard = 0;
     Preferences = 1;
     Environment = 2;
+    Message = 3;
 }
 
 message TypeMatchResponse {

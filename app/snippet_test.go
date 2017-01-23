@@ -54,7 +54,7 @@ func Test_Snippet(t *testing.T) {
 				fullKey := "hola.sh"
 				a.ReturnItemsForGet = []models.Snippet{}
 				results := []*models.SearchResult{}
-				result := &models.SearchResult{Key:"suggestion"}
+				result := &models.SearchResult{Name:"suggestion"}
 				results = append(results, result)
 				h.ReturnForExecute = &models.SearchTermResponse{
 					Total:1,

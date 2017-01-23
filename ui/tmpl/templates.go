@@ -60,8 +60,8 @@ func init() {
 	addColor("account:signup:username", "Choose a great username: ", blue)
 	addColor("account:signup:password", "And enter a password (1 num, 1 cap, 8 chars): ", blue)
 
-	add("search:alpha", "\n\033[7m  \"{{ .Term }}\" found in {{ .Total }} results in {{ .Took }} ms  \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Key | blue }}.{{ .Extension | subdued }}\n{{ . | formatSearchResult}}\n{{end}}", template.FuncMap{"formatSearchResult": alphaSearchResult, "blue": blue, "subdued": subdued})
-	add("search:alphaSuggest", "\n\033[7m Suggestions: \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Key | blue }}.{{ .Extension | subdued }}\n{{end}}\n", template.FuncMap{"blue": blue, "subdued": subdued})
+	add("search:alpha", "\n\033[7m  \"{{ .Term }}\" found in {{ .Total }} results in {{ .Took }} ms  \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{ . | formatSearchResult}}\n{{end}}", template.FuncMap{"formatSearchResult": alphaSearchResult, "blue": blue, "subdued": subdued})
+	add("search:alphaSuggest", "\n\033[7m Suggestions: \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{end}}\n", template.FuncMap{"blue": blue, "subdued": subdued})
 
 	// errors
 	add("validation:title", "{{. | yellow }}\n", template.FuncMap{"yellow": yellow})
@@ -127,11 +127,11 @@ func listSnippets(list *models.SnippetList) string {
 		if v.Private {
 			name = style.Colour(style.Subdued, ".") + name
 			if v.Role == models.RolePreferences {
-				snip = style.Colour(style.Yellow, `Local prefs: Shrtct: 'kwk edit prefs'`)
+				snip = style.Colour(style.Yellow, `(Local prefs) 'kwk edit prefs'`)
 			} else if v.Role == models.RoleEnvironment {
-				snip = style.Colour(style.Yellow, `Runtime env. Shrtct: 'kwk edit env'`)
+				snip = style.Colour(style.Yellow, `(Runtime environment) 'kwk edit env'`)
 			} else {
-				snip = style.Colour(style.Subdued, `<Private>`)
+				snip = style.Colour(style.Subdued, `(Private)`)
 			}
 		} else {
 			snip = fmt.Sprintf("%s", uri(v.Snip))
@@ -165,13 +165,13 @@ func alphaSearchResult(result models.SearchResult) string {
 	if result.Highlights == nil {
 		result.Highlights = map[string]string{}
 	}
-	if result.Highlights["uri"] == "" {
-		result.Highlights["uri"] = result.Snip
+	if result.Highlights["snip"] == "" {
+		result.Highlights["snip"] = result.Snip
 	}
 	lines := highlightsToLines(result.Highlights)
 	f := ""
 	for _, line := range lines {
-		f = f + line.Key[:3] + "\u2847  " + line.Line + "\n"
+		f = f + line.Key[:4] + "\u2847  " + line.Line + "\n"
 	}
 	f = style.Colour(style.Subdued, f)
 	f = style.ColourSpan(40, f, "<em>", "</em>", style.Subdued)

@@ -29,13 +29,20 @@ func (s *AlphaTerm) Execute(term string) (*models.SearchTermResponse, error) {
 		r.Total = res.Total
 		for _, v := range res.Results {
 			item := &models.SearchResult{}
-			item.Key = v.Key
+			item.Name = v.Name
+			item.FullName = v.FullName
 			item.Username = v.Username
 			item.Description = v.Description
 			item.SnipVersion = v.SnipVersion
 			item.Snip = v.Snip
 			item.Extension = v.Extension
 			item.Highlights = v.Highlights
+			item.RunCount = v.RunCount
+			item.CloneCount = v.CloneCount
+			item.Created = v.Created
+			item.Role = models.SnipRole(v.Role)
+			item.Private = v.Private
+			item.Tags = v.Tags
 			r.Results = append(r.Results, item)
 		}
 		return r, nil

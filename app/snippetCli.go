@@ -55,19 +55,20 @@ func (s *SnippetCli) Run(fullKey string, args []string) {
 		return
 	}
 	if list, err := s.service.Get(k); err != nil {
-		s.HandleErr(err)
+		if res, err := s.search.Execute(fullKey); err != nil {
+			s.HandleErr(err)
+		} else if res.Total > 0 {
+			s.Render("search:alphaSuggest", res)
+			return
+		}
+		s.Render("snippet:notfound", map[string]interface{}{"FullKey": fullKey})
 	} else {
 		if alias := s.handleMultiResponse(fullKey, list); alias != nil {
 			if err = s.runner.Run(alias, args); err != nil {
+				//TODO: Move to template
 				fmt.Println(err)
 			}
 		} else {
-			if res, err := s.search.Execute(fullKey); err != nil {
-				s.HandleErr(err)
-			} else if res.Total > 0 {
-				s.Render("search:alphaSuggest", res)
-				return
-			}
 			s.Render("snippet:notfound", map[string]interface{}{"FullKey": fullKey})
 		}
 	}

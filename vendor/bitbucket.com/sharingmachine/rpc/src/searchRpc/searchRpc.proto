@@ -12,11 +12,10 @@ service SearchRpc {
 
 message AlphaRequest {
     string term = 1;
-    string runtime = 2;
-    string extension = 3;
-    string username = 4;
-    bool all = 5; // Search all snippets including private.
-    bool global = 6; // Search everyones snippets.
+    string extension = 2;
+    string username = 3;
+    bool all = 4; // Search snippets with any role.
+    bool global = 5; // Search everyones snippets.
 }
 
 message AlphaResponse {
@@ -28,19 +27,26 @@ message AlphaResponse {
 message AlphaResult {
     string snipId = 1;
     string username = 2;
-    string key = 3;
-    string runtime = 4;
-    string fullKey = 18;
-    string extension = 10;
-    string snip = 5;
-    int64 snipVersion = 6;
+    string name = 3;
+    string fullName = 4;
+    string extension = 5;
+    string snip = 6;
+    int64 snipVersion = 7;
     int64 created = 8;
     repeated string tags = 9;
-    map<string, string> highlights = 11;
-    string forkedFromFullKey = 12;
-    int64 forkedFromVersion = 13;
-    int64 runCount = 14;
-    int64 cloneCount = 15;
-    string description = 16;
-    string private = 17;
+    map<string, string> highlights = 10;
+    string clonedFromFullKey = 11;
+    int64 clonedFromVersion = 12;
+    int64 runCount = 13;
+    int64 cloneCount = 14;
+    string description = 15;
+    bool private = 16;
+    Role role = 17;
+}
+
+enum Role {
+    Standard = 0;
+    Preferences = 1;
+    Environment = 2;
+    Message = 3;
 }
