@@ -100,7 +100,7 @@ func listSnippets(list *models.SnippetList) string {
 	fmt.Fprint(buf, style.Colour(style.LightBlue, "\nkwk.co/"+list.Username+"\n\n"))
 
 	tbl := tablewriter.NewWriter(buf)
-	tbl.SetHeader([]string{"Name", "Version", "Snippet", "Tags", ""})
+	tbl.SetHeader([]string{"Name", "Version", "Snippet", "Tags", "Runs", "Clones", ""})
 	tbl.SetAutoWrapText(false)
 	tbl.SetBorder(false)
 	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
@@ -142,6 +142,8 @@ func listSnippets(list *models.SnippetList) string {
 			fmt.Sprintf("%d", v.Version),
 			snip,
 			strings.Join(tags, ", "),
+			fmt.Sprintf("%d", v.RunCount),
+			fmt.Sprintf("%d", v.CloneCount),
 			humanize.Time(v.Created),
 		})
 
