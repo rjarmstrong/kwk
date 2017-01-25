@@ -239,7 +239,7 @@ func (s *SnippetCli) List(args ...string) {
 		if num, err := strconv.Atoi(v); err == nil {
 			size = int64(num)
 		} else {
-			if i == 0 && v[0] == '/' {
+			if i == 0 && v[len(v)-1:] == "/" {
 				username = strings.Replace(v, "/", "", -1)
 			} else {
 				tags = append(tags, v)
