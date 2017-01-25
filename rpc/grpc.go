@@ -86,12 +86,13 @@ func GetConn(serverAddress string, logger *log.Logger) *grpc.ClientConn {
 
 //
 
-func NewHeaders(t config.Persister) *Headers {
-	return &Headers{persister: t}
+func NewHeaders(t config.Persister, version string) *Headers {
+	return &Headers{persister: t, version: version}
 }
 
 type Headers struct {
 	persister config.Persister
+	version string
 }
 
 func (i *Headers) GetContext() context.Context {
@@ -102,7 +103,13 @@ func (i *Headers) GetContext() context.Context {
 		hostname, _ := os.Hostname()
 		ctx := metadata.NewContext(
 			context.Background(),
-			metadata.Pairs(models.TokenHeaderName, u.Token, "hostname", hostname, "os", runtime.GOOS),
+			metadata.Pairs(
+				models.TokenHeaderName, u.Token,
+				"host", hostname,
+				"os", runtime.GOOS,
+				"agnt", "<not implemented>", //agent //ps -p $$ | tail -1 | awk '{print $NF}'
+				"v", i.version,
+			),
 		)
 		return ctx
 	}

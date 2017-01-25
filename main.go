@@ -35,7 +35,8 @@ func main() {
 
 	s := sys.New()
 	t := config.NewJsonSettings(s, "settings")
-	h := rpc.NewHeaders(t)
+	v := version + "+" + build
+	h := rpc.NewHeaders(t, v)
 	u := account.NewStdManager(conn, t, h)
 	ss := snippets.New(conn, t, h)
 	w := tmpl.NewWriter(os.Stdout)
@@ -48,7 +49,7 @@ func main() {
 	api := rpc.New(conn, h)
 
 	kwkApp := app.New(ss, s, t, o, u, d, w, ch, api, su)
-	kwkApp.App.Version = version + "+" + build
+	kwkApp.App.Version = v
 
 	su.Preload()
 	kwkApp.App.Run(os.Args)
