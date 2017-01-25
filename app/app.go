@@ -1,6 +1,7 @@
 package app
 
 import (
+	"bitbucket.com/sharingmachine/kwkcli/ui/dashboard"
 	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/account"
@@ -10,8 +11,8 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
-	"github.com/urfave/cli"
 	"bitbucket.com/sharingmachine/kwkcli/setup"
+	"github.com/urfave/cli"
 )
 
 type KwkApp struct {
@@ -31,7 +32,7 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 	d dlg.Dialog, w tmpl.Writer, h search.Term, api rpc.Service, su setup.Provider) *KwkApp {
 
 	app := cli.NewApp()
-	//cli.HelpPrinter = system.Help
+	cli.HelpPrinter = dashboard.Layout
 	app.Flags = []cli.Flag {
 		cli.BoolFlag{
 			Name: "covert, x",
