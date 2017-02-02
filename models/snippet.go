@@ -7,8 +7,8 @@ import (
 const (
 	ProfileFullKey  = "profile.json"
 	TokenHeaderName = "token"
-	ROOT_POUCH = "root"
-	SETUP_POUCH = "setup"
+	ROOT_POUCH      = "root"
+	SETTINGS_POUCH  = "settings"
 )
 
 type SnippetList struct {

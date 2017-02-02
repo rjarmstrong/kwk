@@ -65,7 +65,7 @@ func (e *EnvResolvers) Default() (string, error) {
 func (e *EnvResolvers) Fallback() (string, error) {
 	n := fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH)
 	defaultA := models.NewAlias("env", models.ROOT_POUCH, n, "yml")
-	local := models.NewAlias("", models.SETUP_POUCH, n, "yml")
+	local := models.NewAlias("", models.SETTINGS_POUCH, n, "yml")
 	if snip, err := e.snippets.Clone(*defaultA, *local); err != nil {
 		return "", err
 	} else {

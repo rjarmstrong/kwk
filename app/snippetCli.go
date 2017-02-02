@@ -28,8 +28,8 @@ type SnippetCli struct {
 	tmpl.Writer
 }
 
-func NewSnippetCli(a snippets.Service, r cmd.Runner, s sys.Manager, d dlg.Dialog, w tmpl.Writer, t config.Persister, search search.Term, su setup.Provider) *SnippetCli {
-	return &SnippetCli{service: a, runner: r, system: s, Dialog: d, Writer: w, settings: t, search: search, su: su}
+func NewSnippetCli(a snippets.Service, r cmd.Runner, s sys.Manager, d dlg.Dialog, w tmpl.Writer, t config.Persister, search search.Term, su setup.Provider, ps snippets.PouchService) *SnippetCli {
+	return &SnippetCli{service: a, runner: r, system: s, Dialog: d, Writer: w, settings: t, search: search, su: su, ps: ps}
 }
 
 func (s *SnippetCli) Share(distinctName string, destination string) {
@@ -286,14 +286,22 @@ func (s *SnippetCli) UnTag(distinctName string, tags ...string) {
 // kwk ls richard (this is a pouch in this case)
 // kwk ls /richard/examples
 func (s *SnippetCli) List(args ...string) {
+	if len(args) == 0 {
+		r, err := s.ps.GetRoot("", s.su.Prefs().ListAll)
+		if err != nil {
+			panic(err)
+		}
+		s.Render("pouch:list-root", r)
+		return
+	}
 	a, err := models.ParseAlias(args[0])
 	if err != nil {
 		panic(err)
 	}
-	if len(args) == 0 || (a.Username != "" && a.Pouch == "") {
-		r, err := s.ps.GetRoot("", s.su.Prefs().ListAll)
+	if a.Username != "" && a.Pouch == "" {
+		r, err := s.ps.GetRoot(a.Username, s.su.Prefs().ListAll)
 		if err != nil {
-
+			panic(err)
 		}
 		s.Render("pouch:list-root", r)
 		return

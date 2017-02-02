@@ -1,37 +1,16 @@
 package snippets
 
-import "bitbucket.com/sharingmachine/kwkcli/models"
-
-type PouchService interface {
-	GetRoot (username string, all bool) (*Root, error)
-	Create (pouch string) (string, error)
-	Rename (pouch string, newPouch string) (string, error)
-	MakePrivate (pouch string, private bool) (bool, error)
-	Delete (pouch string) (bool, error)
-}
+import (
+	"bitbucket.com/sharingmachine/kwkcli/models"
+	"bitbucket.com/sharingmachine/rpc/src/snipsRpc"
+	"bitbucket.com/sharingmachine/kwkcli/config"
+	"bitbucket.com/sharingmachine/kwkcli/rpc"
+)
 
 type Pouches struct {
-
-}
-
-func (*Pouches) GetRoot(username string, all bool) (*Root, error) {
-	panic("implement me")
-}
-
-func (*Pouches) Create(pouch string) (string, error) {
-	panic("implement me")
-}
-
-func (*Pouches) Rename(pouch string, newPouch string) (string, error) {
-	panic("implement me")
-}
-
-func (*Pouches) MakePrivate(pouch string, private bool) (bool, error) {
-	panic("implement me")
-}
-
-func (*Pouches) Delete(pouch string) (bool, error) {
-	panic("implement me")
+	persister config.Persister
+	c         snipsRpc.PouchesRpcClient
+	headers   *rpc.Headers
 }
 
 type Root struct {

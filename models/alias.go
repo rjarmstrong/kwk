@@ -34,7 +34,7 @@ func NewSetupAlias(name string, ext string) *Alias {
 		panic(err)
 	} else {
 		return &Alias{
-			Pouch:SETUP_POUCH,
+			Pouch:   SETTINGS_POUCH,
 			SnipName:SnipName{Name:fmt.Sprintf("%s_%s", h, name), Ext:ext},
 		}
 	}

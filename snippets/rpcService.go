@@ -12,69 +12,74 @@ import (
 
 type RpcService struct {
 	persister config.Persister
+	pc        snipsRpc.PouchesRpcClient
 	client    snipsRpc.SnipsRpcClient
 	headers   *rpc.Headers
 }
 
 func New(conn *grpc.ClientConn, s config.Persister, h *rpc.Headers) Service {
-	return &RpcService{persister: s, client: snipsRpc.NewSnipsRpcClient(conn), headers: h}
+	return &RpcService{persister: s,
+		client: snipsRpc.NewSnipsRpcClient(conn),
+		pc: snipsRpc.NewPouchesRpcClient(conn),
+		headers: h,
+	}
 }
 
-func (r *RpcService) Update(a models.Alias, description string) (*models.Snippet, error) {
-	if res, err := r.client.Update(r.headers.GetContext(), &snipsRpc.UpdateRequest{Alias: mapAlias(a), Description: description}); err != nil {
+func (rs *RpcService) Update(a models.Alias, description string) (*models.Snippet, error) {
+	if res, err := rs.client.Update(rs.headers.GetContext(), &snipsRpc.UpdateRequest{Alias: mapAlias(a), Description: description}); err != nil {
 		return nil, err
 	} else {
 		m := &models.Snippet{}
-		r.mapSnip(res.Snip, m, true)
+		rs.mapSnip(res.Snip, m, true)
 		return m, nil
 	}
 }
 
 // since unix time in milliseconds
-func (r *RpcService) List(l *models.ListParams) (*models.SnippetList, error) {
-	if res, err := r.client.List(r.headers.GetContext(), &snipsRpc.ListRequest{Username: l.Username, Since: l.Since, Size: l.Size, Tags: l.Tags, All:l.All}); err != nil {
+func (rs *RpcService) List(l *models.ListParams) (*models.SnippetList, error) {
+	if res, err := rs.client.List(rs.headers.GetContext(), &snipsRpc.ListRequest{Username: l.Username, Since: l.Since, Size: l.Size, Tags: l.Tags, All:l.All}); err != nil {
 		return nil, err
 	} else {
 		list := &models.SnippetList{}
-		r.mapSnippetList(res, list, true)
+		rs.mapSnippetList(res, list, true)
 		return list, nil
 	}
 }
 
-func (r *RpcService) Get(k models.Alias) (*models.SnippetList, error) {
-	if res, err := r.client.Get(r.headers.GetContext(), &snipsRpc.GetRequest{Alias:mapAlias(k)}); err != nil {
+func (rs *RpcService) Get(k models.Alias) (*models.SnippetList, error) {
+	if res, err := rs.client.Get(rs.headers.GetContext(), &snipsRpc.GetRequest{Alias:mapAlias(k)}); err != nil {
 		return nil, err
 	} else {
 		list := &models.SnippetList{}
-		r.mapSnippetList(res, list, false)
+		rs.mapSnippetList(res, list, false)
 		return list, nil
 	}
 }
 
-func (r *RpcService) Delete(username string, pouch string, names []*models.SnipName) error {
+func (rs *RpcService) Delete(username string, pouch string, names []*models.SnipName) error {
 	sn := []*snipsRpc.SnipName{}
 	for _, v := range names {
 		sn = append(sn, &snipsRpc.SnipName{Name: v.Name, Extension: v.Ext })
 	}
-	_, err := r.client.Delete(r.headers.GetContext(), &snipsRpc.DeleteRequest{Username:username, Pouch:pouch, Names:sn})
+	_, err := rs.client.Delete(rs.headers.GetContext(), &snipsRpc.DeleteRequest{Username:username, Pouch:pouch, Names:sn})
 	//if err != nil {
-	//	r.Settings.Upsert(DELETED_SNIPPET, )
+	//	rs.Settings.Upsert(DELETED_SNIPPET, )
 	//}
 	return err
 }
 
-func (sm *RpcService) Move(username string, sourcePouch string, targetPouch string, names []*models.SnipName) (string, error) {
+func (rs *RpcService) Move(username string, sourcePouch string, targetPouch string, names []*models.SnipName) (string, error) {
 	panic("not imp")
 }
 
-func (r *RpcService) Create(snip string, a models.Alias, role models.SnipRole) (*models.CreateSnippetResponse, error) {
-	if res, err := r.client.Create(r.headers.GetContext(), &snipsRpc.CreateRequest{Snip: snip, Alias: mapAlias(a), Role: snipsRpc.Role(role)}); err != nil {
+func (rs *RpcService) Create(snip string, a models.Alias, role models.SnipRole) (*models.CreateSnippetResponse, error) {
+	if res, err := rs.client.Create(rs.headers.GetContext(), &snipsRpc.CreateRequest{Snip: snip, Alias: mapAlias(a), Role: snipsRpc.Role(role)}); err != nil {
 		return nil, err
 	} else {
 		cs := &models.CreateSnippetResponse{}
 		if res.Snip != nil {
 			snip := &models.Snippet{}
-			r.mapSnip(res.Snip, snip, true)
+			rs.mapSnip(res.Snip, snip, true)
 			cs.Snippet = snip
 		} else {
 			cs.TypeMatch = &models.TypeMatch{
@@ -92,60 +97,84 @@ func (r *RpcService) Create(snip string, a models.Alias, role models.SnipRole) (
 	}
 }
 
-func (r *RpcService) Rename(a models.Alias, new models.SnipName) (*models.Snippet, *models.SnipName, error) {
-	if res, err := r.client.Rename(r.headers.GetContext(), &snipsRpc.RenameRequest{Alias:mapAlias(a), NewName: &snipsRpc.SnipName{Name:new.Name, Extension:new.Ext}}); err != nil {
+func (rs *RpcService) Rename(a models.Alias, new models.SnipName) (*models.Snippet, *models.SnipName, error) {
+	if res, err := rs.client.Rename(rs.headers.GetContext(), &snipsRpc.RenameRequest{Alias:mapAlias(a), NewName: &snipsRpc.SnipName{Name:new.Name, Extension:new.Ext}}); err != nil {
 		return nil, nil, err
 	} else {
 		snip := &models.Snippet{}
-		r.mapSnip(res.Snip, snip, true)
+		rs.mapSnip(res.Snip, snip, true)
 		return snip, &models.SnipName{Name:res.Original.Name, Ext:res.Original.Extension}, nil
 	}
 }
 
-func (r *RpcService) Patch(a models.Alias, target string, patch string) (*models.Snippet, error) {
-	if res, err := r.client.Patch(r.headers.GetContext(), &snipsRpc.PatchRequest{Alias:mapAlias(a), Target: target, Patch: patch}); err != nil {
+func (rs *RpcService) Patch(a models.Alias, target string, patch string) (*models.Snippet, error) {
+	if res, err := rs.client.Patch(rs.headers.GetContext(), &snipsRpc.PatchRequest{Alias:mapAlias(a), Target: target, Patch: patch}); err != nil {
 		return nil, err
 	} else {
 		snip := &models.Snippet{}
-		r.mapSnip(res.Snip, snip, true)
+		rs.mapSnip(res.Snip, snip, true)
 		return snip, nil
 	}
 }
 
-func (r *RpcService) Clone(a models.Alias, new models.Alias) (*models.Snippet, error) {
-	if res, err := r.client.Clone(r.headers.GetContext(), &snipsRpc.CloneRequest{Alias:mapAlias(a), New:mapAlias(new)}); err != nil {
+func (rs *RpcService) Clone(a models.Alias, new models.Alias) (*models.Snippet, error) {
+	if res, err := rs.client.Clone(rs.headers.GetContext(), &snipsRpc.CloneRequest{Alias:mapAlias(a), New:mapAlias(new)}); err != nil {
 		return nil, err
 	} else {
 		snip := &models.Snippet{}
-		r.mapSnip(res.Snip, snip, true)
+		rs.mapSnip(res.Snip, snip, true)
 		return snip, nil
 	}
 }
 
-func (r *RpcService) Tag(a models.Alias, tags ...string) (*models.Snippet, error) {
-	if res, err := r.client.Tag(r.headers.GetContext(), &snipsRpc.TagRequest{Alias: mapAlias(a), Tags: tags}); err != nil {
+func (rs *RpcService) Tag(a models.Alias, tags ...string) (*models.Snippet, error) {
+	if res, err := rs.client.Tag(rs.headers.GetContext(), &snipsRpc.TagRequest{Alias: mapAlias(a), Tags: tags}); err != nil {
 		return nil, err
 	} else {
 		snip := &models.Snippet{}
-		r.mapSnip(res.Snip, snip, true)
+		rs.mapSnip(res.Snip, snip, true)
 		return snip, nil
 	}
 }
 
-func (r *RpcService) UnTag(a models.Alias, tags ...string) (*models.Snippet, error) {
-	if res, err := r.client.UnTag(r.headers.GetContext(), &snipsRpc.UnTagRequest{Alias: mapAlias(a), Tags: tags}); err != nil {
+func (rs *RpcService) UnTag(a models.Alias, tags ...string) (*models.Snippet, error) {
+	if res, err := rs.client.UnTag(rs.headers.GetContext(), &snipsRpc.UnTagRequest{Alias: mapAlias(a), Tags: tags}); err != nil {
 		return nil, err
 	} else {
 		snip := &models.Snippet{}
-		r.mapSnip(res.Snip, snip, true)
+		rs.mapSnip(res.Snip, snip, true)
 		return snip, nil
 	}
+}
+
+func (rs *RpcService) GetRoot(username string, all bool) (*Root, error) {
+	r, err := rs.pc.GetRoot(rs.headers.GetContext(), &snipsRpc.RootRequest{Username:username, All:all})
+	if err != nil {
+		return nil, err
+	}
+	rs.mapSnippetList()r.Snips
+}
+
+func (rs *RpcService) CreatePouch(pouch string) (string, error) {
+	panic("implement me")
+}
+
+func (rs *RpcService) RenamePouch(pouch string, newPouch string) (string, error) {
+	panic("implement me")
+}
+
+func (rs *RpcService) MakePrivate(pouch string, private bool) (bool, error) {
+	panic("implement me")
+}
+
+func (rs *RpcService) DeletePouch(pouch string) (bool, error) {
+	panic("implement me")
 }
 
 /*
   cache will add the snippet to the local cache to deal with eventual consistency user experience.
  */
-func (r *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache bool) {
+func (rs *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache bool) {
 	model.Id = rpc.SnipId
 	model.Alias = models.Alias{
 		Username:rpc.Alias.Username,
@@ -167,25 +196,25 @@ func (r *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache bo
 	model.CloneCount = rpc.CloneCount
 	model.Role = models.SnipRole(rpc.Role)
 	if cache {
-		r.persister.Upsert(LATEST_SNIPPET, model)
+		rs.persister.Upsert(LATEST_SNIPPET, model)
 	}
 }
 
 const LATEST_SNIPPET = "latest-snippet.json"
 const DELETED_SNIPPET = "deleted-snippet.json"
 
-func (r *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.SnippetList, isList bool) {
+func (rs *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.SnippetList, isList bool) {
 	model.Total = rpc.Total
 	model.Since = time.Unix(rpc.Since/1000, 0)
 	model.Size = rpc.Size
 	newSnip := &models.Snippet{}
 	// TODO: Monitor eventual consistency and tweak cache duration.
 	// Test with: go build;./kwkcli new "dong1" zing.sh;./kwkcli ls;sleep 11;./kwkcli ls;
-	r.persister.Get(LATEST_SNIPPET, newSnip, time.Now().Unix()-10)
+	rs.persister.Get(LATEST_SNIPPET, newSnip, time.Now().Unix()-10)
 	isInList := false
 	for _, v := range rpc.Items {
 		item := &models.Snippet{}
-		r.mapSnip(v, item, false)
+		rs.mapSnip(v, item, false)
 		model.Items = append(model.Items, *item)
 		if item.Id == newSnip.Id {
 			isInList = true

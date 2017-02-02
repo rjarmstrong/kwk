@@ -6,6 +6,8 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"gopkg.in/yaml.v2"
 	"fmt"
+	"os"
+	"io/ioutil"
 )
 
 type ConfigProvider struct {
@@ -75,16 +77,17 @@ func (cs *ConfigProvider) Prefs() *Preferences {
 }
 
 func (cs *ConfigProvider) GetConfig(r Resolvers) (string, error) {
-	//if os.Getenv(sys.KWK_TESTMODE) != "" && fullName == "env.yml" {
-	//	testEnv := "./cmd/testEnv.yml"
-	//	// TODO: use log
-	//	//fmt.Println(">> Running with:", testEnv, " <<")
-	//	b, err := ioutil.ReadFile(testEnv)
-	//	return string(b), nil
-	//	if err != nil {
-	//		return "", err
-	//	}
-	//}
+	_, ok := r.(*EnvResolvers)
+	if os.Getenv(sys.KWK_TESTMODE) != "" &&  ok {
+		testEnv := "./cmd/testEnv.yml"
+		// TODO: use log
+		fmt.Println(">> Running with:", testEnv, " <<")
+		b, err := ioutil.ReadFile(testEnv)
+		return string(b), nil
+		if err != nil {
+			return "", err
+		}
+	}
 	if !cs.u.HasValidCredentials() {
 		return r.Anon()
 	}
