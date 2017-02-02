@@ -24,14 +24,20 @@ const (
 	End                = "\033[0m"
 	Space              = 20
 	UBlock             = "\u2588"
-	Lock               = "\xF0\x9F\x94\x92"
-	OpenLock           = "\xF0\x9F\x94\x93"
-	Warning            = "\xE2\x9A\xA0"
-	Fire               = "\xF0\x9F\x94\xA5"
-	Tick               = "\xE2\x9C\x93"
-	Ambulance          = "\xF0\x9F\x9A\x91"
-	Glasses            = "\xF0\x9F\x91\x93"
-	InfoDeskPerson     = "\xF0\x9F\x92\x81"
+
+	// UTF-8 Hex
+	Lock           = "\xF0\x9F\x94\x92"
+	OpenLock       = "\xF0\x9F\x94\x93"
+	Warning        = "\xE2\x9A\xA0"
+	Fire           = "\xF0\x9F\x94\xA5"
+	Tick           = "\xE2\x9C\x93"
+	Ambulance      = "\xF0\x9F\x9A\x91"
+	Glasses        = "\xF0\x9F\x91\x93"
+	InfoDeskPerson = "\xF0\x9F\x92\x81"
+	Folder         = "\xF0\x9F\x93\x81"
+	Task           = "\xE2\x98\xB0"
+	BriefCase      = "\xF0\x9F\x92\xBC"
+	Pouch          = "\xF0\x9F\x91\x9D"
 )
 
 func Build(quant int, unicode string) string {

@@ -2,8 +2,6 @@ package setup
 
 import (
 	"gopkg.in/yaml.v2"
-	"fmt"
-	"os"
 )
 
 const (
@@ -16,13 +14,6 @@ type Provider interface {
 	Preload()
 }
 
-func GetHostConfigFullName(fullName string) string {
-	if h, err := os.Hostname(); err != nil {
-		panic(err)
-	} else {
-		return fmt.Sprintf(".%s_%s", h, fullName)
-	}
-}
 
 type Resolvers interface{
 	Anon() (string, error)

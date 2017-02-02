@@ -13,7 +13,7 @@ func Test_System(t *testing.T) {
 	//	Convey(`Upgrade`, func() {
 	//		Convey(`Should run by name`, func() {
 	//			p := app.App.Command("upgrade")
-	//			So(p, should.NotBeNil)
+	//			So(p, ShouldNotBeNil)
 	//		})
 	//	})
 	//})

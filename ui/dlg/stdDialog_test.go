@@ -2,7 +2,6 @@ package dlg
 
 import (
 	. "github.com/smartystreets/goconvey/convey"
-	"github.com/smartystreets/assertions/should"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"testing"
 	"bytes"
@@ -20,9 +19,9 @@ func Test_StdDialog(t *testing.T) {
 			options := []string{"apple", "banana", "pear"}
 			b.WriteString("2\n")
 			r := d.MultiChoice("dialog:choose", "some header", options)
-			So(w.RenderCalledWith[0], should.Resemble, "dialog:choose")
-			So(w.RenderCallCount, should.Equal, 2)
-			So(r.Value, should.Resemble, "banana")
+			So(w.RenderCalledWith[0], ShouldResemble, "dialog:choose")
+			So(w.RenderCallCount, ShouldEqual, 2)
+			So(r.Value, ShouldResemble, "banana")
 		})
 
 		Convey(`Given a non-numeric input should re-ask for options`, func() {
@@ -30,9 +29,9 @@ func Test_StdDialog(t *testing.T) {
 			b.WriteString("sdfs\n")
 			b.WriteString("1\n")
 			r := d.MultiChoice("dialog:choose", "some header", options)
-			So(w.RenderCalledWith[0], should.Resemble, "dialog:choose")
-			So(w.RenderCallCount, should.Equal, 4)
-			So(r.Value, should.Resemble, "apple")
+			So(w.RenderCalledWith[0], ShouldResemble, "dialog:choose")
+			So(w.RenderCallCount, ShouldEqual, 4)
+			So(r.Value, ShouldResemble, "apple")
 		})
 
 		Convey(`Given an out of range input should re-ask for options`, func() {
@@ -40,9 +39,9 @@ func Test_StdDialog(t *testing.T) {
 			b.WriteString("4\n")
 			b.WriteString("2\n")
 			r := d.MultiChoice("dialog:choose", "some header", options)
-			So(w.RenderCalledWith[0], should.Resemble, "dialog:choose")
-			So(w.RenderCallCount, should.Equal, 4)
-			So(r.Value, should.Resemble, "banana")
+			So(w.RenderCalledWith[0], ShouldResemble, "dialog:choose")
+			So(w.RenderCallCount, ShouldEqual, 4)
+			So(r.Value, ShouldResemble, "banana")
 		})
 
 	})

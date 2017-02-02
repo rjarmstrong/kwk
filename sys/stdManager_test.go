@@ -2,7 +2,6 @@ package sys
 
 import (
 	"fmt"
-	"github.com/smartystreets/assertions/should"
 	. "github.com/smartystreets/goconvey/convey"
 	"os"
 	"testing"
@@ -16,23 +15,23 @@ func Test_System(t *testing.T) {
 			dir := "test_dir"
 			path, err := s.GetDirPath(dir)
 			So(err, ShouldBeNil)
-			So(path, should.Equal, fmt.Sprintf("/Users/%s/Library/Caches/kwk/%s", os.Getenv("USER"), dir))
+			So(path, ShouldEqual, fmt.Sprintf("/Users/%s/Library/Caches/kwk/%s", os.Getenv("USER"), dir))
 			fi, err := os.Stat(path)
-			So(fi.IsDir(), should.BeTrue)
+			So(fi.IsDir(), ShouldBeTrue)
 			err = os.RemoveAll(path)
 			So(err, ShouldBeNil)
 		})
 
 		Convey(`Should check file exists and not exists`, func() {
 			path, err := s.WriteToFile(".", "testfile.js", "some text")
-			So(err, should.BeNil)
+			So(err, ShouldBeNil)
 			ok, err := s.Exists(path)
-			So(ok, should.BeTrue)
+			So(ok, ShouldBeTrue)
 			err = os.RemoveAll(path)
-			So(err, should.BeNil)
+			So(err, ShouldBeNil)
 			ok, err = s.Exists(path)
-			So(ok, should.BeFalse)
-			So(err, should.BeNil)
+			So(ok, ShouldBeFalse)
+			So(err, ShouldBeNil)
 		})
 
 		//Convey(`Should write and read from file`, func() {

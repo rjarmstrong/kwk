@@ -3,7 +3,6 @@ package config
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
-	"github.com/smartystreets/assertions/should"
 	. "github.com/smartystreets/goconvey/convey"
 	"os"
 	"testing"
@@ -22,7 +21,7 @@ func Test_JsonFile(t *testing.T) {
 			s.Upsert(key, expected)
 			actual := &models.User{}
 			s.Get(key, actual)
-			So(*actual, should.Resemble, expected)
+			So(*actual, ShouldResemble, expected)
 
 			expectedUpdate := models.User{
 				Email: "richard@kwk.io",
@@ -30,14 +29,14 @@ func Test_JsonFile(t *testing.T) {
 			}
 			s.Upsert(key, expectedUpdate)
 			s.Get(key, actual)
-			So(*actual, should.Resemble, expectedUpdate)
+			So(*actual, ShouldResemble, expectedUpdate)
 
 			err := s.Delete(key)
 			So(err, ShouldBeNil)
 
 			actual = &models.User{}
 			err = s.Get(key, actual)
-			So(err.Error(), should.Equal, "Not found.")
+			So(err.Error(), ShouldEqual, "Not found.")
 			p, _ := sys.GetDirPath("test_settings")
 			os.RemoveAll(p)
 		})

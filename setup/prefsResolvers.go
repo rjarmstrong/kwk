@@ -10,17 +10,17 @@ import (
 
 type PrefsResolvers struct {
 	snippets snippets.Service
-	system         sys.Manager
-	account        account.Manager
-	hostConfigName string
+	system   sys.Manager
+	account  account.Manager
+	a        models.Alias
 }
 
 func NewPrefsResolvers(s snippets.Service, sys sys.Manager, a account.Manager) Resolvers {
 	return &PrefsResolvers{
-		hostConfigName:GetHostConfigFullName("prefs.yml"),
+		a:       *models.NewSetupAlias("prefs", "yml"),
 		snippets:s,
-		system:sys,
-		account:a,
+		system:  sys,
+		account: a,
 	}
 }
 
@@ -31,7 +31,7 @@ func (p *PrefsResolvers) Anon() (string, error) {
 
 func (p *PrefsResolvers) Local() (string, error) {
 	//fmt.Println("GETTING LOCAL")
-	return p.system.ReadFromFile(SNIP_CACHE_PATH, p.hostConfigName, true, 0)
+	return p.system.ReadFromFile(SNIP_CACHE_PATH, p.a.Path(), true, 0)
 }
 
 func (p *PrefsResolvers) Own() (string, error) {
@@ -39,10 +39,10 @@ func (p *PrefsResolvers) Own() (string, error) {
 	if u, err := p.account.Get(); err != nil {
 		return "", err
 	} else {
-		if l, err := p.snippets.Get(&models.Alias{FullKey: p.hostConfigName, Username: u.Username }); err != nil {
+		if l, err := p.snippets.Get(*models.NewAlias(u.Username, p.a.Pouch, p.a.Name, p.a.Ext)); err != nil {
 			return "", err
 		} else {
-			if _, err := p.system.WriteToFile(SNIP_CACHE_PATH, p.hostConfigName, l.Items[0].Snip, true); err != nil {
+			if _, err := p.system.WriteToFile(SNIP_CACHE_PATH, p.a.Path(), l.Items[0].Snip, true); err != nil {
 				return "", err
 			}
 			return l.Items[0].Snip, nil
@@ -56,7 +56,7 @@ func (p *PrefsResolvers) Default() (string, error) {
 		return "", err
 	} else {
 		if p.account.HasValidCredentials() {
-			if _, err := p.snippets.Create(prefs, p.hostConfigName, models.RolePreferences); err != nil {
+			if _, err := p.snippets.Create(prefs, *models.NewAlias("", p.a.Pouch, p.a.Name, p.a.Ext), models.RolePreferences); err != nil {
 				return "", err
 			}
 		}

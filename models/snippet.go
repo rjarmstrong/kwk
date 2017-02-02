@@ -7,12 +7,9 @@ import (
 const (
 	ProfileFullKey  = "profile.json"
 	TokenHeaderName = "token"
+	ROOT_POUCH = "root"
+	SETUP_POUCH = "setup"
 )
-
-type Alias struct {
-	Username string `json:"username" schema:"username"`
-	FullKey  string `json:"fullKey" schema:"fullKey"`
-}
 
 type SnippetList struct {
 	Username string
@@ -22,28 +19,29 @@ type SnippetList struct {
 	Size     int64
 }
 
+func NewSnippet(snippet string) *Snippet{
+	return &Snippet{Snip:snippet, Alias:Alias{SnipName:SnipName{}}}
+}
+
 type Snippet struct {
 	Id string
 
 	FullName  string
-	Username  string
-	Name      string
-	Extension string
+	Alias
 
 	Snip    string
 	Version int64
-	Runtime string
 	Media   string
 	Tags    []string
 	Created time.Time
 
-	Description        string
-	ClonedFromFullName string
-	ClonedFromVersion  int64
-	Private            bool
-	CloneCount         int64
-	RunCount           int64
-	Role               SnipRole
+	Description       string
+	ClonedFromAlias   string
+	ClonedFromVersion int64
+	Private           bool
+	CloneCount        int64
+	RunCount          int64
+	Role              SnipRole
 }
 
 type SnipRole int32

@@ -1,23 +1,22 @@
 package integration
 
 import (
+	"github.com/smartystreets/goconvey/web/server/system"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
-	"bitbucket.com/sharingmachine/kwkcli/cmd"
 	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/config"
-	"bitbucket.com/sharingmachine/kwkcli/system"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/app"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
+	"bitbucket.com/sharingmachine/kwkcli/setup"
 	"google.golang.org/grpc"
 	"strings"
 	"os/exec"
 	"bufio"
 	"bytes"
 	"fmt"
-	"bitbucket.com/sharingmachine/kwkcli/setup"
 )
 
 func createApp(conn *grpc.ClientConn, writer *bytes.Buffer, r *bufio.Reader) *app.KwkApp {

@@ -3,14 +3,15 @@ package snippets
 import "bitbucket.com/sharingmachine/kwkcli/models"
 
 type Service interface {
-	Create(snip string, fullName string, role models.SnipRole) (*models.CreateSnippetResponse, error)
-	Update(fullName string, description string) (*models.Snippet, error)
-	Rename(fullName string, newFullName string) (*models.Snippet, string, error)
-	Patch(fullName string, target string, patch string) (*models.Snippet, error)
-	Delete(fullName string) error
-	Clone(k *models.Alias, newName string) (*models.Snippet, error)
-	Tag(fullName string, tag ...string) (*models.Snippet, error)
-	UnTag(fullName string, tag ...string) (*models.Snippet, error)
-	Get(k *models.Alias) (*models.SnippetList, error)
+	Create(snip string, a models.Alias, role models.SnipRole) (*models.CreateSnippetResponse, error)
+	Update(a models.Alias, description string) (*models.Snippet, error)
+	Rename(a models.Alias, new models.SnipName) (*models.Snippet, *models.SnipName, error)
+	Patch(a models.Alias, target string, patch string) (*models.Snippet, error)
+	Delete(username string, pouch string, names []*models.SnipName) error
+	Move(username string, sourcePouch string, targetPouch string, names []*models.SnipName) (string, error)
+	Clone(a models.Alias, new models.Alias) (*models.Snippet, error)
+	Tag(a models.Alias, tag ...string) (*models.Snippet, error)
+	UnTag(a models.Alias, tag ...string) (*models.Snippet, error)
+	Get(a models.Alias) (*models.SnippetList, error)
 	List(l *models.ListParams) (*models.SnippetList, error)
 }

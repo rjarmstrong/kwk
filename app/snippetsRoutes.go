@@ -40,9 +40,9 @@ func Snippets(s *SnippetCli) []cli.Command {
 		},
 		{
 			Name:    "rename",
-			Aliases: []string{"mv"},
+			Aliases: []string{"mv", "move"},
 			Action: func(c *cli.Context) error {
-				s.Rename(c.Args().Get(0), c.Args().Get(1))
+				s.Move(c.Args())
 				return nil
 			},
 		},
@@ -92,7 +92,7 @@ func Snippets(s *SnippetCli) []cli.Command {
 				if autoYes {
 					s.su.Prefs().AutoYes = true
 				}
-				s.Delete(c.Args().First())
+				s.Delete(c.Args())
 				return nil
 			},
 		},
@@ -141,18 +141,10 @@ func Snippets(s *SnippetCli) []cli.Command {
 			},
 		},
 		{
-			Name:    "lock",
-			Aliases: []string{},
+			Name:    "mkpouch",
+			Aliases: []string{"mkdir"},
 			Action: func(c *cli.Context) error {
-				s.Rename(c.Args().First(), "."+c.Args().First())
-				return nil
-			},
-		},
-		{
-			Name:    "unlock",
-			Aliases: []string{},
-			Action: func(c *cli.Context) error {
-				s.Rename(c.Args().First(), c.Args().First())
+				s.ps.Create(c.Args().First())
 				return nil
 			},
 		},

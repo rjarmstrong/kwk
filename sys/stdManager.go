@@ -37,14 +37,14 @@ func NewLogger() (*os.File, *log.Logger) {
 	return f, logger
 }
 
-func (s *StdManager) WriteToFile(subDirName string, fullName string, snippet string, incHoldingDir bool) (filePath string, err error) {
-	fp := s.getFilePath(subDirName, fullName, incHoldingDir)
+func (s *StdManager) WriteToFile(subDirName string, suffixPath string, snippet string, incHoldingDir bool) (filePath string, err error) {
+	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
 	err = ioutil.WriteFile(fp, []byte(snippet), FILE_PERMISSION)
 	return fp, err
 }
 
-func (s *StdManager) ReadFromFile(subDirName string, fullName string, incHoldingDir bool, after int64) (string, error) {
-	fp := s.getFilePath(subDirName, fullName, incHoldingDir)
+func (s *StdManager) ReadFromFile(subDirName string, suffixPath string, incHoldingDir bool, after int64) (string, error) {
+	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
 	if fi, err := os.Stat(fp); err != nil {
 		if os.IsNotExist(err) {
 			// TODO: PUT IN STANDARD ERROR
@@ -63,8 +63,8 @@ func (s *StdManager) ReadFromFile(subDirName string, fullName string, incHolding
 	}
 }
 
-func (s *StdManager) FileExists(subDirName string, fullName string, incHoldingDir bool) (bool, error) {
-	fp := s.getFilePath(subDirName, fullName, incHoldingDir)
+func (s *StdManager) FileExists(subDirName string, suffixPath string, incHoldingDir bool) (bool, error) {
+	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
 	return s.Exists(fp)
 }
 
@@ -117,8 +117,8 @@ func (s *StdManager) getHoldingDirectory(subDirName string, fullName string) str
 	return hd
 }
 
-func (s *StdManager) getFilePath(subDirName string, fullName string, incHoldingDir bool) string {
-	sn := sanitize.Name(fullName)
+func (s *StdManager) getFilePath(subDirName string, suffixPath string, incHoldingDir bool) string {
+	sn := sanitize.Name(suffixPath)
 	if incHoldingDir {
 		hd := s.getHoldingDirectory(subDirName, sn)
 		return path.Join(getCachePath(), subDirName, hd, sn)

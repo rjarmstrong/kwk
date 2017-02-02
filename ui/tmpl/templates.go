@@ -39,6 +39,8 @@ func init() {
 	add("snippet:notdeleted", "{{.FullName | blue }} was NOT deleted.", template.FuncMap{"blue": blue})
 	add("snippet:inspect",
 		"\n{{range .Items}}"+"Full name: {{.Username}}/{{.FullName}}"+"\nSnippet: {{.Snip}}"+"\nVersion: {{.Version}}"+"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+"\nWeb: \033[4mhttp://www.kwk.co/{{.Username}}/{{.FullName}}\033[0m"+"\nDescription: {{.Description}}"+"\nRun count: {{.RunCount}}"+"\nClone count: {{.CloneCount}}"+"\n{{ end }}\n\n", nil)
+	add("pouch:notdeleted", "{{. | blue }} was NOT deleted.", template.FuncMap{"blue": blue})
+	add("pouch:deleted", "{{. | blue }} was deleted.", template.FuncMap{"blue": blue})
 
 	// System
 	add("system:upgraded", "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n   Successfully upgraded!  \n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", nil)
@@ -100,7 +102,7 @@ func listSnippets(list *models.SnippetList) string {
 	fmt.Fprint(buf, style.Colour(style.LightBlue, "\nkwk.co/"+list.Username+"\n\n"))
 
 	tbl := tablewriter.NewWriter(buf)
-	tbl.SetHeader([]string{"Name", "Version", "Snippet", "Tags", "Runs", "Clones", ""})
+	tbl.SetHeader([]string{"Name", "Version", "Preview", "Tags", "Runs", ""})
 	tbl.SetAutoWrapText(false)
 	tbl.SetBorder(false)
 	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
@@ -123,7 +125,7 @@ func listSnippets(list *models.SnippetList) string {
 		var snip string
 		var name string
 
-		name = style.Colour(style.LightBlue, v.Name) + style.Colour(style.Subdued, "."+v.Extension)
+		name = style.Colour(style.LightBlue, v.Name) + style.Colour(style.Subdued, "." + v.Ext)
 		if v.Private {
 			name = style.Colour(style.Subdued, ".") + name
 			if v.Role == models.RolePreferences {
@@ -138,12 +140,11 @@ func listSnippets(list *models.SnippetList) string {
 		}
 
 		tbl.Append([]string{
-			name,
+			style.Pouch + "   " + name,
 			fmt.Sprintf("%d", v.Version),
 			snip,
 			strings.Join(tags, ", "),
 			fmt.Sprintf("%d", v.RunCount),
-			fmt.Sprintf("%d", v.CloneCount),
 			humanize.Time(v.Created),
 		})
 

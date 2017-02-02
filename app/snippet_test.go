@@ -6,7 +6,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
-	"github.com/smartystreets/assertions/should"
 	. "github.com/smartystreets/goconvey/convey"
 	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
@@ -32,8 +31,8 @@ func Test_Snippet(t *testing.T) {
 				}
 				t.GetHydrateWith = &models.User{Username: "rjarmstrong"}
 				app.App.Run([]string{"[app]", fullKey, "covert", "arg2"})
-				So(a.GetCalledWith, should.Resemble, &models.Alias{FullKey: fullKey, Username: "rjarmstrong"})
-				So(r.OpenCalledWith, should.Resemble, []interface{}{&a.ReturnItemsForGet[0], []string{"covert", "arg2"}})
+				So(a.GetCalledWith, ShouldResemble, &models.Alias{FullKey: fullKey, Username: "rjarmstrong"})
+				So(r.OpenCalledWith, ShouldResemble, []interface{}{&a.ReturnItemsForGet[0], []string{"covert", "arg2"}})
 				a.ReturnItemsForGet = nil
 			})
 			Convey(`Should call 'run' and prompt if multiple found`, func() {
@@ -46,8 +45,8 @@ func Test_Snippet(t *testing.T) {
 				t.GetHydrateWith = &models.User{Username: "rjarmstrong"}
 				d.MultiChoiceResponse = &dlg.DialogResponse{Value: a.ReturnItemsForGet[0]}
 				app.App.Run([]string{"[app]", "hola", "arg1", "arg2"})
-				So(a.GetCalledWith, should.Resemble, &models.Alias{Username: "rjarmstrong", FullKey: "hola"})
-				So(d.MultiChoiceCalledWith, should.Resemble, []interface{}{"dialog:choose", "Multiple matches. Choose a snippet to run:", a.ReturnItemsForGet})
+				So(a.GetCalledWith, ShouldResemble, &models.Alias{Username: "rjarmstrong", FullKey: "hola"})
+				So(d.MultiChoiceCalledWith, ShouldResemble, []interface{}{"dialog:choose", "Multiple matches. Choose a snippet to run:", a.ReturnItemsForGet})
 				a.ReturnItemsForGet = nil
 			})
 			Convey(`Should suggest if not found`, func() {
@@ -61,9 +60,9 @@ func Test_Snippet(t *testing.T) {
 					Results:results,
 				}
 				app.App.Run([]string{"[app]", fullKey, "arg1", "arg2"})
-				So(a.GetCalledWith, should.Resemble, &models.Alias{FullKey: "hola.sh"})
-				So(w.RenderCalledWith[0], should.Resemble, "search:alphaSuggest")
-				So(w.RenderCalledWith[1].(*models.SearchTermResponse).Results[0], should.Resemble, result)
+				So(a.GetCalledWith, ShouldResemble, &models.Alias{FullKey: "hola.sh"})
+				So(w.RenderCalledWith[0], ShouldResemble, "search:alphaSuggest")
+				So(w.RenderCalledWith[1].(*models.SearchTermResponse).Results[0], ShouldResemble, result)
 				a.ReturnItemsForGet = nil
 			})
 		})
@@ -71,66 +70,66 @@ func Test_Snippet(t *testing.T) {
 		Convey(`New/Create/Save`, func() {
 			Convey(`Create and Save should be equivalent`, func() {
 				p := app.App.Command("new")
-				So(p, should.NotBeNil)
+				So(p, ShouldNotBeNil)
 				p2 := app.App.Command("create")
 				p3 := app.App.Command("save")
-				So(p2.Name, should.Equal, p.Name)
-				So(p3.Name, should.Equal, p.Name)
+				So(p2.Name, ShouldEqual, p.Name)
+				So(p3.Name, ShouldEqual, p.Name)
 			})
 			Convey(`Should call create, save to clip board and respond with template WITH a fullKey`, func() {
 				fullKey := "hola.sh"
 				app.App.Run([]string{"[app]", "new", "echo hola", fullKey})
-				So(a.CreateCalledWith, should.Resemble, []string{"echo hola", fullKey})
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:new", &models.Snippet{FullName: fullKey}})
+				So(a.CreateCalledWith, ShouldResemble, []string{"echo hola", fullKey})
+				So(w.RenderCalledWith, ShouldResemble, []interface{}{"snippet:new", &models.Snippet{FullName: fullKey}})
 			})
 			Convey(`Should call create, save to clip board and respond with template WITHOUT a fullKey`, func() {
 				app.App.Run([]string{"[app]", "new", "echo hola"})
-				So(a.CreateCalledWith, should.Resemble, []string{"echo hola", ""})
+				So(a.CreateCalledWith, ShouldResemble, []string{"echo hola", ""})
 				mockKey := "x5hi23"
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:new", &models.Snippet{FullName: mockKey}})
+				So(w.RenderCalledWith, ShouldResemble, []interface{}{"snippet:new", &models.Snippet{FullName: mockKey}})
 			})
 		})
 
 		Convey(`Inspect`, func() {
 			Convey(`Should run by name`, func() {
 				p := app.App.Command("inspect")
-				So(p, should.NotBeNil)
+				So(p, ShouldNotBeNil)
 				p2 := app.App.Command("i")
-				So(p2.Name, should.Equal, p.Name)
+				So(p2.Name, ShouldEqual, p.Name)
 			})
 			Convey(`Should call get and respond with template`, func() {
 				app.App.Run([]string{"[app]", "inspect", "arrows.js"})
-				So(a.GetCalledWith, should.Resemble, &models.Alias{FullKey: "arrows.js"})
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:inspect", &models.SnippetList{}})
+				So(a.GetCalledWith, ShouldResemble, &models.Alias{FullKey: "arrows.js"})
+				So(w.RenderCalledWith, ShouldResemble, []interface{}{"snippet:inspect", &models.SnippetList{}})
 			})
 		})
 
 		Convey(`Tag`, func() {
 			Convey(`Should run by name`, func() {
 				p := app.App.Command("tag")
-				So(p, should.NotBeNil)
+				So(p, ShouldNotBeNil)
 				p2 := app.App.Command("t")
-				So(p2.Name, should.Equal, p.Name)
+				So(p2.Name, ShouldEqual, p.Name)
 			})
 			Convey(`Should run by name (untag)`, func() {
 				p := app.App.Command("untag")
-				So(p, should.NotBeNil)
+				So(p, ShouldNotBeNil)
 				p2 := app.App.Command("ut")
-				So(p2.Name, should.Equal, p.Name)
+				So(p2.Name, ShouldEqual, p.Name)
 			})
 			Convey(`Should call tag and respond with template`, func() {
 				app.App.Run([]string{"[app]", "tag", "arrows.js", "tag1", "tag2"})
-				So(a.TagCalledWith, should.Resemble, map[string][]string{
+				So(a.TagCalledWith, ShouldResemble, map[string][]string{
 					"arrows.js": []string{"tag1", "tag2"},
 				})
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:tag", &models.Snippet{}})
+				So(w.RenderCalledWith, ShouldResemble, []interface{}{"snippet:tag", &models.Snippet{}})
 			})
 			Convey(`Should call untag and respond with template`, func() {
 				app.App.Run([]string{"[app]", "untag", "arrows.js", "tag1", "tag2"})
-				So(a.UnTagCalledWith, should.Resemble, map[string][]string{
+				So(a.UnTagCalledWith, ShouldResemble, map[string][]string{
 					"arrows.js": []string{"tag1", "tag2"},
 				})
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:untag", &models.Snippet{}})
+				So(w.RenderCalledWith, ShouldResemble, []interface{}{"snippet:untag", &models.Snippet{}})
 			})
 		})
 
@@ -138,23 +137,23 @@ func Test_Snippet(t *testing.T) {
 			data := &models.Snippet{FullName: "arrows.js"}
 			Convey(`Should run by name`, func() {
 				p := app.App.Command("delete")
-				So(p, should.NotBeNil)
+				So(p, ShouldNotBeNil)
 				p2 := app.App.Command("rm")
-				So(p2.Name, should.Equal, p.Name)
+				So(p2.Name, ShouldEqual, p.Name)
 			})
 			Convey(`Should prompt to delete and then confirm deleted`, func() {
 				d.ReturnItem = &dlg.DialogResponse{Ok: true}
 				app.App.Run([]string{"[app]", "delete", "arrows.js"})
-				So(a.DeleteCalledWith, should.Equal, "arrows.js")
-				So(d.LastModalCalledWith[0].(string), should.Resemble, "snippet:delete")
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:deleted", data})
+				So(a.DeleteCalledWith, ShouldEqual, "arrows.js")
+				So(d.LastModalCalledWith[0].(string), ShouldResemble, "snippet:delete")
+				So(w.RenderCalledWith, ShouldResemble, []interface{}{"snippet:deleted", data})
 				d.ReturnItem = nil
 			})
 			Convey(`Should prompt to delete and then confirm not deleted`, func() {
 				d.ReturnItem = &dlg.DialogResponse{Ok: false}
 				app.App.Run([]string{"[app]", "delete", "arrows.js"})
-				So(d.CallHistory[0].([]interface{})[0], should.Resemble, "snippet:delete")
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:notdeleted", data})
+				So(d.CallHistory[0].([]interface{})[0], ShouldResemble, "snippet:delete")
+				So(w.RenderCalledWith, ShouldResemble, []interface{}{"snippet:notdeleted", data})
 				d.ReturnItem = nil
 			})
 		})
@@ -162,104 +161,104 @@ func Test_Snippet(t *testing.T) {
 		Convey(`Cat`, func() {
 			Convey(`Should test equivalent cmd names`, func() {
 				p := app.App.Command("cat")
-				So(p, should.NotBeNil)
+				So(p, ShouldNotBeNil)
 				p2 := app.App.Command("raw")
 				p3 := app.App.Command("read")
 				p4 := app.App.Command("print")
 				p5 := app.App.Command("get")
-				So(p2.Name, should.Equal, p.Name)
-				So(p3.Name, should.Equal, p.Name)
-				So(p4.Name, should.Equal, p.Name)
-				So(p5.Name, should.Equal, p.Name)
+				So(p2.Name, ShouldEqual, p.Name)
+				So(p3.Name, ShouldEqual, p.Name)
+				So(p4.Name, ShouldEqual, p.Name)
+				So(p5.Name, ShouldEqual, p.Name)
 			})
 			Convey(`Should call get and respond with template`, func() {
 				a.ReturnItemsForGet = []models.Snippet{
 					{FullName: "arrows.js"},
 				}
 				app.App.Run([]string{"[app]", "cat", "arrows.js"})
-				So(a.GetCalledWith, should.Resemble, &models.Alias{FullKey: "arrows.js"})
-				So(w.RenderCalledWith[0].(string), should.Resemble, "snippet:cat")
-				So(w.RenderCalledWith[1].(models.Snippet).FullName, should.Resemble, "arrows.js")
+				So(a.GetCalledWith, ShouldResemble, &models.Alias{FullKey: "arrows.js"})
+				So(w.RenderCalledWith[0].(string), ShouldResemble, "snippet:cat")
+				So(w.RenderCalledWith[1].(models.Snippet).FullName, ShouldResemble, "arrows.js")
 			})
 		})
 
 		Convey(`Rename`, func() {
 			Convey(`Should run by name`, func() {
 				p := app.App.Command("rename")
-				So(p, should.NotBeNil)
+				So(p, ShouldNotBeNil)
 				p2 := app.App.Command("mv")
-				So(p2.Name, should.Equal, p.Name)
+				So(p2.Name, ShouldEqual, p.Name)
 			})
 			Convey(`Should call rename and respond with template`, func() {
 				app.App.Run([]string{"[app]", "rename", "arrows.js", "pointers.js"})
-				So(a.RenameCalledWith, should.Resemble, []string{"arrows.js", "pointers.js"})
-				So(w.RenderCalledWith[0].(string), should.Resemble, "snippet:renamed")
+				So(a.RenameCalledWith, ShouldResemble, []string{"arrows.js", "pointers.js"})
+				So(w.RenderCalledWith[0].(string), ShouldResemble, "snippet:renamed")
 				r := w.RenderCalledWith[1].(*map[string]string)
-				So((*r)["newFullKey"], should.Resemble,  "pointers.js")
+				So((*r)["newFullKey"], ShouldResemble,  "pointers.js")
 			})
 		})
 
 		Convey(`Clone`, func() {
 			Convey(`Should run by name`, func() {
 				p := app.App.Command("clone")
-				So(p, should.NotBeNil)
+				So(p, ShouldNotBeNil)
 			})
 			Convey(`Should call rename and respond with template`, func() {
 				app.App.Run([]string{"[app]", "clone", "unicode/arrows.js", "myarrows.js"})
-				So(a.CloneCalledWith, should.Resemble, []interface{}{
+				So(a.CloneCalledWith, ShouldResemble, []interface{}{
 
 					&models.Alias{Username: "unicode", FullKey: "arrows.js"}, "myarrows.js"})
 
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:cloned", &models.Snippet{}})
+				So(w.RenderCalledWith, ShouldResemble, []interface{}{"snippet:cloned", &models.Snippet{}})
 			})
 		})
 
 		Convey(`Edit`, func() {
 			Convey(`Should run by name`, func() {
 				p := app.App.Command("edit")
-				So(p, should.NotBeNil)
+				So(p, ShouldNotBeNil)
 				p2 := app.App.Command("e")
-				So(p2.Name, should.Equal, p.Name)
+				So(p2.Name, ShouldEqual, p.Name)
 			})
 			Convey(`Should call edit and respond with template`, func() {
 				a.ReturnItemsForGet = []models.Snippet{{FullName: "arrows.js"}}
 				d.MultiChoiceResponse = &dlg.DialogResponse{Value: a.ReturnItemsForGet[0]}
 				app.App.Run([]string{"[app]", "edit", "arrows.js"})
-				So(r.EditCalledWith, should.Resemble, &a.ReturnItemsForGet[0])
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:edited", &a.ReturnItemsForGet[0]})
+				So(r.EditCalledWith, ShouldResemble, &a.ReturnItemsForGet[0])
+				So(w.RenderCalledWith, ShouldResemble, []interface{}{"snippet:edited", &a.ReturnItemsForGet[0]})
 			})
 			Convey(`Should call edit and respond with error if not exists`, func() {
 				app.App.Run([]string{"[app]", "edit", "arrows.js"})
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:notfound", &models.Snippet{FullName: "arrows.js"}})
+				So(w.RenderCalledWith, ShouldResemble, []interface{}{"snippet:notfound", &models.Snippet{FullName: "arrows.js"}})
 			})
 		})
 
 		Convey(`Patch`, func() {
 			Convey(`Should run by name`, func() {
 				p := app.App.Command("patch")
-				So(p, should.NotBeNil)
+				So(p, ShouldNotBeNil)
 			})
 			Convey(`Should call patch and respond with patch`, func() {
 				app.App.Run([]string{"[app]", "patch", "arrows.js", "console.log('original')", "console.log('patched')"})
-				So(a.PatchCalledWith, should.Resemble, []string{"arrows.js", "console.log('original')", "console.log('patched')"})
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:patched", &models.Snippet{FullName: "arrows.js", Snip: "console.log('patched')"}})
+				So(a.PatchCalledWith, ShouldResemble, []string{"arrows.js", "console.log('original')", "console.log('patched')"})
+				So(w.RenderCalledWith, ShouldResemble, []interface{}{"snippet:patched", &models.Snippet{FullName: "arrows.js", Snip: "console.log('patched')"}})
 			})
 		})
 
 		Convey(`List`, func() {
 			Convey(`Should run by name`, func() {
 				p := app.App.Command("list")
-				So(p, should.NotBeNil)
+				So(p, ShouldNotBeNil)
 				p2 := app.App.Command("ls")
-				So(p2.Name, should.Equal, p.Name)
+				So(p2.Name, ShouldEqual, p.Name)
 			})
 			Convey(`Should call list and respond with template`, func() {
 				app.App.Run([]string{"[app]", "list", "5", "tag1"})
-				So(a.ListCalledWith.Username, should.Resemble, "")
-				So(a.ListCalledWith.Size, should.Resemble, int64(5))
-				So(a.ListCalledWith.Since/1000, should.Resemble, time.Now().UnixNano()/1000000000)
-				So(a.ListCalledWith.Tags, should.Resemble, []string{"tag1"})
-				So(w.RenderCalledWith, should.Resemble, []interface{}{"snippet:list", &models.SnippetList{}})
+				So(a.ListCalledWith.Username, ShouldResemble, "")
+				So(a.ListCalledWith.Size, ShouldResemble, int64(5))
+				So(a.ListCalledWith.Since/1000, ShouldResemble, time.Now().UnixNano()/1000000000)
+				So(a.ListCalledWith.Tags, ShouldResemble, []string{"tag1"})
+				So(w.RenderCalledWith, ShouldResemble, []interface{}{"snippet:list", &models.SnippetList{}})
 			})
 		})
 	})

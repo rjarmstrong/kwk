@@ -1,0 +1,90 @@
+hash: c6745ae5ddf4b38688f9f05f497663428ae661875c527fbd7e76d063e51d2bc6
+updated: 2017-02-02T18:58:30.42165779+13:00
+imports:
+- name: bitbucket.com/sharingmachine/rpc
+  version: 6a847a0d39f35ff2d481e89b5cc21320e8d54dd8
+  vcs: git
+  subpackages:
+  - src/searchRpc
+  - src/snipsRpc
+  - src/sysRpc
+  - src/usersRpc
+- name: github.com/atotto/clipboard
+  version: bb272b845f1112e10117e3e45ce39f690c0001ad
+- name: github.com/dustin/go-humanize
+  version: 7a41df006ff9af79a29f0ffa9c5f21fbe6314a2d
+- name: github.com/golang/protobuf
+  version: 8ee79997227bf9b34611aee7946ae64735e6fd93
+  subpackages:
+  - proto
+- name: github.com/gopherjs/gopherjs
+  version: 5c8f21741620ef6a52e185bbc920499581901c9e
+  subpackages:
+  - js
+- name: github.com/howeyc/gopass
+  version: bf9dde6d0d2c004a008c27aaee91170c786f6db8
+- name: github.com/jtolds/gls
+  version: bb0351aa7eb6f322f32667d51375f26a2bca6628
+- name: github.com/kennygrant/sanitize
+  version: 6a0bfdde8629a3a3a7418a7eae45c54154692514
+- name: github.com/mattn/go-runewidth
+  version: 14207d285c6c197daabb5c9793d63e7af9ab2d50
+- name: github.com/olekukonko/tablewriter
+  version: febf2d34b54a69ce7530036c7503b1c9fbfdf0bb
+- name: github.com/siddontang/go
+  version: 1e9ce2a5ac4092fdf61e293634e40bfb49595105
+  subpackages:
+  - num
+- name: github.com/smartystreets/assertions
+  version: e9a2f6771d97c709b2f7609fdf89ebde8b64c926
+  subpackages:
+  - internal/go-render/render
+  - internal/oglematchers
+  - should
+- name: github.com/smartystreets/goconvey
+  version: d4c757aa9afd1e2fc1832aaab209b5794eb336e1
+  subpackages:
+  - convey
+  - convey/gotest
+  - convey/reporting
+  - web/server/system
+- name: github.com/urfave/cli
+  version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
+- name: golang.org/x/crypto
+  version: dc137beb6cce2043eb6b5f223ab8bf51c32459f4
+  subpackages:
+  - ssh/terminal
+- name: golang.org/x/net
+  version: 007e530097ad7f954752df63046b4036f98ba6a6
+  subpackages:
+  - context
+  - html
+  - html/atom
+  - http2
+  - http2/hpack
+  - idna
+  - internal/timeseries
+  - lex/httplex
+  - trace
+- name: golang.org/x/sys
+  version: 7a6e5648d140666db5d920909e082ca00a87ba2c
+  subpackages:
+  - unix
+- name: google.golang.org/grpc
+  version: 708a7f9f3283aa2d4f6132d287d78683babe55c8
+  subpackages:
+  - codes
+  - credentials
+  - grpclog
+  - internal
+  - metadata
+  - naming
+  - peer
+  - stats
+  - tap
+  - transport
+- name: gopkg.in/yaml.v2
+  version: 4c78c975fe7c825c6d1466c42be594d1d6f3aba6
+testImports:
+- name: github.com/go-sql-driver/mysql
+  version: a0583e0143b1624142adab07e0e97fe106d99561

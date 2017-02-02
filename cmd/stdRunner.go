@@ -37,9 +37,9 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	if err != nil {
 		return err
 	}
-	_, candidates := getSubSection(eRoot, s.Extension)
+	_, candidates := getSubSection(eRoot, s.Ext)
 	if len(candidates) != 1 {
-		return errors.New("No editors have been specified for " + s.Extension + " . And default editor is not specified.")
+		return errors.New("No editors have been specified for " + s.Ext + " . And default editor is not specified.")
 	}
 	_, cli := getSubSection(a, candidates[0])
 
@@ -78,7 +78,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 		return err
 	} else {
 		// else save and close the app
-		if s, err = r.snippets.Patch(s.FullName, s.Snip, text); err != nil {
+		if s, err = r.snippets.Patch(s.Alias, s.Snip, text); err != nil {
 			closer()
 			return err
 		}
@@ -93,7 +93,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 	if err != nil {
 		return err
 	}
-	yamlKey := s.Extension
+	yamlKey := s.Ext
 	if r.setup.Prefs().Covert {
 		yamlKey += "-covert"
 	}
@@ -162,7 +162,7 @@ func replaceVariables(cliArgs *[]string, filePath string, s *models.Snippet) {
 	for i := range *cliArgs {
 		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$FULL_NAME", filePath, -1)
 		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$DIR", strings.Replace(filePath, s.FullName, "", -1), -1)
-		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$NAME", strings.Replace(filePath, "."+s.Extension, "", -1), -1)
+		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$NAME", strings.Replace(filePath, "."+s.Ext, "", -1), -1)
 	}
 }
 

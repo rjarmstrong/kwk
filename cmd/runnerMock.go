@@ -1,6 +1,7 @@
 package cmd
 
-import (
+import
+(
 	"bitbucket.com/sharingmachine/kwkcli/models"
 )
 

@@ -1,7 +1,6 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/ui/dashboard"
 	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/account"
@@ -11,8 +10,9 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
-	"bitbucket.com/sharingmachine/kwkcli/setup"
 	"github.com/urfave/cli"
+	"bitbucket.com/sharingmachine/kwkcli/setup"
+	"bitbucket.com/sharingmachine/kwkcli/ui/dashboard"
 )
 
 type KwkApp struct {

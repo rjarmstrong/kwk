@@ -29,13 +29,15 @@ message AlphaResult {
     string username = 2;
     string name = 3;
     string fullName = 4;
+    string pouchName = 18;
+    string pouchId = 19;
     string extension = 5;
     string snip = 6;
     int64 snipVersion = 7;
     int64 created = 8;
     repeated string tags = 9;
     map<string, string> highlights = 10;
-    string clonedFromFullKey = 11;
+    string clonedFromFullName = 11;
     int64 clonedFromVersion = 12;
     int64 runCount = 13;
     int64 cloneCount = 14;

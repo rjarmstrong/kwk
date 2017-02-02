@@ -9,8 +9,20 @@ It is generated from these files:
 	snipsRpc.proto
 
 It has these top-level messages:
+	CreatePouchRequest
+	CreatePouchResponse
+	RenamePouchRequest
+	RenamePouchResponse
+	MakePrivateRequest
+	MakePrivateResponse
+	DeletePouchRequest
+	DeletePouchResponse
 	CreateRequest
 	UpdateRequest
+	MoveRequest
+	Alias
+	SnipName
+	MoveResponse
 	RenameRequest
 	RenameResponse
 	PatchRequest
@@ -24,9 +36,12 @@ It has these top-level messages:
 	UnTagResponse
 	GetRequest
 	ListRequest
+	RootRequest
+	RootResponse
 	DeleteRequest
 	DeleteResponse
 	CreateResponse
+	Pouch
 	Snip
 	TypeMatchResponse
 	MatchResponse
@@ -81,9 +96,169 @@ func (x Role) String() string {
 }
 func (Role) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
+type CreatePouchRequest struct {
+	Name        string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	MakePrivate bool   `protobuf:"varint,2,opt,name=makePrivate" json:"makePrivate,omitempty"`
+	Encrypt     bool   `protobuf:"varint,3,opt,name=encrypt" json:"encrypt,omitempty"`
+}
+
+func (m *CreatePouchRequest) Reset()                    { *m = CreatePouchRequest{} }
+func (m *CreatePouchRequest) String() string            { return proto.CompactTextString(m) }
+func (*CreatePouchRequest) ProtoMessage()               {}
+func (*CreatePouchRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+
+func (m *CreatePouchRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *CreatePouchRequest) GetMakePrivate() bool {
+	if m != nil {
+		return m.MakePrivate
+	}
+	return false
+}
+
+func (m *CreatePouchRequest) GetEncrypt() bool {
+	if m != nil {
+		return m.Encrypt
+	}
+	return false
+}
+
+type CreatePouchResponse struct {
+	Id string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
+}
+
+func (m *CreatePouchResponse) Reset()                    { *m = CreatePouchResponse{} }
+func (m *CreatePouchResponse) String() string            { return proto.CompactTextString(m) }
+func (*CreatePouchResponse) ProtoMessage()               {}
+func (*CreatePouchResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+
+func (m *CreatePouchResponse) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+type RenamePouchRequest struct {
+	Name    string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	NewName string `protobuf:"bytes,2,opt,name=newName" json:"newName,omitempty"`
+}
+
+func (m *RenamePouchRequest) Reset()                    { *m = RenamePouchRequest{} }
+func (m *RenamePouchRequest) String() string            { return proto.CompactTextString(m) }
+func (*RenamePouchRequest) ProtoMessage()               {}
+func (*RenamePouchRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+
+func (m *RenamePouchRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *RenamePouchRequest) GetNewName() string {
+	if m != nil {
+		return m.NewName
+	}
+	return ""
+}
+
+type RenamePouchResponse struct {
+	OriginalName string `protobuf:"bytes,2,opt,name=originalName" json:"originalName,omitempty"`
+	Name         string `protobuf:"bytes,3,opt,name=name" json:"name,omitempty"`
+}
+
+func (m *RenamePouchResponse) Reset()                    { *m = RenamePouchResponse{} }
+func (m *RenamePouchResponse) String() string            { return proto.CompactTextString(m) }
+func (*RenamePouchResponse) ProtoMessage()               {}
+func (*RenamePouchResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+
+func (m *RenamePouchResponse) GetOriginalName() string {
+	if m != nil {
+		return m.OriginalName
+	}
+	return ""
+}
+
+func (m *RenamePouchResponse) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+type MakePrivateRequest struct {
+	Name        string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	MakePrivate bool   `protobuf:"varint,2,opt,name=makePrivate" json:"makePrivate,omitempty"`
+}
+
+func (m *MakePrivateRequest) Reset()                    { *m = MakePrivateRequest{} }
+func (m *MakePrivateRequest) String() string            { return proto.CompactTextString(m) }
+func (*MakePrivateRequest) ProtoMessage()               {}
+func (*MakePrivateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+
+func (m *MakePrivateRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *MakePrivateRequest) GetMakePrivate() bool {
+	if m != nil {
+		return m.MakePrivate
+	}
+	return false
+}
+
+type MakePrivateResponse struct {
+}
+
+func (m *MakePrivateResponse) Reset()                    { *m = MakePrivateResponse{} }
+func (m *MakePrivateResponse) String() string            { return proto.CompactTextString(m) }
+func (*MakePrivateResponse) ProtoMessage()               {}
+func (*MakePrivateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+
+type DeletePouchRequest struct {
+	Username string `protobuf:"bytes,1,opt,name=username" json:"username,omitempty"`
+	Name     string `protobuf:"bytes,3,opt,name=name" json:"name,omitempty"`
+}
+
+func (m *DeletePouchRequest) Reset()                    { *m = DeletePouchRequest{} }
+func (m *DeletePouchRequest) String() string            { return proto.CompactTextString(m) }
+func (*DeletePouchRequest) ProtoMessage()               {}
+func (*DeletePouchRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+
+func (m *DeletePouchRequest) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *DeletePouchRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+type DeletePouchResponse struct {
+}
+
+func (m *DeletePouchResponse) Reset()                    { *m = DeletePouchResponse{} }
+func (m *DeletePouchResponse) String() string            { return proto.CompactTextString(m) }
+func (*DeletePouchResponse) ProtoMessage()               {}
+func (*DeletePouchResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+
 type CreateRequest struct {
 	Snip        string `protobuf:"bytes,1,opt,name=snip" json:"snip,omitempty"`
-	FullName    string `protobuf:"bytes,2,opt,name=fullName" json:"fullName,omitempty"`
+	Alias       *Alias `protobuf:"bytes,2,opt,name=alias" json:"alias,omitempty"`
 	Description string `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
 	Role        Role   `protobuf:"varint,4,opt,name=role,enum=snipsRpc.Role" json:"role,omitempty"`
 }
@@ -91,7 +266,7 @@ type CreateRequest struct {
 func (m *CreateRequest) Reset()                    { *m = CreateRequest{} }
 func (m *CreateRequest) String() string            { return proto.CompactTextString(m) }
 func (*CreateRequest) ProtoMessage()               {}
-func (*CreateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (*CreateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
 
 func (m *CreateRequest) GetSnip() string {
 	if m != nil {
@@ -100,11 +275,11 @@ func (m *CreateRequest) GetSnip() string {
 	return ""
 }
 
-func (m *CreateRequest) GetFullName() string {
+func (m *CreateRequest) GetAlias() *Alias {
 	if m != nil {
-		return m.FullName
+		return m.Alias
 	}
-	return ""
+	return nil
 }
 
 func (m *CreateRequest) GetDescription() string {
@@ -122,20 +297,20 @@ func (m *CreateRequest) GetRole() Role {
 }
 
 type UpdateRequest struct {
-	FullName    string `protobuf:"bytes,1,opt,name=fullName" json:"fullName,omitempty"`
+	Alias       *Alias `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
 	Description string `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`
 }
 
 func (m *UpdateRequest) Reset()                    { *m = UpdateRequest{} }
 func (m *UpdateRequest) String() string            { return proto.CompactTextString(m) }
 func (*UpdateRequest) ProtoMessage()               {}
-func (*UpdateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+func (*UpdateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
 
-func (m *UpdateRequest) GetFullName() string {
+func (m *UpdateRequest) GetAlias() *Alias {
 	if m != nil {
-		return m.FullName
+		return m.Alias
 	}
-	return ""
+	return nil
 }
 
 func (m *UpdateRequest) GetDescription() string {
@@ -145,39 +320,151 @@ func (m *UpdateRequest) GetDescription() string {
 	return ""
 }
 
+type MoveRequest struct {
+	Username    string      `protobuf:"bytes,1,opt,name=username" json:"username,omitempty"`
+	SourcePouch string      `protobuf:"bytes,2,opt,name=sourcePouch" json:"sourcePouch,omitempty"`
+	TargetPouch string      `protobuf:"bytes,3,opt,name=targetPouch" json:"targetPouch,omitempty"`
+	SnipNames   []*SnipName `protobuf:"bytes,4,rep,name=snipNames" json:"snipNames,omitempty"`
+}
+
+func (m *MoveRequest) Reset()                    { *m = MoveRequest{} }
+func (m *MoveRequest) String() string            { return proto.CompactTextString(m) }
+func (*MoveRequest) ProtoMessage()               {}
+func (*MoveRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
+
+func (m *MoveRequest) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *MoveRequest) GetSourcePouch() string {
+	if m != nil {
+		return m.SourcePouch
+	}
+	return ""
+}
+
+func (m *MoveRequest) GetTargetPouch() string {
+	if m != nil {
+		return m.TargetPouch
+	}
+	return ""
+}
+
+func (m *MoveRequest) GetSnipNames() []*SnipName {
+	if m != nil {
+		return m.SnipNames
+	}
+	return nil
+}
+
+type Alias struct {
+	Username string    `protobuf:"bytes,1,opt,name=username" json:"username,omitempty"`
+	Pouch    string    `protobuf:"bytes,2,opt,name=pouch" json:"pouch,omitempty"`
+	SnipName *SnipName `protobuf:"bytes,3,opt,name=snipName" json:"snipName,omitempty"`
+}
+
+func (m *Alias) Reset()                    { *m = Alias{} }
+func (m *Alias) String() string            { return proto.CompactTextString(m) }
+func (*Alias) ProtoMessage()               {}
+func (*Alias) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
+
+func (m *Alias) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *Alias) GetPouch() string {
+	if m != nil {
+		return m.Pouch
+	}
+	return ""
+}
+
+func (m *Alias) GetSnipName() *SnipName {
+	if m != nil {
+		return m.SnipName
+	}
+	return nil
+}
+
+type SnipName struct {
+	Name      string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Extension string `protobuf:"bytes,2,opt,name=extension" json:"extension,omitempty"`
+}
+
+func (m *SnipName) Reset()                    { *m = SnipName{} }
+func (m *SnipName) String() string            { return proto.CompactTextString(m) }
+func (*SnipName) ProtoMessage()               {}
+func (*SnipName) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
+
+func (m *SnipName) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *SnipName) GetExtension() string {
+	if m != nil {
+		return m.Extension
+	}
+	return ""
+}
+
+type MoveResponse struct {
+	Pouch string `protobuf:"bytes,1,opt,name=pouch" json:"pouch,omitempty"`
+}
+
+func (m *MoveResponse) Reset()                    { *m = MoveResponse{} }
+func (m *MoveResponse) String() string            { return proto.CompactTextString(m) }
+func (*MoveResponse) ProtoMessage()               {}
+func (*MoveResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
+
+func (m *MoveResponse) GetPouch() string {
+	if m != nil {
+		return m.Pouch
+	}
+	return ""
+}
+
 type RenameRequest struct {
-	FullName    string `protobuf:"bytes,1,opt,name=fullName" json:"fullName,omitempty"`
-	NewFullName string `protobuf:"bytes,2,opt,name=newFullName" json:"newFullName,omitempty"`
+	Alias   *Alias    `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
+	NewName *SnipName `protobuf:"bytes,3,opt,name=newName" json:"newName,omitempty"`
 }
 
 func (m *RenameRequest) Reset()                    { *m = RenameRequest{} }
 func (m *RenameRequest) String() string            { return proto.CompactTextString(m) }
 func (*RenameRequest) ProtoMessage()               {}
-func (*RenameRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+func (*RenameRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
 
-func (m *RenameRequest) GetFullName() string {
+func (m *RenameRequest) GetAlias() *Alias {
 	if m != nil {
-		return m.FullName
+		return m.Alias
 	}
-	return ""
+	return nil
 }
 
-func (m *RenameRequest) GetNewFullName() string {
+func (m *RenameRequest) GetNewName() *SnipName {
 	if m != nil {
-		return m.NewFullName
+		return m.NewName
 	}
-	return ""
+	return nil
 }
 
 type RenameResponse struct {
-	Snip             *Snip  `protobuf:"bytes,1,opt,name=snip" json:"snip,omitempty"`
-	OriginalFullName string `protobuf:"bytes,2,opt,name=originalFullName" json:"originalFullName,omitempty"`
+	Snip     *Snip     `protobuf:"bytes,1,opt,name=snip" json:"snip,omitempty"`
+	Original *SnipName `protobuf:"bytes,2,opt,name=original" json:"original,omitempty"`
 }
 
 func (m *RenameResponse) Reset()                    { *m = RenameResponse{} }
 func (m *RenameResponse) String() string            { return proto.CompactTextString(m) }
 func (*RenameResponse) ProtoMessage()               {}
-func (*RenameResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+func (*RenameResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
 
 func (m *RenameResponse) GetSnip() *Snip {
 	if m != nil {
@@ -186,29 +473,29 @@ func (m *RenameResponse) GetSnip() *Snip {
 	return nil
 }
 
-func (m *RenameResponse) GetOriginalFullName() string {
+func (m *RenameResponse) GetOriginal() *SnipName {
 	if m != nil {
-		return m.OriginalFullName
+		return m.Original
 	}
-	return ""
+	return nil
 }
 
 type PatchRequest struct {
-	FullName string `protobuf:"bytes,1,opt,name=fullName" json:"fullName,omitempty"`
-	Target   string `protobuf:"bytes,3,opt,name=target" json:"target,omitempty"`
-	Patch    string `protobuf:"bytes,2,opt,name=patch" json:"patch,omitempty"`
+	Alias  *Alias `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
+	Target string `protobuf:"bytes,2,opt,name=target" json:"target,omitempty"`
+	Patch  string `protobuf:"bytes,3,opt,name=patch" json:"patch,omitempty"`
 }
 
 func (m *PatchRequest) Reset()                    { *m = PatchRequest{} }
 func (m *PatchRequest) String() string            { return proto.CompactTextString(m) }
 func (*PatchRequest) ProtoMessage()               {}
-func (*PatchRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+func (*PatchRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
 
-func (m *PatchRequest) GetFullName() string {
+func (m *PatchRequest) GetAlias() *Alias {
 	if m != nil {
-		return m.FullName
+		return m.Alias
 	}
-	return ""
+	return nil
 }
 
 func (m *PatchRequest) GetTarget() string {
@@ -232,7 +519,7 @@ type PatchResponse struct {
 func (m *PatchResponse) Reset()                    { *m = PatchResponse{} }
 func (m *PatchResponse) String() string            { return proto.CompactTextString(m) }
 func (*PatchResponse) ProtoMessage()               {}
-func (*PatchResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+func (*PatchResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
 
 func (m *PatchResponse) GetSnip() *Snip {
 	if m != nil {
@@ -248,7 +535,7 @@ type UpdateResponse struct {
 func (m *UpdateResponse) Reset()                    { *m = UpdateResponse{} }
 func (m *UpdateResponse) String() string            { return proto.CompactTextString(m) }
 func (*UpdateResponse) ProtoMessage()               {}
-func (*UpdateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+func (*UpdateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
 
 func (m *UpdateResponse) GetSnip() *Snip {
 	if m != nil {
@@ -258,35 +545,27 @@ func (m *UpdateResponse) GetSnip() *Snip {
 }
 
 type CloneRequest struct {
-	FullName    string `protobuf:"bytes,1,opt,name=fullName" json:"fullName,omitempty"`
-	NewFullName string `protobuf:"bytes,2,opt,name=newFullName" json:"newFullName,omitempty"`
-	Username    string `protobuf:"bytes,3,opt,name=username" json:"username,omitempty"`
+	Alias *Alias `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
+	New   *Alias `protobuf:"bytes,2,opt,name=new" json:"new,omitempty"`
 }
 
 func (m *CloneRequest) Reset()                    { *m = CloneRequest{} }
 func (m *CloneRequest) String() string            { return proto.CompactTextString(m) }
 func (*CloneRequest) ProtoMessage()               {}
-func (*CloneRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+func (*CloneRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
 
-func (m *CloneRequest) GetFullName() string {
+func (m *CloneRequest) GetAlias() *Alias {
 	if m != nil {
-		return m.FullName
+		return m.Alias
 	}
-	return ""
+	return nil
 }
 
-func (m *CloneRequest) GetNewFullName() string {
+func (m *CloneRequest) GetNew() *Alias {
 	if m != nil {
-		return m.NewFullName
+		return m.New
 	}
-	return ""
-}
-
-func (m *CloneRequest) GetUsername() string {
-	if m != nil {
-		return m.Username
-	}
-	return ""
+	return nil
 }
 
 type CloneResponse struct {
@@ -296,7 +575,7 @@ type CloneResponse struct {
 func (m *CloneResponse) Reset()                    { *m = CloneResponse{} }
 func (m *CloneResponse) String() string            { return proto.CompactTextString(m) }
 func (*CloneResponse) ProtoMessage()               {}
-func (*CloneResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
+func (*CloneResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
 
 func (m *CloneResponse) GetSnip() *Snip {
 	if m != nil {
@@ -306,21 +585,20 @@ func (m *CloneResponse) GetSnip() *Snip {
 }
 
 type TagRequest struct {
-	FullName string   `protobuf:"bytes,1,opt,name=fullName" json:"fullName,omitempty"`
-	Tags     []string `protobuf:"bytes,2,rep,name=tags" json:"tags,omitempty"`
-	Username string   `protobuf:"bytes,3,opt,name=username" json:"username,omitempty"`
+	Alias *Alias   `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
+	Tags  []string `protobuf:"bytes,2,rep,name=tags" json:"tags,omitempty"`
 }
 
 func (m *TagRequest) Reset()                    { *m = TagRequest{} }
 func (m *TagRequest) String() string            { return proto.CompactTextString(m) }
 func (*TagRequest) ProtoMessage()               {}
-func (*TagRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
+func (*TagRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
 
-func (m *TagRequest) GetFullName() string {
+func (m *TagRequest) GetAlias() *Alias {
 	if m != nil {
-		return m.FullName
+		return m.Alias
 	}
-	return ""
+	return nil
 }
 
 func (m *TagRequest) GetTags() []string {
@@ -330,13 +608,6 @@ func (m *TagRequest) GetTags() []string {
 	return nil
 }
 
-func (m *TagRequest) GetUsername() string {
-	if m != nil {
-		return m.Username
-	}
-	return ""
-}
-
 type TagResponse struct {
 	Snip *Snip `protobuf:"bytes,1,opt,name=snip" json:"snip,omitempty"`
 }
@@ -344,7 +615,7 @@ type TagResponse struct {
 func (m *TagResponse) Reset()                    { *m = TagResponse{} }
 func (m *TagResponse) String() string            { return proto.CompactTextString(m) }
 func (*TagResponse) ProtoMessage()               {}
-func (*TagResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
+func (*TagResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{22} }
 
 func (m *TagResponse) GetSnip() *Snip {
 	if m != nil {
@@ -354,21 +625,20 @@ func (m *TagResponse) GetSnip() *Snip {
 }
 
 type UnTagRequest struct {
-	FullName string   `protobuf:"bytes,1,opt,name=fullName" json:"fullName,omitempty"`
-	Tags     []string `protobuf:"bytes,2,rep,name=tags" json:"tags,omitempty"`
-	Username string   `protobuf:"bytes,3,opt,name=username" json:"username,omitempty"`
+	Alias *Alias   `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
+	Tags  []string `protobuf:"bytes,2,rep,name=tags" json:"tags,omitempty"`
 }
 
 func (m *UnTagRequest) Reset()                    { *m = UnTagRequest{} }
 func (m *UnTagRequest) String() string            { return proto.CompactTextString(m) }
 func (*UnTagRequest) ProtoMessage()               {}
-func (*UnTagRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
+func (*UnTagRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{23} }
 
-func (m *UnTagRequest) GetFullName() string {
+func (m *UnTagRequest) GetAlias() *Alias {
 	if m != nil {
-		return m.FullName
+		return m.Alias
 	}
-	return ""
+	return nil
 }
 
 func (m *UnTagRequest) GetTags() []string {
@@ -378,13 +648,6 @@ func (m *UnTagRequest) GetTags() []string {
 	return nil
 }
 
-func (m *UnTagRequest) GetUsername() string {
-	if m != nil {
-		return m.Username
-	}
-	return ""
-}
-
 type UnTagResponse struct {
 	Snip *Snip `protobuf:"bytes,1,opt,name=snip" json:"snip,omitempty"`
 }
@@ -392,7 +655,7 @@ type UnTagResponse struct {
 func (m *UnTagResponse) Reset()                    { *m = UnTagResponse{} }
 func (m *UnTagResponse) String() string            { return proto.CompactTextString(m) }
 func (*UnTagResponse) ProtoMessage()               {}
-func (*UnTagResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
+func (*UnTagResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{24} }
 
 func (m *UnTagResponse) GetSnip() *Snip {
 	if m != nil {
@@ -402,27 +665,19 @@ func (m *UnTagResponse) GetSnip() *Snip {
 }
 
 type GetRequest struct {
-	FullName string `protobuf:"bytes,1,opt,name=fullName" json:"fullName,omitempty"`
-	Username string `protobuf:"bytes,2,opt,name=username" json:"username,omitempty"`
+	Alias *Alias `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
 }
 
 func (m *GetRequest) Reset()                    { *m = GetRequest{} }
 func (m *GetRequest) String() string            { return proto.CompactTextString(m) }
 func (*GetRequest) ProtoMessage()               {}
-func (*GetRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
+func (*GetRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{25} }
 
-func (m *GetRequest) GetFullName() string {
+func (m *GetRequest) GetAlias() *Alias {
 	if m != nil {
-		return m.FullName
+		return m.Alias
 	}
-	return ""
-}
-
-func (m *GetRequest) GetUsername() string {
-	if m != nil {
-		return m.Username
-	}
-	return ""
+	return nil
 }
 
 type ListRequest struct {
@@ -432,12 +687,13 @@ type ListRequest struct {
 	Tags       []string `protobuf:"bytes,4,rep,name=tags" json:"tags,omitempty"`
 	Extensions []string `protobuf:"bytes,5,rep,name=extensions" json:"extensions,omitempty"`
 	All        bool     `protobuf:"varint,6,opt,name=all" json:"all,omitempty"`
+	Pouch      string   `protobuf:"bytes,7,opt,name=pouch" json:"pouch,omitempty"`
 }
 
 func (m *ListRequest) Reset()                    { *m = ListRequest{} }
 func (m *ListRequest) String() string            { return proto.CompactTextString(m) }
 func (*ListRequest) ProtoMessage()               {}
-func (*ListRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
+func (*ListRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{26} }
 
 func (m *ListRequest) GetUsername() string {
 	if m != nil {
@@ -481,22 +737,71 @@ func (m *ListRequest) GetAll() bool {
 	return false
 }
 
+func (m *ListRequest) GetPouch() string {
+	if m != nil {
+		return m.Pouch
+	}
+	return ""
+}
+
+type RootRequest struct {
+	Username string `protobuf:"bytes,1,opt,name=username" json:"username,omitempty"`
+	All      bool   `protobuf:"varint,2,opt,name=all" json:"all,omitempty"`
+}
+
+func (m *RootRequest) Reset()                    { *m = RootRequest{} }
+func (m *RootRequest) String() string            { return proto.CompactTextString(m) }
+func (*RootRequest) ProtoMessage()               {}
+func (*RootRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{27} }
+
+func (m *RootRequest) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *RootRequest) GetAll() bool {
+	if m != nil {
+		return m.All
+	}
+	return false
+}
+
+type RootResponse struct {
+	Snips   []*Snip  `protobuf:"bytes,1,rep,name=snips" json:"snips,omitempty"`
+	Pouches []*Pouch `protobuf:"bytes,2,rep,name=pouches" json:"pouches,omitempty"`
+}
+
+func (m *RootResponse) Reset()                    { *m = RootResponse{} }
+func (m *RootResponse) String() string            { return proto.CompactTextString(m) }
+func (*RootResponse) ProtoMessage()               {}
+func (*RootResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{28} }
+
+func (m *RootResponse) GetSnips() []*Snip {
+	if m != nil {
+		return m.Snips
+	}
+	return nil
+}
+
+func (m *RootResponse) GetPouches() []*Pouch {
+	if m != nil {
+		return m.Pouches
+	}
+	return nil
+}
+
 type DeleteRequest struct {
-	FullName string `protobuf:"bytes,1,opt,name=fullName" json:"fullName,omitempty"`
-	Username string `protobuf:"bytes,2,opt,name=username" json:"username,omitempty"`
+	Username string      `protobuf:"bytes,1,opt,name=username" json:"username,omitempty"`
+	Pouch    string      `protobuf:"bytes,2,opt,name=pouch" json:"pouch,omitempty"`
+	Names    []*SnipName `protobuf:"bytes,3,rep,name=names" json:"names,omitempty"`
 }
 
 func (m *DeleteRequest) Reset()                    { *m = DeleteRequest{} }
 func (m *DeleteRequest) String() string            { return proto.CompactTextString(m) }
 func (*DeleteRequest) ProtoMessage()               {}
-func (*DeleteRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
-
-func (m *DeleteRequest) GetFullName() string {
-	if m != nil {
-		return m.FullName
-	}
-	return ""
-}
+func (*DeleteRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{29} }
 
 func (m *DeleteRequest) GetUsername() string {
 	if m != nil {
@@ -505,20 +810,34 @@ func (m *DeleteRequest) GetUsername() string {
 	return ""
 }
 
+func (m *DeleteRequest) GetPouch() string {
+	if m != nil {
+		return m.Pouch
+	}
+	return ""
+}
+
+func (m *DeleteRequest) GetNames() []*SnipName {
+	if m != nil {
+		return m.Names
+	}
+	return nil
+}
+
 type DeleteResponse struct {
-	FullName string `protobuf:"bytes,1,opt,name=fullName" json:"fullName,omitempty"`
+	SnipNames []*SnipName `protobuf:"bytes,1,rep,name=snipNames" json:"snipNames,omitempty"`
 }
 
 func (m *DeleteResponse) Reset()                    { *m = DeleteResponse{} }
 func (m *DeleteResponse) String() string            { return proto.CompactTextString(m) }
 func (*DeleteResponse) ProtoMessage()               {}
-func (*DeleteResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
+func (*DeleteResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{30} }
 
-func (m *DeleteResponse) GetFullName() string {
+func (m *DeleteResponse) GetSnipNames() []*SnipName {
 	if m != nil {
-		return m.FullName
+		return m.SnipNames
 	}
-	return ""
+	return nil
 }
 
 type CreateResponse struct {
@@ -529,7 +848,7 @@ type CreateResponse struct {
 func (m *CreateResponse) Reset()                    { *m = CreateResponse{} }
 func (m *CreateResponse) String() string            { return proto.CompactTextString(m) }
 func (*CreateResponse) ProtoMessage()               {}
-func (*CreateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
+func (*CreateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{31} }
 
 func (m *CreateResponse) GetSnip() *Snip {
 	if m != nil {
@@ -545,65 +864,105 @@ func (m *CreateResponse) GetTypeMatch() *TypeMatchResponse {
 	return nil
 }
 
-type Snip struct {
-	SnipId             string   `protobuf:"bytes,1,opt,name=snipId" json:"snipId,omitempty"`
-	FullName           string   `protobuf:"bytes,2,opt,name=fullName" json:"fullName,omitempty"`
-	Username           string   `protobuf:"bytes,3,opt,name=username" json:"username,omitempty"`
-	Name               string   `protobuf:"bytes,4,opt,name=name" json:"name,omitempty"`
-	Extension          string   `protobuf:"bytes,5,opt,name=extension" json:"extension,omitempty"`
-	Snip               string   `protobuf:"bytes,6,opt,name=snip" json:"snip,omitempty"`
-	SnipVersion        int64    `protobuf:"varint,7,opt,name=snipVersion" json:"snipVersion,omitempty"`
-	Tags               []string `protobuf:"bytes,8,rep,name=tags" json:"tags,omitempty"`
-	Created            int64    `protobuf:"varint,9,opt,name=created" json:"created,omitempty"`
-	Description        string   `protobuf:"bytes,10,opt,name=description" json:"description,omitempty"`
-	ClonedFromFullName string   `protobuf:"bytes,11,opt,name=clonedFromFullName" json:"clonedFromFullName,omitempty"`
-	ClonedFromVersion  int64    `protobuf:"varint,12,opt,name=clonedFromVersion" json:"clonedFromVersion,omitempty"`
-	Private            bool     `protobuf:"varint,13,opt,name=private" json:"private,omitempty"`
-	CloneCount         int64    `protobuf:"varint,14,opt,name=cloneCount" json:"cloneCount,omitempty"`
-	RunCount           int64    `protobuf:"varint,15,opt,name=runCount" json:"runCount,omitempty"`
-	SnipChecksum       string   `protobuf:"bytes,16,opt,name=snipChecksum" json:"snipChecksum,omitempty"`
-	SnipSignature      string   `protobuf:"bytes,17,opt,name=snipSignature" json:"snipSignature,omitempty"`
-	Encrypted          bool     `protobuf:"varint,18,opt,name=encrypted" json:"encrypted,omitempty"`
-	Algorithm          string   `protobuf:"bytes,19,opt,name=algorithm" json:"algorithm,omitempty"`
-	Role               Role     `protobuf:"varint,20,opt,name=role,enum=snipsRpc.Role" json:"role,omitempty"`
+type Pouch struct {
+	Hidden      bool     `protobuf:"varint,1,opt,name=hidden" json:"hidden,omitempty"`
+	Username    string   `protobuf:"bytes,2,opt,name=username" json:"username,omitempty"`
+	Name        string   `protobuf:"bytes,3,opt,name=name" json:"name,omitempty"`
+	MakePrivate bool     `protobuf:"varint,4,opt,name=makePrivate" json:"makePrivate,omitempty"`
+	Encrypt     bool     `protobuf:"varint,5,opt,name=encrypt" json:"encrypt,omitempty"`
+	SnipCount   int64    `protobuf:"varint,6,opt,name=snipCount" json:"snipCount,omitempty"`
+	SharedWith  []string `protobuf:"bytes,7,rep,name=sharedWith" json:"sharedWith,omitempty"`
 }
 
-func (m *Snip) Reset()                    { *m = Snip{} }
-func (m *Snip) String() string            { return proto.CompactTextString(m) }
-func (*Snip) ProtoMessage()               {}
-func (*Snip) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
+func (m *Pouch) Reset()                    { *m = Pouch{} }
+func (m *Pouch) String() string            { return proto.CompactTextString(m) }
+func (*Pouch) ProtoMessage()               {}
+func (*Pouch) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{32} }
 
-func (m *Snip) GetSnipId() string {
+func (m *Pouch) GetHidden() bool {
 	if m != nil {
-		return m.SnipId
+		return m.Hidden
 	}
-	return ""
+	return false
 }
 
-func (m *Snip) GetFullName() string {
-	if m != nil {
-		return m.FullName
-	}
-	return ""
-}
-
-func (m *Snip) GetUsername() string {
+func (m *Pouch) GetUsername() string {
 	if m != nil {
 		return m.Username
 	}
 	return ""
 }
 
-func (m *Snip) GetName() string {
+func (m *Pouch) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-func (m *Snip) GetExtension() string {
+func (m *Pouch) GetMakePrivate() bool {
 	if m != nil {
-		return m.Extension
+		return m.MakePrivate
+	}
+	return false
+}
+
+func (m *Pouch) GetEncrypt() bool {
+	if m != nil {
+		return m.Encrypt
+	}
+	return false
+}
+
+func (m *Pouch) GetSnipCount() int64 {
+	if m != nil {
+		return m.SnipCount
+	}
+	return 0
+}
+
+func (m *Pouch) GetSharedWith() []string {
+	if m != nil {
+		return m.SharedWith
+	}
+	return nil
+}
+
+type Snip struct {
+	Alias             *Alias   `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
+	SnipId            string   `protobuf:"bytes,2,opt,name=snipId" json:"snipId,omitempty"`
+	Snip              string   `protobuf:"bytes,3,opt,name=snip" json:"snip,omitempty"`
+	SnipVersion       int64    `protobuf:"varint,4,opt,name=snipVersion" json:"snipVersion,omitempty"`
+	Tags              []string `protobuf:"bytes,5,rep,name=tags" json:"tags,omitempty"`
+	Created           int64    `protobuf:"varint,6,opt,name=created" json:"created,omitempty"`
+	Description       string   `protobuf:"bytes,7,opt,name=description" json:"description,omitempty"`
+	ClonedFromAlias   string   `protobuf:"bytes,8,opt,name=clonedFromAlias" json:"clonedFromAlias,omitempty"`
+	ClonedFromVersion int64    `protobuf:"varint,9,opt,name=clonedFromVersion" json:"clonedFromVersion,omitempty"`
+	Private           bool     `protobuf:"varint,10,opt,name=private" json:"private,omitempty"`
+	CloneCount        int64    `protobuf:"varint,11,opt,name=cloneCount" json:"cloneCount,omitempty"`
+	RunCount          int64    `protobuf:"varint,12,opt,name=runCount" json:"runCount,omitempty"`
+	SnipChecksum      string   `protobuf:"bytes,13,opt,name=snipChecksum" json:"snipChecksum,omitempty"`
+	SnipSignature     string   `protobuf:"bytes,14,opt,name=snipSignature" json:"snipSignature,omitempty"`
+	Encrypted         bool     `protobuf:"varint,15,opt,name=encrypted" json:"encrypted,omitempty"`
+	Algorithm         string   `protobuf:"bytes,16,opt,name=algorithm" json:"algorithm,omitempty"`
+	Role              Role     `protobuf:"varint,17,opt,name=role,enum=snipsRpc.Role" json:"role,omitempty"`
+}
+
+func (m *Snip) Reset()                    { *m = Snip{} }
+func (m *Snip) String() string            { return proto.CompactTextString(m) }
+func (*Snip) ProtoMessage()               {}
+func (*Snip) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{33} }
+
+func (m *Snip) GetAlias() *Alias {
+	if m != nil {
+		return m.Alias
+	}
+	return nil
+}
+
+func (m *Snip) GetSnipId() string {
+	if m != nil {
+		return m.SnipId
 	}
 	return ""
 }
@@ -643,9 +1002,9 @@ func (m *Snip) GetDescription() string {
 	return ""
 }
 
-func (m *Snip) GetClonedFromFullName() string {
+func (m *Snip) GetClonedFromAlias() string {
 	if m != nil {
-		return m.ClonedFromFullName
+		return m.ClonedFromAlias
 	}
 	return ""
 }
@@ -720,7 +1079,7 @@ type TypeMatchResponse struct {
 func (m *TypeMatchResponse) Reset()                    { *m = TypeMatchResponse{} }
 func (m *TypeMatchResponse) String() string            { return proto.CompactTextString(m) }
 func (*TypeMatchResponse) ProtoMessage()               {}
-func (*TypeMatchResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
+func (*TypeMatchResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{34} }
 
 func (m *TypeMatchResponse) GetMatches() []*MatchResponse {
 	if m != nil {
@@ -737,7 +1096,7 @@ type MatchResponse struct {
 func (m *MatchResponse) Reset()                    { *m = MatchResponse{} }
 func (m *MatchResponse) String() string            { return proto.CompactTextString(m) }
 func (*MatchResponse) ProtoMessage()               {}
-func (*MatchResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
+func (*MatchResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{35} }
 
 func (m *MatchResponse) GetExtension() string {
 	if m != nil {
@@ -763,7 +1122,7 @@ type ListResponse struct {
 func (m *ListResponse) Reset()                    { *m = ListResponse{} }
 func (m *ListResponse) String() string            { return proto.CompactTextString(m) }
 func (*ListResponse) ProtoMessage()               {}
-func (*ListResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
+func (*ListResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{36} }
 
 func (m *ListResponse) GetItems() []*Snip {
 	if m != nil {
@@ -794,8 +1153,20 @@ func (m *ListResponse) GetSize() int64 {
 }
 
 func init() {
+	proto.RegisterType((*CreatePouchRequest)(nil), "snipsRpc.CreatePouchRequest")
+	proto.RegisterType((*CreatePouchResponse)(nil), "snipsRpc.CreatePouchResponse")
+	proto.RegisterType((*RenamePouchRequest)(nil), "snipsRpc.RenamePouchRequest")
+	proto.RegisterType((*RenamePouchResponse)(nil), "snipsRpc.RenamePouchResponse")
+	proto.RegisterType((*MakePrivateRequest)(nil), "snipsRpc.MakePrivateRequest")
+	proto.RegisterType((*MakePrivateResponse)(nil), "snipsRpc.MakePrivateResponse")
+	proto.RegisterType((*DeletePouchRequest)(nil), "snipsRpc.DeletePouchRequest")
+	proto.RegisterType((*DeletePouchResponse)(nil), "snipsRpc.DeletePouchResponse")
 	proto.RegisterType((*CreateRequest)(nil), "snipsRpc.CreateRequest")
 	proto.RegisterType((*UpdateRequest)(nil), "snipsRpc.UpdateRequest")
+	proto.RegisterType((*MoveRequest)(nil), "snipsRpc.MoveRequest")
+	proto.RegisterType((*Alias)(nil), "snipsRpc.Alias")
+	proto.RegisterType((*SnipName)(nil), "snipsRpc.SnipName")
+	proto.RegisterType((*MoveResponse)(nil), "snipsRpc.MoveResponse")
 	proto.RegisterType((*RenameRequest)(nil), "snipsRpc.RenameRequest")
 	proto.RegisterType((*RenameResponse)(nil), "snipsRpc.RenameResponse")
 	proto.RegisterType((*PatchRequest)(nil), "snipsRpc.PatchRequest")
@@ -809,9 +1180,12 @@ func init() {
 	proto.RegisterType((*UnTagResponse)(nil), "snipsRpc.UnTagResponse")
 	proto.RegisterType((*GetRequest)(nil), "snipsRpc.GetRequest")
 	proto.RegisterType((*ListRequest)(nil), "snipsRpc.ListRequest")
+	proto.RegisterType((*RootRequest)(nil), "snipsRpc.RootRequest")
+	proto.RegisterType((*RootResponse)(nil), "snipsRpc.RootResponse")
 	proto.RegisterType((*DeleteRequest)(nil), "snipsRpc.DeleteRequest")
 	proto.RegisterType((*DeleteResponse)(nil), "snipsRpc.DeleteResponse")
 	proto.RegisterType((*CreateResponse)(nil), "snipsRpc.CreateResponse")
+	proto.RegisterType((*Pouch)(nil), "snipsRpc.Pouch")
 	proto.RegisterType((*Snip)(nil), "snipsRpc.Snip")
 	proto.RegisterType((*TypeMatchResponse)(nil), "snipsRpc.TypeMatchResponse")
 	proto.RegisterType((*MatchResponse)(nil), "snipsRpc.MatchResponse")
@@ -832,12 +1206,15 @@ const _ = grpc.SupportPackageIsVersion4
 type SnipsRpcClient interface {
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
+	Move(ctx context.Context, in *MoveRequest, opts ...grpc.CallOption) (*MoveResponse, error)
 	Rename(ctx context.Context, in *RenameRequest, opts ...grpc.CallOption) (*RenameResponse, error)
 	Patch(ctx context.Context, in *PatchRequest, opts ...grpc.CallOption) (*PatchResponse, error)
 	Clone(ctx context.Context, in *CloneRequest, opts ...grpc.CallOption) (*CloneResponse, error)
 	Tag(ctx context.Context, in *TagRequest, opts ...grpc.CallOption) (*TagResponse, error)
 	UnTag(ctx context.Context, in *UnTagRequest, opts ...grpc.CallOption) (*UnTagResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*ListResponse, error)
+	// Lists snippets in either a given pouch or as a flat list.
+	// Tree view currently not supported.
 	List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 }
@@ -862,6 +1239,15 @@ func (c *snipsRpcClient) Create(ctx context.Context, in *CreateRequest, opts ...
 func (c *snipsRpcClient) Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error) {
 	out := new(UpdateResponse)
 	err := grpc.Invoke(ctx, "/snipsRpc.SnipsRpc/Update", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *snipsRpcClient) Move(ctx context.Context, in *MoveRequest, opts ...grpc.CallOption) (*MoveResponse, error) {
+	out := new(MoveResponse)
+	err := grpc.Invoke(ctx, "/snipsRpc.SnipsRpc/Move", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -945,12 +1331,15 @@ func (c *snipsRpcClient) Delete(ctx context.Context, in *DeleteRequest, opts ...
 type SnipsRpcServer interface {
 	Create(context.Context, *CreateRequest) (*CreateResponse, error)
 	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
+	Move(context.Context, *MoveRequest) (*MoveResponse, error)
 	Rename(context.Context, *RenameRequest) (*RenameResponse, error)
 	Patch(context.Context, *PatchRequest) (*PatchResponse, error)
 	Clone(context.Context, *CloneRequest) (*CloneResponse, error)
 	Tag(context.Context, *TagRequest) (*TagResponse, error)
 	UnTag(context.Context, *UnTagRequest) (*UnTagResponse, error)
 	Get(context.Context, *GetRequest) (*ListResponse, error)
+	// Lists snippets in either a given pouch or as a flat list.
+	// Tree view currently not supported.
 	List(context.Context, *ListRequest) (*ListResponse, error)
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
 }
@@ -991,6 +1380,24 @@ func _SnipsRpc_Update_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SnipsRpcServer).Update(ctx, req.(*UpdateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SnipsRpc_Move_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MoveRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SnipsRpcServer).Move(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snipsRpc.SnipsRpc/Move",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SnipsRpcServer).Move(ctx, req.(*MoveRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1152,6 +1559,10 @@ var _SnipsRpc_serviceDesc = grpc.ServiceDesc{
 			Handler:    _SnipsRpc_Update_Handler,
 		},
 		{
+			MethodName: "Move",
+			Handler:    _SnipsRpc_Move_Handler,
+		},
+		{
 			MethodName: "Rename",
 			Handler:    _SnipsRpc_Rename_Handler,
 		},
@@ -1188,71 +1599,296 @@ var _SnipsRpc_serviceDesc = grpc.ServiceDesc{
 	Metadata: "snipsRpc.proto",
 }
 
+// Client API for PouchesRpc service
+
+type PouchesRpcClient interface {
+	// Lists the root of your kwk account. Includes pouches and snippets.
+	GetRoot(ctx context.Context, in *RootRequest, opts ...grpc.CallOption) (*RootResponse, error)
+	Create(ctx context.Context, in *CreatePouchRequest, opts ...grpc.CallOption) (*CreatePouchResponse, error)
+	Rename(ctx context.Context, in *RenamePouchRequest, opts ...grpc.CallOption) (*RenamePouchResponse, error)
+	MakePrivate(ctx context.Context, in *MakePrivateRequest, opts ...grpc.CallOption) (*MakePrivateResponse, error)
+	Delete(ctx context.Context, in *DeletePouchRequest, opts ...grpc.CallOption) (*DeletePouchResponse, error)
+}
+
+type pouchesRpcClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewPouchesRpcClient(cc *grpc.ClientConn) PouchesRpcClient {
+	return &pouchesRpcClient{cc}
+}
+
+func (c *pouchesRpcClient) GetRoot(ctx context.Context, in *RootRequest, opts ...grpc.CallOption) (*RootResponse, error) {
+	out := new(RootResponse)
+	err := grpc.Invoke(ctx, "/snipsRpc.PouchesRpc/GetRoot", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *pouchesRpcClient) Create(ctx context.Context, in *CreatePouchRequest, opts ...grpc.CallOption) (*CreatePouchResponse, error) {
+	out := new(CreatePouchResponse)
+	err := grpc.Invoke(ctx, "/snipsRpc.PouchesRpc/Create", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *pouchesRpcClient) Rename(ctx context.Context, in *RenamePouchRequest, opts ...grpc.CallOption) (*RenamePouchResponse, error) {
+	out := new(RenamePouchResponse)
+	err := grpc.Invoke(ctx, "/snipsRpc.PouchesRpc/Rename", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *pouchesRpcClient) MakePrivate(ctx context.Context, in *MakePrivateRequest, opts ...grpc.CallOption) (*MakePrivateResponse, error) {
+	out := new(MakePrivateResponse)
+	err := grpc.Invoke(ctx, "/snipsRpc.PouchesRpc/MakePrivate", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *pouchesRpcClient) Delete(ctx context.Context, in *DeletePouchRequest, opts ...grpc.CallOption) (*DeletePouchResponse, error) {
+	out := new(DeletePouchResponse)
+	err := grpc.Invoke(ctx, "/snipsRpc.PouchesRpc/Delete", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for PouchesRpc service
+
+type PouchesRpcServer interface {
+	// Lists the root of your kwk account. Includes pouches and snippets.
+	GetRoot(context.Context, *RootRequest) (*RootResponse, error)
+	Create(context.Context, *CreatePouchRequest) (*CreatePouchResponse, error)
+	Rename(context.Context, *RenamePouchRequest) (*RenamePouchResponse, error)
+	MakePrivate(context.Context, *MakePrivateRequest) (*MakePrivateResponse, error)
+	Delete(context.Context, *DeletePouchRequest) (*DeletePouchResponse, error)
+}
+
+func RegisterPouchesRpcServer(s *grpc.Server, srv PouchesRpcServer) {
+	s.RegisterService(&_PouchesRpc_serviceDesc, srv)
+}
+
+func _PouchesRpc_GetRoot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RootRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PouchesRpcServer).GetRoot(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snipsRpc.PouchesRpc/GetRoot",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PouchesRpcServer).GetRoot(ctx, req.(*RootRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PouchesRpc_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePouchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PouchesRpcServer).Create(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snipsRpc.PouchesRpc/Create",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PouchesRpcServer).Create(ctx, req.(*CreatePouchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PouchesRpc_Rename_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RenamePouchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PouchesRpcServer).Rename(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snipsRpc.PouchesRpc/Rename",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PouchesRpcServer).Rename(ctx, req.(*RenamePouchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PouchesRpc_MakePrivate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MakePrivateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PouchesRpcServer).MakePrivate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snipsRpc.PouchesRpc/MakePrivate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PouchesRpcServer).MakePrivate(ctx, req.(*MakePrivateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PouchesRpc_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletePouchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PouchesRpcServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snipsRpc.PouchesRpc/Delete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PouchesRpcServer).Delete(ctx, req.(*DeletePouchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _PouchesRpc_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "snipsRpc.PouchesRpc",
+	HandlerType: (*PouchesRpcServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetRoot",
+			Handler:    _PouchesRpc_GetRoot_Handler,
+		},
+		{
+			MethodName: "Create",
+			Handler:    _PouchesRpc_Create_Handler,
+		},
+		{
+			MethodName: "Rename",
+			Handler:    _PouchesRpc_Rename_Handler,
+		},
+		{
+			MethodName: "MakePrivate",
+			Handler:    _PouchesRpc_MakePrivate_Handler,
+		},
+		{
+			MethodName: "Delete",
+			Handler:    _PouchesRpc_Delete_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "snipsRpc.proto",
+}
+
 func init() { proto.RegisterFile("snipsRpc.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 1002 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xb4, 0x57, 0x5f, 0x6f, 0xdb, 0x36,
-	0x10, 0xb7, 0x2c, 0xd9, 0x71, 0x4e, 0xb6, 0xeb, 0x70, 0x69, 0x2b, 0x78, 0xc3, 0x60, 0x10, 0x7d,
-	0x08, 0x8a, 0xc2, 0x40, 0x93, 0x0e, 0xc3, 0x06, 0xf4, 0xa5, 0xee, 0x12, 0x0c, 0x58, 0x86, 0x40,
-	0x49, 0x87, 0x62, 0x4f, 0xd3, 0xe4, 0xab, 0x23, 0x44, 0x26, 0x35, 0x92, 0x4e, 0xd7, 0xbd, 0xef,
-	0x43, 0xec, 0xdb, 0xed, 0x03, 0xec, 0x43, 0x0c, 0xa4, 0xfe, 0x51, 0x76, 0xe1, 0xd9, 0xc0, 0xfa,
-	0x14, 0xdd, 0xef, 0xee, 0x7e, 0x77, 0x3c, 0xd2, 0x77, 0x17, 0x18, 0x4a, 0x96, 0x64, 0x32, 0xcc,
-	0xe2, 0x69, 0x26, 0xb8, 0xe2, 0xa4, 0x57, 0xca, 0xf4, 0x4f, 0x07, 0x06, 0x33, 0x81, 0x91, 0xc2,
-	0x10, 0x7f, 0x5b, 0xa1, 0x54, 0x84, 0x80, 0xa7, 0xb5, 0x81, 0x33, 0x71, 0x4e, 0x0e, 0x43, 0xf3,
-	0x4d, 0xc6, 0xd0, 0x7b, 0xb7, 0x4a, 0xd3, 0x1f, 0xa3, 0x25, 0x06, 0x6d, 0x83, 0x57, 0x32, 0x99,
-	0x80, 0x3f, 0x47, 0x19, 0x8b, 0x24, 0x53, 0x09, 0x67, 0x81, 0x6b, 0xd4, 0x36, 0x44, 0x28, 0x78,
-	0x82, 0xa7, 0x18, 0x78, 0x13, 0xe7, 0x64, 0x78, 0x3a, 0x9c, 0x56, 0xc9, 0x84, 0x3c, 0xc5, 0xd0,
-	0xe8, 0xe8, 0x25, 0x0c, 0xde, 0x64, 0x73, 0x2b, 0x0d, 0x3b, 0xa4, 0xb3, 0x3d, 0x64, 0x7b, 0x23,
-	0xa4, 0xa6, 0x0b, 0x91, 0x45, 0xcb, 0x5d, 0xe9, 0x18, 0xbe, 0x3f, 0x6f, 0x1e, 0xd0, 0x86, 0xe8,
-	0x2f, 0x30, 0x2c, 0xe9, 0x64, 0xc6, 0x99, 0x44, 0x7d, 0xa6, 0xaa, 0x4a, 0xbe, 0x7d, 0xa6, 0x6b,
-	0x96, 0x64, 0x45, 0xd5, 0x9e, 0xc2, 0x88, 0x8b, 0x64, 0x91, 0xb0, 0x28, 0x5d, 0x23, 0xdf, 0xc0,
-	0xe9, 0x5b, 0xe8, 0x5f, 0x45, 0x2a, 0xbe, 0xdd, 0x25, 0xdf, 0x47, 0xd0, 0x55, 0x91, 0x58, 0xa0,
-	0x2a, 0x8a, 0x5d, 0x48, 0xe4, 0x18, 0x3a, 0x99, 0xe6, 0x28, 0x82, 0xe4, 0x02, 0x3d, 0x83, 0x41,
-	0xc1, 0xbc, 0x7b, 0xea, 0xf4, 0x05, 0x0c, 0xcb, 0xeb, 0xd8, 0xc3, 0xeb, 0x16, 0xfa, 0xb3, 0x94,
-	0xb3, 0xff, 0xa7, 0xe8, 0xda, 0x7b, 0x25, 0x51, 0xe8, 0xb2, 0x17, 0x07, 0xad, 0x64, 0x7d, 0xa8,
-	0x22, 0xd2, 0x1e, 0xe9, 0xbd, 0x05, 0xb8, 0x89, 0x16, 0xbb, 0x24, 0x47, 0xc0, 0x53, 0xd1, 0x42,
-	0x06, 0xed, 0x89, 0xab, 0x7f, 0x03, 0xfa, 0x7b, 0x6b, 0x3a, 0xcf, 0xc1, 0x37, 0xcc, 0x7b, 0x24,
-	0xf3, 0x33, 0xf4, 0xdf, 0xb0, 0x4f, 0x94, 0xce, 0x19, 0x0c, 0x0a, 0xee, 0x3d, 0x12, 0x7a, 0x0d,
-	0x70, 0x81, 0x6a, 0x97, 0x74, 0xec, 0xd0, 0xed, 0xb5, 0xd0, 0x7f, 0x39, 0xe0, 0xff, 0x90, 0x48,
-	0x9b, 0xa7, 0xb2, 0x75, 0x9a, 0xb6, 0xfa, 0xbd, 0xca, 0x84, 0xc5, 0x39, 0x89, 0x1b, 0xe6, 0x82,
-	0xe9, 0x3f, 0xc9, 0x1f, 0xf9, 0xa1, 0xdc, 0xd0, 0x7c, 0x57, 0x05, 0xf0, 0xac, 0x02, 0x7c, 0x09,
-	0x80, 0xbf, 0x2b, 0x64, 0x32, 0xe1, 0x4c, 0x06, 0x1d, 0xa3, 0xb1, 0x10, 0x32, 0x02, 0x37, 0x4a,
-	0xd3, 0xa0, 0x3b, 0x71, 0x4e, 0x7a, 0xa1, 0xfe, 0xa4, 0x17, 0x30, 0x78, 0x8d, 0x29, 0xee, 0xd6,
-	0x63, 0xb6, 0x1d, 0xf2, 0x19, 0x0c, 0x4b, 0xa2, 0xa2, 0xc0, 0x5b, 0x98, 0x28, 0x87, 0x61, 0xd9,
-	0x61, 0xf7, 0x68, 0x1e, 0xdf, 0xc0, 0xa1, 0xfa, 0x90, 0xe1, 0x65, 0xf5, 0x83, 0xf6, 0x4f, 0x3f,
-	0xaf, 0x0d, 0x6f, 0x4a, 0x55, 0xc9, 0x19, 0xd6, 0xd6, 0xf4, 0x1f, 0x0f, 0x3c, 0xcd, 0xa4, 0x1b,
-	0x85, 0xf6, 0xf8, 0x7e, 0x5e, 0xe4, 0x54, 0x48, 0x5b, 0xdb, 0xf9, 0x96, 0x77, 0xa5, 0xaf, 0xc1,
-	0xe0, 0x5e, 0x3e, 0x1a, 0x0c, 0xf6, 0x05, 0x1c, 0x56, 0x45, 0x0f, 0x3a, 0x46, 0x51, 0x03, 0xd5,
-	0x30, 0xe9, 0x5a, 0xc3, 0x64, 0x02, 0xbe, 0xfe, 0xfb, 0x13, 0x0a, 0xe3, 0x73, 0x60, 0xee, 0xd9,
-	0x86, 0xaa, 0xeb, 0xee, 0x59, 0xd7, 0x1d, 0xc0, 0x41, 0x6c, 0xaa, 0x38, 0x0f, 0x0e, 0x8d, 0x47,
-	0x29, 0xae, 0x4f, 0x03, 0xd8, 0x1c, 0x40, 0x53, 0x20, 0xb1, 0xee, 0x16, 0xf3, 0x73, 0xc1, 0x97,
-	0x55, 0xcb, 0xf1, 0x8d, 0xe1, 0x47, 0x34, 0xe4, 0x19, 0x1c, 0xd5, 0x68, 0x99, 0x67, 0xdf, 0x44,
-	0xdd, 0x54, 0xe8, 0xcc, 0x32, 0x91, 0xdc, 0x47, 0x0a, 0x83, 0x81, 0x79, 0x6c, 0xa5, 0xa8, 0x9f,
-	0xa8, 0x31, 0x9f, 0xf1, 0x15, 0x53, 0xc1, 0xd0, 0x10, 0x58, 0x88, 0xae, 0xb5, 0x58, 0xb1, 0x5c,
-	0xfb, 0xc0, 0x68, 0x2b, 0x99, 0x50, 0xe8, 0xeb, 0x92, 0xcc, 0x6e, 0x31, 0xbe, 0x93, 0xab, 0x65,
-	0x30, 0x32, 0xd9, 0x36, 0x30, 0xf2, 0x04, 0x06, 0x5a, 0xbe, 0x4e, 0x16, 0x2c, 0x52, 0x2b, 0x81,
-	0xc1, 0x91, 0x31, 0x6a, 0x82, 0xe6, 0x86, 0x58, 0x2c, 0x3e, 0x64, 0xba, 0x76, 0xc4, 0x64, 0x58,
-	0x03, 0x5a, 0x1b, 0xa5, 0x0b, 0x2e, 0x12, 0x75, 0xbb, 0x0c, 0x3e, 0xcb, 0xef, 0xaf, 0x02, 0xaa,
-	0xd1, 0x7d, 0xbc, 0x65, 0x74, 0x9f, 0xc3, 0xd1, 0xc6, 0x73, 0x24, 0xcf, 0xe1, 0x60, 0xa9, 0x01,
-	0x94, 0x81, 0x33, 0x71, 0x4f, 0xfc, 0xd3, 0xc7, 0xb5, 0x6f, 0xf3, 0xe1, 0x96, 0x76, 0x74, 0x06,
-	0x83, 0x26, 0x47, 0xe3, 0x69, 0x39, 0xeb, 0x4f, 0x4b, 0x77, 0x8f, 0x98, 0x8b, 0xba, 0x7b, 0x68,
-	0x81, 0x2a, 0xe8, 0xe7, 0xed, 0xa7, 0xe0, 0x78, 0x02, 0x9d, 0x44, 0xe1, 0xb2, 0xcc, 0x62, 0xfd,
-	0xb7, 0x96, 0x2b, 0x35, 0x97, 0xe2, 0x2a, 0x4a, 0x4b, 0x2e, 0x23, 0xd4, 0xfd, 0xc9, 0xfd, 0x58,
-	0x7f, 0xf2, 0xea, 0xfe, 0xf4, 0x74, 0x06, 0x9e, 0x2e, 0x08, 0xe9, 0x43, 0xef, 0x5a, 0x45, 0x6c,
-	0x1e, 0x89, 0xf9, 0xa8, 0x45, 0x1e, 0x80, 0x7f, 0x25, 0xf0, 0x1d, 0x0a, 0x64, 0x31, 0xca, 0x91,
-	0xa3, 0x81, 0xef, 0xd8, 0x7d, 0x22, 0x38, 0x5b, 0x22, 0x53, 0xa3, 0x36, 0xf1, 0xe1, 0xe0, 0x12,
-	0xa5, 0x8c, 0x16, 0x38, 0x72, 0x4f, 0xff, 0xf6, 0xa0, 0x77, 0x5d, 0x64, 0x47, 0x5e, 0x42, 0x37,
-	0x6f, 0x1a, 0xc4, 0x2a, 0x5c, 0x63, 0x51, 0x1b, 0x07, 0x9b, 0x8a, 0xfc, 0xd0, 0xb4, 0xa5, 0xdd,
-	0xf3, 0xf9, 0x6d, 0xbb, 0x37, 0x16, 0x2c, 0xdb, 0xbd, 0x39, 0xea, 0x73, 0xf7, 0x7c, 0xdf, 0xb1,
-	0xdd, 0x1b, 0x0b, 0x95, 0xed, 0xde, 0x5c, 0x8d, 0x68, 0x8b, 0x7c, 0x0b, 0x1d, 0xb3, 0x72, 0x90,
-	0x47, 0xb5, 0x91, 0xbd, 0xdd, 0x8c, 0x1f, 0x6f, 0xe0, 0xb6, 0xaf, 0x99, 0xec, 0xb6, 0xaf, 0xbd,
-	0x54, 0xd8, 0xbe, 0x8d, 0x15, 0x80, 0xb6, 0xc8, 0x0b, 0x70, 0x6f, 0xa2, 0x05, 0x39, 0xb6, 0xfa,
-	0x64, 0x35, 0x60, 0xc7, 0x0f, 0xd7, 0x50, 0x3b, 0xa2, 0x99, 0x96, 0x76, 0x44, 0x7b, 0x34, 0xdb,
-	0x11, 0x1b, 0x63, 0x95, 0xb6, 0xc8, 0x57, 0xe0, 0x5e, 0xe8, 0xcd, 0xab, 0xb6, 0xa8, 0x67, 0xe8,
-	0xd8, 0xe2, 0xb3, 0xdf, 0x24, 0x6d, 0x91, 0xaf, 0xc1, 0xd3, 0x08, 0x79, 0xb8, 0x6e, 0xf1, 0x5f,
-	0x8e, 0x2f, 0xa1, 0x9b, 0x4f, 0x1e, 0xfb, 0x62, 0x1a, 0x43, 0xcd, 0xbe, 0x98, 0xe6, 0x90, 0xa2,
-	0xad, 0x57, 0x14, 0x8e, 0x13, 0x3e, 0xbd, 0x7b, 0x7f, 0x37, 0x95, 0x28, 0xee, 0x93, 0x18, 0x73,
-	0xdb, 0x57, 0xd5, 0xbb, 0xbb, 0x72, 0x7e, 0xed, 0x9a, 0x7f, 0x11, 0xce, 0xfe, 0x0d, 0x00, 0x00,
-	0xff, 0xff, 0xc6, 0x7b, 0xbc, 0xb3, 0x34, 0x0c, 0x00, 0x00,
+	// 1437 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xac, 0x58, 0x5f, 0x6f, 0xdc, 0x44,
+	0x10, 0x3f, 0x9f, 0xed, 0xdc, 0x65, 0x7c, 0x77, 0x49, 0x37, 0x49, 0x6b, 0x85, 0x80, 0xc2, 0xaa,
+	0x95, 0x02, 0xaa, 0x22, 0x9a, 0x14, 0x21, 0x0a, 0x7d, 0x20, 0x29, 0x8d, 0x8a, 0x1a, 0x74, 0x72,
+	0x5a, 0xe8, 0x1b, 0x32, 0xf6, 0x72, 0xb1, 0x72, 0x67, 0x1f, 0xb6, 0x2f, 0xa5, 0x7c, 0x0a, 0x5e,
+	0x79, 0xe2, 0x81, 0x0f, 0xc0, 0xe7, 0xe0, 0xe3, 0xf0, 0x0d, 0xd0, 0xfe, 0xb1, 0x77, 0xf6, 0xfe,
+	0x24, 0x77, 0x82, 0x37, 0xcf, 0xcc, 0xee, 0xcc, 0xec, 0xec, 0xfc, 0xf9, 0x79, 0xa1, 0x57, 0xa4,
+	0xc9, 0xb8, 0x08, 0xc6, 0xd1, 0xe1, 0x38, 0xcf, 0xca, 0x8c, 0xb4, 0x2b, 0x9a, 0xc6, 0x40, 0x4e,
+	0x73, 0x16, 0x96, 0xac, 0x9f, 0x4d, 0xa2, 0xcb, 0x80, 0xfd, 0x3c, 0x61, 0x45, 0x49, 0x08, 0x38,
+	0x69, 0x38, 0x62, 0xbe, 0xb5, 0x6f, 0x1d, 0xac, 0x07, 0xe2, 0x9b, 0xec, 0x83, 0x37, 0x0a, 0xaf,
+	0x58, 0x3f, 0x4f, 0xae, 0xc3, 0x92, 0xf9, 0xcd, 0x7d, 0xeb, 0xa0, 0x1d, 0x60, 0x16, 0xf1, 0xa1,
+	0xc5, 0xd2, 0x28, 0x7f, 0x37, 0x2e, 0x7d, 0x5b, 0x48, 0x2b, 0x92, 0x3e, 0x80, 0x2d, 0xc3, 0x4a,
+	0x31, 0xce, 0xd2, 0x82, 0x91, 0x1e, 0x34, 0x93, 0x58, 0x19, 0x69, 0x26, 0x31, 0x3d, 0x01, 0x12,
+	0x30, 0x6e, 0xec, 0x56, 0x67, 0x7c, 0x68, 0xa5, 0xec, 0xed, 0xb7, 0x9c, 0xdd, 0x14, 0xec, 0x8a,
+	0xa4, 0xe7, 0xb0, 0x65, 0xe8, 0x50, 0xa6, 0x28, 0x74, 0xb2, 0x3c, 0x19, 0x24, 0x69, 0x38, 0x44,
+	0xbb, 0x0c, 0x5e, 0x6d, 0xc8, 0xd6, 0x86, 0xe8, 0x37, 0x40, 0xce, 0xf5, 0x11, 0xff, 0x53, 0x7c,
+	0xe8, 0x0e, 0x6c, 0x19, 0xba, 0xa4, 0x6b, 0xf4, 0x19, 0x90, 0x67, 0x6c, 0xc8, 0xa6, 0xae, 0x60,
+	0x17, 0xda, 0x93, 0x82, 0xe5, 0xc8, 0x4c, 0x4d, 0xcf, 0x75, 0x74, 0x07, 0xb6, 0x0c, 0x2d, 0x4a,
+	0xf9, 0x6f, 0x16, 0x74, 0x65, 0xe8, 0x91, 0xef, 0xfc, 0xf6, 0x2b, 0xdf, 0xf9, 0x37, 0x79, 0x00,
+	0x6e, 0x38, 0x4c, 0xc2, 0x42, 0x78, 0xed, 0x1d, 0x6d, 0x1c, 0xd6, 0xf9, 0xf2, 0x15, 0x67, 0x07,
+	0x52, 0xca, 0x8f, 0x18, 0xb3, 0x22, 0xca, 0x93, 0x71, 0x99, 0x64, 0xa9, 0x32, 0x8f, 0x59, 0x84,
+	0x82, 0x93, 0x67, 0x43, 0xe6, 0x3b, 0xfb, 0xd6, 0x41, 0xef, 0xa8, 0xa7, 0xf5, 0x04, 0xd9, 0x90,
+	0x05, 0x42, 0x46, 0xdf, 0x40, 0xf7, 0xf5, 0x38, 0x46, 0x1e, 0xd5, 0xd6, 0xad, 0x55, 0xac, 0x37,
+	0x67, 0xac, 0xd3, 0x3f, 0x2c, 0xf0, 0xce, 0xb3, 0x6b, 0xb6, 0x4c, 0x0c, 0xf7, 0xc1, 0x2b, 0xb2,
+	0x49, 0x1e, 0xc9, 0x78, 0x55, 0xda, 0x10, 0x8b, 0xaf, 0x28, 0xc3, 0x7c, 0xc0, 0x4a, 0xb9, 0x42,
+	0x9d, 0x16, 0xb1, 0xc8, 0x27, 0xb0, 0xce, 0x5d, 0xe5, 0xc9, 0x53, 0xf8, 0xce, 0xbe, 0x7d, 0xe0,
+	0x1d, 0x11, 0xed, 0xfc, 0x85, 0x12, 0x05, 0x7a, 0x11, 0x4d, 0xc0, 0x15, 0x67, 0xba, 0xd1, 0xb5,
+	0x6d, 0x70, 0xc7, 0xc8, 0x29, 0x49, 0x90, 0x43, 0x68, 0x57, 0x7a, 0x84, 0x2f, 0xf3, 0x6d, 0xd5,
+	0x6b, 0xe8, 0x97, 0xd0, 0xae, 0xb8, 0x73, 0xf3, 0x75, 0x0f, 0xd6, 0xd9, 0x2f, 0x25, 0x4b, 0x0b,
+	0x1d, 0x4c, 0xcd, 0xa0, 0xf7, 0xa1, 0x23, 0x23, 0xa9, 0xea, 0xa7, 0xf6, 0xc9, 0x42, 0x3e, 0xd1,
+	0x18, 0xba, 0xb2, 0xd8, 0x56, 0xbc, 0xca, 0x87, 0xba, 0x7c, 0x17, 0x1f, 0xa5, 0x2e, 0xe9, 0x18,
+	0x7a, 0x95, 0x95, 0xba, 0x9a, 0x75, 0x0e, 0x7b, 0x38, 0xcd, 0xf8, 0x66, 0x95, 0xd3, 0x87, 0xd0,
+	0xae, 0xaa, 0x5b, 0xa5, 0xf5, 0xdc, 0x78, 0x55, 0x6b, 0x68, 0x04, 0x9d, 0x7e, 0x58, 0xea, 0x02,
+	0x5c, 0xf2, 0x28, 0x77, 0x61, 0x4d, 0xa6, 0x84, 0x8a, 0xa1, 0xa2, 0x44, 0xc0, 0xb8, 0x3a, 0x95,
+	0x37, 0x92, 0xa0, 0xc7, 0xd0, 0x55, 0x46, 0x96, 0x3f, 0x09, 0x7d, 0x0c, 0xbd, 0xaa, 0x60, 0x56,
+	0xd8, 0xf5, 0x06, 0x3a, 0xa7, 0xc3, 0x2c, 0x5d, 0xf5, 0x6a, 0x3e, 0x04, 0x3b, 0x65, 0x6f, 0x17,
+	0x35, 0x02, 0x2e, 0xe3, 0x87, 0x50, 0x9a, 0x57, 0x70, 0xe7, 0x0c, 0xe0, 0x55, 0x38, 0x58, 0xd1,
+	0x19, 0x02, 0x4e, 0x19, 0x0e, 0x78, 0x5b, 0xb2, 0x79, 0xde, 0xf2, 0x6f, 0xfa, 0x08, 0x3c, 0xa1,
+	0x68, 0x05, 0xdb, 0x2f, 0xa0, 0xf3, 0x3a, 0xfd, 0x7f, 0xac, 0x1f, 0x43, 0x57, 0xa9, 0x5a, 0xc1,
+	0xfe, 0x31, 0xc0, 0x19, 0x2b, 0x57, 0xb3, 0x4e, 0xff, 0xb2, 0xc0, 0x7b, 0x99, 0x14, 0xe5, 0x32,
+	0xcd, 0x6c, 0x1b, 0xdc, 0x22, 0x49, 0x23, 0x39, 0x75, 0xec, 0x40, 0x12, 0xa2, 0xd3, 0x27, 0xbf,
+	0xca, 0x12, 0xb3, 0x03, 0xf1, 0x5d, 0x9f, 0xc9, 0xd1, 0x67, 0x22, 0x1f, 0x00, 0xd4, 0x85, 0x5f,
+	0xf8, 0xae, 0x90, 0x20, 0x0e, 0xd9, 0x04, 0x3b, 0x1c, 0x0e, 0xfd, 0x35, 0x31, 0xd1, 0xf8, 0xa7,
+	0xee, 0x06, 0x2d, 0xdc, 0x0d, 0xbe, 0x00, 0x2f, 0xc8, 0xb2, 0xa5, 0x1c, 0x56, 0x2a, 0x9b, 0xb5,
+	0x4a, 0xfa, 0x03, 0x74, 0xe4, 0x66, 0x15, 0xd7, 0xfb, 0xe0, 0x8a, 0xb8, 0xf8, 0x96, 0xe8, 0xab,
+	0xd3, 0x81, 0x95, 0x42, 0xf2, 0x11, 0xb4, 0x84, 0x6d, 0x26, 0x6f, 0xc9, 0x88, 0xa6, 0x1c, 0x84,
+	0x95, 0x9c, 0x5e, 0x41, 0x57, 0x0e, 0xc8, 0x25, 0x03, 0x3a, 0xa7, 0x05, 0x1f, 0x80, 0x9b, 0x8a,
+	0x5e, 0x6f, 0x2f, 0xec, 0xf5, 0x72, 0x01, 0x3d, 0x81, 0x5e, 0x65, 0x4c, 0x9d, 0xc7, 0x98, 0x15,
+	0xd6, 0x32, 0xb3, 0x22, 0x83, 0x5e, 0x35, 0xb9, 0x57, 0x68, 0x7b, 0x9f, 0xc3, 0x7a, 0xf9, 0x6e,
+	0xcc, 0xce, 0x45, 0xef, 0x91, 0x55, 0xfc, 0x9e, 0x5e, 0xf8, 0xaa, 0x12, 0x55, 0x3a, 0x03, 0xbd,
+	0x9a, 0xfe, 0x6d, 0x81, 0x2b, 0x07, 0xdb, 0x5d, 0x58, 0xbb, 0x4c, 0xe2, 0x98, 0xa5, 0xc2, 0x54,
+	0x3b, 0x50, 0x94, 0x11, 0xb2, 0xe6, 0xed, 0xa0, 0x64, 0x1a, 0x13, 0x39, 0x37, 0x62, 0x46, 0xd7,
+	0xc0, 0x8c, 0x7c, 0x3e, 0x71, 0xb7, 0x4f, 0xb3, 0x49, 0x5a, 0x8a, 0xdc, 0xb3, 0x03, 0xcd, 0xe0,
+	0x39, 0x5b, 0x5c, 0x86, 0x39, 0x8b, 0xbf, 0x4f, 0x4a, 0x9e, 0x86, 0x22, 0x67, 0x35, 0x87, 0xfe,
+	0xe9, 0x80, 0x73, 0x61, 0x40, 0x9b, 0x5b, 0xdb, 0x38, 0x17, 0xbc, 0x88, 0xab, 0x36, 0x2e, 0xa9,
+	0x1a, 0x2d, 0xd9, 0x08, 0x2d, 0x71, 0xe8, 0x90, 0x26, 0xe3, 0xef, 0x58, 0x2e, 0x66, 0xa7, 0x23,
+	0x7c, 0xc3, 0xac, 0xba, 0xca, 0x5c, 0x54, 0x65, 0x3e, 0xb4, 0x22, 0x71, 0x9d, 0xb1, 0x3a, 0x4d,
+	0x45, 0x4e, 0x03, 0x9b, 0xd6, 0x2c, 0xac, 0x3a, 0x80, 0x8d, 0x88, 0x77, 0xdc, 0xf8, 0x79, 0x9e,
+	0x8d, 0x84, 0xdf, 0x7e, 0x5b, 0xac, 0x9a, 0x66, 0x93, 0x87, 0x70, 0x47, 0xb3, 0x2a, 0x0f, 0xd7,
+	0x85, 0xbd, 0x59, 0x01, 0xf7, 0x69, 0xac, 0xee, 0x06, 0x64, 0xf4, 0x15, 0xc9, 0xe3, 0x2b, 0x96,
+	0xcb, 0xf0, 0x7b, 0x42, 0x01, 0xe2, 0xf0, 0x4c, 0xc8, 0x27, 0xa9, 0x94, 0x76, 0x84, 0xb4, 0xa6,
+	0x39, 0xd6, 0x16, 0x17, 0x75, 0xc9, 0xa2, 0xab, 0x62, 0x32, 0xf2, 0xbb, 0x12, 0x6b, 0x63, 0x1e,
+	0xb9, 0x0f, 0x5d, 0x4e, 0x5f, 0x24, 0x83, 0x34, 0x2c, 0x27, 0x39, 0xf3, 0x7b, 0x62, 0x91, 0xc9,
+	0x14, 0x18, 0x45, 0xa6, 0x03, 0x8b, 0xfd, 0x0d, 0xe1, 0xa1, 0x66, 0x70, 0x69, 0x38, 0x1c, 0x64,
+	0x79, 0x52, 0x5e, 0x8e, 0xfc, 0x4d, 0x89, 0x60, 0x6a, 0x46, 0x0d, 0x45, 0xef, 0xdc, 0x00, 0x45,
+	0x9f, 0xc3, 0x9d, 0x99, 0x8a, 0x20, 0x8f, 0xa0, 0x35, 0xe2, 0x8c, 0xba, 0x4e, 0xef, 0xe9, 0xbd,
+	0x66, 0xed, 0x54, 0xeb, 0xe8, 0x29, 0x74, 0x4d, 0x1d, 0x06, 0xb8, 0xb2, 0xa6, 0xc0, 0x95, 0x68,
+	0xd7, 0x51, 0x96, 0xeb, 0x76, 0xcd, 0x09, 0x5a, 0x42, 0x47, 0xf6, 0x7b, 0xdd, 0x01, 0x93, 0x92,
+	0x8d, 0x16, 0x76, 0x40, 0x21, 0xe4, 0xba, 0xca, 0xac, 0x54, 0x18, 0xc7, 0x0e, 0x24, 0xa1, 0x07,
+	0x82, 0x3d, 0x6f, 0x20, 0x38, 0x7a, 0x20, 0x7c, 0x7c, 0x0a, 0x0e, 0x0f, 0x08, 0xe9, 0x40, 0xfb,
+	0xa2, 0x0c, 0xd3, 0x38, 0xcc, 0xe3, 0xcd, 0x06, 0xd9, 0x00, 0xaf, 0x9f, 0xb3, 0x9f, 0x58, 0xce,
+	0xd2, 0x88, 0x15, 0x9b, 0x16, 0x67, 0x7c, 0x9d, 0x5e, 0x27, 0x79, 0x96, 0x8e, 0x58, 0x5a, 0x6e,
+	0x36, 0x89, 0x07, 0xad, 0x73, 0x56, 0x14, 0xe1, 0x80, 0x6d, 0xda, 0x47, 0xbf, 0xbb, 0x12, 0x6c,
+	0x72, 0xef, 0xc8, 0x53, 0x58, 0x93, 0x7d, 0x8b, 0xa0, 0xc0, 0x19, 0xff, 0x20, 0xbb, 0xfe, 0xac,
+	0x40, 0xfd, 0xaf, 0x34, 0xf8, 0x76, 0x89, 0x76, 0xf0, 0x76, 0xe3, 0x87, 0x01, 0x6f, 0x37, 0x81,
+	0x11, 0x6d, 0x90, 0xcf, 0xc0, 0xe1, 0xc0, 0x95, 0xec, 0xa0, 0x4b, 0xd3, 0xbf, 0x04, 0xbb, 0x77,
+	0xa7, 0xd9, 0xd8, 0xae, 0x44, 0x99, 0xd8, 0xae, 0x81, 0x6e, 0xb1, 0x5d, 0x13, 0x90, 0xd2, 0x06,
+	0x79, 0x02, 0xae, 0x40, 0x76, 0x04, 0x59, 0xc0, 0x78, 0x72, 0xf7, 0xde, 0x0c, 0x1f, 0xef, 0x15,
+	0x80, 0x0a, 0xef, 0xc5, 0xd8, 0x0d, 0xef, 0x35, 0x90, 0x17, 0x6d, 0x90, 0xc7, 0x60, 0xbf, 0x0a,
+	0x07, 0x64, 0x1b, 0xf5, 0xf8, 0x1a, 0xe8, 0xec, 0xee, 0x4c, 0x71, 0xb1, 0x45, 0x01, 0x63, 0xb0,
+	0x45, 0x0c, 0x91, 0xb0, 0x45, 0x03, 0xef, 0xd0, 0x06, 0xf9, 0x14, 0xec, 0x33, 0x0e, 0x70, 0xf5,
+	0x0a, 0x0d, 0x6e, 0x70, 0x7c, 0x71, 0x32, 0xcb, 0x8b, 0xe1, 0x1c, 0x7c, 0x31, 0x08, 0xde, 0xdc,
+	0xb0, 0xf1, 0x29, 0xac, 0xc9, 0x59, 0x8a, 0x2f, 0xc6, 0x18, 0xe5, 0xf8, 0x62, 0xcc, 0xb1, 0x4b,
+	0x1b, 0x47, 0xff, 0x34, 0x01, 0xfa, 0x12, 0x03, 0xf0, 0xec, 0x7c, 0x02, 0x2d, 0xee, 0x6e, 0x96,
+	0x19, 0x9e, 0x20, 0xdc, 0x82, 0x3d, 0xc1, 0x88, 0x84, 0x36, 0xc8, 0x59, 0x9d, 0xd9, 0x7b, 0xd3,
+	0x09, 0x8c, 0xff, 0xdd, 0x77, 0xdf, 0x5f, 0x20, 0xc5, 0x8a, 0x54, 0xae, 0xed, 0x4d, 0xa7, 0xd4,
+	0x22, 0x45, 0x73, 0x1e, 0x35, 0x68, 0x83, 0xbc, 0x04, 0x0f, 0x3d, 0x29, 0x60, 0x6d, 0xb3, 0xaf,
+	0x16, 0x58, 0xdb, 0xbc, 0x77, 0x08, 0xe1, 0x96, 0x8a, 0xf4, 0xde, 0x74, 0x40, 0x17, 0xb9, 0x35,
+	0xef, 0xcd, 0xa1, 0x71, 0x42, 0x61, 0x3b, 0xc9, 0x0e, 0xaf, 0xde, 0x5e, 0x1d, 0x16, 0x2c, 0xbf,
+	0x4e, 0x22, 0x26, 0x37, 0x9c, 0xd4, 0x4d, 0xa2, 0x6f, 0xfd, 0xb8, 0x26, 0x9e, 0xa2, 0x8e, 0xff,
+	0x0d, 0x00, 0x00, 0xff, 0xff, 0x4d, 0xf3, 0xd3, 0x4c, 0x9c, 0x12, 0x00, 0x00,
 }

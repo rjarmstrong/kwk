@@ -1,12 +1,9 @@
 package integration
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/system"
+	. "github.com/smartystreets/goconvey/convey"
 	"bytes"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/smartystreets/assertions/should"
-	. "github.com/smartystreets/goconvey/convey"
-	"os"
 	"testing"
 )
 
@@ -20,7 +17,7 @@ func Test_System(t *testing.T) {
 			Convey(`VERSION`, func() {
 				Convey(`Should get version`, func() {
 					kwk.Run("version")
-					So(w.String(), should.ContainSubstring, "kwk ")
+					So(w.String(), ShouldContainSubstring, "kwk ")
 					w.Reset()
 				})
 			})

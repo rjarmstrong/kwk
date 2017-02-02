@@ -3,7 +3,6 @@ package integration
 import (
 	. "github.com/smartystreets/goconvey/convey"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/smartystreets/assertions/should"
 	"bytes"
 	"testing"
 )
@@ -20,20 +19,20 @@ func Test_App(t *testing.T) {
 			Convey(`SIGNUP`, func() {
 				Convey(`Should signup`, func() {
 					signup(reader, kwk)
-					So(w.String(), should.ContainSubstring, "Welcome to kwk testuser! You're signed in already.\n")
+					So(w.String(), ShouldContainSubstring, "Welcome to kwk testuser! You're signed in already.\n")
 					w.Reset()
 				})
 
 				Convey(`Should get profile`, func() {
 					kwk.Run("me")
-					So(w.String(), should.Equal, "You are: testuser!\n")
+					So(w.String(), ShouldEqual, "You are: testuser!\n")
 				})
 
 				Convey(`Should signout`, func() {
 					kwk.Run("signout")
 					w.Reset()
 					kwk.Run("me")
-					So(w.String(), should.Equal, notLoggedIn)
+					So(w.String(), ShouldEqual, notLoggedIn)
 				})
 
 				Convey(`Should notify if email used`, func() {
@@ -41,7 +40,7 @@ func Test_App(t *testing.T) {
 					reader.WriteString("testuser2\n")
 					reader.WriteString("TestPassword1\n")
 					kwk.Run("signup")
-					So(w.String(), should.ContainSubstring, "Email has been taken.\n")
+					So(w.String(), ShouldContainSubstring, "Email has been taken.\n")
 					w.Reset()
 				})
 
@@ -50,7 +49,7 @@ func Test_App(t *testing.T) {
 					reader.WriteString("testuser\n")
 					reader.WriteString("TestPassword1\n")
 					kwk.Run("signup")
-					So(w.String(), should.ContainSubstring, "Username has been taken.\n")
+					So(w.String(), ShouldContainSubstring, "Username has been taken.\n")
 					w.Reset()
 				})
 			})
@@ -59,30 +58,30 @@ func Test_App(t *testing.T) {
 
 				Convey(`Should successfully signin`, func() {
 					kwk.Run("signin", username, password)
-					So(w.String(), should.Equal, "Welcome back testuser!\n")
+					So(w.String(), ShouldEqual, "Welcome back testuser!\n")
 					w.Reset()
 				})
 				Convey(`Should print profile`, func() {
 					signup(reader, kwk)
 					w.Reset()
 					kwk.Run("profile")
-					So(w.String(), should.Equal, "You are: testuser!\n")
+					So(w.String(), ShouldEqual, "You are: testuser!\n")
 					kwk.Run("signout")
 				})
 				Convey(`Should not signin with wrong password`, func() {
 					kwk.Run("signin", "richard", "D1llbuckWrong")
-					So(w.String(), should.Equal, wrongCreds)
+					So(w.String(), ShouldEqual, wrongCreds)
 					w.Reset()
 				})
 				Convey(`Should not signin with wrong username`, func() {
 					kwk.Run("signin", "richardWrong", "D1llbuck")
-					So(w.String(), should.Equal, wrongCreds)
+					So(w.String(), ShouldEqual, wrongCreds)
 					kwk.Run("signout")
 					w.Reset()
 				})
 				Convey(`When calling method with requires account should reply signin prompt`, func() {
 					kwk.Run("ls")
-					So(w.String(), should.Equal, notLoggedIn)
+					So(w.String(), ShouldEqual, notLoggedIn)
 					w.Reset()
 				})
 			})

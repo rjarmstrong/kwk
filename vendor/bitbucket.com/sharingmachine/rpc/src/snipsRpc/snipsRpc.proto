@@ -11,6 +11,8 @@ service SnipsRpc {
     }
     rpc Update (UpdateRequest) returns (UpdateResponse) {
     }
+    rpc Move (MoveRequest) returns (MoveResponse) {
+    }
     rpc Rename (RenameRequest) returns (RenameResponse) {
     }
     rpc Patch (PatchRequest) returns (PatchResponse) {
@@ -23,38 +25,112 @@ service SnipsRpc {
     }
     rpc Get (GetRequest) returns (ListResponse) {
     }
+    // Lists snippets in either a given pouch or as a flat list.
+    // Tree view currently not supported.
     rpc List (ListRequest) returns (ListResponse) {
     }
     rpc Delete (DeleteRequest) returns (DeleteResponse) {
     }
 }
 
+service PouchesRpc {
+    // Lists the root of your kwk account. Includes pouches and snippets.
+    rpc GetRoot (RootRequest) returns (RootResponse) {
+    }
+    rpc Create (CreatePouchRequest) returns (CreatePouchResponse) {
+    }
+    rpc Rename (RenamePouchRequest) returns (RenamePouchResponse) {
+    }
+    rpc MakePrivate (MakePrivateRequest) returns (MakePrivateResponse) {
+    }
+    rpc Delete (DeletePouchRequest) returns (DeletePouchResponse) {
+    }
+}
+
+message CreatePouchRequest {
+    string name  = 1;
+    bool makePrivate = 2;
+    bool encrypt = 3;
+}
+
+message CreatePouchResponse {
+    string id = 1;
+}
+
+message RenamePouchRequest {
+    string name = 1;
+    string newName = 2;
+}
+
+message RenamePouchResponse {
+    string originalName = 2;
+    string name = 3;
+}
+
+message MakePrivateRequest {
+    string name = 1;
+    bool makePrivate = 2;
+}
+
+message MakePrivateResponse {
+}
+
+message DeletePouchRequest {
+    string username = 1;
+    string name = 3;
+}
+
+message DeletePouchResponse {
+}
+
 message CreateRequest {
     string snip = 1;
-    string fullName = 2;
+    Alias alias = 2;
     string description = 3;
     Role role = 4;
 }
 
 message UpdateRequest {
-    string fullName = 1;
+    Alias alias = 1;
     string description = 2;
 }
 
+message MoveRequest {
+    string username = 1;
+    string sourcePouch = 2;
+    string targetPouch = 3;
+    repeated SnipName snipNames = 4;
+}
+
+message Alias {
+    string username = 1;
+    string pouch = 2;
+    SnipName snipName = 3;
+}
+
+message SnipName {
+    string name = 1;
+    string extension = 2;
+}
+
+message MoveResponse {
+    string pouch = 1;
+}
+
 message RenameRequest {
-    string fullName = 1;
-    string newFullName = 2;
+    Alias alias = 1;
+    SnipName newName = 3;
 }
 
 message RenameResponse {
     Snip snip = 1;
-    string originalFullName = 2;
+    SnipName original = 2;
 }
 
 message PatchRequest {
-    string fullName = 1;
-    string target = 3;
-    string patch = 2;
+    Alias alias = 1;
+    string target = 2;
+    string patch = 3;
 }
 
 message PatchResponse {
@@ -66,9 +142,8 @@ message UpdateResponse {
 }
 
 message CloneRequest {
-    string fullName = 1;
-    string newFullName = 2;
-    string username = 3;
+    Alias alias = 1;
+    Alias new = 2;
 }
 
 message CloneResponse {
@@ -76,9 +151,8 @@ message CloneResponse {
 }
 
 message TagRequest {
-    string fullName = 1;
+    Alias alias = 1;
     repeated string tags = 2;
-    string username = 3;
 }
 
 message TagResponse {
@@ -86,9 +160,8 @@ message TagResponse {
 }
 
 message UnTagRequest {
-    string fullName = 1;
+    Alias alias = 1;
     repeated string tags = 2;
-    string username = 3;
 }
 
 message UnTagResponse {
@@ -96,8 +169,7 @@ message UnTagResponse {
 }
 
 message GetRequest {
-    string fullName = 1;
-    string username = 2;
+    Alias alias = 1;
 }
 
 message ListRequest {
@@ -107,15 +179,27 @@ message ListRequest {
     repeated string tags = 4;
     repeated string extensions = 5;
     bool all = 6;
+    string pouch = 7;
+}
+
+message RootRequest {
+    string username = 1;
+    bool all = 2;
+}
+
+message RootResponse {
+    repeated Snip snips = 1;
+    repeated Pouch pouches = 2;
 }
 
 message DeleteRequest {
-    string fullName = 1;
-    string username = 2;
+    string username = 1;
+    string pouch = 2;
+    repeated SnipName names = 3;
 }
 
 message DeleteResponse {
-    string fullName = 1;
+    repeated SnipName snipNames = 1;
 }
 
 message CreateResponse {
@@ -123,27 +207,34 @@ message CreateResponse {
     TypeMatchResponse typeMatch = 2;
 }
 
+message Pouch {
+    bool hidden = 1;
+    string username = 2;
+    string name = 3;
+    bool makePrivate = 4;
+    bool encrypt = 5;
+    int64 snipCount = 6;
+    repeated string sharedWith = 7;
+}
+
 message Snip {
-    string snipId = 1;
-    string fullName = 2;
-    string username = 3;
-    string name = 4;
-    string extension = 5;
-    string snip = 6;
-    int64 snipVersion = 7;
-    repeated string tags = 8;
-    int64 created = 9;
-    string description = 10;
-    string clonedFromFullName = 11;
-    int64 clonedFromVersion = 12;
-    bool private = 13;
-    int64 cloneCount = 14;
-    int64 runCount = 15;
-    string snipChecksum = 16;
-    string snipSignature = 17;
-    bool encrypted = 18;
-    string algorithm = 19;
-    Role role = 20;
+    Alias alias = 1;
+    string snipId = 2;
+    string snip = 3;
+    int64 snipVersion = 4;
+    repeated string tags = 5;
+    int64 created = 6;
+    string description = 7;
+    string clonedFromAlias = 8;
+    int64 clonedFromVersion = 9;
+    bool private = 10;
+    int64 cloneCount = 11;
+    int64 runCount = 12;
+    string snipChecksum = 13;
+    string snipSignature = 14;
+    bool encrypted = 15;
+    string algorithm = 16;
+    Role role = 17;
 }
 
 enum Role {

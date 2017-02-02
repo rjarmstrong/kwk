@@ -1,72 +1,82 @@
 package snippets
 
-import "bitbucket.com/sharingmachine/kwkcli/models"
+import (
+	"bitbucket.com/sharingmachine/kwkcli/models"
+)
 
 type ServiceMock struct {
-	GetCalledWith     *models.Alias
+	GetCalledWith     models.Alias
 	RenameCalledWith  []string
 	CreateCalledWith  []string
 	ReturnItemsForGet []models.Snippet
 	PatchCalledWith   []string
-	DeleteCalledWith  string
+	DeleteCalledWith  []interface{}
 	CloneCalledWith   []interface{}
 	TagCalledWith     map[string][]string
 	UnTagCalledWith   map[string][]string
 	ListCalledWith    *models.ListParams
 }
 
-func (a *ServiceMock) Get(k *models.Alias) (*models.SnippetList, error) {
-	a.GetCalledWith = k
-	return &models.SnippetList{Items: a.ReturnItemsForGet, Total: int64(len(a.ReturnItemsForGet))}, nil
+func (sm *ServiceMock) Move(username string, sourcePouch string, targetPouch string, names []*models.SnipName) (string, error) {
+	panic("not imp")
 }
 
-func (a *ServiceMock) Create(uri string, fullKey string, role models.SnipRole) (*models.CreateSnippetResponse, error) {
-	a.CreateCalledWith = []string{uri, fullKey}
-	if fullKey == "" {
-		fullKey = "x5hi23"
+func (sm *ServiceMock) Get(a models.Alias) (*models.SnippetList, error) {
+	sm.GetCalledWith = a
+	return &models.SnippetList{Items: sm.ReturnItemsForGet, Total: int64(len(sm.ReturnItemsForGet))}, nil
+}
+
+func (sm *ServiceMock) Create(snip string, a models.Alias, role models.SnipRole) (*models.CreateSnippetResponse, error) {
+	sm.CreateCalledWith = []string{snip, a.String()}
+	if a.Name == "" {
+		a.Name = "x5hi23"
 	}
-	return &models.CreateSnippetResponse{Snippet: &models.Snippet{FullName: fullKey}}, nil
+	return &models.CreateSnippetResponse{Snippet: &models.Snippet{Alias: a}}, nil
 }
 
-func (a *ServiceMock) Update(fullKey string, description string) (*models.Snippet, error) {
+func (sm *ServiceMock) Update(a models.Alias, description string) (*models.Snippet, error) {
 	panic("not implemented")
 }
 
-func (a *ServiceMock) Rename(fullKey string, newFullKey string) (*models.Snippet, string, error) {
-	a.RenameCalledWith = []string{fullKey, newFullKey}
-	return &models.Snippet{FullName: newFullKey}, fullKey, nil
+func (sm *ServiceMock) Rename(a models.Alias, new models.SnipName) (*models.Snippet, *models.SnipName, error) {
+	sm.RenameCalledWith = []string{a.String(), new.String()}
+	s := models.NewSnippet("")
+	s.Alias.SnipName = new
+	return s, &new, nil
 }
 
-func (a *ServiceMock) Patch(fullKey string, target string, patch string) (*models.Snippet, error) {
-	a.PatchCalledWith = []string{fullKey, target, patch}
-	return &models.Snippet{FullName: fullKey, Snip: patch}, nil
+func (sm *ServiceMock) Patch(a models.Alias, target string, patch string) (*models.Snippet, error) {
+	sm.PatchCalledWith = []string{a.String(), target, patch}
+	s := models.NewSnippet("")
+	s.Alias = a
+	return s, nil
 }
 
-func (a *ServiceMock) Delete(fullKey string) error {
-	a.DeleteCalledWith = fullKey
+func (sm *ServiceMock) Delete(username string, pouch string, names []*models.SnipName) error {
+	sm.DeleteCalledWith = []interface{}{username, pouch, names}
 	return nil
 }
 
-func (a *ServiceMock) Clone(k *models.Alias, newKey string) (*models.Snippet, error) {
-	a.CloneCalledWith = []interface{}{k, newKey}
+func (sm *ServiceMock) Clone(a models.Alias, new models.Alias) (*models.Snippet, error) {
+	sm.CloneCalledWith = []interface{}{a.String(), new.String()}
 	return &models.Snippet{}, nil
 }
 
-func (a *ServiceMock) Tag(fullKey string, tag ...string) (*models.Snippet, error) {
+func (sm *ServiceMock) Tag(a models.Alias, tag ...string) (*models.Snippet, error) {
 	m := map[string][]string{}
-	m[fullKey] = tag
-	a.TagCalledWith = m
+	m[a.String()] = tag
+	sm.TagCalledWith = m
 	return &models.Snippet{}, nil
 }
 
-func (a *ServiceMock) UnTag(fullKey string, tag ...string) (*models.Snippet, error) {
+func (sm *ServiceMock) UnTag(a models.Alias, tag ...string) (*models.Snippet, error) {
 	m := map[string][]string{}
-	m[fullKey] = tag
-	a.UnTagCalledWith = m
+	m[a.String()] = tag
+	sm.UnTagCalledWith = m
 	return &models.Snippet{}, nil
 }
 
-func (a *ServiceMock) List(l *models.ListParams) (*models.SnippetList, error) {
-	a.ListCalledWith = l
+func (sm *ServiceMock) List(l *models.ListParams) (*models.SnippetList, error) {
+	sm.ListCalledWith = l
 	return &models.SnippetList{}, nil
 }
