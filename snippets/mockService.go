@@ -5,16 +5,21 @@ import (
 )
 
 type ServiceMock struct {
-	GetCalledWith     models.Alias
-	RenameCalledWith  []string
-	CreateCalledWith  []string
-	ReturnItemsForGet []models.Snippet
-	PatchCalledWith   []string
-	DeleteCalledWith  []interface{}
-	CloneCalledWith   []interface{}
-	TagCalledWith     map[string][]string
-	UnTagCalledWith   map[string][]string
-	ListCalledWith    *models.ListParams
+	GetCalledWith         models.Alias
+	RenameCalledWith      []string
+	CreateCalledWith      []string
+	ReturnItemsForGet     []*models.Snippet
+	PatchCalledWith       []string
+	DeleteCalledWith      []interface{}
+	CloneCalledWith       []interface{}
+	TagCalledWith         map[string][]string
+	UnTagCalledWith       map[string][]string
+	ListCalledWith        *models.ListParams
+	CreatePouchCalledWith string
+	DeletePouchCalledWith string
+	GetRootCalledWith     []interface{}
+	RenamePouchCalledWith []string
+	MakePrivateCalledWith []interface{}
 }
 
 func (sm *ServiceMock) Move(username string, sourcePouch string, targetPouch string, names []*models.SnipName) (string, error) {
@@ -79,4 +84,27 @@ func (sm *ServiceMock) UnTag(a models.Alias, tag ...string) (*models.Snippet, er
 func (sm *ServiceMock) List(l *models.ListParams) (*models.SnippetList, error) {
 	sm.ListCalledWith = l
 	return &models.SnippetList{}, nil
+}
+
+func (sm *ServiceMock) CreatePouch(name string) (string, error) {
+	sm.CreatePouchCalledWith = name
+	return name, nil
+}
+
+func (sm *ServiceMock) DeletePouch(name string) (bool, error) {
+	sm.DeletePouchCalledWith = name
+	return true, nil
+}
+
+func (sm *ServiceMock) GetRoot (username string, all bool) (*models.Root, error){
+	sm.GetRootCalledWith = []interface{}{username, all}
+	return &models.Root{}, nil
+}
+func (sm *ServiceMock) RenamePouch (pouch string, newPouch string) (string, error){
+	sm.RenamePouchCalledWith = []string{pouch, newPouch}
+	return pouch, nil
+}
+func (sm *ServiceMock) MakePrivate (pouch string, private bool) (bool, error){
+	sm.MakePrivateCalledWith = []interface{}{pouch, private}
+	return true, nil
 }

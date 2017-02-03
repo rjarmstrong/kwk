@@ -208,13 +208,14 @@ message CreateResponse {
 }
 
 message Pouch {
-    bool hidden = 1;
-    string username = 2;
-    string name = 3;
-    bool makePrivate = 4;
-    bool encrypt = 5;
-    int64 snipCount = 6;
-    repeated string sharedWith = 7;
+    string username = 1;
+    string name = 2;
+    bool makePrivate = 3;
+    bool encrypt = 4;
+    int64 snipCount = 5;
+    repeated string sharedWith = 6;
+    int64 modified = 7;
+    string pouchId = 8;
 }
 
 message Snip {

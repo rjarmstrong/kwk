@@ -47,9 +47,8 @@ func main() {
 	d := dlg.New(w, r)
 	ch := search.NewAlphaTerm(conn, t, h)
 	api := rpc.New(conn, h)
-	ps := snippets.NewPouchService(conn, t, h)
 
-	kwkApp := app.New(ss, s, t, o, u, d, w, ch, api, su, ps)
+	kwkApp := app.New(ss, s, t, o, u, d, w, ch, api, su)
 	kwkApp.App.Version = v
 
 	su.Preload()

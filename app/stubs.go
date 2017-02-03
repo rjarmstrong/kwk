@@ -24,7 +24,6 @@ func CreateAppStub() *KwkApp {
 	d := &dlg.DialogMock{}
 	api := &rpc.SysMock{}
 	su := &setup.ProviderMock{}
-	ps := &snippets.PouchMock{}
-	app := New(a, s, t, o, u, d, w, h, api, su, ps)
+	app := New(a, s, t, o, u, d, w, h, api, su)
 	return app
 }

@@ -29,7 +29,7 @@ type KwkApp struct {
 }
 
 func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u account.Manager,
-	d dlg.Dialog, w tmpl.Writer, h search.Term, api rpc.Service, su setup.Provider, ps snippets.PouchService) *KwkApp {
+	d dlg.Dialog, w tmpl.Writer, h search.Term, api rpc.Service, su setup.Provider) *KwkApp {
 
 	app := cli.NewApp()
 	cli.HelpPrinter = dashboard.Layout
@@ -59,7 +59,7 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 	sysCli := NewSystemCli(s, api, u, w)
 	app.Commands = append(app.Commands, System(sysCli)...)
 
-	snipCli := NewSnippetCli(a, r, s, d, w, t, h, su, ps)
+	snipCli := NewSnippetCli(a, r, s, d, w, t, h, su)
 	app.Commands = append(app.Commands, Snippets(snipCli)...)
 	app.CommandNotFound = func(c *cli.Context, fullKey string) {
 		covert := c.Bool("covert")

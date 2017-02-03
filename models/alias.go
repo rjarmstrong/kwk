@@ -22,7 +22,16 @@ type Alias struct {
 }
 
 func (a *Alias) String() string {
-	return fmt.Sprintf("%s/%s/%s", a.Username, a.Pouch, a.SnipName.String())
+	if a.Username == "" && a.Pouch == "" {
+		return a.SnipName.String()
+	}
+	if a.Pouch == "" {
+		return fmt.Sprintf("/%s/%s", a.Username, a.SnipName.String())
+	}
+	if a.Username == "" {
+		return fmt.Sprintf("%s/%s", a.Pouch, a.SnipName.String())
+	}
+	return fmt.Sprintf("/%s/%s/%s", a.Username, a.Pouch, a.SnipName.String())
 }
 
 func (a *Alias) Path() string {
@@ -69,6 +78,9 @@ func ParseAlias(distinctName string) (*Alias, error) {
 	}
 	// When prefixed with a forward slash this refers to another users alias
 	var isOtherUserAlias bool
+	if distinctName[0] == '.' {
+		distinctName = strings.TrimPrefix(distinctName, ".")
+	}
 	if distinctName[0] == '/' {
 		isOtherUserAlias = true
 		distinctName = strings.TrimPrefix(distinctName, "/")
@@ -81,7 +93,7 @@ func ParseAlias(distinctName string) (*Alias, error) {
 	}
 	if len(t) == 1 {
 		if isOtherUserAlias {
-			return nil, ClientErr{Title:"Incomplete alias for another user must comprise at least /username/snippet"}
+			return nil, ErrOneLine(Code_IncompleteAlias,"Incomplete alias for another user must comprise at least /username/snippet")
 		}
 		// If its just the name
 		return NewAlias("", ROOT_POUCH, sn.Name, sn.Ext), nil
@@ -96,12 +108,12 @@ func ParseAlias(distinctName string) (*Alias, error) {
 		// If it has three parts then this will be an absolute alias
 		return NewAlias(t[0], t[1],  sn.Name, sn.Ext), nil
 	}
-	return nil, ClientErr{Title:"Invalid snippet reference."}
+	return nil, ErrOneLine(Code_AliasMaxSegments,"Alias can only consist of max 3 segments.")
 }
 
 func ParseSnipName (snipName string) (*SnipName, error){
 	if snipName == "" {
-		return &SnipName{}, nil
+		return nil, ErrOneLine(Code_NoSnippetName, "No snippet name given.")
 	}
 	lIts := strings.Split(snipName, ".")
 	extension := ""
@@ -126,7 +138,7 @@ func ParseMany(distinctNames []string) ([]*SnipName, string, error) {
 			return nil, "", err
 		}
 		if i > 0 && pouch != a.Pouch {
-			return nil, "", ClientErr{Title:"Cannot move or rename snippets from multiple source pouches."}
+			return nil, "", ErrOneLine(Code_MultiplePouches, "Cannot move or rename snippets from multiple source pouches.")
 		}
 		pouch = a.Pouch
 		sn = append(sn, &a.SnipName)

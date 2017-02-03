@@ -147,16 +147,25 @@ func (rs *RpcService) UnTag(a models.Alias, tags ...string) (*models.Snippet, er
 	}
 }
 
-func (rs *RpcService) GetRoot(username string, all bool) (*Root, error) {
+func (rs *RpcService) GetRoot(username string, all bool) (*models.Root, error) {
 	r, err := rs.pc.GetRoot(rs.headers.GetContext(), &snipsRpc.RootRequest{Username:username, All:all})
 	if err != nil {
 		return nil, err
 	}
-	rs.mapSnippetList()r.Snips
+	l := &models.SnippetList{}
+	res := &snipsRpc.ListResponse{Items:r.Snips}
+	rs.mapSnippetList(res,l,true)
+	pl := rs.mapPouchList(r.Pouches)
+	root := &models.Root{Snippets:l.Items, Pouches:pl}
+	return root, err
 }
 
 func (rs *RpcService) CreatePouch(pouch string) (string, error) {
-	panic("implement me")
+	_, err := rs.pc.Create(rs.headers.GetContext(), &snipsRpc.CreatePouchRequest{Name:pouch})
+	if err != nil {
+		return "", err
+	}
+	return pouch, nil
 }
 
 func (rs *RpcService) RenamePouch(pouch string, newPouch string) (string, error) {
@@ -169,6 +178,29 @@ func (rs *RpcService) MakePrivate(pouch string, private bool) (bool, error) {
 
 func (rs *RpcService) DeletePouch(pouch string) (bool, error) {
 	panic("implement me")
+}
+
+func MillisToTime(in int64) time.Time {
+	return time.Unix(in/1000, 0)
+}
+
+
+func (rs *RpcService) mapPouchList(in []*snipsRpc.Pouch) []*models.Pouch {
+	out := []*models.Pouch{}
+	for _, v := range in {
+		p := &models.Pouch{
+			Name:v.Name,
+			Username:v.Username,
+			Encrypt:v.Encrypt,
+			MakePrivate:v.MakePrivate,
+			SharedWith:v.SharedWith,
+			SnipCount:v.SnipCount,
+			Modified:MillisToTime(v.Modified),
+			PouchId:v.PouchId,
+		}
+		out = append(out, p)
+	}
+	return out
 }
 
 /*
@@ -187,7 +219,7 @@ func (rs *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache b
 	model.Snip = rpc.Snip
 	model.Version = rpc.SnipVersion
 	model.Tags = rpc.Tags
-	model.Created = time.Unix(rpc.Created/1000, 0)
+	model.Created = MillisToTime(rpc.Created)
 	model.Description = rpc.Description
 	model.ClonedFromAlias = rpc.ClonedFromAlias
 	model.ClonedFromVersion = rpc.ClonedFromVersion
@@ -215,7 +247,7 @@ func (rs *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.S
 	for _, v := range rpc.Items {
 		item := &models.Snippet{}
 		rs.mapSnip(v, item, false)
-		model.Items = append(model.Items, *item)
+		model.Items = append(model.Items, item)
 		if item.Id == newSnip.Id {
 			isInList = true
 		}
@@ -223,7 +255,7 @@ func (rs *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.S
 	if isList && !isInList && newSnip.Alias.Name != "" {
 		// TODO: add to logger
 		fmt.Println("Adding from cache")
-		model.Items = append([]models.Snippet{*newSnip}, model.Items...)
+		model.Items = append([]*models.Snippet{newSnip}, model.Items...)
 	}
 }
 

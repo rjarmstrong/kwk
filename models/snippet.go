@@ -7,13 +7,13 @@ import (
 const (
 	ProfileFullKey  = "profile.json"
 	TokenHeaderName = "token"
-	ROOT_POUCH      = "root"
+	ROOT_POUCH      = ""
 	SETTINGS_POUCH  = "settings"
 )
 
 type SnippetList struct {
 	Username string
-	Items    []Snippet
+	Items    []*Snippet
 	Total    int64
 	Since    time.Time
 	Size     int64

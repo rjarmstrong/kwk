@@ -15,7 +15,7 @@ type Service interface {
 	Get(a models.Alias) (*models.SnippetList, error)
 	List(l *models.ListParams) (*models.SnippetList, error)
 
-	GetRoot (username string, all bool) (*Root, error)
+	GetRoot (username string, all bool) (*models.Root, error)
 	CreatePouch (pouch string) (string, error)
 	RenamePouch (pouch string, newPouch string) (string, error)
 	MakePrivate (pouch string, private bool) (bool, error)

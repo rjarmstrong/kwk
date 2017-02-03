@@ -25,6 +25,11 @@ const (
 	Code_InvalidEmail    Code = 4005
 	Code_InvalidUsername Code = 4006
 	Code_InvalidPassword Code = 4107
+
+	Code_MultiplePouches  Code = 4200
+	Code_IncompleteAlias  Code = 4201
+	Code_AliasMaxSegments Code = 4202
+	Code_NoSnippetName    Code = 4203
 )
 
 // ParseGrpcErr should be used at RPC service call level. i.e. the errors
@@ -40,6 +45,10 @@ func ParseGrpcErr(e error) error {
 	return m
 }
 
+func ErrOneLine(c Code, description string) error {
+	return ClientErr{Msgs:[]Msg{{Code:c, Desc:description}}}
+}
+
 type ClientErr struct {
 	TransportCode codes.Code
 	Msgs          []Msg
@@ -51,6 +60,6 @@ func (e ClientErr) Error() string {
 }
 
 type Msg struct {
-	Code   Code
-	Desc   string
+	Code Code
+	Desc string
 }

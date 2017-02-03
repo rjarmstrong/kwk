@@ -144,7 +144,7 @@ func Snippets(s *SnippetCli) []cli.Command {
 			Name:    "mkpouch",
 			Aliases: []string{"mkdir"},
 			Action: func(c *cli.Context) error {
-				s.ps.Create(c.Args().First())
+				s.CreatePouch(c.Args().First())
 				return nil
 			},
 		},

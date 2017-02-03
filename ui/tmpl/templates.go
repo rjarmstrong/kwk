@@ -31,6 +31,7 @@ func init() {
 
 	add("snippet:ambiguouscat", "That snippet is ambiguous please run it again with the extension:\n{{range .Items}}{{.FullName | blue }}\n{{ end }}", template.FuncMap{"blue": blue})
 	add("snippet:list", "{{. | listSnippets }}", template.FuncMap{"listSnippets": listSnippets })
+	add("pouch:list-root", "{{. | listRoot }}", template.FuncMap{"listRoot": listRoot })
 	add("snippet:tag", "{{.FullName | blue }} tagged.", template.FuncMap{"blue": blue})
 	add("snippet:untag", "{{.FullName | blue }} untagged.", template.FuncMap{"blue": blue})
 	add("snippet:renamed", "{{.fullName | blue }} renamed to {{.newFullName | blue }}", template.FuncMap{"blue": blue})
@@ -41,6 +42,7 @@ func init() {
 		"\n{{range .Items}}"+"Full name: {{.Username}}/{{.FullName}}"+"\nSnippet: {{.Snip}}"+"\nVersion: {{.Version}}"+"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+"\nWeb: \033[4mhttp://www.kwk.co/{{.Username}}/{{.FullName}}\033[0m"+"\nDescription: {{.Description}}"+"\nRun count: {{.RunCount}}"+"\nClone count: {{.CloneCount}}"+"\n{{ end }}\n\n", nil)
 	add("pouch:notdeleted", "{{. | blue }} was NOT deleted.", template.FuncMap{"blue": blue})
 	add("pouch:deleted", "{{. | blue }} was deleted.", template.FuncMap{"blue": blue})
+	add("pouch:created", "Pouch: {{. | blue }} created.", template.FuncMap{"blue": blue})
 
 	// System
 	add("system:upgraded", "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n   Successfully upgraded!  \n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", nil)
@@ -94,6 +96,26 @@ func multiChoice(list []models.Snippet) string {
 		options = options + fmt.Sprintf("[%s] %s   ", style.Colour(style.LightBlue, i+1), v.FullName)
 	}
 	return options
+}
+
+func listRoot(r *models.Root) string {
+	var buff bytes.Buffer
+
+	for _, v := range r.Snippets {
+		buff.WriteString("   ")
+		buff.WriteString(v.String())
+		buff.WriteString("\n")
+	}
+	for _, v := range r.Pouches {
+		buff.WriteString("   [P]  ")
+		buff.WriteString(v.Name)
+		buff.WriteString("\n")
+	}
+	return buff.String()
+
+	//return r.Snippets[0].String()
+	// list snippets
+	// list pouches
 }
 
 func listSnippets(list *models.SnippetList) string {
