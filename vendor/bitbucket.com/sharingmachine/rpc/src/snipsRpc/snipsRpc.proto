@@ -48,9 +48,10 @@ service PouchesRpc {
 }
 
 message CreatePouchRequest {
-    string name  = 1;
-    bool makePrivate = 2;
-    bool encrypt = 3;
+    string username = 1;
+    string name  = 2;
+    bool makePrivate = 3;
+    bool encrypt = 4;
 }
 
 message CreatePouchResponse {
@@ -58,8 +59,9 @@ message CreatePouchResponse {
 }
 
 message RenamePouchRequest {
-    string name = 1;
-    string newName = 2;
+    string username = 1;
+    string name = 2;
+    string newName = 3;
 }
 
 message RenamePouchResponse {
@@ -68,11 +70,13 @@ message RenamePouchResponse {
 }
 
 message MakePrivateRequest {
-    string name = 1;
-    bool makePrivate = 2;
+    string username = 1;
+    string name = 2;
+    bool makePrivate = 3;
 }
 
 message MakePrivateResponse {
+    bool isPrivate = 1;
 }
 
 message DeletePouchRequest {
@@ -259,4 +263,5 @@ message ListResponse {
     int64 total = 2;
     int64 since = 3;
     int64 size = 4;
+    string pouch = 5;
 }

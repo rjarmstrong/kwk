@@ -95,7 +95,7 @@ type Headers struct {
 	version string
 }
 
-func (i *Headers) GetContext() context.Context {
+func (i *Headers) Context() context.Context {
 	u := &models.User{}
 	if err := i.persister.Get(models.ProfileFullKey, u, 0); err != nil {
 		return context.Background()

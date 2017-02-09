@@ -4,6 +4,7 @@ import (
 	"io"
 	"google.golang.org/grpc/codes"
 	"bitbucket.com/sharingmachine/kwkcli/models"
+	"bitbucket.com/sharingmachine/kwkcli/log"
 )
 
 /*
@@ -61,10 +62,11 @@ func (w *StdWriter) HandleErr(err error) {
 	case codes.AlreadyExists:
 		w.Render("api:exists", nil)
 	case codes.PermissionDenied:
-		w.Render("api:not-found", nil)
+		w.Render("api:denied", nil)
 	case codes.Unimplemented:
 		panic("not implemented")
 	case codes.Internal:
+		log.Debug(err)
 		w.Render("api:error", nil)
 	case codes.Unavailable:
 		w.Render("api:not-available", nil)

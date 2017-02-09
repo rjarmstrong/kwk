@@ -38,11 +38,18 @@ func init() {
 	add("snippet:madeprivate", "{{.fullName | blue }} made private "+style.Lock, template.FuncMap{"blue": blue})
 	add("snippet:patched", "{{.FullName | blue }} patched.", template.FuncMap{"blue": blue})
 	add("snippet:notdeleted", "{{.FullName | blue }} was NOT deleted.", template.FuncMap{"blue": blue})
+	add("snippet:moved", "Snippets moved to: {{. | blue }}", template.FuncMap{"blue": blue})
+
 	add("snippet:inspect",
 		"\n{{range .Items}}"+"Full name: {{.Username}}/{{.FullName}}"+"\nSnippet: {{.Snip}}"+"\nVersion: {{.Version}}"+"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+"\nWeb: \033[4mhttp://www.kwk.co/{{.Username}}/{{.FullName}}\033[0m"+"\nDescription: {{.Description}}"+"\nRun count: {{.RunCount}}"+"\nClone count: {{.CloneCount}}"+"\n{{ end }}\n\n", nil)
 	add("pouch:notdeleted", "{{. | blue }} was NOT deleted.", template.FuncMap{"blue": blue})
 	add("pouch:deleted", "{{. | blue }} was deleted.", template.FuncMap{"blue": blue})
 	add("pouch:created", "Pouch: {{. | blue }} created.", template.FuncMap{"blue": blue})
+	add("pouch:renamed", "Pouch: {{. | blue }} renamed.", template.FuncMap{"blue": blue})
+	add("pouch:locked", "Pouch: {{. | blue }} locked.", template.FuncMap{"blue": blue})
+	add("pouch:unlocked", "Pouch: {{. | blue }} unlocked and public.", template.FuncMap{"blue": blue})
+	add("pouch:not-locked", "Pouch: {{. | blue }} NOT locked.", template.FuncMap{"blue": blue})
+	add("pouch:check-unlock", "Are you sure you want pouch 👝  {{. | blue }} public ? [y/n]", template.FuncMap{"blue": blue})
 
 	// System
 	add("system:upgraded", "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n   Successfully upgraded!  \n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", nil)
@@ -73,7 +80,8 @@ func init() {
 	add("validation:one-line", style.Warning+"  {{ .Desc | yellow }} {{ .Code | yellow }}\n", template.FuncMap{"yellow": yellow})
 
 	add("api:not-authenticated", "{{ \"Please login to continue: kwk login\" | yellow }}\n", template.FuncMap{"yellow": yellow})
-	addColor("api:error", style.Fire+"  We have a code RED error. \n- To report type: kwk upload-errors \n- You can also try to upgrade: npm update kwkcli -g\n", red)
+	add("api:denied", "{{ \"Permission denied\" | yellow }}\n", template.FuncMap{"yellow": yellow})
+	addColor("api:error", "\n" + style.Fire+"  We have a code RED error. \n- To report type: kwk upload-errors \n- You can also try to upgrade: npm update kwkcli -g\n", red)
 	addColor("api:not-available", style.Ambulance+"  Kwk is DOWN! Please try again in a bit.\n", yellow)
 	add("api:exists", "{{ \"That item already exists.\" | yellow }}\n", template.FuncMap{"yellow": yellow})
 }
@@ -100,17 +108,35 @@ func multiChoice(list []models.Snippet) string {
 
 func listRoot(r *models.Root) string {
 	var buff bytes.Buffer
-
+	buff.WriteString("\n")
+	buff.WriteString(style.Colour(style.LightBlue,"kwk.co/") + r.Username + "/\n")
+	buff.WriteString("\n")
 	for _, v := range r.Snippets {
-		buff.WriteString("   ")
-		buff.WriteString(v.String())
+		buff.WriteString("   🔸  ")
+		buff.WriteString(v.SnipName.String())
 		buff.WriteString("\n")
 	}
 	for _, v := range r.Pouches {
-		buff.WriteString("   [P]  ")
-		buff.WriteString(v.Name)
-		buff.WriteString("\n")
+		if v.Name != "" {
+			if v.Name == "inbox" {
+				if v.UnOpened > 0 {
+					buff.WriteString(fmt.Sprintf("   📬 %d ", v.UnOpened))
+
+				} else {
+					buff.WriteString("   📪  ")
+				}
+			} else if v.Name == "settings" {
+				buff.WriteString("   ⚙  ")
+			} else if v.MakePrivate {
+				buff.WriteString("   🔒  ")
+			} else {
+				buff.WriteString("   👝  ")
+			}
+			buff.WriteString(v.Name + style.Colour(style.Subdued, fmt.Sprintf("  %d", v.SnipCount)))
+			buff.WriteString("\n")
+		}
 	}
+	buff.WriteString("\n")
 	return buff.String()
 
 	//return r.Snippets[0].String()
@@ -120,8 +146,9 @@ func listRoot(r *models.Root) string {
 
 func listSnippets(list *models.SnippetList) string {
 	buf := new(bytes.Buffer)
+	buf.WriteString("\n")
 
-	fmt.Fprint(buf, style.Colour(style.LightBlue, "\nkwk.co/"+list.Username+"\n\n"))
+	fmt.Fprint(buf, style.Colour(style.LightBlue, "kwk.co/"+list.Username+"/") + list.Pouch + "/\n\n")
 
 	tbl := tablewriter.NewWriter(buf)
 	tbl.SetHeader([]string{"Name", "Version", "Preview", "Tags", "Runs", ""})
@@ -149,7 +176,6 @@ func listSnippets(list *models.SnippetList) string {
 
 		name = style.Colour(style.LightBlue, v.Name) + style.Colour(style.Subdued, "." + v.Ext)
 		if v.Private {
-			name = style.Colour(style.Subdued, ".") + name
 			if v.Role == models.RolePreferences {
 				snip = style.Colour(style.Yellow, `(Local prefs) 'kwk edit prefs'`)
 			} else if v.Role == models.RoleEnvironment {
@@ -162,7 +188,7 @@ func listSnippets(list *models.SnippetList) string {
 		}
 
 		tbl.Append([]string{
-			style.Pouch + "   " + name,
+			"  🔸  " + name,
 			fmt.Sprintf("%d", v.Version),
 			snip,
 			strings.Join(tags, ", "),

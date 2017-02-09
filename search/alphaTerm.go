@@ -18,7 +18,7 @@ func NewAlphaTerm(conn *grpc.ClientConn, s config.Persister, h *rpc.Headers) Ter
 }
 
 func (s *AlphaTerm) Execute(term string) (*models.SearchTermResponse, error) {
-	if res, err := s.client.Alpha(s.headers.GetContext(), &searchRpc.AlphaRequest{
+	if res, err := s.client.Alpha(s.headers.Context(), &searchRpc.AlphaRequest{
 		Term: term,
 	}); err != nil {
 		return nil, err

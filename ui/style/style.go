@@ -38,6 +38,8 @@ const (
 	Task           = "\xE2\x98\xB0"
 	BriefCase      = "\xF0\x9F\x92\xBC"
 	Pouch          = "\xF0\x9F\x91\x9D"
+	BlueDiamond    = "\xF0\x9F\x94\xB9"
+	YelloDiamond   = "\xF0\x9F\x94\xB8"
 )
 
 func Build(quant int, unicode string) string {

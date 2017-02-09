@@ -30,6 +30,7 @@ const (
 	Code_IncompleteAlias  Code = 4201
 	Code_AliasMaxSegments Code = 4202
 	Code_NoSnippetName    Code = 4203
+	Code_PouchMaxSegments    Code = 4204
 )
 
 // ParseGrpcErr should be used at RPC service call level. i.e. the errors
@@ -46,7 +47,7 @@ func ParseGrpcErr(e error) error {
 }
 
 func ErrOneLine(c Code, description string) error {
-	return ClientErr{Msgs:[]Msg{{Code:c, Desc:description}}}
+	return &ClientErr{TransportCode: codes.InvalidArgument, Msgs:[]Msg{{Code:c, Desc:description}}}
 }
 
 type ClientErr struct {

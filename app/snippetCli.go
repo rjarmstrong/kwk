@@ -10,15 +10,12 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bitbucket.com/sharingmachine/kwkcli/setup"
-	"strconv"
-	"strings"
-	"time"
 	"fmt"
 )
 
 type SnippetCli struct {
 	search   search.Term
-	s snippets.Service
+	s        snippets.Service
 	runner   cmd.Runner
 	system   sys.Manager
 	settings config.Persister
@@ -75,7 +72,7 @@ func (sc *SnippetCli) Run(distinctName string, args []string) {
 	}
 }
 
-func (sc *SnippetCli) New(snippet string, distinctName string) {
+func (sc *SnippetCli) Create(snippet string, distinctName string) {
 	a, err := models.ParseAlias(distinctName)
 	if err != nil {
 		sc.Render("validation:one-line", err)
@@ -173,6 +170,7 @@ func (sc *SnippetCli) Delete(args []string) {
 	if r := sc.Modal("snippet:delete", as, sc.su.Prefs().AutoYes); r.Ok {
 		if _, err := sc.s.DeletePouch(pouch); err != nil {
 			sc.HandleErr(err)
+			return
 		}
 		sc.Render("pouch:deleted", pouch)
 	} else {
@@ -180,17 +178,49 @@ func (sc *SnippetCli) Delete(args []string) {
 	}
 }
 
+func (sc *SnippetCli) Lock(pouch string) {
+	_, err := sc.s.MakePrivate(pouch, true)
+	if err != nil {
+		sc.HandleErr(err)
+		return
+	}
+	sc.Render("pouch:locked", pouch)
+}
+
+func (sc *SnippetCli) UnLock(pouch string) {
+	res := sc.Dialog.Modal("pouch:check-unlock", pouch, false)
+	if res.Ok {
+		_, err := sc.s.MakePrivate(pouch, false)
+		if err != nil {
+			sc.HandleErr(err)
+			return
+		}
+		sc.Render("pouch:unlocked", pouch)
+	} else {
+		sc.Render("pouch:not-unlocked", pouch)
+	}
+}
+
 // kwk mv regions.txt reference -- moves the reference pouch, if no reference pouch then move to reference.txt
 // kwk mv examples/regions.txt reference
 func (sc *SnippetCli) Move(args []string) {
-	// TODO: if its a pouch and is prefixed with a "." then make private
 	root, err := sc.s.GetRoot("", true)
 	if err != nil {
-		panic(root)
+		sc.HandleErr(err)
+		return
 	}
-	last := args[len(args) - 1]
+	last := args[len(args)-1]
+	// . (current folder is an alias for root directory)
+	if last == "." {
+		last = ""
+	}
 	if root.IsPouch(args[0]) {
-		sc.s.RenamePouch(args[0], last)
+		p, err := sc.s.RenamePouch(args[0], last)
+		if err != nil {
+			sc.HandleErr(err)
+			return
+		}
+		sc.Render("pouch:renamed", p)
 		return
 	} else if !root.IsPouch(last) {
 		sc.rename(args[0], args[1])
@@ -201,7 +231,17 @@ func (sc *SnippetCli) Move(args []string) {
 		sc.Render("validation:one-line", err)
 		return
 	}
-	_, err = sc.s.Move("", source, last, as)
+	p, err := sc.s.Move("", source, last, as)
+	if err != nil {
+		sc.HandleErr(err)
+		return
+	}
+	if last == "" {
+		sc.Render("snippet:moved", "root")
+	} else {
+		sc.Render("snippet:moved", p)
+	}
+
 }
 
 func (sc *SnippetCli) Cat(distinctName string) {
@@ -296,39 +336,40 @@ func (sc *SnippetCli) List(args ...string) {
 	if len(args) == 0 {
 		r, err := sc.s.GetRoot("", sc.su.Prefs().ListAll)
 		if err != nil {
-			panic(err)
+			sc.HandleErr(err)
+			return
 		}
 		sc.Render("pouch:list-root", r)
 		return
 	}
-	a, err := models.ParseAlias(args[0])
+	username, pouch, err := models.ParsePouch(args[0])
 	if err != nil {
-		panic(err)
+		sc.HandleErr(err)
+		return
 	}
-	if a.Username != "" && a.Pouch == "" {
-		r, err := sc.s.GetRoot(a.Username, sc.su.Prefs().ListAll)
+	if pouch == "" {
+		r, err := sc.s.GetRoot(username, sc.su.Prefs().ListAll)
 		if err != nil {
-			panic(err)
+			sc.HandleErr(err)
 		}
 		sc.Render("pouch:list-root", r)
 		return
 	}
 
 	var size int64
-	var tags = []string{}
+	//var tags = []string{}
 	u := &models.User{}
-	var username = ""
-	for i, v := range args {
-		if num, err := strconv.Atoi(v); err == nil {
-			size = int64(num)
-		} else {
-			if i == 0 && v[len(v) - 1:] == "/" {
-				username = strings.Replace(v, "/", "", -1)
-			} else {
-				tags = append(tags, v)
-			}
-		}
-	}
+	//for i, v := range args {
+	//	if num, err := strconv.Atoi(v); err == nil {
+	//		size = int64(num)
+	//	} else {
+	//		if i == 0 && v[len(v)-1:] == "/" {
+	//			username = strings.Replace(v, "/", "", -1)
+	//		} else {
+	//			tags = append(tags, v)
+	//		}
+	//	}
+	//}
 	if username == "" {
 		if err := sc.settings.Get(models.ProfileFullKey, u, 0); err != nil {
 			sc.Render("api:not-authenticated", nil)
@@ -337,7 +378,7 @@ func (sc *SnippetCli) List(args ...string) {
 			username = u.Username
 		}
 	}
-	p := &models.ListParams{Username:username, Size:size, Since:int64(time.Now().Unix() * 1000), Tags:tags, All:sc.su.Prefs().ListAll}
+	p := &models.ListParams{Username: username, Pouch: pouch, Size: size, All: sc.su.Prefs().ListAll}
 	if list, err := sc.s.List(p); err != nil {
 		sc.HandleErr(err)
 	} else {
@@ -370,7 +411,6 @@ func (sc *SnippetCli) get(distinctName string) (*models.SnippetList, *models.Ali
 	}
 }
 
-
 func (sc *SnippetCli) rename(distinctName string, newSnipName string) {
 	a, err := models.ParseAlias(distinctName)
 	if err != nil {
@@ -386,8 +426,8 @@ func (sc *SnippetCli) rename(distinctName string, newSnipName string) {
 		sc.HandleErr(err)
 	} else {
 		sc.Render("snippet:renamed", &map[string]string{
-			"distinctName":   original.String(),
-			"newDistinctName":    snip.SnipName.String(),
+			"distinctName":    original.String(),
+			"newDistinctName": snip.SnipName.String(),
 		})
 	}
 }

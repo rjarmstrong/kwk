@@ -20,7 +20,7 @@ func NewStdManager(conn *grpc.ClientConn, s config.Persister, h *rpc.Headers) *S
 }
 
 func (u *StdManager) SignIn(username string, password string) (*models.User, error) {
-	if res, err := u.client.SignIn(u.headers.GetContext(), &usersRpc.SignInRequest{Username: username, Password: password}); err != nil {
+	if res, err := u.client.SignIn(u.headers.Context(), &usersRpc.SignInRequest{Username: username, Password: password}); err != nil {
 		return nil, err
 	} else {
 		model := &models.User{}
@@ -30,7 +30,7 @@ func (u *StdManager) SignIn(username string, password string) (*models.User, err
 }
 
 func (u *StdManager) SignUp(email string, username string, password string) (*models.User, error) {
-	if res, err := u.client.SignUp(u.headers.GetContext(), &usersRpc.SignUpRequest{Username: username, Email: email, Password: password}); err != nil {
+	if res, err := u.client.SignUp(u.headers.Context(), &usersRpc.SignUpRequest{Username: username, Email: email, Password: password}); err != nil {
 		return nil, err
 	} else {
 		model := &models.User{}

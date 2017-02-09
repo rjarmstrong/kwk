@@ -10,7 +10,7 @@ func Snippets(s *SnippetCli) []cli.Command {
 			Name:    "new",
 			Aliases: []string{"create", "save"},
 			Action: func(c *cli.Context) error {
-				s.New(c.Args().Get(0), c.Args().Get(1))
+				s.Create(c.Args().Get(0), c.Args().Get(1))
 				return nil
 			},
 		},
@@ -145,6 +145,20 @@ func Snippets(s *SnippetCli) []cli.Command {
 			Aliases: []string{"mkdir"},
 			Action: func(c *cli.Context) error {
 				s.CreatePouch(c.Args().First())
+				return nil
+			},
+		},
+		{
+			Name:    "lock",
+			Action: func(c *cli.Context) error {
+				s.Lock(c.Args().First())
+				return nil
+			},
+		},
+		{
+			Name:    "unlock",
+			Action: func(c *cli.Context) error {
+				s.UnLock(c.Args().First())
 				return nil
 			},
 		},

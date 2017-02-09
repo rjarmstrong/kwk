@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"io/ioutil"
+	"bitbucket.com/sharingmachine/kwkcli/log"
 )
 
 type ConfigProvider struct {
@@ -80,8 +81,7 @@ func (cs *ConfigProvider) GetConfig(r Resolvers) (string, error) {
 	_, ok := r.(*EnvResolvers)
 	if os.Getenv(sys.KWK_TESTMODE) != "" &&  ok {
 		testEnv := "./cmd/testEnv.yml"
-		// TODO: use log
-		fmt.Println(">> Running with:", testEnv, " <<")
+		log.Debug("Running with:", testEnv)
 		b, err := ioutil.ReadFile(testEnv)
 		return string(b), nil
 		if err != nil {

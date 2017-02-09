@@ -8,14 +8,14 @@ import (
 
 func NewAlias(username string, pouch string, name string, extension string) *Alias {
 	return &Alias{
-		Username:username,
-		Pouch:pouch,
-		SnipName:SnipName{Name:name, Ext:extension},
+		Username: username,
+		Pouch:    pouch,
+		SnipName: SnipName{Name: name, Ext: extension},
 	}
 }
 
 type Alias struct {
-	Pouch string
+	Pouch    string
 	Username string `json:"username" schema:"username"`
 	SnipName
 	FullKey  string `json:"fullKey" schema:"fullKey"`
@@ -43,8 +43,8 @@ func NewSetupAlias(name string, ext string) *Alias {
 		panic(err)
 	} else {
 		return &Alias{
-			Pouch:   SETTINGS_POUCH,
-			SnipName:SnipName{Name:fmt.Sprintf("%s_%s", h, name), Ext:ext},
+			Pouch:    SETTINGS_POUCH,
+			SnipName: SnipName{Name: fmt.Sprintf("%s_%s", h, name), Ext: ext},
 		}
 	}
 }
@@ -56,6 +56,29 @@ type SnipName struct {
 
 func (s *SnipName) String() string {
 	return fmt.Sprintf("%s.%s", s.Name, s.Ext)
+}
+
+// [/][<username]/[pouch]
+func ParsePouch(path string) (username string, pouch string, err error) {
+	if path == "" {
+		return "", "", nil
+	}
+	var isOtherUser bool
+	if path[0] == '/' {
+		isOtherUser = true
+		path = strings.TrimPrefix(path, "/")
+	}
+	t := strings.Split(path, "/")
+	if len(t) == 1 {
+		if isOtherUser {
+			return t[0], "", nil
+		}
+		return "", t[0], nil
+	}
+	if len(t) == 2 && isOtherUser {
+		return t[0], t[1], nil
+	}
+	return "", "", ErrOneLine(Code_PouchMaxSegments, "Pouches are only 1 level deep. Prefix a '/' if you meant to list another users pouch.")
 }
 
 // ParseAlias
@@ -93,7 +116,7 @@ func ParseAlias(distinctName string) (*Alias, error) {
 	}
 	if len(t) == 1 {
 		if isOtherUserAlias {
-			return nil, ErrOneLine(Code_IncompleteAlias,"Incomplete alias for another user must comprise at least /username/snippet")
+			return nil, ErrOneLine(Code_IncompleteAlias, "Incomplete alias for another user must comprise at least /username/snippet")
 		}
 		// If its just the name
 		return NewAlias("", ROOT_POUCH, sn.Name, sn.Ext), nil
@@ -102,16 +125,16 @@ func ParseAlias(distinctName string) (*Alias, error) {
 		if isOtherUserAlias {
 			return NewAlias(t[0], ROOT_POUCH, sn.Name, sn.Ext), nil
 		}
-		return NewAlias("", t[0],  sn.Name, sn.Ext), nil
+		return NewAlias("", t[0], sn.Name, sn.Ext), nil
 	}
 	if len(t) == 3 {
 		// If it has three parts then this will be an absolute alias
-		return NewAlias(t[0], t[1],  sn.Name, sn.Ext), nil
+		return NewAlias(t[0], t[1], sn.Name, sn.Ext), nil
 	}
-	return nil, ErrOneLine(Code_AliasMaxSegments,"Alias can only consist of max 3 segments.")
+	return nil, ErrOneLine(Code_AliasMaxSegments, "Alias can only consist of max 3 segments.")
 }
 
-func ParseSnipName (snipName string) (*SnipName, error){
+func ParseSnipName(snipName string) (*SnipName, error) {
 	if snipName == "" {
 		return nil, ErrOneLine(Code_NoSnippetName, "No snippet name given.")
 	}
@@ -121,12 +144,12 @@ func ParseSnipName (snipName string) (*SnipName, error){
 	if len(lIts) > 1 {
 		// if there is an extension
 		extension = lIts[len(lIts)-1]
-		name = strings.TrimSuffix(snipName, "." + extension)
+		name = strings.TrimSuffix(snipName, "."+extension)
 	} else {
 		// If there is no extension
 		name = snipName
 	}
-	return &SnipName{Name:name, Ext:extension}, nil
+	return &SnipName{Name: name, Ext: extension}, nil
 }
 
 func ParseMany(distinctNames []string) ([]*SnipName, string, error) {

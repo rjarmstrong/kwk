@@ -13,6 +13,7 @@ const (
 
 type SnippetList struct {
 	Username string
+	Pouch string
 	Items    []*Snippet
 	Total    int64
 	Since    time.Time
@@ -68,6 +69,7 @@ type Match struct {
 
 type ListParams struct {
 	All bool
+	Pouch string
 	Username string
 	Size int64
 	Since int64
