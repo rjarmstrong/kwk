@@ -17,6 +17,7 @@ type Pouch struct {
 type Root struct {
 	Username string
 	Pouches []*Pouch
+	Personal []*Pouch
 	Snippets []*Snippet
 }
 

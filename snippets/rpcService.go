@@ -165,7 +165,8 @@ func (rs *RpcService) GetRoot(username string, all bool) (*models.Root, error) {
 	res := &snipsRpc.ListResponse{Items: r.Snips}
 	rs.mapSnippetList(res, l, true)
 	pl := rs.mapPouchList(r.Pouches)
-	root := &models.Root{Snippets: l.Items, Pouches: pl, Username:username}
+	perL := rs.mapPouchList(r.Personal)
+	root := &models.Root{Snippets: l.Items, Pouches: pl, Personal:perL, Username:r.Username}
 	return root, err
 }
 

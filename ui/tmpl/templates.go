@@ -118,25 +118,31 @@ func listRoot(r *models.Root) string {
 	}
 	for _, v := range r.Pouches {
 		if v.Name != "" {
-			if v.Name == "inbox" {
-				if v.UnOpened > 0 {
-					buff.WriteString(fmt.Sprintf("   📬 %d ", v.UnOpened))
-
-				} else {
-					buff.WriteString("   📪  ")
-				}
-			} else if v.Name == "settings" {
-				buff.WriteString("   ⚙  ")
-			} else if v.MakePrivate {
-				buff.WriteString("   🔒  ")
+			buff.WriteString("   ")
+			if v.MakePrivate {
+				buff.WriteString("🔒")
 			} else {
-				buff.WriteString("   👝  ")
+				buff.WriteString("👝")
 			}
-			buff.WriteString(v.Name + style.Colour(style.Subdued, fmt.Sprintf("  %d", v.SnipCount)))
+			buff.WriteString(style.Colour(style.Subdued, fmt.Sprintf("  %d ", v.SnipCount)))
+			buff.WriteString(v.Name)
 			buff.WriteString("\n")
 		}
 	}
-	buff.WriteString("\n")
+	buff.WriteString("\n\n")
+	for _, v := range r.Personal {
+		if v.Name == "inbox" {
+			if v.UnOpened > 0 {
+				buff.WriteString(fmt.Sprintf(" 📬 Inbox %d", v.UnOpened))
+
+			} else {
+				buff.WriteString(" 📪  inbox")
+			}
+		} else if v.Name == "settings" {
+			buff.WriteString("   ⚙  settings")
+		}
+	}
+	buff.WriteString("\n\n")
 	return buff.String()
 
 	//return r.Snippets[0].String()

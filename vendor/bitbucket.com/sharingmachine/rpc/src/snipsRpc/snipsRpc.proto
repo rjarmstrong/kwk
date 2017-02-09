@@ -194,6 +194,8 @@ message RootRequest {
 message RootResponse {
     repeated Snip snips = 1;
     repeated Pouch pouches = 2;
+    repeated Pouch personal = 3;
+    string Username = 4;
 }
 
 message DeleteRequest {
