@@ -16,6 +16,7 @@ const (
 	Code_NewFullKeyEmpty        Code = 3010
 	Code_FullKeyExistsWhenClone Code = 3020
 	Code_MultipleSnippetsFound  Code = 3030
+	Code_TwoArgumentsRequiredForMove Code = 3040
 
 	// Users
 	Code_WrongCreds      Code = 4001

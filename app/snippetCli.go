@@ -82,9 +82,9 @@ func (sc *SnippetCli) Create(snippet string, distinctName string) {
 	} else {
 		///if createAlias.Snippet != nil {
 		if createAlias.Snippet.Private {
-			sc.Render("snippet:newprivate", createAlias.Snippet)
+			sc.Render("snippet:newprivate", createAlias.Snippet.String())
 		} else {
-			sc.Render("snippet:new", createAlias.Snippet)
+			sc.Render("snippet:new", createAlias.Snippet.String())
 		}
 		// TODO: Add similarity prompt here
 		//} else {
@@ -148,33 +148,45 @@ func (sc *SnippetCli) Inspect(distinctName string) {
 
 // Problem is that if many items are passed for deletion and any are ambiguous how do we handle this?
 func (sc *SnippetCli) Delete(args []string) {
-	if len(args) == 1 {
-		r, err := sc.s.GetRoot("", true)
-		if err != nil {
-			panic("implement")
-		}
-		if r.IsPouch(args[0]) {
-			_, err := sc.s.DeletePouch(args[0])
-			if err != nil {
-				panic("implement")
-			} else {
-				panic("implement")
-			}
-		}
-	}
-	as, pouch, err := models.ParseMany(args)
+	r, err := sc.s.GetRoot("", true)
 	if err != nil {
-		sc.Render("validation:one-line", err)
+		sc.HandleErr(err)
+	}
+	if r.IsPouch(args[0]) {
+		sc.deletePouch(args[0])
 		return
 	}
-	if r := sc.Modal("snippet:delete", as, sc.su.Prefs().AutoYes); r.Ok {
-		if _, err := sc.s.DeletePouch(pouch); err != nil {
+	sc.deleteSnippet(args)
+}
+
+func (sc *SnippetCli) deleteSnippet(args []string) {
+	as, pouch, err := models.ParseMany(args)
+	if err != nil {
+		sc.HandleErr(err)
+		return
+	}
+	if r := sc.Modal("snippet:check-delete", as, sc.su.Prefs().AutoYes); r.Ok {
+		if err := sc.s.Delete("", pouch, as); err != nil {
+			sc.HandleErr(err)
+			return
+		}
+		sc.Render("snippet:deleted", pouch)
+	} else {
+		sc.Render("snippet:not-deleted", pouch)
+	}
+}
+
+func (sc *SnippetCli) deletePouch(pouch string) {
+	res := sc.Dialog.Modal("pouch:check-delete", pouch, false)
+	if res.Ok {
+		_, err := sc.s.DeletePouch(pouch)
+		if err != nil {
 			sc.HandleErr(err)
 			return
 		}
 		sc.Render("pouch:deleted", pouch)
 	} else {
-		sc.Render("pouch:notdeleted", pouch)
+		sc.Render("pouch:not-deleted", pouch)
 	}
 }
 
@@ -204,6 +216,10 @@ func (sc *SnippetCli) UnLock(pouch string) {
 // kwk mv regions.txt reference -- moves the reference pouch, if no reference pouch then move to reference.txt
 // kwk mv examples/regions.txt reference
 func (sc *SnippetCli) Move(args []string) {
+	if len(args) < 2 {
+		sc.HandleErr(models.ErrOneLine(models.Code_TwoArgumentsRequiredForMove, "Two arguments are required for the move command."))
+		return
+	}
 	root, err := sc.s.GetRoot("", true)
 	if err != nil {
 		sc.HandleErr(err)
@@ -228,7 +244,7 @@ func (sc *SnippetCli) Move(args []string) {
 	}
 	as, source, err := models.ParseMany(args[0:len(args)-1])
 	if err != nil {
-		sc.Render("validation:one-line", err)
+		sc.HandleErr(err)
 		return
 	}
 	p, err := sc.s.Move("", source, last, as)
@@ -261,7 +277,7 @@ func (sc *SnippetCli) Cat(distinctName string) {
 func (sc *SnippetCli) Patch(distinctName string, target string, patch string) {
 	a, err := models.ParseAlias(distinctName)
 	if err != nil {
-		sc.Render("validation:one-line", err)
+		sc.HandleErr(err)
 		return
 	}
 	if alias, err := sc.s.Patch(*a, target, patch); err != nil {
@@ -274,12 +290,12 @@ func (sc *SnippetCli) Patch(distinctName string, target string, patch string) {
 func (sc *SnippetCli) Clone(distinctName string, newFullName string) {
 	a, err := models.ParseAlias(distinctName)
 	if err != nil {
-		sc.Render("validation:one-line", err)
+		sc.HandleErr(err)
 		return
 	}
 	newA, err := models.ParseAlias(newFullName)
 	if err != nil {
-		sc.Render("validation:one-line", err)
+		sc.HandleErr(err)
 		return
 	}
 
@@ -293,7 +309,7 @@ func (sc *SnippetCli) Clone(distinctName string, newFullName string) {
 func (sc *SnippetCli) Tag(distinctName string, tags ...string) {
 	a, err := models.ParseAlias(distinctName)
 	if err != nil {
-		sc.Render("validation:one-line", err)
+		sc.HandleErr(err)
 		return
 	}
 	if alias, err := sc.s.Tag(*a, tags...); err != nil {
@@ -306,7 +322,7 @@ func (sc *SnippetCli) Tag(distinctName string, tags ...string) {
 func (sc *SnippetCli) UnTag(distinctName string, tags ...string) {
 	a, err := models.ParseAlias(distinctName)
 	if err != nil {
-		sc.Render("validation:one-line", err)
+		sc.HandleErr(err)
 		return
 	}
 	if alias, err := sc.s.UnTag(*a, tags...); err != nil {
@@ -318,7 +334,7 @@ func (sc *SnippetCli) UnTag(distinctName string, tags ...string) {
 
 func (sc *SnippetCli) CreatePouch(name string) {
 	if _, err := sc.s.CreatePouch(name); err != nil {
-		sc.Render("validation:one-line", err)
+		sc.HandleErr(err)
 	} else {
 		sc.Render("pouch:created", name)
 	}
@@ -414,20 +430,20 @@ func (sc *SnippetCli) get(distinctName string) (*models.SnippetList, *models.Ali
 func (sc *SnippetCli) rename(distinctName string, newSnipName string) {
 	a, err := models.ParseAlias(distinctName)
 	if err != nil {
-		sc.Render("validation:one-line", err)
+		sc.HandleErr(err)
 		return
 	}
 	sn, err := models.ParseSnipName(newSnipName)
 	if err != nil {
-		sc.Render("validation:one-line", err)
+		sc.HandleErr(err)
 		return
 	}
 	if snip, original, err := sc.s.Rename(*a, *sn); err != nil {
 		sc.HandleErr(err)
 	} else {
 		sc.Render("snippet:renamed", &map[string]string{
-			"distinctName":    original.String(),
-			"newDistinctName": snip.SnipName.String(),
+			"originalName":    original.String(),
+			"newName": snip.SnipName.String(),
 		})
 	}
 }

@@ -32,7 +32,7 @@ func (e *EnvResolvers) Anon() (string, error) {
 }
 
 func (e *EnvResolvers) Local() (string, error) {
-	return e.system.ReadFromFile(SNIP_CACHE_PATH, e.alias.Path(), true, 0)
+	return e.system.ReadFromFile(SNIP_CACHE_PATH, e.alias.String(), true, 0)
 }
 
 func (e *EnvResolvers) Own() (string, error) {
@@ -42,7 +42,7 @@ func (e *EnvResolvers) Own() (string, error) {
 		if l, err := e.snippets.Get(*models.NewAlias(u.Username, e.alias.Pouch, e.alias.Name, e.alias.Ext)); err != nil {
 			return "", err
 		} else {
-			if _, err := e.system.WriteToFile(SNIP_CACHE_PATH, e.alias.Path(), l.Items[0].Snip, true); err != nil {
+			if _, err := e.system.WriteToFile(SNIP_CACHE_PATH, e.alias.String(), l.Items[0].Snip, true); err != nil {
 				return "", err
 			}
 			return l.Items[0].Snip, nil
@@ -54,7 +54,7 @@ func (e *EnvResolvers) Default() (string, error) {
 	if env, err := e.Fallback(); err != nil {
 		return "", err
 	} else {
-		if _, err := e.system.WriteToFile(SNIP_CACHE_PATH, e.alias.Path(), env, true); err != nil {
+		if _, err := e.system.WriteToFile(SNIP_CACHE_PATH, e.alias.String(), env, true); err != nil {
 			return "", err
 		} else {
 			return env, nil

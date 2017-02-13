@@ -53,19 +53,14 @@ QOhTsiedSrnAdyGN/4fy3ryM7xfft0kL0fJuMAsaDk527RH89elWsn2/x20Kk4yl
 NVOFBkpdn627G190
 -----END CERTIFICATE-----`
 
-func GetConn(serverAddress string, logger *log.Logger) *grpc.ClientConn {
+func GetConn(serverAddress string, logger *log.Logger, trustAllCerts bool) *grpc.ClientConn {
 	var opts []grpc.DialOption
-
-	var trustCerts = false
-	if ok := os.Getenv("TRUST_ALL_CERTS"); ok != "" && serverAddress == "localhost:8000" {
-		trustCerts = true
-	}
 
 	pool := x509.NewCertPool()
 	pool.AppendCertsFromPEM([]byte(cert))
 	creds := credentials.NewTLS(&tls.Config{
 		RootCAs:                    pool,
-		InsecureSkipVerify:         trustCerts,
+		InsecureSkipVerify:         trustAllCerts,
 		ClientSessionCache:         tls.NewLRUClientSessionCache(-1),
 		PreferServerCipherSuites:   true,
 		DynamicRecordSizingDisabled:false,

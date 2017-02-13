@@ -12,7 +12,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
 	"github.com/urfave/cli"
 	"bitbucket.com/sharingmachine/kwkcli/setup"
-	"bitbucket.com/sharingmachine/kwkcli/ui/dashboard"
 )
 
 type KwkApp struct {
@@ -32,7 +31,8 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 	d dlg.Dialog, w tmpl.Writer, h search.Term, api rpc.Service, su setup.Provider) *KwkApp {
 
 	app := cli.NewApp()
-	cli.HelpPrinter = dashboard.Layout
+	dash := NewDashBoard(w, a)
+	cli.HelpPrinter = dash.GetWriter()
 	app.Flags = []cli.Flag {
 		cli.BoolFlag{
 			Name: "covert, x",

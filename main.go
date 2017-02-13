@@ -22,15 +22,21 @@ var version string = "-"
 var build string = "-"
 
 func main() {
+	_, sys.KWK_TEST_MODE = os.LookupEnv("KWK_TEST_MODE")
+
 	f, l := sys.NewLogger()
 	defer f.Close()
 	//profile().Close()
 
 	host := os.Getenv("API_HOST")
 	if host == "" {
-		host = "api.kwk.co:443"
+		if sys.KWK_TEST_MODE  {
+			host = "localhost:8000"
+		} else {
+			host = "api.kwk.co:443"
+		}
 	}
-	conn := rpc.GetConn(host, l)
+	conn := rpc.GetConn(host, l, sys.KWK_TEST_MODE)
 	defer conn.Close()
 
 	s := sys.New()

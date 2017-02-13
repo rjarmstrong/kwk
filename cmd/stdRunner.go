@@ -43,7 +43,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	}
 	_, cli := getSubSection(a, candidates[0])
 
-	filePath, err := r.system.WriteToFile(setup.SNIP_CACHE_PATH, s.FullName, s.Snip, true)
+	filePath, err := r.system.WriteToFile(setup.SNIP_CACHE_PATH, s.String(), s.Snip, true)
 	if err != nil {
 		return err
 	}
@@ -72,7 +72,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 		}
 	}
 
-	if text, err := r.system.ReadFromFile(setup.SNIP_CACHE_PATH, s.FullName, true, 0); err != nil {
+	if text, err := r.system.ReadFromFile(setup.SNIP_CACHE_PATH, s.String(), true, 0); err != nil {
 		// if there was an error close the application anyway
 		closer()
 		return err
@@ -99,7 +99,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 	}
 	comp, interp := getSubSection(rs, yamlKey)
 	if comp != nil {
-		if filePath, err := r.system.WriteToFile(setup.SNIP_CACHE_PATH, s.FullName, s.Snip, true); err != nil {
+		if filePath, err := r.system.WriteToFile(setup.SNIP_CACHE_PATH, s.String(), s.Snip, true); err != nil {
 			return err
 		} else {
 			_, compile := getSubSection(&comp, "compile")
@@ -133,13 +133,16 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 func execSafe(name string, arg ...string) io.ReadCloser {
 	c := exec.Command(name, arg...)
 	c.Stdin = os.Stdin
-	out, _ := c.StdoutPipe()
+	out, err := c.StdoutPipe()
+	if err != nil {
+		panic(err)
+	}
 	var stderr bytes.Buffer
 	c.Stdout = os.Stdout
 	c.Stderr = &stderr
-	err := c.Run()
+	err = c.Run()
 	if err != nil {
-		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
+		panic(err)
 	}
 	return out
 }

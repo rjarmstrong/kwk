@@ -31,7 +31,7 @@ func (p *PrefsResolvers) Anon() (string, error) {
 
 func (p *PrefsResolvers) Local() (string, error) {
 	//fmt.Println("GETTING LOCAL")
-	return p.system.ReadFromFile(SNIP_CACHE_PATH, p.a.Path(), true, 0)
+	return p.system.ReadFromFile(SNIP_CACHE_PATH, p.a.String(), true, 0)
 }
 
 func (p *PrefsResolvers) Own() (string, error) {
@@ -42,7 +42,7 @@ func (p *PrefsResolvers) Own() (string, error) {
 		if l, err := p.snippets.Get(*models.NewAlias(u.Username, p.a.Pouch, p.a.Name, p.a.Ext)); err != nil {
 			return "", err
 		} else {
-			if _, err := p.system.WriteToFile(SNIP_CACHE_PATH, p.a.Path(), l.Items[0].Snip, true); err != nil {
+			if _, err := p.system.WriteToFile(SNIP_CACHE_PATH, p.a.String(), l.Items[0].Snip, true); err != nil {
 				return "", err
 			}
 			return l.Items[0].Snip, nil

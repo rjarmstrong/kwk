@@ -12,18 +12,29 @@ import (
 	"strings"
 	"bytes"
 	"fmt"
+	"text/tabwriter"
 )
 
 var Templates = map[string]*template.Template{}
 
+const logo  = `
+      _              _
+     | |            | |
+     | | ____      _| | __
+ \\  | |/ /\ \ /\ / / |/ /
+ //  |   <  \ V  V /|   <
+     |_|\_\  \_/\_/ |_|\_\
+
+`
+
 func init() {
 	// Aliases
-	add("snippet:delete", "Are you sure you want to delete {{.FullName | yellow }}? [y/n] ", template.FuncMap{"yellow": yellow})
-	add("snippet:deleted", "{{.FullName | blue }} deleted.", template.FuncMap{"blue": blue})
+	add("dashboard", logo + "{{. | listRoot }}", template.FuncMap{"listRoot": listRoot })
+
 	add("snippet:updated", "Description updated:\n{{ .Description | blue }}", template.FuncMap{"blue": blue})
 	addColor("api:not-found", "Not found\n", blue)
 	add("snippet:cloned", "Cloned as {{.Username}}/{{.FullName | blue}}\n", template.FuncMap{"blue": blue})
-	add("snippet:new", "{{.FullName | blue }} created "+style.OpenLock+"\n", template.FuncMap{"blue": blue})
+	add("snippet:new", "{{. | blue }} created "+style.OpenLock+"\n", template.FuncMap{"blue": blue})
 	add("snippet:newprivate", "{{.FullName | blue }} created "+style.Lock+"\n", template.FuncMap{"blue": blue})
 	add("snippet:cat", "{{.Snip | blue}}", template.FuncMap{"blue": blue})
 	add("snippet:edited", "Successfully updated {{ .FullName | blue }}", template.FuncMap{"blue": blue})
@@ -32,18 +43,35 @@ func init() {
 	add("snippet:ambiguouscat", "That snippet is ambiguous please run it again with the extension:\n{{range .Items}}{{.FullName | blue }}\n{{ end }}", template.FuncMap{"blue": blue})
 	add("snippet:list", "{{. | listSnippets }}", template.FuncMap{"listSnippets": listSnippets })
 	add("pouch:list-root", "{{. | listRoot }}", template.FuncMap{"listRoot": listRoot })
+
+
 	add("snippet:tag", "{{.FullName | blue }} tagged.", template.FuncMap{"blue": blue})
 	add("snippet:untag", "{{.FullName | blue }} untagged.", template.FuncMap{"blue": blue})
-	add("snippet:renamed", "{{.fullName | blue }} renamed to {{.newFullName | blue }}", template.FuncMap{"blue": blue})
+	add("snippet:renamed", "{{.originalName | blue }} renamed to {{.newName | blue }}", template.FuncMap{"blue": blue})
 	add("snippet:madeprivate", "{{.fullName | blue }} made private "+style.Lock, template.FuncMap{"blue": blue})
 	add("snippet:patched", "{{.FullName | blue }} patched.", template.FuncMap{"blue": blue})
-	add("snippet:notdeleted", "{{.FullName | blue }} was NOT deleted.", template.FuncMap{"blue": blue})
+
+	add("snippet:check-delete", "Are you sure you want to delete {{. | yellow }}? [y/n] ", template.FuncMap{"yellow": yellow})
+	add("snippet:deleted", "Snippets {{. | blue }} deleted.", template.FuncMap{"blue": blue})
+	add("snippet:not-deleted", "Snippets {{. | blue }} NOT deleted.", template.FuncMap{"blue": blue})
+
 	add("snippet:moved", "Snippets moved to: {{. | blue }}", template.FuncMap{"blue": blue})
 
 	add("snippet:inspect",
-		"\n{{range .Items}}"+"Full name: {{.Username}}/{{.FullName}}"+"\nSnippet: {{.Snip}}"+"\nVersion: {{.Version}}"+"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+"\nWeb: \033[4mhttp://www.kwk.co/{{.Username}}/{{.FullName}}\033[0m"+"\nDescription: {{.Description}}"+"\nRun count: {{.RunCount}}"+"\nClone count: {{.CloneCount}}"+"\n{{ end }}\n\n", nil)
-	add("pouch:notdeleted", "{{. | blue }} was NOT deleted.", template.FuncMap{"blue": blue})
+		"\n{{range .Items}}"+
+			"Name: {{.Username}}/{{.Pouch}}/{{.Name}}{{.Ext}}"+
+			"\nCreated: {{.Created}}"+
+			"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+
+			//"\nWeb: \033[4mhttp://www.kwk.co/{{.Username}}/{{.FullName}}\033[0m"+
+			"\nDescription: {{.Description}}"+
+			"\nRun count: {{.RunCount}}"+
+			"\nClone count: {{.CloneCount}}"+
+			"\n{{ end }}\n\n", nil)
+
+	add("pouch:not-deleted", "{{. | blue }} was NOT deleted.", template.FuncMap{"blue": blue})
 	add("pouch:deleted", "{{. | blue }} was deleted.", template.FuncMap{"blue": blue})
+
+	add("pouch:check-delete", "Are you sure you want to delete {{. | yellow }}? [y/n] ", template.FuncMap{"yellow": yellow})
 	add("pouch:created", "Pouch: {{. | blue }} created.", template.FuncMap{"blue": blue})
 	add("pouch:renamed", "Pouch: {{. | blue }} renamed.", template.FuncMap{"blue": blue})
 	add("pouch:locked", "Pouch: {{. | blue }} locked.", template.FuncMap{"blue": blue})
@@ -106,29 +134,46 @@ func multiChoice(list []models.Snippet) string {
 	return options
 }
 
+
+
 func listRoot(r *models.Root) string {
 	var buff bytes.Buffer
 	buff.WriteString("\n")
 	buff.WriteString(style.Colour(style.LightBlue,"kwk.co/") + r.Username + "/\n")
 	buff.WriteString("\n")
-	for _, v := range r.Snippets {
-		buff.WriteString("   🔸  ")
-		buff.WriteString(v.SnipName.String())
-		buff.WriteString("\n")
-	}
-	for _, v := range r.Pouches {
-		if v.Name != "" {
-			buff.WriteString("   ")
-			if v.MakePrivate {
-				buff.WriteString("🔒")
-			} else {
-				buff.WriteString("👝")
-			}
-			buff.WriteString(style.Colour(style.Subdued, fmt.Sprintf("  %d ", v.SnipCount)))
-			buff.WriteString(v.Name)
-			buff.WriteString("\n")
+
+
+	buff.WriteString(style.Colour(style.LightBlue,"Unsorted:\n\n"))
+	w := tabwriter.NewWriter(&buff, 30, 3, 1, ' ', tabwriter.DiscardEmptyColumns)
+	for i, v := range r.Snippets {
+		fmt.Fprint(w,"🔸  ")
+		fmt.Fprint(w, fmt.Sprintf("%s \t%s\n", v.SnipName.String(), v.Snip))
+		x := i+1
+		if x % 5 == 0 {
+			fmt.Fprint(w, " \n")
 		}
 	}
+	w.Flush()
+
+	buff.WriteString(style.Colour(style.LightBlue,"\n\nPouches:\n\n"))
+	w = tabwriter.NewWriter(&buff, 30, 3, 1, ' ', tabwriter.DiscardEmptyColumns)
+	for i, v := range r.Pouches {
+		if v.Name != "" {
+			if v.MakePrivate {
+				fmt.Fprint(w,"🔒   ")
+			} else {
+				fmt.Fprint(w,"👝   ")
+			}
+			fmt.Fprint(w, v.Name)
+			fmt.Fprint(w, style.Colour(style.Subdued, fmt.Sprintf(" %d \t", v.SnipCount)))
+			x := i+1
+			if x % 6 == 0 {
+				fmt.Fprint(w, " \n")
+			}
+		}
+	}
+	w.Flush()
+
 	buff.WriteString("\n\n")
 	for _, v := range r.Personal {
 		if v.Name == "inbox" {
@@ -143,6 +188,7 @@ func listRoot(r *models.Root) string {
 		}
 	}
 	buff.WriteString("\n\n")
+
 	return buff.String()
 
 	//return r.Snippets[0].String()
