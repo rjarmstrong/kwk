@@ -24,7 +24,7 @@ func NewEnvResolvers(s snippets.Service, sys sys.Manager, a account.Manager) Res
 	r := strings.ToLower(fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH))
 	return &EnvResolvers{
 		runtime: 	r,
-		alias:    *models.NewSetupAlias("env", "yml"),
+		alias:    *models.NewSetupAlias("env", "yml", true),
 		snippets: s,
 		system:   sys,
 		account:  a,

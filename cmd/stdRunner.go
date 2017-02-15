@@ -110,7 +110,11 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 				replaceVariables(&compile, filePath, s)
 				// TODO: ADD TO LOG
 				fmt.Println("compile", compile)
-				execSafe(compile[0], compile[1:]...).Close()
+				rc, err := execSafe(compile[0], compile[1:]...)
+				if err != nil {
+					return err
+				}
+				rc.Close()
 			}
 			_, run := getSubSection(&comp, "run")
 			replaceVariables(&run, filePath, s)
@@ -118,7 +122,11 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 			// TODO: ADD TO LOG
 			fmt.Println("run", run)
 			run = append(run, args...)
-			execSafe(run[0], run[1:]...).Close()
+			rc, err := execSafe(run[0], run[1:]...)
+			if err != nil {
+				return err
+			}
+			rc.Close()
 		}
 	} else {
 		//fmt.Println(runner)
@@ -128,12 +136,16 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 		}
 		interp = append(interp, args...)
 		//fmt.Println(runner)
-		execSafe(interp[0], interp[1:]...).Close()
+		rc, err := execSafe(interp[0], interp[1:]...)
+		if err != nil {
+			return err
+		}
+		rc.Close()
 	}
 	return nil
 }
 
-func execSafe(name string, arg ...string) io.ReadCloser {
+func execSafe(name string, arg ...string) (io.ReadCloser, error) {
 	c := exec.Command(name, arg...)
 	c.Stdin = os.Stdin
 	out, err := c.StdoutPipe()
@@ -145,9 +157,9 @@ func execSafe(name string, arg ...string) io.ReadCloser {
 	c.Stderr = &stderr
 	err = c.Run()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return out
+	return out, nil
 }
 
 func (r *StdRunner) getEnvSection(name string) (*yaml.MapSlice, error) {

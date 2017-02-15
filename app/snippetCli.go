@@ -72,23 +72,33 @@ func (sc *SnippetCli) Run(distinctName string, args []string) {
 	}
 }
 
-func (sc *SnippetCli) Create(snippet string, distinctName string) {
-	// TODO: If one arg supplied and can be parsed as an alias with extension then create empty and invoke edit
-	// else create without name as per existing behaviour
-	//var distinctName, snippet string
-	//if len(args) == 1 {
-	//	distinctName = args[0]
-	//if len(args) == 2 {
-	//	distinctName = args[args[1]
-	//} else {
-	//	panic("Ony 1 or 2 args required.")
-	//}
-
-	a, err := models.ParseAlias(distinctName)
-	if err != nil {
-		sc.HandleErr(err)
+func (sc *SnippetCli) Create(args []string) {
+	var alias *models.Alias
+	var snippet string
+	if len(args) == 0 {
+		alias = &models.Alias{}
+	} else if len(args) == 1 {
+		a, err := models.ParseAlias(args[0])
+		if err != nil {
+			sc.HandleErr(err)
+			return
+		}
+		if a.Ext != "" {
+			alias = a
+		} else {
+			snippet = args[0]
+		}
+	} else  {
+		a, err := models.ParseAlias(args[1])
+		if err != nil {
+			sc.HandleErr(err)
+			return
+		}
+		alias = a
+		snippet = args[0]
 	}
-	if createAlias, err := sc.s.Create(snippet, *a, models.RoleStandard); err != nil {
+
+	if createAlias, err := sc.s.Create(snippet, *alias, models.RoleStandard); err != nil {
 		sc.HandleErr(err)
 	} else {
 
@@ -111,8 +121,8 @@ func (sc *SnippetCli) Create(snippet string, distinctName string) {
 }
 
 func (sc *SnippetCli) Edit(distinctName string) {
-	if distinctName == "env" || distinctName == "prefs" {
-		distinctName = models.NewSetupAlias(distinctName, "yml").String()
+	if distinctName == "env"  {
+		distinctName = models.NewSetupAlias(distinctName, "yml", true).String()
 	}
 	if list, _, err := sc.get(distinctName); err != nil {
 		sc.HandleErr(err)

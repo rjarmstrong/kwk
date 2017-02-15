@@ -17,7 +17,7 @@ type PrefsResolvers struct {
 
 func NewPrefsResolvers(s snippets.Service, sys sys.Manager, a account.Manager) Resolvers {
 	return &PrefsResolvers{
-		a:        *models.NewSetupAlias("prefs", "yml"),
+		a:        *models.NewSetupAlias("prefs", "yml", false),
 		snippets: s,
 		system:   sys,
 		account:  a,

@@ -38,14 +38,17 @@ func (a *Alias) Path() string {
 	return fmt.Sprintf("%s/%s", a.Pouch, a.SnipName.String())
 }
 
-func NewSetupAlias(name string, ext string) *Alias {
-	if h, err := os.Hostname(); err != nil {
-		panic(err)
-	} else {
-		return &Alias{
-			Pouch:    SETTINGS_POUCH,
-			SnipName: SnipName{Name: fmt.Sprintf("%s-%s", name, strings.ToLower(h)), Ext: ext},
+func NewSetupAlias(name string, ext string, uniquePerHost bool) *Alias {
+	if uniquePerHost {
+		s, err := os.Hostname()
+		if err != nil {
+			panic(err)
 		}
+		name = fmt.Sprintf("%s-%s", name, strings.ToLower(s))
+	}
+	return &Alias{
+		Pouch:    SETTINGS_POUCH,
+		SnipName: SnipName{Name: name, Ext: ext},
 	}
 }
 

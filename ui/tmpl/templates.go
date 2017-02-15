@@ -32,7 +32,7 @@ const logo = `
 
 func init() {
 	// Aliases
-	add("dashboard", style.Colour(style.LightBlue, logo)+"{{. | listRoot }}", template.FuncMap{"listRoot": listRoot })
+	add("dashboard", style.Fmt(style.Cyan, logo)+"{{. | listRoot }}", template.FuncMap{"listRoot": listRoot })
 
 	add("snippet:updated", "Description updated:\n{{ .Description | blue }}", template.FuncMap{"blue": blue})
 	add("api:not-found", "{{. | yellow }} Not found\n", template.FuncMap{"yellow": yellow})
@@ -128,7 +128,7 @@ func addColor(name string, text string, color ColorFunc) {
 func multiChoice(list []models.Snippet) string {
 	var options string
 	for i, v := range list {
-		options = options + fmt.Sprintf("[%s] %s   ", style.Colour(style.LightBlue, i+1), v.FullName)
+		options = options + fmt.Sprintf("[%s] %s   ", style.Fmt(style.Cyan, i+1), v.FullName)
 	}
 	return options
 }
@@ -136,7 +136,7 @@ func multiChoice(list []models.Snippet) string {
 func listRoot(r *models.Root) string {
 	var buff bytes.Buffer
 	buff.WriteString("\n")
-	buff.WriteString(style.Colour(style.LightBlue, "   kwk.co/") + r.Username + "/\n")
+	buff.WriteString(style.Fmt(style.Cyan, "   kwk.co/") + r.Username + "/\n")
 	buff.WriteString("\n")
 
 	var all []interface{}
@@ -149,40 +149,43 @@ func listRoot(r *models.Root) string {
 		}
 	}
 
-	w := tabwriter.NewWriter(&buff, 50, 3, 1, ' ', tabwriter.DiscardEmptyColumns)
-	//var item bytes.Buffer
+	w := tabwriter.NewWriter(&buff, 25, 3, 1, ' ', tabwriter.DiscardEmptyColumns)
+	var item bytes.Buffer
 	for i, v := range all {
 		if i%6 == 0 {
-			fmt.Fprint(w, "   ")
+			item.WriteString("   ")
 		}
 		if sn, ok := v.(*models.Snippet); ok {
-			fmt.Fprint(w, "🔸")
-			fmt.Fprint(w, "  ")
-			fmt.Fprint(w, style.Colour(style.LightBlue, sn.SnipName.String()))
+			item.WriteString("🔸")
+			item.WriteString("  ")
+			item.WriteString(style.Fmt(style.Cyan, sn.SnipName.String()))
 		}
 		if pch, ok := v.(*models.Pouch); ok {
 			if pch.MakePrivate {
-				fmt.Fprint(w, "🔒")
+				item.WriteString("🔒")
 			} else {
-				fmt.Fprint(w, "👝")
+				item.WriteString("👝")
 			}
-			fmt.Fprint(w, "  ")
-			fmt.Fprint(w, pch.Name)
-			fmt.Fprint(w, style.Colour(style.Subdued, fmt.Sprintf(" %d", pch.SnipCount)))
+			item.WriteString("  ")
+			item.WriteString(pch.Name)
+			item.WriteString(" ")
+			item.WriteString(style.Fmt(style.DarkGrey, fmt.Sprintf("%d", pch.SnipCount)))
 		}
 
-		fmt.Fprint(w, " \t")
+		item.WriteString(" \t")
 		x := i + 1
 		if x%6 == 0 {
-			fmt.Fprint(w, "\n")
+			item.WriteString("\n")
 		}
 		if x%24 == 0 {
-			fmt.Fprint(w, "\n")
+			item.WriteString("\n")
 		}
+		fmt.Fprint(w, fmt.Sprintf("%s", item.String()))
+		item.Reset()
 	}
 	w.Flush()
 
-	buff.WriteString(style.Colour(style.Subdued, fmt.Sprintf("\n\n   %d/50 Pouches\n", len(r.Pouches)-1)))
+	buff.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("\n\n   %d/50 Pouches\n", len(r.Pouches)-1)))
 	buff.WriteString("\n\n")
 	for _, v := range r.Personal {
 		if v.Name == "inbox" {
@@ -205,7 +208,7 @@ func listSnippets(list *models.SnippetList) string {
 	buf := new(bytes.Buffer)
 	buf.WriteString("\n")
 
-	fmt.Fprint(buf, style.Colour(style.LightBlue, "kwk.co/"+list.Username+"/")+list.Pouch+"/\n\n")
+	fmt.Fprint(buf, style.Fmt(style.Cyan, "kwk.co/"+list.Username+"/")+list.Pouch+"/\n\n")
 
 	tbl := tablewriter.NewWriter(buf)
 	tbl.SetHeader([]string{"Name", "Version", "Preview", "Tags", "Runs", ""})
@@ -222,7 +225,7 @@ func listSnippets(list *models.SnippetList) string {
 		var tags = []string{}
 		for _, v := range v.Tags {
 			if v == "error" {
-				tags = append(tags, style.Colour(style.Pink, v))
+				tags = append(tags, style.Fmt(style.Magenta, v))
 			} else {
 				tags = append(tags, v)
 			}
@@ -231,14 +234,14 @@ func listSnippets(list *models.SnippetList) string {
 		var snip string
 		var name string
 
-		name = style.Colour(style.LightBlue, v.Name) + style.Colour(style.Subdued, "."+v.Ext)
+		name = style.Fmt(style.Cyan, v.Name) + style.Fmt(style.Subdued, "."+v.Ext)
 		if v.Private {
 			if v.Role == models.RolePreferences {
-				snip = style.Colour(style.Yellow, `(Local prefs) 'kwk edit prefs'`)
+				snip = style.Fmt(style.Yellow, `(Global prefs) 'kwk edit prefs'`)
 			} else if v.Role == models.RoleEnvironment {
-				snip = style.Colour(style.Yellow, `(Runtime environment) 'kwk edit env'`)
+				snip = style.Fmt(style.Yellow, `(Local environment) 'kwk edit env'`)
 			} else {
-				snip = style.Colour(style.Subdued, `(Private)`)
+				snip = style.Fmt(style.Subdued, `(Private)`)
 			}
 		} else {
 			snip = fmt.Sprintf("%s", uri(v.Snip))
@@ -257,7 +260,7 @@ func listSnippets(list *models.SnippetList) string {
 	tbl.Render()
 
 	if len(list.Items) == 0 {
-		fmt.Println(style.Colour(style.Yellow, "Create some snippets to fill this view!\n"))
+		fmt.Println(style.Fmt(style.Yellow, "Create some snippets to fill this view!\n"))
 	}
 	fmt.Fprintf(buf, "\n%d of %d records\n\n", len(list.Items), list.Total)
 	fmt.Fprint(buf, "\n\n")
@@ -281,8 +284,8 @@ func alphaSearchResult(result models.SearchResult) string {
 	for _, line := range lines {
 		f = f + line.Key[:4] + "\u2847  " + line.Line + "\n"
 	}
-	f = style.Colour(style.Subdued, f)
-	f = style.ColourSpan(40, f, "<em>", "</em>", style.Subdued)
+	f = style.Fmt(style.Subdued, f)
+	f = style.ColourSpan(style.Black, f, "<em>", "</em>", style.Subdued)
 	return f
 }
 
@@ -305,19 +308,19 @@ type SearchResultLine struct {
 type ColorFunc func(text string) string
 
 func blue(text string) string {
-	return style.Colour(style.LightBlue, text)
+	return style.Fmt(style.Cyan, text)
 }
 
 func yellow(text string) string {
-	return style.Colour(style.Yellow, text)
+	return style.Fmt(style.Yellow, text)
 }
 
 func red(text string) string {
-	return style.Colour(style.Red, text)
+	return style.Fmt(style.Red, text)
 }
 
 func subdued(text string) string {
-	return style.Colour(style.Subdued, text)
+	return style.Fmt(style.Subdued, text)
 }
 
 func uri(text string) string {
@@ -326,7 +329,7 @@ func uri(text string) string {
 	text = strings.Replace(text, "www.", "", 1)
 	text = strings.Replace(text, "\n", " ", -1)
 	if len(text) >= 40 {
-		text = text[0:10] + style.Colour(style.Subdued, "...") + text[len(text)-30:]
+		text = text[0:10] + style.Fmt(style.Subdued, "...") + text[len(text)-30:]
 	}
 	if text == "" {
 		text = "<empty>"

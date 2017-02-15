@@ -10,7 +10,7 @@ func Snippets(s *SnippetCli) []cli.Command {
 			Name:    "new",
 			Aliases: []string{"create", "save"},
 			Action: func(c *cli.Context) error {
-				s.Create(c.Args().Get(0), c.Args().Get(1))
+				s.Create(c.Args())
 				return nil
 			},
 		},
