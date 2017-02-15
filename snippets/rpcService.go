@@ -260,6 +260,7 @@ const LATEST_SNIPPET = "latest-snippet.json"
 const DELETED_SNIPPET = "deleted-snippet.json"
 
 func (rs *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.SnippetList, isList bool) {
+	model.Username = rpc.Username
 	model.Pouch = rpc.Pouch
 	model.Total = rpc.Total
 	model.Since = time.Unix(rpc.Since/1000, 0)

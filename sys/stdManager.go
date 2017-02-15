@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/user"
 	"bitbucket.com/sharingmachine/kwkcli/models"
+	lg "bitbucket.com/sharingmachine/kwkcli/log"
 	"google.golang.org/grpc/codes"
 )
 
@@ -39,12 +40,14 @@ func NewLogger() (*os.File, *log.Logger) {
 
 func (s *StdManager) WriteToFile(subDirName string, suffixPath string, snippet string, incHoldingDir bool) (filePath string, err error) {
 	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
+	lg.Debug("WRITING FILE:", fp)
 	err = ioutil.WriteFile(fp, []byte(snippet), FILE_PERMISSION)
 	return fp, err
 }
 
 func (s *StdManager) ReadFromFile(subDirName string, suffixPath string, incHoldingDir bool, after int64) (string, error) {
 	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
+	lg.Debug("READING FILE:", fp)
 	if fi, err := os.Stat(fp); err != nil {
 		if os.IsNotExist(err) {
 			// TODO: PUT IN STANDARD ERROR

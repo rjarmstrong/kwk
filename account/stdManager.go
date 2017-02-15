@@ -39,8 +39,13 @@ func (u *StdManager) SignUp(email string, username string, password string) (*mo
 	}
 }
 
+var user *models.User
+
 func (u *StdManager) Get() (*models.User, error) {
-	user := &models.User{}
+	if user != nil && user.Id != "" {
+		return user, nil
+	}
+	user = &models.User{}
 	if err := u.settings.Get(models.ProfileFullKey, user, 0); err != nil {
 		return nil, err
 	} else {

@@ -5,10 +5,11 @@ import (
 	"io"
 	"log"
 	"fmt"
+	"io/ioutil"
 )
 
 var Error = log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
-var dbg = log.New(os.Stdout, "DEBUG: ", log.LUTC|log.Lshortfile)
+var dbg = log.New(ioutil.Discard, "DEBUG: ", log.LUTC|log.Lshortfile)
 
 func SetOutput(out io.Writer) {
 	dbg.SetOutput(out)

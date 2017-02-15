@@ -91,12 +91,9 @@ func (sc *SnippetCli) Create(snippet string, distinctName string) {
 	if createAlias, err := sc.s.Create(snippet, *a, models.RoleStandard); err != nil {
 		sc.HandleErr(err)
 	} else {
-		///if createAlias.Snippet != nil {
-		if createAlias.Snippet.Private {
-			sc.Render("snippet:newprivate", createAlias.Snippet.String())
-		} else {
-			sc.Render("snippet:new", createAlias.Snippet.String())
-		}
+
+		sc.List()
+		sc.Render("snippet:new", createAlias.Snippet.String())
 		// TODO: Add similarity prompt here
 		//} else {
 		//	matches := createAlias.TypeMatch.Matches
@@ -181,6 +178,7 @@ func (sc *SnippetCli) deleteSnippet(args []string) {
 			sc.HandleErr(err)
 			return
 		}
+		sc.List()
 		sc.Render("snippet:deleted", pouch)
 	} else {
 		sc.Render("snippet:not-deleted", pouch)
@@ -195,6 +193,7 @@ func (sc *SnippetCli) deletePouch(pouch string) {
 			sc.HandleErr(err)
 			return
 		}
+		sc.List()
 		sc.Render("pouch:deleted", pouch)
 	} else {
 		sc.Render("pouch:not-deleted", pouch)
@@ -247,9 +246,11 @@ func (sc *SnippetCli) Move(args []string) {
 			sc.HandleErr(err)
 			return
 		}
+		sc.List()
 		sc.Render("pouch:renamed", p)
 		return
-	} else if !root.IsPouch(last) && len(args) ==2 {
+	} else if !root.IsPouch(last) && len(args) == 2 {
+		sc.List()
 		sc.rename(args[0], args[1])
 		return
 	}
@@ -264,8 +265,10 @@ func (sc *SnippetCli) Move(args []string) {
 		return
 	}
 	if last == "" {
+		sc.List()
 		sc.Render("snippet:moved", "root")
 	} else {
+		sc.List()
 		sc.Render("snippet:moved", p)
 	}
 
@@ -313,6 +316,7 @@ func (sc *SnippetCli) Clone(distinctName string, newFullName string) {
 	if alias, err := sc.s.Clone(*a, *newA); err != nil {
 		sc.HandleErr(err)
 	} else {
+		sc.List()
 		sc.Render("snippet:cloned", alias)
 	}
 }
@@ -385,7 +389,6 @@ func (sc *SnippetCli) List(args ...string) {
 
 	var size int64
 	//var tags = []string{}
-	u := &models.User{}
 	//for i, v := range args {
 	//	if num, err := strconv.Atoi(v); err == nil {
 	//		size = int64(num)
@@ -397,19 +400,10 @@ func (sc *SnippetCli) List(args ...string) {
 	//		}
 	//	}
 	//}
-	if username == "" {
-		if err := sc.settings.Get(models.ProfileFullKey, u, 0); err != nil {
-			sc.Render("api:not-authenticated", nil)
-			return
-		} else {
-			username = u.Username
-		}
-	}
 	p := &models.ListParams{Username: username, Pouch: pouch, Size: size, All: sc.su.Prefs().ListAll}
 	if list, err := sc.s.List(p); err != nil {
 		sc.HandleErr(err)
 	} else {
-		list.Username = username
 		sc.Render("snippet:list", list)
 	}
 }
@@ -453,8 +447,8 @@ func (sc *SnippetCli) rename(distinctName string, newSnipName string) {
 		sc.HandleErr(err)
 	} else {
 		sc.Render("snippet:renamed", &map[string]string{
-			"originalName":    original.String(),
-			"newName": snip.SnipName.String(),
+			"originalName": original.String(),
+			"newName":      snip.SnipName.String(),
 		})
 	}
 }

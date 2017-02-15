@@ -5,8 +5,8 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
-	"bitbucket.com/sharingmachine/kwkcli/log"
+	_ "io/ioutil"
+	_ "bitbucket.com/sharingmachine/kwkcli/log"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 )
@@ -81,16 +81,6 @@ func (cs *ConfigProvider) Prefs() *Preferences {
 }
 
 func (cs *ConfigProvider) GetConfig(r Resolvers) (string, error) {
-	_, ok := r.(*EnvResolvers)
-	if ok && sys.KWK_TEST_MODE {
-		testEnv := "./cmd/testEnv.yml"
-		log.Debug("Running with:", testEnv)
-		b, err := ioutil.ReadFile(testEnv)
-		return string(b), nil
-		if err != nil {
-			return "", err
-		}
-	}
 	if !cs.u.HasValidCredentials() {
 		return r.Anon()
 	}

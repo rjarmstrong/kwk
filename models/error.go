@@ -37,6 +37,7 @@ const (
 	Code_ApiDown Code = 5010
 
 	Code_InvalidConfigSection Code = 6010
+	Code_EnvironmentNotSupported Code = 6020
 )
 
 // ParseGrpcErr should be used at RPC service call level. i.e. the errors

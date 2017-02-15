@@ -203,7 +203,7 @@ func listSnippets(list *models.SnippetList) string {
 	buf := new(bytes.Buffer)
 	buf.WriteString("\n")
 
-	fmt.Fprint(buf, style.Colour(style.LightBlue, "kwk.co/"+list.Username+"/") + list.Pouch + "/\n\n")
+	fmt.Fprint(buf, style.Colour(style.LightBlue, "kwk.co/"+ list.Username+"/") + list.Pouch + "/\n\n")
 
 	tbl := tablewriter.NewWriter(buf)
 	tbl.SetHeader([]string{"Name", "Version", "Preview", "Tags", "Runs", ""})
