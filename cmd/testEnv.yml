@@ -3,8 +3,8 @@ runners:
   sh: ["/bin/bash", "-c", "$SNIP"]
   url: ["open", "$SNIP"]
   url-covert:
-      - ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--incognito", "$SNIP"]
-      - ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--incognito", "$SNIP"]
+    - ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--incognito", "$SNIP"]
+    - ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--incognito", "$SNIP"]
   js: ["node", "-e", "$SNIP"] #nodejs
   py: ["python", "-c", "$SNIP"] #python
   php: ["php", "-r", "$SNIP"] #php

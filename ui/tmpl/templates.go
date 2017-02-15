@@ -17,22 +17,26 @@ import (
 
 var Templates = map[string]*template.Template{}
 
-const logo  = `
-      _              _
-     | |            | |
-     | | ____      _| | __
- \\  | |/ /\ \ /\ / / |/ /
- //  |   <  \ V  V /|   <
-     |_|\_\  \_/\_/ |_|\_\
+
+//const logo = `
+//  ▋                         ▋
+//  ▋                         ▋
+//  ▋   ◢  ◥◣           ◢◤   ▋   ◢◤
+//  ▋ ◤      ◥◣    ◢◤   ◢◤    ▋ ◤
+//  ▋ ◣       ◥◣ ◢◤ ◥◣ ◢◤     ▋ ◣
+//  ▋   ◥     ◢◤     ◢◤      ▋   ◥◣
+//`
+
+const logo = `
 
 `
 
 func init() {
 	// Aliases
-	add("dashboard", logo + "{{. | listRoot }}", template.FuncMap{"listRoot": listRoot })
+	add("dashboard", style.Colour(style.LightBlue,logo) + "{{. | listRoot }}", template.FuncMap{"listRoot": listRoot })
 
 	add("snippet:updated", "Description updated:\n{{ .Description | blue }}", template.FuncMap{"blue": blue})
-	addColor("api:not-found", "Not found\n", blue)
+	add("api:not-found", "{{. | yellow }} Not found\n", template.FuncMap{"yellow": yellow})
 	add("snippet:cloned", "Cloned as {{.Username}}/{{.FullName | blue}}\n", template.FuncMap{"blue": blue})
 	add("snippet:new", "{{. | blue }} created "+style.OpenLock+"\n", template.FuncMap{"blue": blue})
 	add("snippet:newprivate", "{{.FullName | blue }} created "+style.Lock+"\n", template.FuncMap{"blue": blue})
@@ -51,7 +55,7 @@ func init() {
 	add("snippet:madeprivate", "{{.fullName | blue }} made private "+style.Lock, template.FuncMap{"blue": blue})
 	add("snippet:patched", "{{.FullName | blue }} patched.", template.FuncMap{"blue": blue})
 
-	add("snippet:check-delete", "Are you sure you want to delete {{. | yellow }}? [y/n] ", template.FuncMap{"yellow": yellow})
+	add("snippet:check-delete", "Are you sure you want to delete snippet {{. | yellow }}? [y/n] ", template.FuncMap{"yellow": yellow})
 	add("snippet:deleted", "Snippets {{. | blue }} deleted.", template.FuncMap{"blue": blue})
 	add("snippet:not-deleted", "Snippets {{. | blue }} NOT deleted.", template.FuncMap{"blue": blue})
 
@@ -71,7 +75,7 @@ func init() {
 	add("pouch:not-deleted", "{{. | blue }} was NOT deleted.", template.FuncMap{"blue": blue})
 	add("pouch:deleted", "{{. | blue }} was deleted.", template.FuncMap{"blue": blue})
 
-	add("pouch:check-delete", "Are you sure you want to delete {{. | yellow }}? [y/n] ", template.FuncMap{"yellow": yellow})
+	add("pouch:check-delete", "Are you sure you want to delete pouch {{. | yellow }}? [y/n] ", template.FuncMap{"yellow": yellow})
 	add("pouch:created", "Pouch: {{. | blue }} created.", template.FuncMap{"blue": blue})
 	add("pouch:renamed", "Pouch: {{. | blue }} renamed.", template.FuncMap{"blue": blue})
 	add("pouch:locked", "Pouch: {{. | blue }} locked.", template.FuncMap{"blue": blue})
@@ -108,6 +112,7 @@ func init() {
 	add("validation:one-line", style.Warning+"  {{ .Desc | yellow }} {{ .Code | yellow }}\n", template.FuncMap{"yellow": yellow})
 
 	add("api:not-authenticated", "{{ \"Please login to continue: kwk login\" | yellow }}\n", template.FuncMap{"yellow": yellow})
+	add("api:not-implemented", "{{ \"The kwk cli is a greater version than supported by kwk API.\" | yellow }}\n", template.FuncMap{"yellow": yellow})
 	add("api:denied", "{{ \"Permission denied\" | yellow }}\n", template.FuncMap{"yellow": yellow})
 	addColor("api:error", "\n" + style.Fire+"  We have a code RED error. \n- To report type: kwk upload-errors \n- You can also try to upgrade: npm update kwkcli -g\n", red)
 	addColor("api:not-available", style.Ambulance+"  Kwk is DOWN! Please try again in a bit.\n", yellow)
@@ -139,26 +144,24 @@ func multiChoice(list []models.Snippet) string {
 func listRoot(r *models.Root) string {
 	var buff bytes.Buffer
 	buff.WriteString("\n")
-	buff.WriteString(style.Colour(style.LightBlue,"kwk.co/") + r.Username + "/\n")
+	buff.WriteString(style.Colour(style.LightBlue,"   kwk.co/") + r.Username + "/\n")
 	buff.WriteString("\n")
 
-
-	buff.WriteString(style.Colour(style.LightBlue,"Unsorted:\n\n"))
+	//buff.WriteString(style.Colour(style.LightBlue,"Loose Snippets:\n\n"))
 	w := tabwriter.NewWriter(&buff, 30, 3, 1, ' ', tabwriter.DiscardEmptyColumns)
-	for i, v := range r.Snippets {
+	for _, v := range r.Snippets {
+		fmt.Fprint(w, "    ")
 		fmt.Fprint(w,"🔸  ")
 		fmt.Fprint(w, fmt.Sprintf("%s \t%s\n", v.SnipName.String(), v.Snip))
-		x := i+1
-		if x % 5 == 0 {
-			fmt.Fprint(w, " \n")
-		}
 	}
 	w.Flush()
 
-	buff.WriteString(style.Colour(style.LightBlue,"\n\nPouches:\n\n"))
-	w = tabwriter.NewWriter(&buff, 30, 3, 1, ' ', tabwriter.DiscardEmptyColumns)
+	w = tabwriter.NewWriter(&buff, 30, 3, 0, ' ', tabwriter.DiscardEmptyColumns)
 	for i, v := range r.Pouches {
 		if v.Name != "" {
+			if i == 1 || i % 6 == 0 {
+				fmt.Fprint(w, "    ")
+			}
 			if v.MakePrivate {
 				fmt.Fprint(w,"🔒   ")
 			} else {
@@ -168,12 +171,16 @@ func listRoot(r *models.Root) string {
 			fmt.Fprint(w, style.Colour(style.Subdued, fmt.Sprintf(" %d \t", v.SnipCount)))
 			x := i+1
 			if x % 6 == 0 {
-				fmt.Fprint(w, " \n")
+				fmt.Fprint(w, "\n")
+			}
+			if x % 24 == 0 {
+				fmt.Fprint(w, "\n")
 			}
 		}
 	}
 	w.Flush()
 
+	buff.WriteString(style.Colour(style.Subdued,fmt.Sprintf("\n\n   %d/50 Pouches\n", len(r.Pouches)-1)))
 	buff.WriteString("\n\n")
 	for _, v := range r.Personal {
 		if v.Name == "inbox" {
@@ -190,10 +197,6 @@ func listRoot(r *models.Root) string {
 	buff.WriteString("\n\n")
 
 	return buff.String()
-
-	//return r.Snippets[0].String()
-	// list snippets
-	// list pouches
 }
 
 func listSnippets(list *models.SnippetList) string {

@@ -11,8 +11,7 @@ import (
 	"crypto/x509"
 	"google.golang.org/grpc/grpclog"
 	"os"
-	"fmt"
-	"log"
+	lg "log"
 	"time"
 	"runtime"
 )
@@ -53,7 +52,7 @@ QOhTsiedSrnAdyGN/4fy3ryM7xfft0kL0fJuMAsaDk527RH89elWsn2/x20Kk4yl
 NVOFBkpdn627G190
 -----END CERTIFICATE-----`
 
-func GetConn(serverAddress string, logger *log.Logger, trustAllCerts bool) *grpc.ClientConn {
+func GetConn(serverAddress string, logger *lg.Logger, trustAllCerts bool) (*grpc.ClientConn, error) {
 	var opts []grpc.DialOption
 
 	pool := x509.NewCertPool()
@@ -68,15 +67,12 @@ func GetConn(serverAddress string, logger *log.Logger, trustAllCerts bool) *grpc
 	})
 	opts = append(opts, grpc.WithTransportCredentials(creds))
 	opts = append(opts, grpc.WithUnaryInterceptor(errorInterceptor))
-	opts = append(opts, grpc.WithTimeout(time.Second*10))
+	opts = append(opts, grpc.WithTimeout(time.Second*3))
 	opts = append(opts, grpc.WithBlock())
 	grpclog.SetLogger(logger)
 
 	conn, err := grpc.Dial(serverAddress, opts...)
-	if err != nil {
-		panic(fmt.Sprintf("Failure: %v", err))
-	}
-	return conn
+	return conn, err
 }
 
 //

@@ -94,6 +94,9 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 		return err
 	}
 	yamlKey := s.Ext
+	if err != nil {
+		return err
+	}
 	if r.setup.Prefs().Covert {
 		yamlKey += "-covert"
 	}
@@ -148,7 +151,11 @@ func execSafe(name string, arg ...string) io.ReadCloser {
 }
 
 func (r *StdRunner) getEnvSection(name string) (*yaml.MapSlice, error) {
-	rs, _ := getSubSection(r.setup.Env(), name)
+	env, err := r.setup.Env()
+	if err != nil {
+		return nil, err
+	}
+	rs, _ := getSubSection(env, name)
 	if rs == nil {
 		return nil, errors.New(fmt.Sprintf("No %s section in env.yml", name))
 	}
@@ -170,6 +177,11 @@ func replaceVariables(cliArgs *[]string, filePath string, s *models.Snippet) {
 }
 
 func getSubSection(yml *yaml.MapSlice, name string) (yaml.MapSlice, []string) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Printf("The yml config section '%s' is not valid please check it.", name)
+		}
+	}()
 	f := func(yml *yaml.MapSlice, name string) (yaml.MapSlice, []string) {
 		for _, v := range *yml {
 			if v.Key == name {

@@ -5,9 +5,10 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"gopkg.in/yaml.v2"
-	"fmt"
 	"io/ioutil"
 	"bitbucket.com/sharingmachine/kwkcli/log"
+	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
+	"bitbucket.com/sharingmachine/kwkcli/models"
 )
 
 type ConfigProvider struct {
@@ -16,33 +17,36 @@ type ConfigProvider struct {
 	prefsResolvers Resolvers
 	prefs          *Preferences
 	env            *yaml.MapSlice
-
+	w tmpl.Writer
 }
 
-func NewConfigProvider(ss snippets.Service, s sys.Manager, u account.Manager) Provider {
+func NewConfigProvider(ss snippets.Service, s sys.Manager, u account.Manager, w tmpl.Writer) Provider {
 	env := NewEnvResolvers(ss, s, u)
 	prefs := NewPrefsResolvers(ss, s, u)
-	return &ConfigProvider{envResolvers:env, prefsResolvers:prefs, u:u}
+	return &ConfigProvider{envResolvers:env, prefsResolvers:prefs, u:u, w:w}
 }
 
 func (cs *ConfigProvider) Preload(){
-	cs.Env()
+	_, err := cs.Env()
+	if err != nil {
+		cs.w.HandleErr(err)
+	}
 	cs.Prefs()
 }
 
-func (cs *ConfigProvider) Env() *yaml.MapSlice {
+func (cs *ConfigProvider) Env() (*yaml.MapSlice, error) {
 	if cs.env != nil {
-		return cs.env
+		return cs.env, nil
 	}
 	env, err := cs.GetConfig(cs.envResolvers)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	cs.env = &yaml.MapSlice{}
 	if err := yaml.Unmarshal([]byte(env), cs.env); err != nil {
-		panic(err)
+		return nil, err
 	}
-	return cs.env
+	return cs.env, nil
 }
 
 func (cs *ConfigProvider) Prefs() *Preferences {
@@ -50,8 +54,8 @@ func (cs *ConfigProvider) Prefs() *Preferences {
 		return cs.prefs
 	}
 	if c, err := cs.GetConfig(cs.prefsResolvers); err != nil {
-		panic(err)
-
+		cs.w.HandleErr(err)
+		return nil
 	} else {
 		cs.prefs = &Preferences{PersistedPrefs:PersistedPrefs{}}
 		parse := func(p string) (*Preferences, error) {
@@ -65,7 +69,7 @@ func (cs *ConfigProvider) Prefs() *Preferences {
 		}
 		if res, err := parse(c); err != nil {
 			// TODO: USE TEMPLATE WRITER
-			fmt.Println("Invalid kwk *prefs.yml detected. `kwk edit prefs` to fix.")
+			cs.w.HandleErr(models.ErrOneLine(models.Code_InvalidConfigSection, "Invalid kwk *prefs.yml detected. `kwk edit prefs` to fix."))
 			// The fallback is expected not to fail parsing
 			fb, _ := cs.prefsResolvers.Fallback()
 			res, _ = parse(fb)

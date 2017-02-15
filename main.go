@@ -11,6 +11,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/app"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
+	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"runtime/pprof"
 	"bufio"
@@ -36,7 +37,13 @@ func main() {
 			host = "api.kwk.co:443"
 		}
 	}
-	conn := rpc.GetConn(host, l, sys.KWK_TEST_MODE)
+	w := tmpl.NewWriter(os.Stdout)
+	conn, err := rpc.GetConn(host, l, sys.KWK_TEST_MODE)
+	if err != nil {
+		l.Println(err)
+		w.HandleErr(models.ErrOneLine(models.Code_ApiDown,  " The kwk api is down, please try again."))
+		return
+	}
 	defer conn.Close()
 
 	s := sys.New()
@@ -45,9 +52,9 @@ func main() {
 	h := rpc.NewHeaders(t, v)
 	u := account.NewStdManager(conn, t, h)
 	ss := snippets.New(conn, t, h)
-	w := tmpl.NewWriter(os.Stdout)
 
-	su := setup.NewConfigProvider(ss, s, u)
+
+	su := setup.NewConfigProvider(ss, s, u, w)
 	o := cmd.NewStdRunner(s, ss, su)
 	r := bufio.NewReader(os.Stdin)
 	d := dlg.New(w, r)

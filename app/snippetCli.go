@@ -73,9 +73,20 @@ func (sc *SnippetCli) Run(distinctName string, args []string) {
 }
 
 func (sc *SnippetCli) Create(snippet string, distinctName string) {
+	// TODO: If one arg supplied and can be parsed as an alias with extension then create empty and invoke edit
+	// else create without name as per existing behaviour
+	//var distinctName, snippet string
+	//if len(args) == 1 {
+	//	distinctName = args[0]
+	//if len(args) == 2 {
+	//	distinctName = args[args[1]
+	//} else {
+	//	panic("Ony 1 or 2 args required.")
+	//}
+
 	a, err := models.ParseAlias(distinctName)
 	if err != nil {
-		sc.Render("validation:one-line", err)
+		sc.HandleErr(err)
 	}
 	if createAlias, err := sc.s.Create(snippet, *a, models.RoleStandard); err != nil {
 		sc.HandleErr(err)
@@ -238,7 +249,7 @@ func (sc *SnippetCli) Move(args []string) {
 		}
 		sc.Render("pouch:renamed", p)
 		return
-	} else if !root.IsPouch(last) {
+	} else if !root.IsPouch(last) && len(args) ==2 {
 		sc.rename(args[0], args[1])
 		return
 	}

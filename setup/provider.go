@@ -9,7 +9,7 @@ const (
 )
 
 type Provider interface {
-	Env() *yaml.MapSlice
+	Env() (*yaml.MapSlice, error)
 	Prefs() *Preferences
 	Preload()
 }
@@ -27,8 +27,8 @@ type ProviderMock struct {
 
 }
 
-func (ProviderMock) Env() *yaml.MapSlice {
-	return &yaml.MapSlice{}
+func (ProviderMock) Env() (*yaml.MapSlice, error) {
+	return &yaml.MapSlice{}, nil
 }
 
 func (ProviderMock) Prefs() *Preferences {
