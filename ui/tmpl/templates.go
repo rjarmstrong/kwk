@@ -17,7 +17,6 @@ import (
 
 var Templates = map[string]*template.Template{}
 
-
 //const logo = `
 //  ▋                         ▋
 //  ▋                         ▋
@@ -33,7 +32,7 @@ const logo = `
 
 func init() {
 	// Aliases
-	add("dashboard", style.Colour(style.LightBlue,logo) + "{{. | listRoot }}", template.FuncMap{"listRoot": listRoot })
+	add("dashboard", style.Colour(style.LightBlue, logo)+"{{. | listRoot }}", template.FuncMap{"listRoot": listRoot })
 
 	add("snippet:updated", "Description updated:\n{{ .Description | blue }}", template.FuncMap{"blue": blue})
 	add("api:not-found", "{{. | yellow }} Not found\n", template.FuncMap{"yellow": yellow})
@@ -48,7 +47,6 @@ func init() {
 	add("snippet:list", "{{. | listSnippets }}", template.FuncMap{"listSnippets": listSnippets })
 	add("pouch:list-root", "{{. | listRoot }}", template.FuncMap{"listRoot": listRoot })
 
-
 	add("snippet:tag", "{{.FullName | blue }} tagged.", template.FuncMap{"blue": blue})
 	add("snippet:untag", "{{.FullName | blue }} untagged.", template.FuncMap{"blue": blue})
 	add("snippet:renamed", "{{.originalName | blue }} renamed to {{.newName | blue }}", template.FuncMap{"blue": blue})
@@ -62,15 +60,11 @@ func init() {
 	add("snippet:moved", "Snippets moved to: {{. | blue }}", template.FuncMap{"blue": blue})
 
 	add("snippet:inspect",
-		"\n{{range .Items}}"+
-			"Name: {{.Username}}/{{.Pouch}}/{{.Name}}{{.Ext}}"+
-			"\nCreated: {{.Created}}"+
-			"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+
-			//"\nWeb: \033[4mhttp://www.kwk.co/{{.Username}}/{{.FullName}}\033[0m"+
-			"\nDescription: {{.Description}}"+
+		"\n{{range .Items}}"+"Name: {{.Username}}/{{.Pouch}}/{{.Name}}{{.Ext}}"+"\nCreated: {{.Created}}"+"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+
+		//"\nWeb: \033[4mhttp://www.kwk.co/{{.Username}}/{{.FullName}}\033[0m"+
+		"\nDescription: {{.Description}}"+
 			"\nRun count: {{.RunCount}}"+
-			"\nClone count: {{.CloneCount}}"+
-			"\n{{ end }}\n\n", nil)
+			"\nClone count: {{.CloneCount}}"+"\n{{ end }}\n\n", nil)
 
 	add("pouch:not-deleted", "{{. | blue }} was NOT deleted.", template.FuncMap{"blue": blue})
 	add("pouch:deleted", "{{. | blue }} was deleted.", template.FuncMap{"blue": blue})
@@ -114,7 +108,7 @@ func init() {
 	add("api:not-authenticated", "{{ \"Please login to continue: kwk login\" | yellow }}\n", template.FuncMap{"yellow": yellow})
 	add("api:not-implemented", "{{ \"The kwk cli is a greater version than supported by kwk API.\" | yellow }}\n", template.FuncMap{"yellow": yellow})
 	add("api:denied", "{{ \"Permission denied\" | yellow }}\n", template.FuncMap{"yellow": yellow})
-	addColor("api:error", "\n" + style.Fire+"  We have a code RED error. \n- To report type: kwk upload-errors \n- You can also try to upgrade: npm update kwkcli -g\n", red)
+	addColor("api:error", "\n"+style.Fire+"  We have a code RED error. \n- To report type: kwk upload-errors \n- You can also try to upgrade: npm update kwkcli -g\n", red)
 	addColor("api:not-available", style.Ambulance+"  Kwk is DOWN! Please try again in a bit.\n", yellow)
 	add("api:exists", "{{ \"That item already exists.\" | yellow }}\n", template.FuncMap{"yellow": yellow})
 }
@@ -139,48 +133,56 @@ func multiChoice(list []models.Snippet) string {
 	return options
 }
 
-
-
 func listRoot(r *models.Root) string {
 	var buff bytes.Buffer
 	buff.WriteString("\n")
-	buff.WriteString(style.Colour(style.LightBlue,"   kwk.co/") + r.Username + "/\n")
+	buff.WriteString(style.Colour(style.LightBlue, "   kwk.co/") + r.Username + "/\n")
 	buff.WriteString("\n")
 
-	//buff.WriteString(style.Colour(style.LightBlue,"Loose Snippets:\n\n"))
-	w := tabwriter.NewWriter(&buff, 30, 3, 1, ' ', tabwriter.DiscardEmptyColumns)
+	var all []interface{}
 	for _, v := range r.Snippets {
-		fmt.Fprint(w, "    ")
-		fmt.Fprint(w,"🔸  ")
-		fmt.Fprint(w, fmt.Sprintf("%s \t%s\n", v.SnipName.String(), v.Snip))
+		all = append(all, v)
 	}
-	w.Flush()
-
-	w = tabwriter.NewWriter(&buff, 30, 3, 0, ' ', tabwriter.DiscardEmptyColumns)
-	for i, v := range r.Pouches {
+	for _, v := range r.Pouches {
 		if v.Name != "" {
-			if i == 1 || i % 6 == 0 {
-				fmt.Fprint(w, "    ")
-			}
-			if v.MakePrivate {
-				fmt.Fprint(w,"🔒   ")
+			all = append(all, v)
+		}
+	}
+
+	w := tabwriter.NewWriter(&buff, 50, 3, 1, ' ', tabwriter.DiscardEmptyColumns)
+	//var item bytes.Buffer
+	for i, v := range all {
+		if i%6 == 0 {
+			fmt.Fprint(w, "   ")
+		}
+		if sn, ok := v.(*models.Snippet); ok {
+			fmt.Fprint(w, "🔸")
+			fmt.Fprint(w, "  ")
+			fmt.Fprint(w, style.Colour(style.LightBlue, sn.SnipName.String()))
+		}
+		if pch, ok := v.(*models.Pouch); ok {
+			if pch.MakePrivate {
+				fmt.Fprint(w, "🔒")
 			} else {
-				fmt.Fprint(w,"👝   ")
+				fmt.Fprint(w, "👝")
 			}
-			fmt.Fprint(w, v.Name)
-			fmt.Fprint(w, style.Colour(style.Subdued, fmt.Sprintf(" %d \t", v.SnipCount)))
-			x := i+1
-			if x % 6 == 0 {
-				fmt.Fprint(w, "\n")
-			}
-			if x % 24 == 0 {
-				fmt.Fprint(w, "\n")
-			}
+			fmt.Fprint(w, "  ")
+			fmt.Fprint(w, pch.Name)
+			fmt.Fprint(w, style.Colour(style.Subdued, fmt.Sprintf(" %d", pch.SnipCount)))
+		}
+
+		fmt.Fprint(w, " \t")
+		x := i + 1
+		if x%6 == 0 {
+			fmt.Fprint(w, "\n")
+		}
+		if x%24 == 0 {
+			fmt.Fprint(w, "\n")
 		}
 	}
 	w.Flush()
 
-	buff.WriteString(style.Colour(style.Subdued,fmt.Sprintf("\n\n   %d/50 Pouches\n", len(r.Pouches)-1)))
+	buff.WriteString(style.Colour(style.Subdued, fmt.Sprintf("\n\n   %d/50 Pouches\n", len(r.Pouches)-1)))
 	buff.WriteString("\n\n")
 	for _, v := range r.Personal {
 		if v.Name == "inbox" {
@@ -203,7 +205,7 @@ func listSnippets(list *models.SnippetList) string {
 	buf := new(bytes.Buffer)
 	buf.WriteString("\n")
 
-	fmt.Fprint(buf, style.Colour(style.LightBlue, "kwk.co/"+ list.Username+"/") + list.Pouch + "/\n\n")
+	fmt.Fprint(buf, style.Colour(style.LightBlue, "kwk.co/"+list.Username+"/")+list.Pouch+"/\n\n")
 
 	tbl := tablewriter.NewWriter(buf)
 	tbl.SetHeader([]string{"Name", "Version", "Preview", "Tags", "Runs", ""})
@@ -229,7 +231,7 @@ func listSnippets(list *models.SnippetList) string {
 		var snip string
 		var name string
 
-		name = style.Colour(style.LightBlue, v.Name) + style.Colour(style.Subdued, "." + v.Ext)
+		name = style.Colour(style.LightBlue, v.Name) + style.Colour(style.Subdued, "."+v.Ext)
 		if v.Private {
 			if v.Role == models.RolePreferences {
 				snip = style.Colour(style.Yellow, `(Local prefs) 'kwk edit prefs'`)
@@ -324,7 +326,7 @@ func uri(text string) string {
 	text = strings.Replace(text, "www.", "", 1)
 	text = strings.Replace(text, "\n", " ", -1)
 	if len(text) >= 40 {
-		text = text[0:10] + style.Colour(style.Subdued, "...") + text[len(text) - 30:]
+		text = text[0:10] + style.Colour(style.Subdued, "...") + text[len(text)-30:]
 	}
 	if text == "" {
 		text = "<empty>"
