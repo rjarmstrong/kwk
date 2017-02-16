@@ -6,7 +6,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	. "github.com/smartystreets/goconvey/convey"
-	"github.com/smartystreets/assertions/should"
 	"testing"
 )
 
@@ -20,27 +19,27 @@ func Test_App(t *testing.T) {
 		Convey(`Profile`, func() {
 			Convey(`Should run by name`, func() {
 				p := app.App.Command("profile")
-				So(p, should.NotBeNil)
+				So(p, ShouldNotBeNil)
 				p2 := app.App.Command("me")
-				So(p2.Name, should.Equal, p.Name)
+				So(p2.Name, ShouldEqual, p.Name)
 			})
 			Convey(`Should get profile and respond with template`, func() {
 				app.App.Run([]string{"[app]", "profile"})
-				So(t.GetCalledWith, should.Resemble, []interface{}{models.ProfileFullKey, &models.User{}})
+				So(t.GetCalledWith, ShouldResemble, []interface{}{models.ProfileFullKey, &models.User{}})
 			})
 		})
 
 		Convey(`Signin`, func() {
 			Convey(`Should run by name`, func() {
 				p := app.App.Command("signin")
-				So(p, should.NotBeNil)
+				So(p, ShouldNotBeNil)
 				p2 := app.App.Command("login")
-				So(p2.Name, should.Equal, p.Name)
+				So(p2.Name, ShouldEqual, p.Name)
 			})
 			Convey(`Should call api signin`, func() {
 				app.App.Run([]string{"[app]", "signin", "richard", "password"})
-				So(u.LoginCalledWith[0], should.Equal, "richard")
-				So(u.LoginCalledWith[1], should.Equal, "password")
+				So(u.LoginCalledWith[0], ShouldEqual, "richard")
+				So(u.LoginCalledWith[1], ShouldEqual, "password")
 			})
 			Convey(`Should call api signin and enter form details`, func() {
 				d.FieldResponse = &dlg.DialogResponse{Value: "richard"}
@@ -52,16 +51,16 @@ func Test_App(t *testing.T) {
 					Token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dnZWRJbkFzIjoiYWRtaW4iLCJpYXQiOjE0MjI3Nzk2Mzh9.gzSraSYS8EXBxLN_oWnFSRgCzcmJmMjLiuyu5CSpyHI",
 				}
 				app.App.Run([]string{"[app]", "signin"})
-				So(t.UpsertCalledWith, should.Resemble, []interface{}{models.ProfileFullKey, u.SignInResponse})
+				So(t.UpsertCalledWith, ShouldResemble, []interface{}{models.ProfileFullKey, u.SignInResponse})
 			})
 		})
 
 		Convey(`Signup`, func() {
 			Convey(`Should run by name`, func() {
 				p := app.App.Command("signup")
-				So(p, should.NotBeNil)
+				So(p, ShouldNotBeNil)
 				p2 := app.App.Command("register")
-				So(p2.Name, should.Equal, p.Name)
+				So(p2.Name, ShouldEqual, p.Name)
 			})
 			 Convey(`Should call api signup`, func() {
 				d.FieldResponseMap = map[string]interface{}{}
@@ -70,9 +69,9 @@ func Test_App(t *testing.T) {
 				d.FieldResponseMap["account:signup:password"] = "password"
 
 				app.App.Run([]string{"[app]", "signup"})
-				So(u.SignupCalledWith[0], should.Equal, "richard@kwk.co")
-				So(u.SignupCalledWith[1], should.Equal, "richard")
-				So(u.SignupCalledWith[2], should.Equal, "password")
+				So(u.SignupCalledWith[0], ShouldEqual, "richard@kwk.co")
+				So(u.SignupCalledWith[1], ShouldEqual, "richard")
+				So(u.SignupCalledWith[2], ShouldEqual, "password")
 				 d.FieldResponseMap = nil
 			})
 		})
@@ -80,14 +79,14 @@ func Test_App(t *testing.T) {
 		Convey(`Signout`, func() {
 			Convey(`Should run by name`, func() {
 				p := app.App.Command("signout")
-				So(p, should.NotBeNil)
+				So(p, ShouldNotBeNil)
 				p2 := app.App.Command("logout")
-				So(p2.Name, should.Equal, p.Name)
+				So(p2.Name, ShouldEqual, p.Name)
 			})
 			Convey(`Should call api signout`, func() {
 				app.App.Run([]string{"[app]", "signout"})
-				So(u.SignoutCalled, should.BeTrue)
-				So(t.DeleteCalledWith, should.Resemble, models.ProfileFullKey)
+				So(u.SignoutCalled, ShouldBeTrue)
+				So(t.DeleteCalledWith, ShouldResemble, models.ProfileFullKey)
 			})
 		})
 	})

@@ -3,7 +3,6 @@ package integration
 import (
 	. "github.com/smartystreets/goconvey/convey"
 	"bytes"
-	_ "github.com/go-sql-driver/mysql"
 	"testing"
 )
 

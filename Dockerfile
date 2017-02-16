@@ -1,4 +1,4 @@
-FROM golang:1.8rc1
+FROM golang:1.8rc3
 
 RUN apt-get update; apt-get install tree -y; apt-get install zip -y
 
