@@ -88,7 +88,7 @@ func (sc *SnippetCli) Create(args []string) {
 		} else {
 			snippet = args[0]
 		}
-	} else  {
+	} else {
 		a, err := models.ParseAlias(args[1])
 		if err != nil {
 			sc.HandleErr(err)
@@ -121,7 +121,7 @@ func (sc *SnippetCli) Create(args []string) {
 }
 
 func (sc *SnippetCli) Edit(distinctName string) {
-	if distinctName == "env"  {
+	if distinctName == "env" {
 		distinctName = models.NewSetupAlias(distinctName, "yml", true).String()
 	}
 	if list, _, err := sc.get(distinctName); err != nil {
@@ -164,7 +164,6 @@ func (sc *SnippetCli) Inspect(distinctName string) {
 	}
 }
 
-// Problem is that if many items are passed for deletion and any are ambiguous how do we handle this?
 func (sc *SnippetCli) Delete(args []string) {
 	r, err := sc.s.GetRoot("", true)
 	if err != nil {
@@ -251,6 +250,7 @@ func (sc *SnippetCli) Move(args []string) {
 		last = ""
 	}
 	if root.IsPouch(args[0]) {
+		// rename pouch
 		p, err := sc.s.RenamePouch(args[0], last)
 		if err != nil {
 			sc.HandleErr(err)
@@ -260,6 +260,7 @@ func (sc *SnippetCli) Move(args []string) {
 		sc.Render("pouch:renamed", p)
 		return
 	} else if !root.IsPouch(last) && len(args) == 2 {
+		// rename single snippet
 		sc.List()
 		sc.rename(args[0], args[1])
 		return
@@ -269,6 +270,7 @@ func (sc *SnippetCli) Move(args []string) {
 		sc.HandleErr(err)
 		return
 	}
+	// move snippets into a pouch
 	p, err := sc.s.Move("", source, last, as)
 	if err != nil {
 		sc.HandleErr(err)
@@ -276,12 +278,17 @@ func (sc *SnippetCli) Move(args []string) {
 	}
 	if last == "" {
 		sc.List()
-		sc.Render("snippet:moved", "root")
+		sc.Render("snippet:moved-root", MoveResult{Quant:len(as)})
 	} else {
 		sc.List()
-		sc.Render("snippet:moved", p)
+		sc.Render("snippet:moved-pouch", MoveResult{Pouch:p, Quant:len(as)})
 	}
 
+}
+
+type MoveResult struct {
+	Pouch string
+	Quant int
 }
 
 func (sc *SnippetCli) Cat(distinctName string) {

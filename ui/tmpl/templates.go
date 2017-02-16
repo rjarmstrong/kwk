@@ -57,7 +57,8 @@ func init() {
 	add("snippet:deleted", "Snippets {{. | blue }} deleted.", template.FuncMap{"blue": blue})
 	add("snippet:not-deleted", "Snippets {{. | blue }} NOT deleted.", template.FuncMap{"blue": blue})
 
-	add("snippet:moved", "Snippets moved to: {{. | blue }}", template.FuncMap{"blue": blue})
+	add("snippet:moved-root", "{{ .Quant | blue }} snippet(s) moved to root.", template.FuncMap{"blue": blue})
+	add("snippet:moved-pouch", "{{ .Quant | blue }} snippet(s) moved to pouch {{ .Pouch | blue }}", template.FuncMap{"blue": blue})
 
 	add("snippet:inspect",
 		"\n{{range .Items}}"+"Name: {{.Username}}/{{.Pouch}}/{{.Name}}{{.Ext}}"+"\nCreated: {{.Created}}"+"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+
@@ -72,8 +73,8 @@ func init() {
 	add("pouch:check-delete", "Are you sure you want to delete pouch {{. | yellow }}? [y/n] ", template.FuncMap{"yellow": yellow})
 	add("pouch:created", "Pouch: {{. | blue }} created.", template.FuncMap{"blue": blue})
 	add("pouch:renamed", "Pouch: {{. | blue }} renamed.", template.FuncMap{"blue": blue})
-	add("pouch:locked", "Pouch: {{. | blue }} locked.", template.FuncMap{"blue": blue})
-	add("pouch:unlocked", "Pouch: {{. | blue }} unlocked and public.", template.FuncMap{"blue": blue})
+	add("pouch:locked", "🔒  pouch {{. | blue }} locked.", template.FuncMap{"blue": blue})
+	add("pouch:unlocked", "🔓  pouch {{. | blue }} unlocked and public.", template.FuncMap{"blue": blue})
 	add("pouch:not-locked", "Pouch: {{. | blue }} NOT locked.", template.FuncMap{"blue": blue})
 	add("pouch:check-unlock", "Are you sure you want pouch 👝  {{. | blue }} public ? [y/n]", template.FuncMap{"blue": blue})
 
@@ -161,15 +162,17 @@ func listRoot(r *models.Root) string {
 			item.WriteString(style.Fmt(style.Cyan, sn.SnipName.String()))
 		}
 		if pch, ok := v.(*models.Pouch); ok {
-			if pch.MakePrivate {
-				item.WriteString("🔒")
-			} else {
-				item.WriteString("👝")
+			if !r.HidePrivate {
+				if pch.MakePrivate {
+					item.WriteString("🔒")
+				} else {
+					item.WriteString("👝")
+				}
+				item.WriteString("  ")
+				item.WriteString(pch.Name)
+				item.WriteString(" ")
+				item.WriteString(style.Fmt(style.DarkGrey, fmt.Sprintf("%d", pch.SnipCount)))
 			}
-			item.WriteString("  ")
-			item.WriteString(pch.Name)
-			item.WriteString(" ")
-			item.WriteString(style.Fmt(style.DarkGrey, fmt.Sprintf("%d", pch.SnipCount)))
 		}
 
 		item.WriteString(" \t")
@@ -211,7 +214,7 @@ func listSnippets(list *models.SnippetList) string {
 	fmt.Fprint(buf, style.Fmt(style.Cyan, "kwk.co/"+list.Username+"/")+list.Pouch+"/\n\n")
 
 	tbl := tablewriter.NewWriter(buf)
-	tbl.SetHeader([]string{"Name", "Version", "Preview", "Tags", "Runs", ""})
+	tbl.SetHeader([]string{"Name", "Version", "Snippet", "Tags", "Runs", ""})
 	tbl.SetAutoWrapText(false)
 	tbl.SetBorder(false)
 	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
@@ -235,14 +238,10 @@ func listSnippets(list *models.SnippetList) string {
 		var name string
 
 		name = style.Fmt(style.Cyan, v.Name) + style.Fmt(style.Subdued, "."+v.Ext)
-		if v.Private {
-			if v.Role == models.RolePreferences {
-				snip = style.Fmt(style.Yellow, `(Global prefs) 'kwk edit prefs'`)
-			} else if v.Role == models.RoleEnvironment {
-				snip = style.Fmt(style.Yellow, `(Local environment) 'kwk edit env'`)
-			} else {
-				snip = style.Fmt(style.Subdued, `(Private)`)
-			}
+		if v.Role == models.RolePreferences {
+			snip = style.Fmt(style.Yellow, `(Global prefs) 'kwk edit prefs'`)
+		} else if v.Role == models.RoleEnvironment {
+			snip = style.Fmt(style.Yellow, `(Local environment) 'kwk edit env'`)
 		} else {
 			snip = fmt.Sprintf("%s", uri(v.Snip))
 		}
@@ -305,22 +304,22 @@ type SearchResultLine struct {
 	Line string
 }
 
-type ColorFunc func(text string) string
+type ColorFunc func(int interface{}) string
 
-func blue(text string) string {
-	return style.Fmt(style.Cyan, text)
+func blue(in interface{}) string {
+	return style.Fmt(style.Cyan, fmt.Sprintf("%v", in))
 }
 
-func yellow(text string) string {
-	return style.Fmt(style.Yellow, text)
+func yellow(in interface{}) string {
+	return style.Fmt(style.Yellow, fmt.Sprintf("%v", in))
 }
 
-func red(text string) string {
-	return style.Fmt(style.Red, text)
+func red(in interface{}) string {
+	return style.Fmt(style.Red, fmt.Sprintf("%v", in))
 }
 
-func subdued(text string) string {
-	return style.Fmt(style.Subdued, text)
+func subdued(in interface{}) string {
+	return style.Fmt(style.Subdued, fmt.Sprintf("%v", in))
 }
 
 func uri(text string) string {

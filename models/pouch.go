@@ -15,6 +15,7 @@ type Pouch struct {
 }
 
 type Root struct {
+	HidePrivate bool
 	Username string
 	Pouches []*Pouch
 	Personal []*Pouch

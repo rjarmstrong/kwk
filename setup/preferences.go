@@ -8,10 +8,10 @@ func DefaultPrefs() *Preferences {
 	}
 	p.Verbose = false
 	p.Covert = false
-	p.HidePrivate = true
 	p.DisableRun = false
 	p.WipeTrail = false
 	p.SessionTimeout = 15
+	p.ListAll = true
 	return p
 }
 
@@ -34,12 +34,10 @@ type Preferences struct {
 // PersistedPrefs are preferences which can be persistent.
 type PersistedPrefs struct {
 	Covert      bool // Always opens browser in covert mode, when set to true flag should have no effect. TODO: Update env/darwin.yml
+	ListAll bool  //List all pouches including private. TODO: implement on api in search SEARCH.
 	Verbose     bool // Displays more detailed output. TODO: Logging
-	HidePrivate bool //hides content of private snippet text when searching or listing in cli TODO: Security
-	ListPrivate bool //hides private items from listing. TODO: Security
 	DisableRun  bool //Completely disabled running scripts even if using -f TODO: Security
 	WipeTrail      bool  //deletes the history each time a command is run TODO: Security
 	SessionTimeout int64 // 0 = no timeout, TODO: Implement on api SECURITY
 	AutoEncrypt    bool  //Encrypts all snippets when created. TODO: SECURITY
-	ListAll bool //List snippets and configuration all the time. TODO: implement on api in search SEARCH.
 }
