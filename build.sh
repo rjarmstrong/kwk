@@ -9,7 +9,7 @@ echo "\n\n\n**** kwk-cli build ${KWK_VERSION}+${BUILD_NUMBER} *****\n\n\n"
 ARCH=amd64
 
 # TESTING
-go test ./app
+#go test ./app
 go test ./ui/dlg
 
 # PREP OUTPUT

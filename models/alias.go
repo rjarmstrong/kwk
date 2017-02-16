@@ -16,9 +16,8 @@ func NewAlias(username string, pouch string, name string, extension string) *Ali
 
 type Alias struct {
 	Pouch    string
-	Username string `json:"username" schema:"username"`
+	Username string
 	SnipName
-	FullKey  string `json:"fullKey" schema:"fullKey"`
 }
 
 func (a *Alias) String() string {

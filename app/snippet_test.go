@@ -26,7 +26,7 @@ func Test_Snippet(t *testing.T) {
 		Convey(`Snippet Running`, func() {
 			Convey(`Should call 'run' and open if found`, func() {
 				fullKey := "hola.sh"
-				a.ReturnItemsForGet = []models.Snippet{
+				a.ReturnItemsForGet = []*models.Snippet{
 					{FullName: fullKey},
 				}
 				t.GetHydrateWith = &models.User{Username: "rjarmstrong"}
@@ -38,7 +38,7 @@ func Test_Snippet(t *testing.T) {
 			Convey(`Should call 'run' and prompt if multiple found`, func() {
 				fullKey1 := "hola.sh"
 				fullKey2 := "hola.js"
-				a.ReturnItemsForGet = []models.Snippet{
+				a.ReturnItemsForGet = []*models.Snippet{
 					{FullName: fullKey1},
 					{FullName: fullKey2},
 				}
@@ -51,7 +51,7 @@ func Test_Snippet(t *testing.T) {
 			})
 			Convey(`Should suggest if not found`, func() {
 				fullKey := "hola.sh"
-				a.ReturnItemsForGet = []models.Snippet{}
+				a.ReturnItemsForGet = []*models.Snippet{}
 				results := []*models.SearchResult{}
 				result := &models.SearchResult{Name:"suggestion"}
 				results = append(results, result)
@@ -172,7 +172,7 @@ func Test_Snippet(t *testing.T) {
 				So(p5.Name, ShouldEqual, p.Name)
 			})
 			Convey(`Should call get and respond with template`, func() {
-				a.ReturnItemsForGet = []models.Snippet{
+				a.ReturnItemsForGet = []*models.Snippet{
 					{FullName: "arrows.js"},
 				}
 				app.App.Run([]string{"[app]", "cat", "arrows.js"})
@@ -221,7 +221,7 @@ func Test_Snippet(t *testing.T) {
 				So(p2.Name, ShouldEqual, p.Name)
 			})
 			Convey(`Should call edit and respond with template`, func() {
-				a.ReturnItemsForGet = []models.Snippet{{FullName: "arrows.js"}}
+				a.ReturnItemsForGet = []*models.Snippet{{FullName: "arrows.js"}}
 				d.MultiChoiceResponse = &dlg.DialogResponse{Value: a.ReturnItemsForGet[0]}
 				app.App.Run([]string{"[app]", "edit", "arrows.js"})
 				So(r.EditCalledWith, ShouldResemble, &a.ReturnItemsForGet[0])
