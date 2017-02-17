@@ -89,6 +89,6 @@ aws s3 cp s3://kwk-cli/${KWK_VERSION} s3://kwk-cli/latest --recursive --acl publ
 echo "{
 \"current\":\"${KWK_VERSION}\",
 \"build\":\"${BUILD_NUMBER}\"
-}" > /build/release-info.json
+}" > /builds/release-info.json
 
-aws s3 cp /build/release-info.json  s3://kwk-cli/release-info.json --acl public-read
+aws s3 cp /builds/release-info.json  s3://kwk-cli/release-info.json --acl public-read
