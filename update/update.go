@@ -80,7 +80,7 @@ type ReleaseInfo struct {
 
 func SilentCheckAndRun() {
 	fmt.Println("Checking for updates")
-	exe(false,"./kwkcli","update", "silent")
+	exe(false,"kwk","update", "silent")
 
 }
 
