@@ -9,7 +9,7 @@ import (
 	"io/ioutil"
 	"strings"
 	"errors"
-	"os"
+	//"os"
 )
 
 func Test_Update(t *testing.T) {
