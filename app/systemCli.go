@@ -3,9 +3,10 @@ package app
 import (
 	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
+	"bitbucket.com/sharingmachine/kwkcli/update"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
-	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"fmt"
+	"bitbucket.com/sharingmachine/kwkcli/sys"
 )
 
 type SystemCli struct {
@@ -13,14 +14,18 @@ type SystemCli struct {
 	accountManage account.Manager
 	tmpl.Writer
 	rpc rpc.Service
+	updater *update.Runner
 }
 
 func NewSystemCli(s sys.Manager, r rpc.Service, u account.Manager, w tmpl.Writer) *SystemCli {
-	return &SystemCli{service: s, accountManage: u, Writer: w, rpc: r}
+	return &SystemCli{service: s, accountManage: u, Writer: w, rpc: r, updater:update.NewRunner()}
 }
 
-func (c *SystemCli) Upgrade() {
-	panic("not implemented")
+func (c *SystemCli) Update() {
+	err := c.updater.Run()
+	if err != nil {
+		c.HandleErr(err)
+	}
 }
 
 func (c *SystemCli) GetVersion(cliVersion string) {

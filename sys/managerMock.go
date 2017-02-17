@@ -15,11 +15,6 @@ func (m *ManagerMock) GetVersion() (string, error) {
 	return "0.0.1", nil
 }
 
-func (m *ManagerMock) CopyToClipboard(input string) error {
-	m.CopyToClipboardCalledWith = input
-	return nil
-}
-
 func (m *ManagerMock) Exists(path string) (bool, error) {
 	//return s.ExistsResponse
 	return false, nil

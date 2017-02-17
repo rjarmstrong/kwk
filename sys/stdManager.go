@@ -2,7 +2,6 @@ package sys
 
 import (
 	"github.com/kennygrant/sanitize"
-	"github.com/atotto/clipboard"
 	"io/ioutil"
 	"runtime"
 	"strings"
@@ -80,10 +79,6 @@ func (s *StdManager) Exists(fullPath string) (bool, error) {
 		}
 	}
 	return true, nil
-}
-
-func (s *StdManager) CopyToClipboard(input string) error {
-	return clipboard.WriteAll(input)
 }
 
 func (s *StdManager) Delete(directoryName string, fullKey string) error {

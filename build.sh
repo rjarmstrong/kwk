@@ -11,6 +11,7 @@ ARCH=amd64
 # TESTING
 #go test ./app
 go test ./ui/dlg
+go test ./update/
 
 # PREP OUTPUT
 releasePath=/builds/${KWK_VERSION}
@@ -43,7 +44,7 @@ function compile(){
 
   # COMPILE
   binary=${tmp}/bin/${file}
-  env GOOS=${os} GOARCH=${ARCH} go build -ldflags "-X main.version=${KWK_VERSION} -X main.build=${BUILD_NUMBER}" -x -o ${binary}
+  env GOOS=${os} GOARCH=${ARCH} go build -ldflags "-s -w -X main.version=${KWK_VERSION} -X main.build=${BUILD_NUMBER}" -x -o ${binary}
 
   # ZIP
   zipped=${binPath}/${file}.tar.gz
@@ -83,3 +84,11 @@ export AWS_SECRET_ACCESS_KEY=JlxUkDjuhENHFYyZ8slsNmbX7K79PK9rU+ukBI2z
 export DEFAULT_REGION="us-east-1"
 
 aws s3 cp /builds/${KWK_VERSION} s3://kwk-cli/${KWK_VERSION} --recursive --acl public-read
+aws s3 cp s3://kwk-cli/${KWK_VERSION} s3://kwk-cli/latest --recursive --acl public-read
+
+echo "{
+\"current\":\"${KWK_VERSION}\",
+\"build\":\"${BUILD_NUMBER}\"
+}" > /build/release-info.json
+
+aws s3 cp /build/release-info.json  s3://kwk-cli/release-info.json --acl public-read

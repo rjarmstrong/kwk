@@ -8,10 +8,12 @@ const (
 
 var KWK_TEST_MODE = false
 
-type Manager interface {
-	CopyToClipboard(input string) error
-	Exists(path string) (bool, error)
+var Version string
 
+var Build string
+
+type Manager interface {
+	Exists(path string) (bool, error)
 	Delete(subDirName string, suffixPath string) error
 	FileExists(subDirName string, suffixPath string, incHoldingDir bool) (bool, error)
 	WriteToFile(subDirName string, suffixPath string, snippet string, incHoldingDir bool) (string, error)

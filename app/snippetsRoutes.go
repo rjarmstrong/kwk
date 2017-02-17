@@ -16,7 +16,6 @@ func Snippets(s *SnippetCli) []cli.Command {
 		},
 		{
 			Name:    "describe",
-			Aliases: []string{"update", "d"},
 			Action: func(c *cli.Context) error {
 				s.Describe(c.Args().Get(0), c.Args().Get(1))
 				return nil

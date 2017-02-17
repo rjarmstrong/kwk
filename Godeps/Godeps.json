@@ -23,10 +23,6 @@
 			"Rev": "e59f595e9de7b9e3d4762b95eca216410fadc69b"
 		},
 		{
-			"ImportPath": "github.com/atotto/clipboard",
-			"Rev": "bb272b845f1112e10117e3e45ce39f690c0001ad"
-		},
-		{
 			"ImportPath": "github.com/dustin/go-humanize",
 			"Rev": "2fcb5204cdc65b4bec9fd0a87606bb0d0e3c54e8"
 		},

@@ -7,9 +7,9 @@ import (
 func System(s *SystemCli) []cli.Command {
 	c := []cli.Command{
 		{
-			Name: "upgrade",
+			Name: "update",
 			Action: func(c *cli.Context) error {
-				s.Upgrade()
+				s.Update()
 				return nil
 			},
 		},
