@@ -8,11 +8,16 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"path"
+	"bitbucket.com/sharingmachine/kwkcli/sys"
 )
+
+const workFolder = "./update_work"
 
 
 type Remoter interface {
 	Latest() (io.ReadCloser, error)
+	CleanUp()
 	ReleaseInfo() (*ReleaseInfo, error)
 }
 
@@ -23,6 +28,12 @@ func (r *S3Remoter) Latest() (io.ReadCloser, error) {
 	fn := fmt.Sprintf("kwk-%s-%s", runtime.GOOS, runtime.GOARCH)
 	fnt := fmt.Sprintf("%s.tar.gz", fn)
 	url := fmt.Sprintf("https://s3.amazonaws.com/kwk-cli/latest/bin/%s", fnt)
+	err := os.MkdirAll(workFolder, sys.FILE_PERMISSION)
+	if err != nil {
+		return nil, err
+	}
+	fnt = path.Join(workFolder, fnt)
+
 	fmt.Println(url)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -36,8 +47,15 @@ func (r *S3Remoter) Latest() (io.ReadCloser, error) {
 	}
 	resp.Body.Close()
 	out.Close()
-	exe(true,"tar", "-xvf", fnt) //TODO: tar prob no supported everywhere
-	return os.Open(fn)
+	exe(true,"tar", "-xvf", fnt, "-C", workFolder) //TODO: tar prob no supported everywhere
+	return os.Open(path.Join(workFolder, fn))
+}
+
+func (r *S3Remoter) CleanUp() {
+	err := os.RemoveAll(workFolder)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 

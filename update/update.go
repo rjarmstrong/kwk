@@ -60,16 +60,21 @@ func (r *Runner) Run() error {
 		return nil
 	}
 	latest, err := r.Latest()
+	if err != nil {
+		return err
+	}
 	defer latest.Close() //TODO: Currently NOOP, should be real closer
 	err = r.Applier(latest, gu.Options{})
 	if err != nil {
 		fmt.Println("Update error")
-		if err := r.Rollbacker(err); err != nil {
-			return err
-		}
+		err = r.Rollbacker(err)
+		r.CleanUp()
+		return err
+	} else {
+		r.CleanUp()
+		fmt.Printf("Updated kwk to %s\n", ri.Current)
+		return nil
 	}
-	fmt.Printf("Updated kwk to %s\n", ri.Current)
-	return nil
 }
 
 
@@ -80,8 +85,19 @@ type ReleaseInfo struct {
 
 func SilentCheckAndRun() {
 	fmt.Println("Checking for updates")
-	exe(false,"kwk","update", "silent")
-
+	//var cmd string
+	//if sys.KWK_TEST_MODE {
+	//	cmd = "./kwkcli"
+	//} else {
+	//	cmd = "kwk"
+	//}
+	cmd, err := os.Executable()
+	fmt.Println("exe:", cmd)
+	if err != nil {
+		fmt.Println("If you are running nacl or OpenBSD they are not supported.")
+		fmt.Println(err)
+	}
+	exe(false, cmd,"update", "silent")
 }
 
 func exe(wait bool, name string, arg ...string) {

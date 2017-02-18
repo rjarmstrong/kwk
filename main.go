@@ -29,7 +29,9 @@ func main() {
 	args := strings.Join(os.Args[1:], "+")
 	if args == "update+silent" {
 		update.NewRunner().Run()
-	} else {
+	} else if args == "update" {
+		runKwk()
+	}else {
 		update.SilentCheckAndRun()
 		runKwk()
 	}

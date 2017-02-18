@@ -102,3 +102,7 @@ func (rm *RemoterMock) ReleaseInfo() (*ReleaseInfo, error) {
 	rm.ReleaseInfoCalled = true
 	return &rm.RI, nil
 }
+
+func (rm *RemoterMock) CleanUp() {
+
+}
