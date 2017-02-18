@@ -8,21 +8,33 @@ import (
 	"fmt"
 	"os"
 	"io"
+	"bitbucket.com/sharingmachine/kwkcli/config"
+	"time"
+	"bitbucket.com/sharingmachine/kwkcli/models"
+	"google.golang.org/grpc/codes"
 )
 
+const RecordFile = "update-record.json"
+
 type Runner struct {
+	UpdatePeriod time.Duration
 	Remoter
 	Applier
 	Rollbacker
+	config.Persister
 }
 
-func NewRunner() *Runner {
-	return &Runner{Remoter:&S3Remoter{}, Applier:gu.Apply, Rollbacker:gu.RollbackError}
+func NewRunner(p config.Persister) *Runner {
+	return &Runner{Remoter:&S3Remoter{}, Applier:gu.Apply, Rollbacker:gu.RollbackError, Persister:p, UpdatePeriod:time.Hour}
 }
 
 type Applier func(update io.Reader, opts gu.Options) error
 
 type Rollbacker func (err error) error
+
+type Record struct {
+	LastUpdate int64
+}
 
 
 // updater
@@ -52,6 +64,15 @@ kwk [anything]
 
  */
 func (r *Runner) Run() error {
+	due, err := r.isUpdateDue()
+	if !due {
+		fmt.Println("Update not due.")
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+
 	ri, err := r.ReleaseInfo()
 	if err != nil {
 		return err
@@ -69,12 +90,36 @@ func (r *Runner) Run() error {
 		fmt.Println("Update error")
 		err = r.Rollbacker(err)
 		r.CleanUp()
+		r.recordUpdate()
 		return err
 	} else {
 		r.CleanUp()
+		r.recordUpdate()
 		fmt.Printf("Updated kwk to %s\n", ri.Current)
 		return nil
 	}
+}
+
+func (r *Runner) recordUpdate() error {
+	ur := &Record{LastUpdate:time.Now().Unix()}
+	return r.Persister.Upsert(RecordFile, ur)
+}
+
+func (r *Runner) isUpdateDue() (bool, error) {
+	ur := &Record{}
+	hiatus := time.Now().Unix() - int64(r.UpdatePeriod/time.Second)
+	if err := r.Persister.Get(RecordFile, ur, hiatus); err != nil {
+		err2, ok := err.(*models.ClientErr)
+		if !ok {
+			return false, err
+		}
+		if err2.TransportCode == codes.NotFound {
+			// If no record is found then lets update.
+			return true, nil
+		}
+		return false, err2
+	}
+	return false, nil
 }
 
 

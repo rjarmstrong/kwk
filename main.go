@@ -24,11 +24,17 @@ var version string = "-"
 
 var build string = "-"
 
+var s sys.Manager
+var j config.Persister
+
 func main() {
 	_, sys.KWK_TEST_MODE = os.LookupEnv("KWK_TEST_MODE")
 	args := strings.Join(os.Args[1:], "+")
+	s = sys.New()
+	j = config.NewJsonSettings(s, "settings")
+
 	if args == "update+silent" {
-		update.NewRunner().Run()
+		update.NewRunner(j).Run()
 	} else if args == "update" {
 		runKwk()
 	}else {
@@ -62,21 +68,19 @@ func runKwk() {
 	}
 	defer conn.Close()
 
-	s := sys.New()
-	t := config.NewJsonSettings(s, "settings")
 	v := version + "+" + build
-	h := rpc.NewHeaders(t, v)
-	u := account.NewStdManager(conn, t, h)
-	ss := snippets.New(conn, t, h)
+	h := rpc.NewHeaders(j, v)
+	u := account.NewStdManager(conn, j, h)
+	ss := snippets.New(conn, j, h)
 
 	su := setup.NewConfigProvider(ss, s, u, w)
 	o := cmd.NewStdRunner(s, ss, su)
 	r := bufio.NewReader(os.Stdin)
 	d := dlg.New(w, r)
-	ch := search.NewAlphaTerm(conn, t, h)
+	ch := search.NewAlphaTerm(conn, j, h)
 	api := rpc.New(conn, h)
 
-	kwkApp := app.New(ss, s, t, o, u, d, w, ch, api, su)
+	kwkApp := app.New(ss, s, j, o, u, d, w, ch, api, su)
 	kwkApp.App.Version = v
 
 	su.Preload()

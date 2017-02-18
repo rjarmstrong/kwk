@@ -56,7 +56,7 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 	accCli := NewAccountCli(u, t, w, d)
 	app.Commands = append(app.Commands, Accounts(accCli)...)
 
-	sysCli := NewSystemCli(s, api, u, w)
+	sysCli := NewSystemCli(s, api, u, w, t)
 	app.Commands = append(app.Commands, System(sysCli)...)
 
 	snipCli := NewSnippetCli(a, r, s, d, w, t, h, su)

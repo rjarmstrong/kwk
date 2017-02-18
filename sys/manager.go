@@ -17,5 +17,9 @@ type Manager interface {
 	Delete(subDirName string, suffixPath string) error
 	FileExists(subDirName string, suffixPath string, incHoldingDir bool) (bool, error)
 	WriteToFile(subDirName string, suffixPath string, snippet string, incHoldingDir bool) (string, error)
+
+	/*
+	ReadFromFile fresherThan = get record as long as it was last modified after this unix time value in seconds.
+	 */
 	ReadFromFile(subDirName string, suffixPath string, incHoldingDir bool, fresherThan int64) (string, error)
 }
