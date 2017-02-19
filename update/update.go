@@ -71,7 +71,7 @@ func (r *Runner) Run() error {
 	} else {
 		r.CleanUp()
 		r.recordUpdate()
-		log.Debug("Updated to version: %s", ri.Current)
+		log.Debug("Updated to version: %s+%s", ri.Current, ri.Build)
 		return nil
 	}
 }
@@ -84,6 +84,7 @@ func (r *Runner) recordUpdate() error {
 func (r *Runner) isUpdateDue() (bool, error) {
 	ur := &Record{}
 	hiatus := time.Now().Unix() - int64(r.UpdatePeriod/time.Second)
+	log.Debug("Update new than (Unix time seconds): %d", hiatus)
 	if err := r.Persister.Get(RecordFile, ur, hiatus); err != nil {
 		log.Error("Couldn't get local update record.", err)
 		err2, ok := err.(*models.ClientErr)
