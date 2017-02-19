@@ -2,13 +2,14 @@ package update
 
 import (
 	. "github.com/smartystreets/goconvey/convey"
-	"testing"
-	"github.com/inconshreveable/go-update"
-	"io"
+	gu "github.com/inconshreveable/go-update"
+	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"io/ioutil"
 	"strings"
+	"testing"
 	"errors"
+	"io"
 	//"os"
 )
 
@@ -16,34 +17,49 @@ func Test_Update(t *testing.T) {
 	Convey("Runner test", t, func() {
 		am := &ApplierMock{}
 		rm := &RemoterMock{}
+		pm := &config.PersisterMock{}
+
 		r := Runner{
 			Applier:    am.Apply,
 			Rollbacker: am.RollbackError,
 			Remoter:    rm,
+			Persister: pm,
 		}
 
-		Convey(`Given the current version is  equal to the latest version should NOT run update`, func() {
-			sys.Version = "v0.0.2"
+		Convey("Given there is an update record should NOT run update.", func() {
+			sys.Version = "v0.0.1"
 			rm.RI = ReleaseInfo{Current: "v0.0.2"}
+			pm.GetHydrates = &Record{}
 			err := r.Run()
 			So(err, ShouldBeNil)
 			So(rm.LatestCalled, ShouldBeFalse)
 			So(am.ApplyCalledWith, ShouldBeNil)
 		})
 
-		Convey(`Given the current version is not equal to the latest version should run update`, func() {
+		Convey(`Given the current version is equal to the latest version should NOT run update.`, func() {
+			sys.Version = "v0.0.2"
+			rm.RI = ReleaseInfo{Current: "v0.0.2"}
+			pm.GetHydrates = &Record{}
+			err := r.Run()
+			So(err, ShouldBeNil)
+			So(rm.LatestCalled, ShouldBeFalse)
+			So(am.ApplyCalledWith, ShouldBeNil)
+		})
+
+		Convey("Given there is NOT an update record and the remote version is newer should update.", func() {
 			sys.Version = "v0.0.1"
 			rm.RI = ReleaseInfo{Current: "v0.0.2"}
+			pm.GetReturns = sys.ErrFileNotFound
 			err := r.Run()
 			So(err, ShouldBeNil)
 			So(rm.LatestCalled, ShouldBeTrue)
-			So(am.ApplyCalledWith[0], ShouldResemble, ioutil.NopCloser(strings.NewReader("This is the binary")))
-			So(am.ApplyCalledWith[1], ShouldResemble, update.Options{})
+			So(am.ApplyCalledWith, ShouldNotBeNil)
 		})
 
-		Convey(`Given the applier returns an error should rollback`, func() {
+		Convey(`When updating Given the applier returns an error should rollback.`, func() {
 			sys.Version = "v0.0.1"
 			rm.RI = ReleaseInfo{Current: "v0.0.2"}
+			pm.GetReturns = sys.ErrFileNotFound
 			m := "Couldn't apply."
 			am.ApplyErr = errors.New(m)
 			err := r.Run()
@@ -73,7 +89,7 @@ type ApplierMock struct {
 	ApplyErr        error
 }
 
-func (am *ApplierMock) Apply(update io.Reader, opts update.Options) error {
+func (am *ApplierMock) Apply(update io.Reader, opts gu.Options) error {
 	am.ApplyCalledWith = []interface{}{update, opts}
 	if am.ApplyErr != nil {
 		return am.ApplyErr

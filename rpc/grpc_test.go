@@ -15,7 +15,7 @@ func Test_RPC(t *testing.T) {
 			Convey(`Given the current settings has a profile (signed in user) should add token to context`, func() {
 				t := &config.PersisterMock{}
 				token := "sometoken234234234"
-				t.GetHydrateWith = &models.User{Token: token}
+				t.GetHydrates = &models.User{Token: token}
 				h := NewHeaders(t)
 				md, _ := metadata.FromContext(h.Context())
 				So(md[models.TokenHeaderName][0], ShouldEqual, token)

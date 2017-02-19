@@ -9,7 +9,8 @@ type PersisterMock struct {
 	ChangeDirectoryCalledWith string
 	UpsertCalledWith          []interface{}
 	DeleteCalledWith          string
-	GetHydrateWith            interface{}
+	GetHydrates               interface{}
+	GetReturns               error
 }
 
 func (s *PersisterMock) Delete(fullKey string) error {
@@ -19,9 +20,12 @@ func (s *PersisterMock) Delete(fullKey string) error {
 
 func (s *PersisterMock) Get(fullKey string, input interface{}, fresherThan int64) error {
 	s.GetCalledWith = []interface{}{fullKey, input}
-	if s.GetHydrateWith != nil {
+	if s.GetReturns != nil {
+		return s.GetReturns
+	}
+	if s.GetHydrates != nil {
 		v1 := reflect.ValueOf(input).Elem()
-		v2 := reflect.ValueOf(s.GetHydrateWith).Elem()
+		v2 := reflect.ValueOf(s.GetHydrates).Elem()
 		v1.Set(v2)
 	}
 	return nil

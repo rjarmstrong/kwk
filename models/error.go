@@ -1,16 +1,18 @@
 package models
 
 import (
-	"google.golang.org/grpc/codes"
-	"encoding/json"
 	"google.golang.org/grpc"
+	"encoding/json"
 	"fmt"
+	"google.golang.org/grpc/codes"
 )
 
 type Code uint32
 
 const (
 	Code_Unspecified Code = 0
+	Code_NotFound Code = 10
+	Code_InvalidArgument Code = 20
 	// Snippets
 	Code_NoTags                 Code = 3000
 	Code_NewFullKeyEmpty        Code = 3010
@@ -45,7 +47,7 @@ const (
 func ParseGrpcErr(e error) error {
 	desc := grpc.ErrorDesc(e)
 	m := &ClientErr{}
-	m.TransportCode = grpc.Code(e)
+	m.remoteCode = grpc.Code(e)
 	if err := json.Unmarshal([]byte(desc), m); err != nil {
 		m.Title = desc
 		return m
@@ -53,18 +55,27 @@ func ParseGrpcErr(e error) error {
 	return m
 }
 
-func ErrOneLine(c Code, description string) error {
-	return &ClientErr{TransportCode: codes.InvalidArgument, Msgs:[]Msg{{Code:c, Desc:description}}}
+func ErrOneLine(c Code, desc string, args ...interface{}) error {
+	return &ClientErr{Msgs: []Msg{{Code: c, Desc: fmt.Sprintf(desc, args...)}}}
 }
 
 type ClientErr struct {
-	TransportCode codes.Code
-	Msgs          []Msg
-	Title         string
+	Msgs  []Msg
+	Title string
+	remoteCode codes.Code
 }
 
-func (e ClientErr) Error() string {
-	return fmt.Sprintf("%d %s\n%v+", e.TransportCode, e.Title, e.Msgs)
+func (c *ClientErr) Contains(code Code) bool{
+	for _, v := range c.Msgs {
+		if v.Code == code {
+			return true
+		}
+	}
+	return false
+}
+
+func (c ClientErr) Error() string {
+	return fmt.Sprintf("%s %+v %d", c.Title, c.Msgs, c.remoteCode)
 }
 
 type Msg struct {

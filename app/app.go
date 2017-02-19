@@ -38,6 +38,11 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 			Name: "covert, x",
 			Usage: "Open browser in covert mode.",
 		},
+		cli.BoolFlag{
+			Name: "debug, d",
+			Usage: "Debug.",
+		},
+
 		//cli.BoolFlag{
 		//	Name: "global, g",
 		//	Usage: "Searches all users public snippets plus your private ones.",

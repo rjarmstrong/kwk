@@ -29,7 +29,7 @@ func Test_Snippet(t *testing.T) {
 				a.ReturnItemsForGet = []*models.Snippet{
 					{FullName: fullKey},
 				}
-				t.GetHydrateWith = &models.User{Username: "rjarmstrong"}
+				t.GetHydrates = &models.User{Username: "rjarmstrong"}
 				app.App.Run([]string{"[app]", fullKey, "covert", "arg2"})
 				So(a.GetCalledWith, ShouldResemble, &models.Alias{FullKey: fullKey, Username: "rjarmstrong"})
 				So(r.OpenCalledWith, ShouldResemble, []interface{}{&a.ReturnItemsForGet[0], []string{"covert", "arg2"}})
@@ -42,7 +42,7 @@ func Test_Snippet(t *testing.T) {
 					{FullName: fullKey1},
 					{FullName: fullKey2},
 				}
-				t.GetHydrateWith = &models.User{Username: "rjarmstrong"}
+				t.GetHydrates = &models.User{Username: "rjarmstrong"}
 				d.MultiChoiceResponse = &dlg.DialogResponse{Value: a.ReturnItemsForGet[0]}
 				app.App.Run([]string{"[app]", "hola", "arg1", "arg2"})
 				So(a.GetCalledWith, ShouldResemble, &models.Alias{Username: "rjarmstrong", FullKey: "hola"})

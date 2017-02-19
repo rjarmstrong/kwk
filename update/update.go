@@ -1,17 +1,16 @@
 package update
 
 import (
+	"bitbucket.com/sharingmachine/kwkcli/config"
+	"bitbucket.com/sharingmachine/kwkcli/models"
 	gu "github.com/inconshreveable/go-update"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
+	"bitbucket.com/sharingmachine/kwkcli/log"
 	"os/exec"
 	"bytes"
-	"fmt"
+	"time"
 	"os"
 	"io"
-	"bitbucket.com/sharingmachine/kwkcli/config"
-	"time"
-	"bitbucket.com/sharingmachine/kwkcli/models"
-	"google.golang.org/grpc/codes"
 )
 
 const RecordFile = "update-record.json"
@@ -36,58 +35,35 @@ type Record struct {
 	LastUpdate int64
 }
 
-
-// updater
-/*
-kwk [anything]
-
-  update.ForkRun()
-
-	1. Check for updates
-
-	Get current app version
-	TODO: Read file last check from file
-		Check when last update happened, it it was older than 24 hours then...
-		else 	Write file
-
-	2. Download update
-
-	Download from 'latest' tag for 'os'-'arch'
-
-	3. Apply update
-
-	Patch or switcher-oo
-
-	4. Clean up
-
-	5. Write file
-
- */
 func (r *Runner) Run() error {
 	due, err := r.isUpdateDue()
 	if !due {
-		fmt.Println("Update not due.")
+		log.Debug("Update not due.")
 		return nil
 	}
 	if err != nil {
+		log.Debug("%+v", err)
 		return err
 	}
 
 	ri, err := r.ReleaseInfo()
 	if err != nil {
+		log.Error("Couldn't get remote release info.", err)
 		return err
 	}
 	if ri.Current == sys.Version {
+		log.Debug("Local is same as latest version: %s", ri.Current)
 		return nil
 	}
 	latest, err := r.Latest()
 	if err != nil {
+		log.Error("Couldn't get latest from remote.", err)
 		return err
 	}
 	defer latest.Close() //TODO: Currently NOOP, should be real closer
 	err = r.Applier(latest, gu.Options{})
 	if err != nil {
-		fmt.Println("Update error")
+		log.Error("Couldn't apply update.", err)
 		err = r.Rollbacker(err)
 		r.CleanUp()
 		r.recordUpdate()
@@ -95,7 +71,7 @@ func (r *Runner) Run() error {
 	} else {
 		r.CleanUp()
 		r.recordUpdate()
-		fmt.Printf("Updated kwk to %s\n", ri.Current)
+		log.Debug("Updated to version: %s", ri.Current)
 		return nil
 	}
 }
@@ -109,11 +85,12 @@ func (r *Runner) isUpdateDue() (bool, error) {
 	ur := &Record{}
 	hiatus := time.Now().Unix() - int64(r.UpdatePeriod/time.Second)
 	if err := r.Persister.Get(RecordFile, ur, hiatus); err != nil {
+		log.Error("Couldn't get local update record.", err)
 		err2, ok := err.(*models.ClientErr)
 		if !ok {
 			return false, err
 		}
-		if err2.TransportCode == codes.NotFound {
+		if err2.Contains(models.Code_NotFound) {
 			// If no record is found then lets update.
 			return true, nil
 		}
@@ -129,18 +106,10 @@ type ReleaseInfo struct {
 }
 
 func SilentCheckAndRun() {
-	fmt.Println("Checking for updates")
-	//var cmd string
-	//if sys.KWK_TEST_MODE {
-	//	cmd = "./kwkcli"
-	//} else {
-	//	cmd = "kwk"
-	//}
 	cmd, err := os.Executable()
-	fmt.Println("exe:", cmd)
+	log.Debug("Initiating silent update check for: %s", cmd)
 	if err != nil {
-		fmt.Println("If you are running nacl or OpenBSD they are not supported.")
-		fmt.Println(err)
+		log.Error("If you are running nacl or OpenBSD they are not supported.", err)
 	}
 	exe(false, cmd,"update", "silent")
 }
@@ -150,8 +119,7 @@ func exe(wait bool, name string, arg ...string) {
 	c.Stdin = os.Stdin
 	out, err := c.StdoutPipe()
 	if err != nil {
-		fmt.Println(err)
-		// log to file
+		log.Error("If you are running nacl or OpenBSD they are not supported.", err)
 	}
 	var stderr bytes.Buffer
 	c.Stdout = os.Stdout
@@ -163,8 +131,7 @@ func exe(wait bool, name string, arg ...string) {
 	}
 
 	if err != nil {
-		fmt.Println(err)
-		// log to file
+		log.Error("Couldn't execute command.", err)
 	}
 	out.Close()
 }

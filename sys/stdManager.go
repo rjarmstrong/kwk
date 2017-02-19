@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"runtime"
 	"strings"
-	"errors"
 	"path"
 	"log"
 	"fmt"
@@ -13,12 +12,14 @@ import (
 	"os/user"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	lg "bitbucket.com/sharingmachine/kwkcli/log"
-	"google.golang.org/grpc/codes"
 )
 
 const (
-	FILE_PERMISSION = 0700
+	StandardFilePermission = 0700
 )
+
+var ErrFileNotFound = models.ErrOneLine(models.Code_NotFound, "File not found.")
+var ErrFileExpired = models.ErrOneLine(models.Code_NotFound, "File found but expired.")
 
 func New() Manager {
 	return &StdManager{}
@@ -39,18 +40,18 @@ func NewLogger() (*os.File, *log.Logger) {
 
 func (s *StdManager) WriteToFile(subDirName string, suffixPath string, snippet string, incHoldingDir bool) (filePath string, err error) {
 	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
-	lg.Debug("WRITING FILE:", fp)
-	err = ioutil.WriteFile(fp, []byte(snippet), FILE_PERMISSION)
+	lg.Debug("Writing file: %s", fp)
+	err = ioutil.WriteFile(fp, []byte(snippet), StandardFilePermission)
 	return fp, err
 }
 
 func (s *StdManager) ReadFromFile(subDirName string, suffixPath string, incHoldingDir bool, after int64) (string, error) {
 	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
-	lg.Debug("READING FILE:", fp)
+	lg.Debug("Reading file: %s", fp)
 	if fi, err := os.Stat(fp); err != nil {
 		if os.IsNotExist(err) {
 			// TODO: PUT IN STANDARD ERROR
-			return "", &models.ClientErr{TransportCode:codes.NotFound}
+			return "", ErrFileNotFound
 		} else {
 			return "", err
 		}
@@ -59,7 +60,7 @@ func (s *StdManager) ReadFromFile(subDirName string, suffixPath string, incHoldi
 			bts, err := ioutil.ReadFile(fp)
 			return string(bts), err
 		} else {
-			return "", errors.New("Not found. (Expired)")
+			return "", ErrFileExpired
 		}
 
 	}
@@ -91,7 +92,7 @@ func (s *StdManager) Delete(directoryName string, fullKey string) error {
 }
 
 func (s *StdManager) upsertDirectory(dir string) error {
-	if err := os.MkdirAll(dir, FILE_PERMISSION); err != nil {
+	if err := os.MkdirAll(dir, StandardFilePermission); err != nil {
 		if os.IsExist(err) {
 			return nil
 		}
@@ -150,7 +151,7 @@ func getCachePath() string {
 		// TODO: Write friendly
 		panic("OS not supported.")
 	}
-	if err := os.MkdirAll(p, FILE_PERMISSION); err != nil {
+	if err := os.MkdirAll(p, StandardFilePermission); err != nil {
 		if os.IsExist(err) {
 			return p
 		}
