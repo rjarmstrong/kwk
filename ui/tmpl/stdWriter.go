@@ -3,7 +3,7 @@ package tmpl
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/log"
-	"github.com/siddontang/go/rpc"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc"
 	"io"
@@ -28,24 +28,11 @@ func (w *StdWriter) Render(templateName string, data interface{}) {
 	}
 }
 
-func (w *StdWriter) HandleErr(err error) {
-	switch e := err.(type) {
-	case *models.ClientErr:
-		w.handleClientError(e)
-	case *rpc.RpcError:
-		log.Debug("Handling error as remote. Consider replacing with a ClientErr.")
-		w.handleRemoteError(e)
-	default:
-	}
-}
-
-/*
- handleRemoteError should only come into effect where we have inadvertently not
- transposed it to a ClientErr in the respective integration service.
- */
-func (w *StdWriter) handleRemoteError(e *rpc.RpcError) {
+func (w *StdWriter) HandleErr(e error) {
 	code := grpc.Code(e)
 	switch code {
+	case codes.InvalidArgument:
+		w.handleClientError(e)
 	case codes.Unauthenticated:
 		w.Render("api:not-authenticated", nil)
 	case codes.NotFound:
@@ -67,7 +54,11 @@ func (w *StdWriter) handleRemoteError(e *rpc.RpcError) {
 	}
 }
 
-func (w *StdWriter) handleClientError(e *models.ClientErr) {
+func (w *StdWriter) handleClientError(err error) {
+	e, ok := err.(*models.ClientErr)
+	if !ok {
+		log.Error("Unhandled error.", err)
+	}
 	if e.Title != "" {
 		w.Render("validation:title", e.Title)
 	}
