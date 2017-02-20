@@ -7,7 +7,9 @@ type Dialog interface {
 	Modal(templateName string, data interface{}, autoYes bool) *DialogResponse
 
 	// FormField renders a prompt with a templated label to take user input.
-	FormField(templateName string, data interface{}, mask bool) *DialogResponse
+	TemplateFormField(templateName string, data interface{}, mask bool) *DialogResponse
+
+	FormField(label string) *DialogResponse
 
 	// MultiChoice is a special modal with multiple possible choices.
 	MultiChoice(templateName string, header interface{}, options interface{}) *DialogResponse

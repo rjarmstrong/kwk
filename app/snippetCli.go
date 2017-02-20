@@ -89,7 +89,7 @@ func (sc *SnippetCli) Run(distinctName string, args []string) {
 
 func (sc *SnippetCli) typeAhead(distinctName string, onSelect func(name string)) {
 	exe, _ := os.Executable()
-	opt := fzf.ParseOptionsAs(fmt.Sprintf("--preview=kwk cat %s", "{}"), "--header=Suggestions:\n", "--query="+distinctName, "--reverse", "--height=40%", "--no-mouse", "--color=prompt:008,fg:255,hl:006,pointer:014,hl+:014,fg+:006,bg+:000")
+	opt := fzf.ParseOptionsAs(fmt.Sprintf("--preview=%s cat %s", exe, "{}"), "--preview-window=right:70%", "--header=   Suggestions:   ", "--query="+distinctName, "--reverse", "--margin=2,6,2,2", "--height=40%", "--no-mouse", "--color=prompt:008,header:0,headerbg:008,fg:255,hl:006,pointer:014,hl+:014,fg+:006,bg+:000")
 	opt.Printer = onSelect
 	fzf.Run(fmt.Sprintf("%s suggest %s", exe, distinctName), opt)
 }
@@ -166,6 +166,19 @@ func (sc *SnippetCli) Edit(distinctName string) {
 
 func (sc *SnippetCli) Describe(distinctName string, description string) {
 	a, err := models.ParseAlias(distinctName)
+	if description == "" {
+		sc.typeAhead(distinctName, func(input string){
+			cm := fmt.Sprintf("Enter new description for %s: ", input)
+			if res := sc.FormField(cm); res.Ok {
+				log.Debug("Form result: %+v", res.Value)
+				sc.Describe(input, res.Value.(string))
+			} else {
+				log.Debug("not ok")
+			}
+			return
+		})
+		return
+	}
 	if err != nil {
 		sc.Render("validation:one-line", err)
 	}

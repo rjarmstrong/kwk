@@ -61,7 +61,7 @@ func init() {
 	add("snippet:moved-pouch", "{{ .Quant | blue }} snippet(s) moved to pouch {{ .Pouch | blue }}", template.FuncMap{"blue": blue})
 
 	add("snippet:inspect",
-		"\n{{range .Items}}"+"Name: {{.Username}}/{{.Pouch}}/{{.Name}}{{.Ext}}"+"\nCreated: {{.Created}}"+"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+
+		"\n{{range .Items}}"+"Name: {{.String}}"+"\nCreated: {{.Created}}"+"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+
 		//"\nWeb: \033[4mhttp://www.kwk.co/{{.Username}}/{{.FullName}}\033[0m"+
 		"\nDescription: {{.Description}}"+
 			"\nRun count: {{.RunCount}}"+
@@ -100,7 +100,7 @@ func init() {
 
 	add("search:alpha", "\n\033[7m  \"{{ .Term }}\" found in {{ .Total }} results in {{ .Took }} ms  \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{ . | formatSearchResult}}\n{{end}}", template.FuncMap{"formatSearchResult": alphaSearchResult, "blue": blue, "subdued": subdued})
 	add("search:alphaSuggest", "\n\033[7m Suggestions: \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{end}}\n", template.FuncMap{"blue": blue, "subdued": subdued})
-	add("search:typeahead", "{{range .Results}}{{ .Name }}.{{ .Extension }}\n{{end}}", nil)
+	add("search:typeahead", "{{range .Results}}{{ .String }}\n{{end}}", nil)
 
 	// errors
 	add("validation:title", "{{. | yellow }}\n", template.FuncMap{"yellow": yellow})
@@ -113,6 +113,7 @@ func init() {
 	addColor("api:error", "\n"+style.Fire+"  We have a code RED error. \n- To report type: kwk upload-errors \n- You can also try to upgrade: npm update kwkcli -g\n", red)
 	addColor("api:not-available", style.Ambulance+"  Kwk is DOWN! Please try again in a bit.\n", yellow)
 	add("api:exists", "{{ \"That item already exists.\" | yellow }}\n", template.FuncMap{"yellow": yellow})
+	add("free-text", "{{.}}", nil)
 }
 
 func add(name string, templateText string, funcMap template.FuncMap) {

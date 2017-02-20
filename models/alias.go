@@ -33,10 +33,6 @@ func (a *Alias) String() string {
 	return fmt.Sprintf("/%s/%s/%s", a.Username, a.Pouch, a.SnipName.String())
 }
 
-func (a *Alias) Path() string {
-	return fmt.Sprintf("%s/%s", a.Pouch, a.SnipName.String())
-}
-
 func NewSetupAlias(name string, ext string, uniquePerHost bool) *Alias {
 	if uniquePerHost {
 		s, err := os.Hostname()

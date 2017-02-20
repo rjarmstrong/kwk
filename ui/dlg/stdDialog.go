@@ -36,11 +36,11 @@ func (d *StdDialog) MultiChoice(templateName string, header interface{}, options
 	d.writer.Render(templateName, options)
 	input, _, _ := d.reader.ReadLine()
 	i, err := num.ParseInt(string(input))
-	if i > len(o)  || err != nil {
+	if i > len(o) || err != nil {
 		return d.MultiChoice(templateName, "Please choose a number.", options)
 	}
 	return &DialogResponse{
-		Value: o[i - 1],
+		Value: o[i-1],
 	}
 }
 
@@ -58,7 +58,22 @@ func InterfaceSlice(slice interface{}) []interface{} {
 	return ret
 }
 
-func (d *StdDialog) FormField(templateName string, data interface{}, mask bool) *DialogResponse {
+func (d *StdDialog) FormField(label string) *DialogResponse {
+	d.writer.Render("free-text", label)
+	var value []byte
+	var err error
+	value, _, err = d.reader.ReadLine()
+	if err != nil {
+		panic(err.Error())
+	}
+	//d.reader.Reset(nil)
+	return &DialogResponse{
+		Ok:true,
+		Value: string(value),
+	}
+}
+
+func (d *StdDialog) TemplateFormField(templateName string, data interface{}, mask bool) *DialogResponse {
 	d.writer.Render(templateName, data)
 	var value []byte
 	var err error
