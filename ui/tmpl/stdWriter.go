@@ -28,11 +28,19 @@ func (w *StdWriter) Render(templateName string, data interface{}) {
 	}
 }
 
+// Should be able to handle all types of errors not limited to grpc.rpcError and models.ClientErr
 func (w *StdWriter) HandleErr(e error) {
 	code := grpc.Code(e)
+	ce, ok := e.(*models.ClientErr)
+	if ok {
+		w.handleClientError(ce)
+		return
+	}
+
 	switch code {
 	case codes.InvalidArgument:
-		w.handleClientError(e)
+		log.Error("Unhandled err, requires mapping to client err.:", e)
+		panic(e)
 	case codes.Unauthenticated:
 		w.Render("api:not-authenticated", nil)
 	case codes.NotFound:
@@ -54,11 +62,7 @@ func (w *StdWriter) HandleErr(e error) {
 	}
 }
 
-func (w *StdWriter) handleClientError(err error) {
-	e, ok := err.(*models.ClientErr)
-	if !ok {
-		log.Error("Unhandled error.", err)
-	}
+func (w *StdWriter) handleClientError(e *models.ClientErr) {
 	if e.Title != "" {
 		w.Render("validation:title", e.Title)
 	}

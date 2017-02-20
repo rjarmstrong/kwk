@@ -26,7 +26,7 @@ func (d *StdDialog) Modal(templateName string, data interface{}, autoYes bool) *
 	}
 	d.writer.Render(templateName, data)
 	yesNo, _, _ := d.reader.ReadRune()
-	r.Ok = string(yesNo) == "y"
+	r.Ok = string(yesNo) == "y" || string(yesNo) == "Y"
 	return r
 }
 
