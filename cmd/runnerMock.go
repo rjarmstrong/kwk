@@ -6,12 +6,12 @@ import
 )
 
 type RunnerMock struct {
-	OpenCalledWith []interface{}
+	RunCalledWith  []interface{}
 	EditCalledWith *models.Snippet
 }
 
 func (o *RunnerMock) Run(alias *models.Snippet, args []string) error {
-	o.OpenCalledWith = []interface{}{alias, args}
+	o.RunCalledWith = []interface{}{alias, args}
 	return nil
 }
 

@@ -15,6 +15,67 @@ func Snippets(s *SnippetCli) []cli.Command {
 			},
 		},
 		{
+			Name:    "list",
+			Aliases: []string{"ls"},
+			Flags: []cli.Flag {
+				cli.BoolFlag{
+					Name: "all, a",
+					Usage: "List all snippets.",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				all := c.Bool("all")
+				if all {
+					s.su.Prefs().ListAll = true
+				}
+				s.List([]string(c.Args())...)
+				return nil
+			},
+		},
+		{
+			Name:    "mkpouch",
+			Aliases: []string{"mkdir"},
+			Action: func(c *cli.Context) error {
+				s.CreatePouch(c.Args().First())
+				return nil
+			},
+		},
+		{
+			Name:    "lock",
+			Action: func(c *cli.Context) error {
+				s.Lock(c.Args().First())
+				return nil
+			},
+		},
+		{
+			Name:    "unlock",
+			Action: func(c *cli.Context) error {
+				s.UnLock(c.Args().First())
+				return nil
+			},
+		},
+		{
+			Name:    "suggest",
+			Action: func(c *cli.Context) error {
+				s.Suggest(c.Args().First())
+				return nil
+			},
+		},
+		{
+			Name:    "find",
+			Aliases: []string{"search"},
+			Action: func(c *cli.Context) error {
+				args := []string(c.Args())
+				s.Search(args...)
+				return nil
+			},
+		},
+
+
+		/*
+		The following are actions on existing snippets (and in some cases pouches):
+		 */
+		{
 			Name:    "describe",
 			Action: func(c *cli.Context) error {
 				s.Describe(c.Args().Get(0), c.Args().Get(1))
@@ -58,14 +119,6 @@ func Snippets(s *SnippetCli) []cli.Command {
 			Aliases: []string{"e"},
 			Action: func(c *cli.Context) error {
 				s.Edit(c.Args().First())
-				return nil
-			},
-		},
-		{
-			Name:    "clone",
-			Aliases: []string{"fork", "copy", "c"},
-			Action: func(c *cli.Context) error {
-				s.Clone(c.Args().First(), c.Args().Get(1))
 				return nil
 			},
 		},
@@ -114,50 +167,10 @@ func Snippets(s *SnippetCli) []cli.Command {
 			},
 		},
 		{
-			Name:    "list",
-			Aliases: []string{"ls"},
-			Flags: []cli.Flag {
-				cli.BoolFlag{
-					Name: "all, a",
-					Usage: "List all snippets.",
-				},
-			},
-			Action: func(c *cli.Context) error {
-				all := c.Bool("all")
-				if all {
-					s.su.Prefs().ListAll = true
-				}
-				s.List([]string(c.Args())...)
-				return nil
-			},
-		},
-		{
 			Name:    "share",
 			Aliases: []string{"send"},
 			Action: func(c *cli.Context) error {
 				s.Share(c.Args().First(), c.Args().Get(2))
-				return nil
-			},
-		},
-		{
-			Name:    "mkpouch",
-			Aliases: []string{"mkdir"},
-			Action: func(c *cli.Context) error {
-				s.CreatePouch(c.Args().First())
-				return nil
-			},
-		},
-		{
-			Name:    "lock",
-			Action: func(c *cli.Context) error {
-				s.Lock(c.Args().First())
-				return nil
-			},
-		},
-		{
-			Name:    "unlock",
-			Action: func(c *cli.Context) error {
-				s.UnLock(c.Args().First())
 				return nil
 			},
 		},

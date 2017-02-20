@@ -1,7 +1,6 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
@@ -23,12 +22,11 @@ type KwkApp struct {
 	Runner         cmd.Runner
 	Dialogue       dlg.Dialog
 	TemplateWriter tmpl.Writer
-	Search         search.Term
 	Api 	       rpc.Service
 }
 
 func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u account.Manager,
-	d dlg.Dialog, w tmpl.Writer, h search.Term, api rpc.Service, su setup.Provider) *KwkApp {
+	d dlg.Dialog, w tmpl.Writer, api rpc.Service, su setup.Provider) *KwkApp {
 
 	app := cli.NewApp()
 	dash := NewDashBoard(w, a)
@@ -64,7 +62,7 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 	sysCli := NewSystemCli(s, api, u, w, t)
 	app.Commands = append(app.Commands, System(sysCli)...)
 
-	snipCli := NewSnippetCli(a, r, s, d, w, t, h, su)
+	snipCli := NewSnippetCli(a, r, s, d, w, t,  su)
 	app.Commands = append(app.Commands, Snippets(snipCli)...)
 	app.CommandNotFound = func(c *cli.Context, fullKey string) {
 		covert := c.Bool("covert")
@@ -73,8 +71,6 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 		}
 		snipCli.Run(fullKey, []string(c.Args())[1:])
 	}
-	searchCli := NewSearchCli(h, w, d)
-	app.Commands = append(app.Commands, Search(searchCli)...)
 
 	return &KwkApp{
 		App: app,
@@ -85,7 +81,6 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 		Dialogue: d,
 		Snippets: a,
 		TemplateWriter: w,
-		Search:h,
 		Api:api,
 	}
 }

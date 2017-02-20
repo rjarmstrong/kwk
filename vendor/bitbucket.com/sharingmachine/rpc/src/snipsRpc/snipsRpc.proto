@@ -33,6 +33,7 @@ service SnipsRpc {
     }
     rpc Delete (DeleteRequest) returns (DeleteResponse) {
     }
+    rpc Alpha (AlphaRequest) returns (AlphaResponse) {}
 }
 
 service PouchesRpc {
@@ -47,6 +48,25 @@ service PouchesRpc {
     }
     rpc Delete (DeletePouchRequest) returns (DeletePouchResponse) {
     }
+}
+
+message AlphaRequest {
+    string term = 1;
+    string extension = 2;
+    string username = 3;
+    bool all = 4; // Search both private and public snippets.
+    bool global = 5; // Search everyones snippets.
+}
+
+message AlphaResponse {
+    repeated AlphaResult results = 1;
+    int64 total = 2;
+    int64 took = 3;
+}
+
+message AlphaResult {
+    Snip snippet = 1;
+    map<string, string> highlights = 2;
 }
 
 message CreatePouchRequest {

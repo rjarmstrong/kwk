@@ -4,17 +4,19 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/models"
-	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bitbucket.com/sharingmachine/kwkcli/setup"
+	"bitbucket.com/sharingmachine/kwkcli/log"
+	"github.com/rjarmstrong/fzf/src"
 	"fmt"
+	"os"
+	"strings"
 )
 
 type SnippetCli struct {
-	search   search.Term
 	s        snippets.Service
 	runner   cmd.Runner
 	system   sys.Manager
@@ -24,8 +26,18 @@ type SnippetCli struct {
 	tmpl.Writer
 }
 
-func NewSnippetCli(a snippets.Service, r cmd.Runner, s sys.Manager, d dlg.Dialog, w tmpl.Writer, t config.Persister, search search.Term, su setup.Provider) *SnippetCli {
-	return &SnippetCli{s: a, runner: r, system: s, Dialog: d, Writer: w, settings: t, search: search, su: su}
+func NewSnippetCli(a snippets.Service, r cmd.Runner, s sys.Manager, d dlg.Dialog, w tmpl.Writer, t config.Persister, su setup.Provider) *SnippetCli {
+	return &SnippetCli{s: a, runner: r, system: s, Dialog: d, Writer: w, settings: t, su: su}
+}
+
+func (sc *SnippetCli) Search(args ...string) {
+	term := strings.Join(args, " ")
+	if res, err := sc.s.AlphaSearch(term); err != nil {
+		sc.HandleErr(err)
+	} else {
+		res.Term = term
+		sc.Render("search:alpha", res)
+	}
 }
 
 func (sc *SnippetCli) Share(distinctName string, destination string) {
@@ -33,7 +45,7 @@ func (sc *SnippetCli) Share(distinctName string, destination string) {
 		sc.HandleErr(err)
 	} else {
 		if alias := sc.handleMultiResponse(distinctName, list); alias != nil {
-			snip := "https://mail.google.com/mail/?ui=2&view=cm&fs=1&tf=1&su=&body=http%3A%2F%2Faus.kwk.co%2F" + alias.Username + "%2f" + alias.FullName
+			snip := "https://mail.google.com/mail/?ui=2&view=cm&fs=1&tf=1&su=&body=http%3A%2F%2Faus.kwk.co%2F" + alias.String()
 			gmail := models.NewSnippet(snip)
 			gmail.Ext = "url"
 			sc.runner.Run(gmail, []string{})
@@ -43,23 +55,26 @@ func (sc *SnippetCli) Share(distinctName string, destination string) {
 	}
 }
 
+func (sc *SnippetCli) Suggest(term string) {
+	if res, err := sc.s.AlphaSearch(term); err != nil {
+		sc.HandleErr(err)
+	} else if res.Total > 0 {
+		//sc.Render("search:alphaSuggest", res)
+		sc.Render("search:typeahead", res)
+		return
+	}
+}
+
 func (sc *SnippetCli) Run(distinctName string, args []string) {
 	a, err := models.ParseAlias(distinctName)
 	if err != nil {
 		sc.Render("validation:one-line", err)
 	}
-
-	suggest := func(fn string) {
-		if res, err := sc.search.Execute(fn); err != nil {
-			sc.HandleErr(err)
-		} else if res.Total > 0 {
-			sc.Render("search:alphaSuggest", res)
-			return
-		}
+	rerun := func(selected string){
+		sc.Run(selected, args)
 	}
-
 	if list, err := sc.s.Get(*a); err != nil {
-		suggest(distinctName)
+		sc.typeAhead(distinctName, rerun)
 	} else {
 		if alias := sc.handleMultiResponse(distinctName, list); alias != nil {
 			if err = sc.runner.Run(alias, args); err != nil {
@@ -67,28 +82,37 @@ func (sc *SnippetCli) Run(distinctName string, args []string) {
 				fmt.Println(err)
 			}
 		} else {
-			suggest(distinctName)
+			sc.typeAhead(distinctName, rerun)
 		}
 	}
 }
 
+func (sc *SnippetCli) typeAhead(distinctName string, onSelect func(name string)) {
+	exe, _ := os.Executable()
+	opt := fzf.ParseOptionsAs(fmt.Sprintf("--preview=kwk cat %s", "{}"), "--header=Suggestions:\n", "--query="+distinctName, "--reverse", "--height=40%", "--no-mouse", "--color=prompt:008,fg:255,hl:006,pointer:014,hl+:014,fg+:006,bg+:000")
+	opt.Printer = onSelect
+	fzf.Run(fmt.Sprintf("%s suggest %s", exe, distinctName), opt)
+}
+
 func (sc *SnippetCli) Create(args []string) {
-	var alias *models.Alias
-	var snippet string
+	alias := &models.Alias{}
+	snippet := ""
 	if len(args) == 0 {
-		alias = &models.Alias{}
+		log.Debug("No args provided.")
 	} else if len(args) == 1 {
 		a, err := models.ParseAlias(args[0])
 		if err != nil {
 			sc.HandleErr(err)
 			return
 		}
-		if a.Ext != "" {
-			alias = a
-		} else {
+		if a.Ext == "" {
+			log.Debug("Assuming first arg is the snippet.")
 			snippet = args[0]
+			a = &models.Alias{}
 		}
+		alias = a
 	} else {
+		log.Debug("Assuming first arg is the snippet and second is alias.")
 		a, err := models.ParseAlias(args[1])
 		if err != nil {
 			sc.HandleErr(err)
@@ -101,7 +125,6 @@ func (sc *SnippetCli) Create(args []string) {
 	if createAlias, err := sc.s.Create(snippet, *alias, models.RoleStandard); err != nil {
 		sc.HandleErr(err)
 	} else {
-
 		sc.List()
 		sc.Render("snippet:new", createAlias.Snippet.String())
 		// TODO: Add similarity prompt here
@@ -135,7 +158,8 @@ func (sc *SnippetCli) Edit(distinctName string) {
 				sc.Render("snippet:edited", alias)
 			}
 		} else {
-			sc.Render("snippet:notfound", &models.Snippet{FullName: distinctName})
+			//TODO: FIX
+			sc.Render("snippet:notfound", &models.Snippet{})
 		}
 	}
 }
@@ -278,10 +302,10 @@ func (sc *SnippetCli) Move(args []string) {
 	}
 	if last == "" {
 		sc.List()
-		sc.Render("snippet:moved-root", MoveResult{Quant:len(as)})
+		sc.Render("snippet:moved-root", MoveResult{Quant: len(as)})
 	} else {
 		sc.List()
-		sc.Render("snippet:moved-pouch", MoveResult{Pouch:p, Quant:len(as)})
+		sc.Render("snippet:moved-pouch", MoveResult{Pouch: p, Quant: len(as)})
 	}
 
 }
@@ -293,9 +317,11 @@ type MoveResult struct {
 
 func (sc *SnippetCli) Cat(distinctName string) {
 	if list, a, err := sc.get(distinctName); err != nil {
+		//sc.suggest(distinctName)
 		sc.HandleErr(err)
 	} else {
 		if len(list.Items) == 0 {
+			//sc.suggest(distinctName)
 			sc.Render("snippet:notfound", a)
 		} else if len(list.Items) == 1 {
 			sc.Render("snippet:cat", list.Items[0])

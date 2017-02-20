@@ -22,6 +22,10 @@ type ServiceMock struct {
 	MakePrivateCalledWith []interface{}
 }
 
+func (sm *ServiceMock) AlphaSearch(term string) (*models.SearchTermResponse, error) {
+	panic("not impl")
+}
+
 func (sm *ServiceMock) Move(username string, sourcePouch string, targetPouch string, names []*models.SnipName) (string, error) {
 	panic("not imp")
 }

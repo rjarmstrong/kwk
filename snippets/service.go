@@ -14,6 +14,7 @@ type Service interface {
 	UnTag(a models.Alias, tag ...string) (*models.Snippet, error)
 	Get(a models.Alias) (*models.SnippetList, error)
 	List(l *models.ListParams) (*models.SnippetList, error)
+	AlphaSearch(term string) (*models.SearchTermResponse, error)
 
 	GetRoot (username string, all bool) (*models.Root, error)
 	CreatePouch (pouch string) (string, error)

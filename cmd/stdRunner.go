@@ -183,7 +183,7 @@ func (r *StdRunner) getEnvSection(name string) (*yaml.MapSlice, error) {
 func replaceVariables(cliArgs *[]string, filePath string, s *models.Snippet) {
 	for i := range *cliArgs {
 		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$FULL_NAME", filePath, -1)
-		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$DIR", strings.Replace(filePath, s.FullName, "", -1), -1)
+		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$DIR", strings.Replace(filePath, s.String(), "", -1), -1)
 		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$NAME", strings.Replace(filePath, "."+s.Ext, "", -1), -1)
 	}
 }

@@ -3,7 +3,6 @@ package integration
 import (
 	"github.com/smartystreets/goconvey/web/server/system"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
-	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
@@ -29,7 +28,6 @@ func createApp(conn *grpc.ClientConn, writer *bytes.Buffer, r *bufio.Reader) *ap
 	w := tmpl.NewWriter(writer)
 	d := dlg.New(w, r)
 	o := openers.New(s, a, w)
-	ch := search.NewAlphaTerm(conn, t, h)
 	return app.New(a, s, t, o, u, d, w, ch)
 }
 

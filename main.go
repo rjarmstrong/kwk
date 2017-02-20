@@ -2,7 +2,6 @@ package main
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
-	"bitbucket.com/sharingmachine/kwkcli/search"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
@@ -77,10 +76,9 @@ func runKwk() {
 	o := cmd.NewStdRunner(s, ss, su)
 	r := bufio.NewReader(os.Stdin)
 	d := dlg.New(w, r)
-	ch := search.NewAlphaTerm(conn, j, h)
 	api := rpc.New(conn, h)
 
-	kwkApp := app.New(ss, s, j, o, u, d, w, ch, api, su)
+	kwkApp := app.New(ss, s, j, o, u, d, w, api, su)
 	kwkApp.App.Version = v
 
 	su.Preload()

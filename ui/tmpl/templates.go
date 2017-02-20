@@ -100,6 +100,7 @@ func init() {
 
 	add("search:alpha", "\n\033[7m  \"{{ .Term }}\" found in {{ .Total }} results in {{ .Took }} ms  \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{ . | formatSearchResult}}\n{{end}}", template.FuncMap{"formatSearchResult": alphaSearchResult, "blue": blue, "subdued": subdued})
 	add("search:alphaSuggest", "\n\033[7m Suggestions: \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{end}}\n", template.FuncMap{"blue": blue, "subdued": subdued})
+	add("search:typeahead", "{{range .Results}}{{ .Name }}.{{ .Extension }}\n{{end}}", nil)
 
 	// errors
 	add("validation:title", "{{. | yellow }}\n", template.FuncMap{"yellow": yellow})
@@ -129,7 +130,7 @@ func addColor(name string, text string, color ColorFunc) {
 func multiChoice(list []models.Snippet) string {
 	var options string
 	for i, v := range list {
-		options = options + fmt.Sprintf("[%s] %s   ", style.Fmt(style.Cyan, i+1), v.FullName)
+		options = options + fmt.Sprintf("[%s] %s   ", style.Fmt(style.Cyan, i+1), v.SnipName.String())
 	}
 	return options
 }

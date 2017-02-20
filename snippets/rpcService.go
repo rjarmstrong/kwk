@@ -25,6 +25,29 @@ func New(conn *grpc.ClientConn, s config.Persister, h *rpc.Headers) Service {
 	}
 }
 
+func (rs *RpcService) AlphaSearch(term string) (*models.SearchTermResponse, error) {
+	if res, err := rs.client.Alpha(rs.h.Context(), &snipsRpc.AlphaRequest{
+		Term: term,
+	}); err != nil {
+		return nil, err
+	} else {
+		r := &models.SearchTermResponse{}
+		r.Results = []*models.SearchResult{}
+		r.Took = res.Took
+		r.Total = res.Total
+		for _, v := range res.Results {
+			s := &models.Snippet{}
+			rs.mapSnip(v.Snippet, s, false)
+			sr := &models.SearchResult{
+				Snippet: s,
+				Highlights: v.Highlights,
+			}
+			r.Results = append(r.Results, sr)
+		}
+		return r, nil
+	}
+}
+
 func (rs *RpcService) Update(a models.Alias, description string) (*models.Snippet, error) {
 	if res, err := rs.client.Update(rs.h.Context(), &snipsRpc.UpdateRequest{Alias: mapAlias(a), Description: description}); err != nil {
 		return nil, err

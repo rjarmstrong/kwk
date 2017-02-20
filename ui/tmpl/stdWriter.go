@@ -44,12 +44,12 @@ func (w *StdWriter) HandleErr(e error) {
 	case codes.Unimplemented:
 		w.Render("api:not-implemented", nil)
 	case codes.Internal:
-		log.Debug("Internal Error.", e)
+		log.Error("Internal Error.", e)
 		w.Render("api:error", nil)
 	case codes.Unavailable:
 		w.Render("api:not-available", nil)
 	default:
-		log.Debug("Unhandled err:", e)
+		log.Error("Unhandled err:", e)
 		panic(e)
 	}
 }

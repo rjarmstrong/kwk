@@ -27,7 +27,6 @@ func NewSnippet(snippet string) *Snippet{
 type Snippet struct {
 	Id string
 
-	FullName  string
 	Alias
 
 	Snip    string
