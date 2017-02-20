@@ -100,23 +100,23 @@
 		},
 		{
 			"ImportPath": "github.com/rjarmstrong/fzf/src",
-			"Comment": "0.16.5-3-gd75f4eb",
-			"Rev": "d75f4eb8669fe12588ce3d52dde8efa536a0da2c"
+			"Comment": "0.16.5-4-g2b5d860",
+			"Rev": "2b5d8608604a79441bb95dd2f19c119d760a7695"
 		},
 		{
 			"ImportPath": "github.com/rjarmstrong/fzf/src/algo",
-			"Comment": "0.16.5-3-gd75f4eb",
-			"Rev": "d75f4eb8669fe12588ce3d52dde8efa536a0da2c"
+			"Comment": "0.16.5-4-g2b5d860",
+			"Rev": "2b5d8608604a79441bb95dd2f19c119d760a7695"
 		},
 		{
 			"ImportPath": "github.com/rjarmstrong/fzf/src/tui",
-			"Comment": "0.16.5-3-gd75f4eb",
-			"Rev": "d75f4eb8669fe12588ce3d52dde8efa536a0da2c"
+			"Comment": "0.16.5-4-g2b5d860",
+			"Rev": "2b5d8608604a79441bb95dd2f19c119d760a7695"
 		},
 		{
 			"ImportPath": "github.com/rjarmstrong/fzf/src/util",
-			"Comment": "0.16.5-3-gd75f4eb",
-			"Rev": "d75f4eb8669fe12588ce3d52dde8efa536a0da2c"
+			"Comment": "0.16.5-4-g2b5d860",
+			"Rev": "2b5d8608604a79441bb95dd2f19c119d760a7695"
 		},
 		{
 			"ImportPath": "github.com/siddontang/go/num",
