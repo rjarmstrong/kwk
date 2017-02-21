@@ -8,7 +8,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
-	"bitbucket.com/sharingmachine/kwkcli/setup"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"github.com/rjarmstrong/fzf/src"
 	"strings"
@@ -25,7 +24,7 @@ type SnippetCli struct {
 	tmpl.Writer
 }
 
-func NewSnippetCli(a snippets.Service, r cmd.Runner, s sys.Manager, d dlg.Dialog, w tmpl.Writer, t config.Persister, su setup.Provider) *SnippetCli {
+func NewSnippetCli(a snippets.Service, r cmd.Runner, s sys.Manager, d dlg.Dialog, w tmpl.Writer, t config.Persister) *SnippetCli {
 	return &SnippetCli{s: a, runner: r, system: s, Dialog: d, Writer: w, settings: t}
 }
 
@@ -221,7 +220,7 @@ func (sc *SnippetCli) deleteSnippet(args []string) {
 		sc.HandleErr(err)
 		return
 	}
-	if r := sc.Modal("snippet:check-delete", as, setup.Prefs().AutoYes); r.Ok {
+	if r := sc.Modal("snippet:check-delete", as, models.Prefs().AutoYes); r.Ok {
 		if err := sc.s.Delete("", pouch, as); err != nil {
 			sc.HandleErr(err)
 			return
@@ -424,12 +423,12 @@ func (sc *SnippetCli) CreatePouch(name string) {
 // kwk ls /richard/examples
 func (sc *SnippetCli) List(args ...string) {
 	if len(args) == 0 {
-		r, err := sc.s.GetRoot("", setup.Prefs().ListAll)
+		r, err := sc.s.GetRoot("", models.Prefs().ListAll)
 		if err != nil {
 			sc.HandleErr(err)
 			return
 		}
-		if setup.Prefs().ListLong {
+		if models.Prefs().ListLong {
 			fmt.Println("listing long")
 		} else {
 			sc.Render("pouch:list-root", r)
@@ -442,7 +441,7 @@ func (sc *SnippetCli) List(args ...string) {
 		return
 	}
 	if pouch == "" {
-		r, err := sc.s.GetRoot(username, setup.Prefs().ListAll)
+		r, err := sc.s.GetRoot(username, models.Prefs().ListAll)
 		if err != nil {
 			sc.HandleErr(err)
 		}
@@ -463,7 +462,7 @@ func (sc *SnippetCli) List(args ...string) {
 	//		}
 	//	}
 	//}
-	p := &models.ListParams{Username: username, Pouch: pouch, Size: size, All: setup.Prefs().ListAll}
+	p := &models.ListParams{Username: username, Pouch: pouch, Size: size, All: models.Prefs().ListAll}
 	if list, err := sc.s.List(p); err != nil {
 		sc.HandleErr(err)
 	} else {

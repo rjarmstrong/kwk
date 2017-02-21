@@ -105,7 +105,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 	if err != nil {
 		return err
 	}
-	if setup.Prefs().Covert {
+	if models.Prefs().Covert {
 		yamlKey += "-covert"
 	}
 	comp, interp := getSubSection(rs, yamlKey)
@@ -171,7 +171,7 @@ func execSafe(name string, arg ...string) (io.ReadCloser, error) {
 }
 
 func (r *StdRunner) getEnvSection(name string) (*yaml.MapSlice, error) {
-	rs, _ := getSubSection(setup.Env(), name)
+	rs, _ := getSubSection(models.Env(), name)
 	if rs == nil {
 		return nil, errors.New(fmt.Sprintf("No %s section in env.yml", name))
 	}

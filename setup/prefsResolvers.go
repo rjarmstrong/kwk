@@ -55,7 +55,7 @@ func (p *PrefsResolvers) Default() (string, error) {
 }
 
 func (p *PrefsResolvers) Fallback() (string, error) {
-	ph := &PreferencesHolder{KwkPrefs: "v1", Preferences: DefaultPrefs().PersistedPrefs }
+	ph := &models.PreferencesHolder{KwkPrefs: "v1", Preferences: models.DefaultPrefs().PersistedPrefs }
 	if b, err := yaml.Marshal(ph); err != nil {
 		return "", err
 	} else {

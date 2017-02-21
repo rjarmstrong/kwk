@@ -137,25 +137,12 @@ func multiChoice(list []models.Snippet) string {
 	return options
 }
 
-func listRoot(r *models.Root) string {
+
+func listHorizontal(l []interface{}) []byte {
 	var buff bytes.Buffer
-	buff.WriteString("\n")
-	buff.WriteString(style.Fmt(style.Cyan, "   kwk.co/") + r.Username + "/\n")
-	buff.WriteString("\n")
-
-	var all []interface{}
-	for _, v := range r.Snippets {
-		all = append(all, v)
-	}
-	for _, v := range r.Pouches {
-		if v.Name != "" {
-			all = append(all, v)
-		}
-	}
-
 	w := tabwriter.NewWriter(&buff, 25, 3, 1, ' ', tabwriter.DiscardEmptyColumns)
 	var item bytes.Buffer
-	for i, v := range all {
+	for i, v := range l {
 		if i%6 == 0 {
 			item.WriteString("   ")
 		}
@@ -165,7 +152,7 @@ func listRoot(r *models.Root) string {
 			item.WriteString(style.Fmt(style.Cyan, sn.SnipName.String()))
 		}
 		if pch, ok := v.(*models.Pouch); ok {
-			if !r.HidePrivate {
+			if models.Prefs().ListAll || !pch.MakePrivate {
 				if pch.MakePrivate {
 					item.WriteString("🔒")
 				} else {
@@ -190,6 +177,26 @@ func listRoot(r *models.Root) string {
 		item.Reset()
 	}
 	w.Flush()
+	return buff.Bytes()
+}
+
+func listRoot(r *models.Root) string {
+	var buff bytes.Buffer
+	buff.WriteString("\n")
+	buff.WriteString(style.Fmt(style.Cyan, "   kwk.co/") + r.Username + "/\n")
+	buff.WriteString("\n")
+
+	var all []interface{}
+	for _, v := range r.Snippets {
+		all = append(all, v)
+	}
+	for _, v := range r.Pouches {
+		if v.Name != "" {
+			all = append(all, v)
+		}
+	}
+
+	buff.Write(listHorizontal(all))
 
 	buff.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("\n\n   %d/50 Pouches\n", len(r.Pouches)-1)))
 	buff.WriteString("\n\n")

@@ -1,4 +1,27 @@
-package setup
+package models
+
+import (
+	"gopkg.in/yaml.v2"
+)
+
+var prefs  *Preferences
+var env   *yaml.MapSlice
+
+func Prefs() *Preferences {
+	return prefs
+}
+
+func Env() *yaml.MapSlice {
+	return env
+}
+
+func SetPrefs(p *Preferences) {
+	prefs = p
+}
+
+func SetEnv(e *yaml.MapSlice) {
+	env = e
+}
 
 func DefaultPrefs() *Preferences {
 	p := &Preferences{

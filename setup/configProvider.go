@@ -5,8 +5,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"gopkg.in/yaml.v2"
-	_ "io/ioutil"
-	_ "bitbucket.com/sharingmachine/kwkcli/log"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 )
@@ -18,57 +16,47 @@ type ConfigProvider struct {
 	w tmpl.Writer
 }
 
-var prefs  *Preferences
-var env   *yaml.MapSlice
-
 func NewConfigProvider(ss snippets.Service, s sys.Manager, u account.Manager, w tmpl.Writer) Provider {
 	env := NewEnvResolvers(ss, s, u)
 	prefs := NewPrefsResolvers(ss, s, u)
 	return &ConfigProvider{envResolvers:env, prefsResolvers:prefs, u:u, w:w}
 }
 
-func Prefs() *Preferences {
-	return prefs
-}
-
-func Env() *yaml.MapSlice {
-	return env
-}
-
 func (cs *ConfigProvider) Load(){
-	_, err := cs.localEnv()
+	_, err := cs.loadEnv()
 	if err != nil {
 		cs.w.HandleErr(err)
 	}
 	cs.loadPrefs()
 }
 
-func (cs *ConfigProvider) localEnv() (*yaml.MapSlice, error) {
-	if env != nil {
-		return env, nil
+func (cs *ConfigProvider) loadEnv() (*yaml.MapSlice, error) {
+	if models.Env() != nil {
+		return models.Env(), nil
 	}
 	envString, err := cs.GetConfig(cs.envResolvers)
 	if err != nil {
 		return nil, err
 	}
-	env = &yaml.MapSlice{}
+	env := &yaml.MapSlice{}
 	if err := yaml.Unmarshal([]byte(envString), env); err != nil {
 		return nil, err
 	}
-	return env, nil
+	models.SetEnv(env)
+	return models.Env(), nil
 }
 
 func (cs *ConfigProvider) loadPrefs() {
-	if prefs != nil {
+	if models.Prefs() != nil {
 		return
 	}
 	if c, err := cs.GetConfig(cs.prefsResolvers); err != nil {
 		cs.w.HandleErr(err)
 		return
 	} else {
-		prefs = &Preferences{PersistedPrefs:PersistedPrefs{}}
-		parse := func(p string) (*Preferences, error) {
-			ph := &PreferencesHolder{}
+		prefs := &models.Preferences{PersistedPrefs:models.PersistedPrefs{}}
+		parse := func(p string) (*models.Preferences, error) {
+			ph := &models.PreferencesHolder{}
 			if err := yaml.Unmarshal([]byte(p), ph); err != nil {
 				return nil, err
 			} else {
@@ -83,7 +71,7 @@ func (cs *ConfigProvider) loadPrefs() {
 			fb, _ := cs.prefsResolvers.Fallback()
 			res, _ = parse(fb)
 		} else {
-			prefs = res
+			models.SetPrefs(res)
 		}
 	}
 }

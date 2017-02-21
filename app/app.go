@@ -11,6 +11,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
 	"github.com/urfave/cli"
 	"bitbucket.com/sharingmachine/kwkcli/setup"
+	"bitbucket.com/sharingmachine/kwkcli/models"
 )
 
 type KwkApp struct {
@@ -62,12 +63,12 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 	sysCli := NewSystemCli(s, api, u, w, t)
 	app.Commands = append(app.Commands, System(sysCli)...)
 
-	snipCli := NewSnippetCli(a, r, s, d, w, t,  su)
+	snipCli := NewSnippetCli(a, r, s, d, w, t)
 	app.Commands = append(app.Commands, Snippets(snipCli)...)
 	app.CommandNotFound = func(c *cli.Context, fullKey string) {
 		covert := c.Bool("covert")
 		if covert {
-			setup.Prefs().Covert = true
+			models.Prefs().Covert = true
 		}
 		snipCli.Run(fullKey, []string(c.Args())[1:])
 	}
