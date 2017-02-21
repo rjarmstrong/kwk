@@ -180,16 +180,39 @@ func listHorizontal(l []interface{}) []byte {
 	return buff.Bytes()
 }
 
+func formatSnippet(s *models.Snippet) string {
+	var snip string
+	if s.Role == models.RolePreferences {
+		snip = style.Fmt(style.Yellow, `(Global prefs) 'kwk edit prefs'`)
+	} else if s.Role == models.RoleEnvironment {
+		snip = style.Fmt(style.Yellow, `(Local environment) 'kwk edit env'`)
+	} else {
+		snip = fmt.Sprintf("%s", uri(s.Snip))
+	}
+	snip = strings.Replace(snip, "\t", " ", -1)
+	snip = strings.Replace(snip, "\n", " ", -1)
+	snip = strings.Replace(snip, "    ", " ", -1)
+	return snip
+}
+
 func listLong(l []interface{}) []byte {
 	var buff bytes.Buffer
-	w := tabwriter.NewWriter(&buff, 25, 3, 1, ' ', tabwriter.DiscardEmptyColumns)
+	w := tabwriter.NewWriter(&buff, 35, 3, 1, ' ', tabwriter.DiscardEmptyColumns)
 	var item bytes.Buffer
+	item.WriteString("   ")
+	item.WriteString(style.Fmt(style.Subdued, "   Name"))
+	item.WriteString(" ")
+	item.WriteString("\t")
+	item.WriteString(style.Fmt(style.Subdued, "Snippet"))
+	item.WriteString("\n")
 	for _, v := range l {
 		item.WriteString("   ")
 		if sn, ok := v.(*models.Snippet); ok {
 			item.WriteString("🔸")
 			item.WriteString("  ")
 			item.WriteString(style.Fmt(style.Cyan, sn.SnipName.String()))
+			item.WriteString( "\t")
+			item.WriteString(formatSnippet(sn))
 		}
 		if pch, ok := v.(*models.Pouch); ok {
 			if models.Prefs().ListAll || !pch.MakePrivate {
@@ -202,6 +225,8 @@ func listLong(l []interface{}) []byte {
 				item.WriteString(pch.Name)
 				item.WriteString(" ")
 				item.WriteString(style.Fmt(style.DarkGrey, fmt.Sprintf("%d", pch.SnipCount)))
+				item.WriteString( "\t")
+				item.WriteString(" ")
 			}
 		}
 		fmt.Fprint(w, fmt.Sprintf("%s", item.String()))
@@ -280,10 +305,11 @@ func listSnippets(list *models.SnippetList) string {
 			}
 		}
 
-		var snip string
-		var name string
 
+		var name string
 		name = style.Fmt(style.Cyan, v.Name) + style.Fmt(style.Subdued, "."+v.Ext)
+
+		var snip string
 		if v.Role == models.RolePreferences {
 			snip = style.Fmt(style.Yellow, `(Global prefs) 'kwk edit prefs'`)
 		} else if v.Role == models.RoleEnvironment {
