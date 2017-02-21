@@ -67,7 +67,7 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 	app.CommandNotFound = func(c *cli.Context, fullKey string) {
 		covert := c.Bool("covert")
 		if covert {
-			su.Prefs().Covert = true
+			setup.Prefs().Covert = true
 		}
 		snipCli.Run(fullKey, []string(c.Args())[1:])
 	}

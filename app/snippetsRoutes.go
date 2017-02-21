@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/urfave/cli"
+	"bitbucket.com/sharingmachine/kwkcli/setup"
 )
 
 func Snippets(s *SnippetCli) []cli.Command {
@@ -22,11 +23,19 @@ func Snippets(s *SnippetCli) []cli.Command {
 					Name: "all, a",
 					Usage: "List all snippets.",
 				},
+				cli.BoolFlag{
+					Name: "long, l",
+					Usage: "List with columns.",
+				},
 			},
 			Action: func(c *cli.Context) error {
 				all := c.Bool("all")
 				if all {
-					s.su.Prefs().ListAll = true
+					setup.Prefs().ListAll = true
+				}
+				long := c.Bool("long")
+				if long {
+					setup.Prefs().ListLong = true
 				}
 				s.List([]string(c.Args())...)
 				return nil
@@ -142,7 +151,7 @@ func Snippets(s *SnippetCli) []cli.Command {
 			Action: func(c *cli.Context) error {
 				autoYes := c.Bool("yes")
 				if autoYes {
-					s.su.Prefs().AutoYes = true
+					setup.Prefs().AutoYes = true
 				}
 				s.Delete(c.Args())
 				return nil

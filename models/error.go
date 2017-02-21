@@ -19,6 +19,7 @@ const (
 	Code_FullKeyExistsWhenClone Code = 3020
 	Code_MultipleSnippetsFound  Code = 3030
 	Code_TwoArgumentsRequiredForMove Code = 3040
+	Code_SnippetNotVerified Code = 3050
 
 	// Users
 	Code_WrongCreds      Code = 4010

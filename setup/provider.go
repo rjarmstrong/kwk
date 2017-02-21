@@ -1,17 +1,12 @@
 package setup
 
-import (
-	"gopkg.in/yaml.v2"
-)
-
 const (
 	SNIP_CACHE_PATH = "snip-cache"
 )
 
 type Provider interface {
-	Env() (*yaml.MapSlice, error)
-	Prefs() *Preferences
-	Preload()
+	//Load loads preferences and environments.
+	Load()
 }
 
 
@@ -24,17 +19,9 @@ type Resolvers interface{
 }
 
 type ProviderMock struct {
-
 }
 
-func (ProviderMock) Env() (*yaml.MapSlice, error) {
-	return &yaml.MapSlice{}, nil
-}
 
-func (ProviderMock) Prefs() *Preferences {
-	return DefaultPrefs()
-}
-
-func (ProviderMock) Preload() {
+func (ProviderMock) Load() {
 }
 

@@ -30,6 +30,7 @@ type Snippet struct {
 	Alias
 
 	Snip    string
+	Signature string
 	Version int64
 	Media   string
 	Tags    []string

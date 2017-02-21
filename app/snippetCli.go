@@ -21,13 +21,12 @@ type SnippetCli struct {
 	runner   cmd.Runner
 	system   sys.Manager
 	settings config.Persister
-	su       setup.Provider
 	dlg.Dialog
 	tmpl.Writer
 }
 
 func NewSnippetCli(a snippets.Service, r cmd.Runner, s sys.Manager, d dlg.Dialog, w tmpl.Writer, t config.Persister, su setup.Provider) *SnippetCli {
-	return &SnippetCli{s: a, runner: r, system: s, Dialog: d, Writer: w, settings: t, su: su}
+	return &SnippetCli{s: a, runner: r, system: s, Dialog: d, Writer: w, settings: t}
 }
 
 func (sc *SnippetCli) Search(args ...string) {
@@ -77,6 +76,7 @@ func (sc *SnippetCli) Run(distinctName string, args []string) {
 		sc.typeAhead(distinctName, rerun)
 	} else {
 		if alias := sc.handleMultiResponse(distinctName, list); alias != nil {
+			//TODO: If username is not the current user or 'kwk' then prompt before executing.
 			if err = sc.runner.Run(alias, args); err != nil {
 				//TODO: Move to template
 				fmt.Println(err)
@@ -219,7 +219,7 @@ func (sc *SnippetCli) deleteSnippet(args []string) {
 		sc.HandleErr(err)
 		return
 	}
-	if r := sc.Modal("snippet:check-delete", as, sc.su.Prefs().AutoYes); r.Ok {
+	if r := sc.Modal("snippet:check-delete", as, setup.Prefs().AutoYes); r.Ok {
 		if err := sc.s.Delete("", pouch, as); err != nil {
 			sc.HandleErr(err)
 			return
@@ -337,6 +337,7 @@ func (sc *SnippetCli) Cat(distinctName string) {
 			//sc.suggest(distinctName)
 			sc.Render("snippet:notfound", a)
 		} else if len(list.Items) == 1 {
+			// TODO: use echo instead so that we can do variable substitution
 			sc.Render("snippet:cat", list.Items[0])
 		} else {
 			sc.Render("snippet:ambiguouscat", list)
@@ -421,12 +422,16 @@ func (sc *SnippetCli) CreatePouch(name string) {
 // kwk ls /richard/examples
 func (sc *SnippetCli) List(args ...string) {
 	if len(args) == 0 {
-		r, err := sc.s.GetRoot("", sc.su.Prefs().ListAll)
+		r, err := sc.s.GetRoot("", setup.Prefs().ListAll)
 		if err != nil {
 			sc.HandleErr(err)
 			return
 		}
-		sc.Render("pouch:list-root", r)
+		if setup.Prefs().ListLong {
+			fmt.Println("listing long")
+		} else {
+			sc.Render("pouch:list-root", r)
+		}
 		return
 	}
 	username, pouch, err := models.ParsePouch(args[0])
@@ -435,7 +440,7 @@ func (sc *SnippetCli) List(args ...string) {
 		return
 	}
 	if pouch == "" {
-		r, err := sc.s.GetRoot(username, sc.su.Prefs().ListAll)
+		r, err := sc.s.GetRoot(username, setup.Prefs().ListAll)
 		if err != nil {
 			sc.HandleErr(err)
 		}
@@ -456,7 +461,7 @@ func (sc *SnippetCli) List(args ...string) {
 	//		}
 	//	}
 	//}
-	p := &models.ListParams{Username: username, Pouch: pouch, Size: size, All: sc.su.Prefs().ListAll}
+	p := &models.ListParams{Username: username, Pouch: pouch, Size: size, All: setup.Prefs().ListAll}
 	if list, err := sc.s.List(p); err != nil {
 		sc.HandleErr(err)
 	} else {

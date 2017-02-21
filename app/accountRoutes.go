@@ -38,6 +38,20 @@ func Accounts(a *AccountCli) []cli.Command {
 				return nil
 			},
 		},
+		{
+			Name: "reset-password",
+			Action: func(c *cli.Context) error {
+				panic("not implemented.")
+				return nil
+			},
+		},
+		{
+			Name: "change-password",
+			Action: func(c *cli.Context) error {
+				panic("not implemented.")
+				return nil
+			},
+		},
 	}
 	return c
 }

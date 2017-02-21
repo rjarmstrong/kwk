@@ -87,8 +87,15 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	}
 }
 
+func Verify(snippet string, signature string) bool {
+	return true
+}
+
 
 func (r *StdRunner) Run(s *models.Snippet, args []string) error {
+	if !Verify(s.Snip, s.Signature) {
+		return models.ErrOneLine(models.Code_SnippetNotVerified, "The snippet is not verified by the kwk signature.")
+	}
 	rs, err := r.getEnvSection("runners")
 	if err != nil {
 		return err
@@ -97,7 +104,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 	if err != nil {
 		return err
 	}
-	if r.setup.Prefs().Covert {
+	if setup.Prefs().Covert {
 		yamlKey += "-covert"
 	}
 	comp, interp := getSubSection(rs, yamlKey)
@@ -163,11 +170,7 @@ func execSafe(name string, arg ...string) (io.ReadCloser, error) {
 }
 
 func (r *StdRunner) getEnvSection(name string) (*yaml.MapSlice, error) {
-	env, err := r.setup.Env()
-	if err != nil {
-		return nil, err
-	}
-	rs, _ := getSubSection(env, name)
+	rs, _ := getSubSection(setup.Env(), name)
 	if rs == nil {
 		return nil, errors.New(fmt.Sprintf("No %s section in env.yml", name))
 	}

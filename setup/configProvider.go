@@ -15,10 +15,11 @@ type ConfigProvider struct {
 	u              account.Manager
 	envResolvers   Resolvers
 	prefsResolvers Resolvers
-	prefs          *Preferences
-	env            *yaml.MapSlice
 	w tmpl.Writer
 }
+
+var prefs  *Preferences
+var env   *yaml.MapSlice
 
 func NewConfigProvider(ss snippets.Service, s sys.Manager, u account.Manager, w tmpl.Writer) Provider {
 	env := NewEnvResolvers(ss, s, u)
@@ -26,45 +27,53 @@ func NewConfigProvider(ss snippets.Service, s sys.Manager, u account.Manager, w 
 	return &ConfigProvider{envResolvers:env, prefsResolvers:prefs, u:u, w:w}
 }
 
-func (cs *ConfigProvider) Preload(){
-	_, err := cs.Env()
+func Prefs() *Preferences {
+	return prefs
+}
+
+func Env() *yaml.MapSlice {
+	return env
+}
+
+func (cs *ConfigProvider) Load(){
+	_, err := cs.localEnv()
 	if err != nil {
 		cs.w.HandleErr(err)
 	}
-	cs.Prefs()
+	cs.loadPrefs()
 }
 
-func (cs *ConfigProvider) Env() (*yaml.MapSlice, error) {
-	if cs.env != nil {
-		return cs.env, nil
+func (cs *ConfigProvider) localEnv() (*yaml.MapSlice, error) {
+	if env != nil {
+		return env, nil
 	}
-	env, err := cs.GetConfig(cs.envResolvers)
+	envString, err := cs.GetConfig(cs.envResolvers)
 	if err != nil {
 		return nil, err
 	}
-	cs.env = &yaml.MapSlice{}
-	if err := yaml.Unmarshal([]byte(env), cs.env); err != nil {
+	env = &yaml.MapSlice{}
+	if err := yaml.Unmarshal([]byte(envString), env); err != nil {
 		return nil, err
 	}
-	return cs.env, nil
+	return env, nil
 }
 
-func (cs *ConfigProvider) Prefs() *Preferences {
-	if cs.prefs != nil {
-		return cs.prefs
+func (cs *ConfigProvider) loadPrefs() {
+	if prefs != nil {
+		return
 	}
 	if c, err := cs.GetConfig(cs.prefsResolvers); err != nil {
 		cs.w.HandleErr(err)
-		return nil
+		return
 	} else {
-		cs.prefs = &Preferences{PersistedPrefs:PersistedPrefs{}}
+		prefs = &Preferences{PersistedPrefs:PersistedPrefs{}}
 		parse := func(p string) (*Preferences, error) {
 			ph := &PreferencesHolder{}
 			if err := yaml.Unmarshal([]byte(p), ph); err != nil {
 				return nil, err
 			} else {
-				cs.prefs.PersistedPrefs = ph.Preferences
-				return cs.prefs, nil
+				prefs.PersistedPrefs = ph.Preferences
+				return prefs, nil
 			}
 		}
 		if res, err := parse(c); err != nil {
@@ -73,9 +82,8 @@ func (cs *ConfigProvider) Prefs() *Preferences {
 			// The fallback is expected not to fail parsing
 			fb, _ := cs.prefsResolvers.Fallback()
 			res, _ = parse(fb)
-			return res
 		} else {
-			return res
+			prefs = res
 		}
 	}
 }
@@ -94,3 +102,5 @@ func (cs *ConfigProvider) GetConfig(r Resolvers) (string, error) {
 		return "", err
 	}
 }
+
+

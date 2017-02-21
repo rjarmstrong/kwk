@@ -29,6 +29,7 @@ type Preferences struct {
 	Force   bool // TODO: Security Will squash warning messages e.g. when running third party snippets.
 	Encrypt bool // TODO: Security
 	Decrypt bool // TODO: Security
+	ListLong bool
 }
 
 // PersistedPrefs are preferences which can be persistent.
