@@ -53,6 +53,7 @@ func (r *S3Remoter) Latest() (io.ReadCloser, error) {
 }
 
 func (r *S3Remoter) CleanUp() {
+	log.Debug("Removing work folder.")
 	err := os.RemoveAll(workFolder)
 	if err != nil {
 		log.Error("Error cleaning up.", err)

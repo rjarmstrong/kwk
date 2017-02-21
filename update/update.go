@@ -61,6 +61,7 @@ func (r *Runner) Run() error {
 		return err
 	}
 	defer latest.Close() //TODO: Currently NOOP, should be real closer
+	log.Debug("Applying update.")
 	err = r.Applier(latest, gu.Options{})
 	if err != nil {
 		log.Error("Couldn't apply update.", err)
@@ -78,6 +79,7 @@ func (r *Runner) Run() error {
 
 func (r *Runner) recordUpdate() error {
 	ur := &Record{LastUpdate:time.Now().Unix()}
+	log.Debug("Updating update record.")
 	return r.Persister.Upsert(RecordFile, ur)
 }
 
