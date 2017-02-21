@@ -9,6 +9,7 @@ import (
 	"flag"
 	"path"
 	"bitbucket.com/sharingmachine/kwkcli/cache"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var er = log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
@@ -20,19 +21,21 @@ var dbgFlag = flag.Bool("debug", false, "Show debug trace.")
 
 func init() {
 	flag.Parse()
-	f, err := os.OpenFile(path.Join(cache.Path(), "kwk.log"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		panic(err)
+	output := &lumberjack.Logger{
+		Filename:   path.Join(cache.Path(), "kwk.log"),
+		MaxSize:    3, // megabytes
+		MaxBackups: 2,
+		MaxAge:     5, //days
 	}
 	if !*dbgFlag {
-		SetOutput(f)
+		setOutput(output)
 	} else {
 		Debug("--debug")
 	}
-	er.SetOutput(f)
+	er.SetOutput(output)
 }
 
-func SetOutput(out io.Writer) {
+func setOutput(out io.Writer) {
 	dbg.SetOutput(out)
 	er.SetOutput(out)
 }
