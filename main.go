@@ -81,7 +81,7 @@ func runKwk() {
 	kwkApp := app.New(ss, s, j, o, u, d, w, api, su)
 	kwkApp.App.Version = v
 
-	su.Preload()
+	su.Load()
 	kwkApp.App.Run(os.Args)
 }
 
