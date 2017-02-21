@@ -11,6 +11,7 @@ import (
 	"errors"
 	"io"
 	//"os"
+	"os"
 )
 
 func Test_Update(t *testing.T) {
@@ -72,7 +73,7 @@ func Test_Update(t *testing.T) {
 		//	r := S3Remoter{}
 		//	ri, err := r.ReleaseInfo()
 		//	So(err, ShouldBeNil)
-		//	So(ri.Current, ShouldEqual, "v1.2.4")
+		//	So(ri.Current, ShouldEqual, "v1.2.7")
 		//	rdr, err := r.Latest()
 		//	So(err, ShouldBeNil)
 		//	out, err := os.Create("kwk")

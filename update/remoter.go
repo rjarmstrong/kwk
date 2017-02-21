@@ -11,6 +11,8 @@ import (
 	"path"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"bitbucket.com/sharingmachine/kwkcli/cache"
+	"compress/gzip"
+	"archive/tar"
 )
 
 const workFolder = "./update_work"
@@ -48,8 +50,74 @@ func (r *S3Remoter) Latest() (io.ReadCloser, error) {
 	}
 	resp.Body.Close()
 	out.Close()
-	exe(true,"tar", "-xvf", fnt, "-C", workFolder) //TODO: tar prob no supported everywhere
-	return os.Open(path.Join(workFolder, fn))
+	tarFile := path.Join(workFolder, fn + ".tar")
+	target := path.Join(workFolder, fn)
+	err = unGZip(fnt, tarFile)
+	if err != nil {
+		return nil, err
+	}
+	err = unTar(tarFile, target)
+	if err != nil {
+		return nil, err
+	}
+	return os.Open(target)
+}
+
+func unGZip(source, target string) error {
+	reader, err := os.Open(source)
+	if err != nil {
+		return err
+	}
+	defer reader.Close()
+
+	archive, err := gzip.NewReader(reader)
+	if err != nil {
+		return err
+	}
+	defer archive.Close()
+
+	writer, err := os.Create(target)
+	if err != nil {
+		return err
+	}
+	defer writer.Close()
+
+	_, err = io.Copy(writer, archive)
+	return err
+}
+
+func unTar(tarball, target string) error {
+	reader, err := os.Open(tarball)
+	if err != nil {
+		return err
+	}
+	defer reader.Close()
+	tarReader := tar.NewReader(reader)
+
+	for {
+		header, err := tarReader.Next()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return err
+		}
+
+		info := header.FileInfo()
+		if info.IsDir() {
+			continue
+		}
+
+		file, err := os.OpenFile(target, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, info.Mode())
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		_, err = io.Copy(file, tarReader)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (r *S3Remoter) CleanUp() {

@@ -13,6 +13,7 @@ const (
 	Code_Unspecified Code = 0
 	Code_NotFound Code = 10
 	Code_InvalidArgument Code = 20
+	Code_UnexpectedEndOfTar Code = 30
 	// Snippets
 	Code_NoTags                 Code = 3000
 	Code_NewFullKeyEmpty        Code = 3010
