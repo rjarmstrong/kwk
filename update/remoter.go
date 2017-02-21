@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bitbucket.com/sharingmachine/kwkcli/log"
+	"bitbucket.com/sharingmachine/kwkcli/cache"
 )
 
 const workFolder = "./update_work"
@@ -29,7 +29,7 @@ func (r *S3Remoter) Latest() (io.ReadCloser, error) {
 	fn := fmt.Sprintf("kwk-%s-%s", runtime.GOOS, runtime.GOARCH)
 	fnt := fmt.Sprintf("%s.tar.gz", fn)
 	url := fmt.Sprintf("https://s3.amazonaws.com/kwk-cli/latest/bin/%s", fnt)
-	err := os.MkdirAll(workFolder, sys.StandardFilePermission)
+	err := os.MkdirAll(workFolder, cache.StandardFilePermission)
 	if err != nil {
 		return nil, err
 	}

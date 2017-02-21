@@ -11,9 +11,9 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/setup"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"github.com/rjarmstrong/fzf/src"
+	"strings"
 	"fmt"
 	"os"
-	"strings"
 )
 
 type SnippetCli struct {
@@ -70,7 +70,9 @@ func (sc *SnippetCli) Run(distinctName string, args []string) {
 		sc.Render("validation:one-line", err)
 	}
 	rerun := func(selected string){
-		sc.Run(selected, args)
+		r := sc.Dialog.FormField(fmt.Sprintf("kwk %s ", selected))
+		argstr := r.Value.(string)
+		sc.Run(selected, strings.Split(argstr, " "))
 	}
 	if list, err := sc.s.Get(*a); err != nil {
 		sc.typeAhead(distinctName, rerun)

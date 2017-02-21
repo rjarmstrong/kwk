@@ -1,11 +1,5 @@
 package sys
 
-const (
-	OS_DARWIN = `darwin`
-	OS_LINUX = `linux`
-	OS_WINDOWS = `windows`
-)
-
 var KWK_TEST_MODE = false
 
 var Version string

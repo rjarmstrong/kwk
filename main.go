@@ -46,8 +46,6 @@ func runKwk() {
 	sys.Version = version
 	sys.Build = build
 
-	f, l := sys.NewLogger()
-	defer f.Close()
 	//profile().Close()
 
 	host := os.Getenv("API_HOST")
@@ -59,9 +57,8 @@ func runKwk() {
 		}
 	}
 	w := tmpl.NewWriter(os.Stdout)
-	conn, err := rpc.GetConn(host, l, sys.KWK_TEST_MODE)
+	conn, err := rpc.GetConn(host, sys.KWK_TEST_MODE)
 	if err != nil {
-		l.Println(err)
 		w.HandleErr(models.ErrOneLine(models.Code_ApiDown, " The kwk api is down, please try again."))
 		return
 	}

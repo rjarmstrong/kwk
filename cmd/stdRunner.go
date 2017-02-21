@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"bitbucket.com/sharingmachine/kwkcli/cache"
 )
 
 type StdRunner struct {
@@ -63,10 +64,10 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	}
 
 	closer := func() {
-		if runtime.GOOS == sys.OS_DARWIN {
+		if runtime.GOOS == cache.OS_DARWIN {
 			// This assumes we are using iTerm, we'll have to get the active shell (echo $TERM_PROGRAM on Mac)
 			execSafe("osascript", "-e", "tell application \"iTerm2\" to activate")
-		} else if runtime.GOOS == sys.OS_WINDOWS {
+		} else if runtime.GOOS == cache.OS_WINDOWS {
 			//	// How will this work on:
 			//	- windows https://technet.microsoft.com/en-us/library/ee176882.aspx
 		}

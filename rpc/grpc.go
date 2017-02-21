@@ -11,9 +11,9 @@ import (
 	"crypto/x509"
 	"google.golang.org/grpc/grpclog"
 	"os"
-	lg "log"
 	"time"
 	"runtime"
+	"bitbucket.com/sharingmachine/kwkcli/log"
 )
 
 // /etc/ssl/certs/COMODO_RSA_Certification_Authority.pem
@@ -52,7 +52,7 @@ QOhTsiedSrnAdyGN/4fy3ryM7xfft0kL0fJuMAsaDk527RH89elWsn2/x20Kk4yl
 NVOFBkpdn627G190
 -----END CERTIFICATE-----`
 
-func GetConn(serverAddress string, logger *lg.Logger, trustAllCerts bool) (*grpc.ClientConn, error) {
+func GetConn(serverAddress string, trustAllCerts bool) (*grpc.ClientConn, error) {
 	var opts []grpc.DialOption
 
 	pool := x509.NewCertPool()
@@ -69,7 +69,7 @@ func GetConn(serverAddress string, logger *lg.Logger, trustAllCerts bool) (*grpc
 	opts = append(opts, grpc.WithUnaryInterceptor(errorInterceptor))
 	opts = append(opts, grpc.WithTimeout(time.Second*3))
 	opts = append(opts, grpc.WithBlock())
-	grpclog.SetLogger(logger)
+	grpclog.SetLogger(log.GetDebugLog())
 
 	conn, err := grpc.Dial(serverAddress, opts...)
 	return conn, err
