@@ -428,11 +428,7 @@ func (sc *SnippetCli) List(args ...string) {
 			sc.HandleErr(err)
 			return
 		}
-		if models.Prefs().ListLong {
-			fmt.Println("listing long")
-		} else {
-			sc.Render("pouch:list-root", r)
-		}
+		sc.Render("pouch:list-root", r)
 		return
 	}
 	username, pouch, err := models.ParsePouch(args[0])

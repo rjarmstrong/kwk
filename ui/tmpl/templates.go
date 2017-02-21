@@ -180,6 +180,38 @@ func listHorizontal(l []interface{}) []byte {
 	return buff.Bytes()
 }
 
+func listLong(l []interface{}) []byte {
+	var buff bytes.Buffer
+	w := tabwriter.NewWriter(&buff, 25, 3, 1, ' ', tabwriter.DiscardEmptyColumns)
+	var item bytes.Buffer
+	for _, v := range l {
+		item.WriteString("   ")
+		if sn, ok := v.(*models.Snippet); ok {
+			item.WriteString("🔸")
+			item.WriteString("  ")
+			item.WriteString(style.Fmt(style.Cyan, sn.SnipName.String()))
+		}
+		if pch, ok := v.(*models.Pouch); ok {
+			if models.Prefs().ListAll || !pch.MakePrivate {
+				if pch.MakePrivate {
+					item.WriteString("🔒")
+				} else {
+					item.WriteString("👝")
+				}
+				item.WriteString("  ")
+				item.WriteString(pch.Name)
+				item.WriteString(" ")
+				item.WriteString(style.Fmt(style.DarkGrey, fmt.Sprintf("%d", pch.SnipCount)))
+			}
+		}
+		fmt.Fprint(w, fmt.Sprintf("%s", item.String()))
+		item.Reset()
+		fmt.Fprint(w,"\n")
+	}
+	w.Flush()
+	return buff.Bytes()
+}
+
 func listRoot(r *models.Root) string {
 	var buff bytes.Buffer
 	buff.WriteString("\n")
@@ -196,7 +228,11 @@ func listRoot(r *models.Root) string {
 		}
 	}
 
-	buff.Write(listHorizontal(all))
+	if models.Prefs().ListLong {
+		buff.Write(listLong(all))
+	} else {
+		buff.Write(listHorizontal(all))
+	}
 
 	buff.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("\n\n   %d/50 Pouches\n", len(r.Pouches)-1)))
 	buff.WriteString("\n\n")
@@ -277,9 +313,6 @@ func listSnippets(list *models.SnippetList) string {
 	return buf.String()
 }
 
-func getConfigName(name string) string {
-	return "." + strings.Split(name, "_")[1]
-}
 
 func alphaSearchResult(result models.SearchResult) string {
 	if result.Highlights == nil {

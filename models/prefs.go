@@ -35,6 +35,7 @@ func DefaultPrefs() *Preferences {
 	p.WipeTrail = false
 	p.SessionTimeout = 15
 	p.ListAll = true
+	p.ListLong = false
 	return p
 }
 
