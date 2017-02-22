@@ -8,10 +8,16 @@ var prefs  *Preferences
 var env   *yaml.MapSlice
 
 func Prefs() *Preferences {
+	if prefs == nil {
+		prefs = DefaultPrefs()
+	}
 	return prefs
 }
 
 func Env() *yaml.MapSlice {
+	if env == nil {
+		env = &yaml.MapSlice{}
+	}
 	return env
 }
 
