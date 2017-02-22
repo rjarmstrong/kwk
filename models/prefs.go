@@ -36,6 +36,7 @@ func DefaultPrefs() *Preferences {
 	p.SessionTimeout = 15
 	p.ListAll = true
 	p.ListLong = false
+	p.RegulateUpdates = true
 	return p
 }
 
@@ -65,4 +66,5 @@ type PersistedPrefs struct {
 	WipeTrail      bool  //deletes the history each time a command is run TODO: Security
 	SessionTimeout int64 // 0 = no timeout, TODO: Implement on api SECURITY
 	AutoEncrypt    bool  //Encrypts all snippets when created. TODO: SECURITY
+	RegulateUpdates bool //Updates based on the recommended schedule. If false get updates as soon as available.
 }

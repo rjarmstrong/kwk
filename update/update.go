@@ -94,6 +94,10 @@ func (r *Runner) recordUpdate() error {
 }
 
 func (r *Runner) isUpdateDue() (bool, error) {
+	if !models.Prefs().RegulateUpdates {
+		log.Debug("Updates not regulated.")
+		return true, nil
+	}
 	ur := &Record{}
 	hiatus := time.Now().Unix() - int64(r.UpdatePeriod/time.Second)
 	log.Debug("Checking update is newer than: %d (Unix time seconds)", hiatus)
