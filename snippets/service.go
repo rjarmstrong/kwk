@@ -15,6 +15,7 @@ type Service interface {
 	Get(a models.Alias) (*models.SnippetList, error)
 	List(l *models.ListParams) (*models.SnippetList, error)
 	AlphaSearch(term string) (*models.SearchTermResponse, error)
+	LogRun(a models.Alias, s models.RunStatus)
 
 	GetRoot (username string, all bool) (*models.Root, error)
 	CreatePouch (pouch string) (string, error)

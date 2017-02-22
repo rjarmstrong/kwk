@@ -9,6 +9,7 @@ import (
 	"time"
 	"fmt"
 	"bitbucket.com/sharingmachine/kwkcli/update"
+	"bitbucket.com/sharingmachine/kwkcli/log"
 )
 
 type RpcService struct {
@@ -157,6 +158,14 @@ func (rs *RpcService) Clone(a models.Alias, new models.Alias) (*models.Snippet, 
 		snip := &models.Snippet{}
 		rs.mapSnip(res.Snip, snip, true)
 		return snip, nil
+	}
+}
+
+func (rs *RpcService) LogRun(a models.Alias, s models.RunStatus) {
+	_, err := rs.client.LogRun(rs.h.Context(), &snipsRpc.LogRunRequest{
+		Alias: mapAlias(a), Status: snipsRpc.RunStatus(s), Time: time.Now().Unix() })
+	if err != nil {
+		log.Error("Error sending LogRun", err)
 	}
 }
 

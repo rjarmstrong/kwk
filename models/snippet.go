@@ -46,8 +46,13 @@ type Snippet struct {
 }
 
 type SnipRole int32
+type RunStatus int64
 
 const (
+	RunStatusUnknown RunStatus = 0
+	RunStatusSuccess RunStatus = 1
+	RunStatusFail  RunStatus = 2
+
 	RoleStandard    SnipRole = 0
 	RolePreferences SnipRole = 1
 	RoleEnvironment SnipRole = 2

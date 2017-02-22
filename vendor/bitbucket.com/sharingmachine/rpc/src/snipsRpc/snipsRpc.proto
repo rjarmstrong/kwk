@@ -34,6 +34,8 @@ service SnipsRpc {
     rpc Delete (DeleteRequest) returns (DeleteResponse) {
     }
     rpc Alpha (AlphaRequest) returns (AlphaResponse) {}
+
+    rpc LogRun (LogRunRequest) returns (LogRunResponse) {}
 }
 
 service PouchesRpc {
@@ -48,6 +50,16 @@ service PouchesRpc {
     }
     rpc Delete (DeletePouchRequest) returns (DeletePouchResponse) {
     }
+}
+
+message LogRunRequest {
+    Alias alias = 1;
+    RunStatus status = 2;
+    int64 time = 3;
+}
+
+message LogRunResponse {
+
 }
 
 message AlphaRequest {
@@ -272,6 +284,12 @@ message Snip {
     bool encrypted = 15;
     string algorithm = 16;
     Role role = 17;
+}
+
+enum RunStatus {
+    Unknown = 0;
+    Success = 1;
+    Fail = 2;
 }
 
 enum Role {

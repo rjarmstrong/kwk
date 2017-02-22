@@ -22,6 +22,10 @@ type ServiceMock struct {
 	MakePrivateCalledWith []interface{}
 }
 
+func (sm *ServiceMock) LogRun(a models.Alias, s models.RunStatus) {
+	panic("not impl")
+}
+
 func (sm *ServiceMock) AlphaSearch(term string) (*models.SearchTermResponse, error) {
 	panic("not impl")
 }
