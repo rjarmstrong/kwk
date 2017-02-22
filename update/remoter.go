@@ -17,17 +17,42 @@ import (
 
 const workFolder = "./update_work"
 
-
 type Remoter interface {
-	Latest() (io.ReadCloser, error)
+	// LatestInfo gets information about the latest build.
+	LatestInfo() (*ReleaseInfo, error)
+	// Latest gets the actual binary.
+	LatestBinary() (io.ReadCloser, error)
+	// Delete any residual files post update.
 	CleanUp()
-	ReleaseInfo() (*ReleaseInfo, error)
+}
+
+type ReleaseInfo struct {
+	Version string `json:"version"`
+	Build   string `json:"build"`
+	Time   int64 `json:"time"`
+	Notes string `json:"notes"`
 }
 
 type S3Remoter struct {
 }
 
-func (r *S3Remoter) Latest() (io.ReadCloser, error) {
+func (r *S3Remoter) LatestInfo() (*ReleaseInfo, error) {
+	i, err := http.Get("https://s3.amazonaws.com/kwk-cli/release-info.json")
+	if err != nil {
+		return nil, err
+	}
+	ri := &ReleaseInfo{}
+	info, err := ioutil.ReadAll(i.Body)
+	json.Unmarshal(info, ri)
+	if err != nil {
+		log.Debug("Failed unmarshalling release info.", err)
+		return nil, err
+	}
+	i.Body.Close()
+	return ri, nil
+}
+
+func (r *S3Remoter) LatestBinary() (io.ReadCloser, error) {
 	fn := fmt.Sprintf("kwk-%s-%s", runtime.GOOS, runtime.GOARCH)
 	fnt := fmt.Sprintf("%s.tar.gz", fn)
 	url := fmt.Sprintf("https://s3.amazonaws.com/kwk-cli/latest/bin/%s", fnt)
@@ -61,6 +86,14 @@ func (r *S3Remoter) Latest() (io.ReadCloser, error) {
 		return nil, err
 	}
 	return os.Open(target)
+}
+
+func (r *S3Remoter) CleanUp() {
+	log.Debug("Removing work folder.")
+	err := os.RemoveAll(workFolder)
+	if err != nil {
+		log.Error("Error cleaning up.", err)
+	}
 }
 
 func unGZip(source, target string) error {
@@ -118,28 +151,4 @@ func unTar(tarball, target string) error {
 		}
 	}
 	return nil
-}
-
-func (r *S3Remoter) CleanUp() {
-	log.Debug("Removing work folder.")
-	err := os.RemoveAll(workFolder)
-	if err != nil {
-		log.Error("Error cleaning up.", err)
-	}
-}
-
-
-func (r *S3Remoter) ReleaseInfo() (*ReleaseInfo, error) {
-	i, err := http.Get("https://s3.amazonaws.com/kwk-cli/release-info.json")
-	if err != nil {
-		return nil, err
-	}
-	ri := &ReleaseInfo{}
-	info, err := ioutil.ReadAll(i.Body)
-	json.Unmarshal(info, ri)
-	if err != nil {
-		return nil, err
-	}
-	i.Body.Close()
-	return ri, nil
 }

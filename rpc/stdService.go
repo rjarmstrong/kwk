@@ -18,11 +18,11 @@ func New(conn *grpc.ClientConn, h *Headers) *stdService {
 	return &stdService{client: sysRpc.NewSysRpcClient(conn), headers: h}
 }
 
-func (s *stdService) GetApiInfo() (*models.InfoResponse, error) {
+func (s *stdService) GetApiInfo() (*models.ApiInfo, error) {
 	if r, err := s.client.GetApiInfo(s.headers.Context(), &sysRpc.InfoRequest{}); err != nil {
 		return nil, err
 	} else {
-		return &models.InfoResponse{Build:r.Build, Version:r.Version, Revision: r.Revision}, nil
+		return &models.ApiInfo{Build: r.Build, Version: r.Version, Revision: r.Revision}, nil
 	}
 }
 

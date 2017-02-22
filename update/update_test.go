@@ -5,6 +5,7 @@ import (
 	gu "github.com/inconshreveable/go-update"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
+	"bitbucket.com/sharingmachine/kwkcli/models"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -18,6 +19,7 @@ func Test_Update(t *testing.T) {
 		am := &ApplierMock{}
 		rm := &RemoterMock{}
 		pm := &config.PersisterMock{}
+		models.Client.Version = "v0.0.1"
 
 		r := Runner{
 			Applier:    am.Apply,
@@ -27,8 +29,7 @@ func Test_Update(t *testing.T) {
 		}
 
 		Convey("Given there is an update record should NOT run update.", func() {
-			sys.Version = "v0.0.1"
-			rm.RI = ReleaseInfo{Current: "v0.0.2"}
+			rm.BI = ReleaseInfo{Version: "v0.0.2"}
 			pm.GetHydrates = &Record{}
 			err := r.Run()
 			So(err, ShouldBeNil)
@@ -37,8 +38,7 @@ func Test_Update(t *testing.T) {
 		})
 
 		Convey(`Given the current version is equal to the latest version should NOT run update.`, func() {
-			sys.Version = "v0.0.2"
-			rm.RI = ReleaseInfo{Current: "v0.0.2"}
+			rm.BI = ReleaseInfo{Version: "v0.0.1"}
 			pm.GetHydrates = &Record{}
 			err := r.Run()
 			So(err, ShouldBeNil)
@@ -47,8 +47,7 @@ func Test_Update(t *testing.T) {
 		})
 
 		Convey("Given there is NOT an update record and the remote version is newer should update.", func() {
-			sys.Version = "v0.0.1"
-			rm.RI = ReleaseInfo{Current: "v0.0.2"}
+			rm.BI = ReleaseInfo{Version: "v0.0.2"}
 			pm.GetReturns = sys.ErrFileNotFound
 			err := r.Run()
 			So(err, ShouldBeNil)
@@ -57,8 +56,7 @@ func Test_Update(t *testing.T) {
 		})
 
 		Convey(`When updating Given the applier returns an error should rollback.`, func() {
-			sys.Version = "v0.0.1"
-			rm.RI = ReleaseInfo{Current: "v0.0.2"}
+			rm.BI = ReleaseInfo{Version: "v0.0.2"}
 			pm.GetReturns = sys.ErrFileNotFound
 			m := "Couldn't apply."
 			am.ApplyErr = errors.New(m)
@@ -67,18 +65,21 @@ func Test_Update(t *testing.T) {
 			So(am.RollbackCalledWith.Error(), ShouldEqual, m)
 		})
 
-		// TODO: Run on ad-hoc basis
-		// Convey(`Test remoter info and bin downloader`, func() {
-		//	r := S3Remoter{}
-		//	ri, err := r.ReleaseInfo()
-		//	So(err, ShouldBeNil)
-		//	So(ri.Current, ShouldEqual, "v1.2.7")
-		//	rdr, err := r.Latest()
-		//	So(err, ShouldBeNil)
-		//	out, err := os.Create("kwk")
-		//	So(err, ShouldBeNil)
-		//	io.Copy(out, rdr)
-		//})
+		// //TODO: Run on ad-hoc basis
+		 Convey(`Test remoter info and bin downloader`, func() {
+			//r := S3Remoter{}
+			//ri, err := r.LatestInfo()
+			//So(err, ShouldBeNil)
+			//So(ri.Version, ShouldEqual, "1.2.3")
+			//So(ri.Build, ShouldEqual, "12")
+			//So(ri.Time, ShouldEqual, 233423423)
+			//So(ri.Notes, ShouldResemble, "Feature A\nFeature B\n")
+			//rdr, err := r.LatestBinary()
+			//So(err, ShouldBeNil)
+			//out, err := os.Create("kwk")
+			//So(err, ShouldBeNil)
+			//io.Copy(out, rdr)
+		})
 
 	})
 }
@@ -103,20 +104,20 @@ func (am *ApplierMock) RollbackError(err error) error {
 }
 
 type RemoterMock struct {
-	RI                ReleaseInfo
+	BI                ReleaseInfo
 	LatestCalled      bool
 	ReleaseInfoCalled bool
 }
 
-func (rm *RemoterMock) Latest() (io.ReadCloser, error) {
+func (rm *RemoterMock) LatestBinary() (io.ReadCloser, error) {
 	rm.LatestCalled = true
 	r := strings.NewReader("This is the binary")
 	return ioutil.NopCloser(r), nil
 }
 
-func (rm *RemoterMock) ReleaseInfo() (*ReleaseInfo, error) {
+func (rm *RemoterMock) LatestInfo() (*ReleaseInfo, error) {
 	rm.ReleaseInfoCalled = true
-	return &rm.RI, nil
+	return &rm.BI, nil
 }
 
 func (rm *RemoterMock) CleanUp() {

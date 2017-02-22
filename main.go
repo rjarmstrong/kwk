@@ -17,11 +17,8 @@ import (
 	"bufio"
 	"os"
 	"strings"
+	"strconv"
 )
-
-var version string = "-"
-
-var build string = "-"
 
 var s sys.Manager
 var j config.Persister
@@ -42,10 +39,14 @@ func main() {
 	}
 }
 
-func runKwk() {
-	sys.Version = version
-	sys.Build = build
+var version string = "v-.-.-"
+var build string = "0"
+var releaseTime string
 
+func runKwk() {
+	models.Client.Version = version
+	models.Client.Build = build
+	models.Client.Time, _ = strconv.ParseInt(releaseTime, 10, 64)
 	//profile().Close()
 
 	host := os.Getenv("API_HOST")
@@ -64,8 +65,7 @@ func runKwk() {
 	}
 	defer conn.Close()
 
-	v := version + "+" + build
-	h := rpc.NewHeaders(j, v)
+	h := rpc.NewHeaders(j)
 	u := account.NewStdManager(conn, j, h)
 	ss := snippets.New(conn, j, h)
 
@@ -76,7 +76,6 @@ func runKwk() {
 	api := rpc.New(conn, h)
 
 	kwkApp := app.New(ss, s, j, o, u, d, w, api, su)
-	kwkApp.App.Version = v
 
 	su.Load()
 	kwkApp.App.Run(os.Args)

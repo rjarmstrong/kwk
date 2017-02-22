@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"fmt"
 	"text/tabwriter"
+	"time"
 )
 
 var Templates = map[string]*template.Template{}
@@ -27,7 +28,6 @@ var Templates = map[string]*template.Template{}
 //`
 
 const logo = `
-
 `
 
 func init() {
@@ -63,10 +63,7 @@ func init() {
 
 	add("snippet:inspect",
 		"\n{{range .Items}}"+"Name: {{.String}}"+"\nCreated: {{.Created}}"+"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+
-		//"\nWeb: \033[4mhttp://www.kwk.co/{{.Username}}/{{.FullName}}\033[0m"+
-		"\nDescription: {{.Description}}"+
-			"\nRun count: {{.RunCount}}"+
-			"\nClone count: {{.CloneCount}}"+"\n{{ end }}\n\n", nil)
+		"\nDescription: {{.Description}}"+"\nRun count: {{.RunCount}}"+"\nClone count: {{.CloneCount}}"+"\n{{ end }}\n\n", nil)
 
 	add("pouch:not-deleted", "{{. | blue }} was NOT deleted.", template.FuncMap{"blue": blue})
 	add("pouch:deleted", "{{. | blue }} was deleted.", template.FuncMap{"blue": blue})
@@ -81,7 +78,8 @@ func init() {
 
 	// System
 	add("system:upgraded", "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n   Successfully upgraded!  \n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", nil)
-	add("system:version", "kwk version:\n CLI: {{ .cliVersion | blue}}\n API: {{ .apiVersion | blue}}\n", template.FuncMap{"blue": blue})
+	add("system:version", "kwk version:\n CLI: {{ .String | blue }} released {{ .Time | time }}\n API: {{ .Api.String | blue}}\n", template.FuncMap{"blue": blue, "time": humanTime })
+
 	// Account
 	add("account:signedup", "Welcome to kwk {{.Username | blue }}!\n You're signed in already.\n", template.FuncMap{"blue": blue})
 	addColor("account:usernamefield", "Your Kwk Username: ", blue)
@@ -117,6 +115,10 @@ func init() {
 	add("free-text", "{{.}}", nil)
 }
 
+func humanTime(t int64) string {
+	return humanize.Time(time.Unix(t, 0))
+}
+
 func add(name string, templateText string, funcMap template.FuncMap) {
 	t := template.New(name)
 	if funcMap != nil {
@@ -136,7 +138,6 @@ func multiChoice(list []models.Snippet) string {
 	}
 	return options
 }
-
 
 func listHorizontal(l []interface{}) []byte {
 	var buff bytes.Buffer
@@ -211,7 +212,7 @@ func listLong(l []interface{}) []byte {
 			item.WriteString("🔸")
 			item.WriteString("  ")
 			item.WriteString(style.Fmt(style.Cyan, sn.SnipName.String()))
-			item.WriteString( "\t")
+			item.WriteString("\t")
 			item.WriteString(formatSnippet(sn))
 		}
 		if pch, ok := v.(*models.Pouch); ok {
@@ -225,13 +226,13 @@ func listLong(l []interface{}) []byte {
 				item.WriteString(pch.Name)
 				item.WriteString(" ")
 				item.WriteString(style.Fmt(style.DarkGrey, fmt.Sprintf("%d", pch.SnipCount)))
-				item.WriteString( "\t")
+				item.WriteString("\t")
 				item.WriteString(" ")
 			}
 		}
 		fmt.Fprint(w, fmt.Sprintf("%s", item.String()))
 		item.Reset()
-		fmt.Fprint(w,"\n")
+		fmt.Fprint(w, "\n")
 	}
 	w.Flush()
 	return buff.Bytes()
@@ -239,6 +240,7 @@ func listLong(l []interface{}) []byte {
 
 func listRoot(r *models.Root) string {
 	var buff bytes.Buffer
+
 	buff.WriteString("\n")
 	buff.WriteString(style.Fmt(style.Cyan, "   kwk.co/") + r.Username + "/\n")
 	buff.WriteString("\n")
@@ -259,7 +261,12 @@ func listRoot(r *models.Root) string {
 		buff.Write(listHorizontal(all))
 	}
 
-	buff.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("\n\n   %d/50 Pouches\n", len(r.Pouches)-1)))
+	buff.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("\n\n   %d/50 Pouches", len(r.Pouches)-1)))
+	if models.ClientIsNew(r.LastUpdate) {
+		buff.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("          kwk auto-updated to %s %s", models.Client.Version, humanTime(r.LastUpdate))))
+	} else {
+		buff.WriteString("\n")
+	}
 	buff.WriteString("\n\n")
 	for _, v := range r.Personal {
 		if v.Name == "inbox" {
@@ -274,7 +281,6 @@ func listRoot(r *models.Root) string {
 		}
 	}
 	buff.WriteString("\n\n")
-
 	return buff.String()
 }
 
@@ -304,7 +310,6 @@ func listSnippets(list *models.SnippetList) string {
 				tags = append(tags, v)
 			}
 		}
-
 
 		var name string
 		name = style.Fmt(style.Cyan, v.Name) + style.Fmt(style.Subdued, "."+v.Ext)
@@ -338,7 +343,6 @@ func listSnippets(list *models.SnippetList) string {
 
 	return buf.String()
 }
-
 
 func alphaSearchResult(result models.SearchResult) string {
 	if result.Highlights == nil {

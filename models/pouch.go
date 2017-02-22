@@ -15,11 +15,12 @@ type Pouch struct {
 }
 
 type Root struct {
+	LastUpdate  int64
 	HidePrivate bool
-	Username string
-	Pouches []*Pouch
-	Personal []*Pouch
-	Snippets []*Snippet
+	Username    string
+	Pouches     []*Pouch
+	Personal    []*Pouch
+	Snippets    []*Snippet
 }
 
 func (rt *Root) IsPouch(name string) bool {

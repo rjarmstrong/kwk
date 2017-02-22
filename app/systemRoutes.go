@@ -17,7 +17,7 @@ func System(s *SystemCli) []cli.Command {
 			Name:    "version",
 			Aliases: []string{"v"},
 			Action: func(c *cli.Context) error {
-				s.GetVersion(c.App.Version)
+				s.GetVersion()
 				return nil
 			},
 		},

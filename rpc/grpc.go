@@ -77,8 +77,8 @@ func GetConn(serverAddress string, trustAllCerts bool) (*grpc.ClientConn, error)
 
 //
 
-func NewHeaders(t config.Persister, version string) *Headers {
-	return &Headers{persister: t, version: version}
+func NewHeaders(t config.Persister) *Headers {
+	return &Headers{persister: t, version: models.Client.String() }
 }
 
 type Headers struct {

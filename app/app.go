@@ -30,6 +30,7 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 	d dlg.Dialog, w tmpl.Writer, api rpc.Service, su setup.Provider) *KwkApp {
 
 	app := cli.NewApp()
+	app.Version = models.Client.String()
 	dash := NewDashBoard(w, a)
 	cli.HelpPrinter = dash.GetWriter()
 	app.Flags = []cli.Flag {

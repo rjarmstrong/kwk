@@ -2,9 +2,6 @@ package sys
 
 var KWK_TEST_MODE = false
 
-var Version string
-
-var Build string
 
 type Manager interface {
 	Exists(path string) (bool, error)

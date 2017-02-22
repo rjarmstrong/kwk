@@ -6,8 +6,8 @@ type SysMock struct {
 
 }
 
-func (*SysMock) GetApiInfo() (*models.InfoResponse, error) {
-	return &models.InfoResponse{}, nil
+func (*SysMock) GetApiInfo() (*models.ApiInfo, error) {
+	return &models.ApiInfo{}, nil
 }
 
 func (*SysMock) TestAppError(bool) (error) {

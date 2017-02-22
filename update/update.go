@@ -4,7 +4,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	gu "github.com/inconshreveable/go-update"
-	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"os/exec"
 	"bytes"
@@ -14,6 +13,16 @@ import (
 )
 
 const RecordFile = "update-record.json"
+
+// SilentCheckAndRun spawns a new process to check for updates and run.
+func SilentCheckAndRun() {
+	cmd, err := os.Executable()
+	log.Debug("Initiating silent update check for: %s", cmd)
+	if err != nil {
+		log.Error("If you are running nacl or OpenBSD they are not supported.", err)
+	}
+	exe(false, cmd,"update", "silent")
+}
 
 type Runner struct {
 	UpdatePeriod time.Duration
@@ -46,16 +55,17 @@ func (r *Runner) Run() error {
 		return err
 	}
 
-	ri, err := r.ReleaseInfo()
+	li, err := r.LatestInfo()
 	if err != nil {
 		log.Error("Couldn't get remote release info.", err)
 		return err
 	}
-	if ri.Current == sys.Version {
-		log.Debug("Local is same as latest version: %s", ri.Current)
+	if li.Version == models.Client.Version {
+		log.Debug("Local is same as latest version: %s", li.Version)
+		r.recordUpdate()
 		return nil
 	}
-	latest, err := r.Latest()
+	latest, err := r.LatestBinary()
 	if err != nil {
 		log.Error("Couldn't get latest from remote.", err)
 		return err
@@ -72,7 +82,7 @@ func (r *Runner) Run() error {
 	} else {
 		r.CleanUp()
 		r.recordUpdate()
-		log.Debug("Updated to version: %s+%s", ri.Current, ri.Build)
+		log.Debug("Updated to version: %s+%s", li.Version, li.Build)
 		return nil
 	}
 }
@@ -100,21 +110,6 @@ func (r *Runner) isUpdateDue() (bool, error) {
 		return false, err2
 	}
 	return false, nil
-}
-
-
-type ReleaseInfo struct {
-	Current string `json:"current"`
-	Build string `json:"build"`
-}
-
-func SilentCheckAndRun() {
-	cmd, err := os.Executable()
-	log.Debug("Initiating silent update check for: %s", cmd)
-	if err != nil {
-		log.Error("If you are running nacl or OpenBSD they are not supported.", err)
-	}
-	exe(false, cmd,"update", "silent")
 }
 
 func exe(wait bool, name string, arg ...string) {

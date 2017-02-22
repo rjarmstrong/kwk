@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc"
 	"time"
 	"fmt"
+	"bitbucket.com/sharingmachine/kwkcli/update"
 )
 
 type RpcService struct {
@@ -189,7 +190,11 @@ func (rs *RpcService) GetRoot(username string, all bool) (*models.Root, error) {
 	rs.mapSnippetList(res, l, true)
 	pl := rs.mapPouchList(r.Pouches)
 	perL := rs.mapPouchList(r.Personal)
+	record := &update.Record{}
 	root := &models.Root{Snippets: l.Items, Pouches: pl, Personal:perL, Username:r.Username}
+	if e := rs.persister.Get(update.RecordFile, record, 0); e == nil {
+		root.LastUpdate = record.LastUpdate
+	}
 	return root, err
 }
 

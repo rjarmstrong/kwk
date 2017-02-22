@@ -5,9 +5,9 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/update"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
-	"fmt"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bitbucket.com/sharingmachine/kwkcli/config"
+	"bitbucket.com/sharingmachine/kwkcli/models"
 )
 
 type SystemCli struct {
@@ -29,14 +29,8 @@ func (c *SystemCli) Update() {
 	}
 }
 
-func (c *SystemCli) GetVersion(cliVersion string) {
-	apiV, err := c.rpc.GetApiInfo(); if err != nil {
-		c.HandleErr(err)
-	}
-	c.Render("system:version", map[string]string{
-		"cliVersion": cliVersion,
-		"apiVersion": fmt.Sprintf("%s+%s", apiV.Version, apiV.Build),
-	})
+func (c *SystemCli) GetVersion() {
+	c.Render("system:version", &models.Client)
 }
 
 func (c *SystemCli) TestAppErr(multi bool) {
