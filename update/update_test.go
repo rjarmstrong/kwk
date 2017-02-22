@@ -19,6 +19,7 @@ func Test_Update(t *testing.T) {
 		am := &ApplierMock{}
 		rm := &RemoterMock{}
 		pm := &config.PersisterMock{}
+		models.SetPrefs(models.DefaultPrefs())
 		models.Client.Version = "v0.0.1"
 
 		r := Runner{
