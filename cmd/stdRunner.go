@@ -54,7 +54,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	fi, _ := os.Stat(filePath)
 	openTime := fi.ModTime().UnixNano()
 
-	r.exec(s.Alias, cli[0], cli[1:]...)
+	r.exec(s.Alias, false, cli[0], cli[1:]...)
 
 	edited := false
 	for edited == false {
@@ -68,7 +68,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	closer := func() {
 		if runtime.GOOS == cache.OS_DARWIN {
 			// This assumes we are using iTerm, we'll have to get the active shell (echo $TERM_PROGRAM on Mac)
-			r.exec(s.Alias,"osascript", "-e", "tell application \"iTerm2\" to activate")
+			r.exec(s.Alias,false,"osascript", "-e", "tell application \"iTerm2\" to activate")
 		} else if runtime.GOOS == cache.OS_WINDOWS {
 			//	// How will this work on:
 			//	- windows https://technet.microsoft.com/en-us/library/ee176882.aspx
@@ -119,7 +119,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 			if compile != nil {
 				replaceVariables(&compile, filePath, s)
 				log.Debug("COMPILE", compile)
-				rc, err := r.exec(s.Alias, compile[0], compile[1:]...)
+				rc, err := r.exec(s.Alias, true, compile[0], compile[1:]...)
 				if err != nil {
 					return err
 				}
@@ -130,7 +130,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 
 			log.Debug("RUN", run)
 			run = append(run, args...)
-			rc, err := r.exec(s.Alias, run[0], run[1:]...)
+			rc, err := r.exec(s.Alias, true, run[0], run[1:]...)
 			if err != nil {
 				return err
 			}
@@ -139,12 +139,18 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 	} else {
 		//fmt.Println(runner)
 		// TODO: MULTI-STEP
+
+		isExe := true
+		if len(interp) > 1 && interp[0] == "echo" && interp[1] == "$SNIP" {
+			isExe = false
+		}
 		for i, v := range interp {
 			interp[i] = strings.Replace(v, "$SNIP", s.Snip, -1)
 		}
 		interp = append(interp, args...)
 		//fmt.Println(runner)
-		rc, err := r.exec(s.Alias, interp[0], interp[1:]...)
+
+		rc, err := r.exec(s.Alias, isExe, interp[0], interp[1:]...)
 		if err != nil {
 			return err
 		}
@@ -153,7 +159,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 	return nil
 }
 
-func (r *StdRunner) exec(a models.Alias, name string, arg ...string) (io.ReadCloser, error) {
+func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string) (io.ReadCloser, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	c := exec.CommandContext(ctx, name, arg...)
 	c.Stdin = os.Stdin
@@ -168,11 +174,14 @@ func (r *StdRunner) exec(a models.Alias, name string, arg ...string) (io.ReadClo
 	if err != nil {
 		cancel()
 		desc := fmt.Sprintf("%s execution error: %s\n\n%s", strings.ToUpper(name), err.Error(), stderr.String())
-		r.snippets.LogRun(a, models.RunStatusFail)
+		if isExe {
+			r.snippets.LogRun(a, models.RunStatusFail)
+		}
 		return nil, models.ErrOneLine(models.Code_RunnerExitError, desc)
 	} else {
-
-		r.snippets.LogRun(a, models.RunStatusSuccess)
+		if isExe {
+			r.snippets.LogRun(a, models.RunStatusSuccess)
+		}
 		return out, nil
 	}
 }

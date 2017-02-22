@@ -284,6 +284,8 @@ message Snip {
     bool encrypted = 15;
     string algorithm = 16;
     Role role = 17;
+    RunStatus runStatus = 18;
+    int64 runStatusTime = 19;
 }
 
 enum RunStatus {

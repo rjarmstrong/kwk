@@ -13,15 +13,15 @@ const (
 
 type SnippetList struct {
 	Username string
-	Pouch string
+	Pouch    string
 	Items    []*Snippet
 	Total    int64
 	Since    time.Time
 	Size     int64
 }
 
-func NewSnippet(snippet string) *Snippet{
-	return &Snippet{Snip:snippet, Alias:Alias{SnipName:SnipName{}}}
+func NewSnippet(snippet string) *Snippet {
+	return &Snippet{Snip: snippet, Alias: Alias{SnipName: SnipName{}}}
 }
 
 type Snippet struct {
@@ -29,12 +29,12 @@ type Snippet struct {
 
 	Alias
 
-	Snip    string
+	Snip      string
 	Signature string
-	Version int64
-	Media   string
-	Tags    []string
-	Created time.Time
+	Version   int64
+	Media     string
+	Tags      []string
+	Created   time.Time
 
 	Description       string
 	ClonedFromAlias   string
@@ -43,6 +43,9 @@ type Snippet struct {
 	CloneCount        int64
 	RunCount          int64
 	Role              SnipRole
+
+	RunStatus     RunStatus
+	RunStatusTime int64
 }
 
 type SnipRole int32
@@ -51,7 +54,7 @@ type RunStatus int64
 const (
 	RunStatusUnknown RunStatus = 0
 	RunStatusSuccess RunStatus = 1
-	RunStatusFail  RunStatus = 2
+	RunStatusFail    RunStatus = 2
 
 	RoleStandard    SnipRole = 0
 	RolePreferences SnipRole = 1
@@ -73,10 +76,10 @@ type Match struct {
 }
 
 type ListParams struct {
-	All bool
-	Pouch string
+	All      bool
+	Pouch    string
 	Username string
-	Size int64
-	Since int64
-	Tags []string
+	Size     int64
+	Since    int64
+	Tags     []string
 }

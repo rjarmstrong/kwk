@@ -141,16 +141,16 @@ func multiChoice(list []models.Snippet) string {
 
 func listHorizontal(l []interface{}) []byte {
 	var buff bytes.Buffer
-	w := tabwriter.NewWriter(&buff, 25, 3, 1, ' ', tabwriter.DiscardEmptyColumns)
+	w := tabwriter.NewWriter(&buff, 20, 3, 2, ' ', tabwriter.DiscardEmptyColumns)
 	var item bytes.Buffer
 	for i, v := range l {
-		if i%6 == 0 {
+		if i%5 == 0 {
 			item.WriteString("   ")
 		}
 		if sn, ok := v.(*models.Snippet); ok {
-			item.WriteString("🔸")
+			item.WriteString(statusString(sn.RunStatus))
 			item.WriteString("  ")
-			item.WriteString(style.Fmt(style.Cyan, sn.SnipName.String()))
+			item.WriteString(sn.SnipName.String())
 		}
 		if pch, ok := v.(*models.Pouch); ok {
 			if models.Prefs().ListAll || !pch.MakePrivate {
@@ -161,17 +161,16 @@ func listHorizontal(l []interface{}) []byte {
 				}
 				item.WriteString("  ")
 				item.WriteString(pch.Name)
-				item.WriteString(" ")
-				item.WriteString(style.Fmt(style.DarkGrey, fmt.Sprintf("%d", pch.SnipCount)))
+				item.WriteString(fmt.Sprintf(" (%d)", pch.SnipCount))
 			}
 		}
 
 		item.WriteString(" \t")
 		x := i + 1
-		if x%6 == 0 {
+		if x%5 == 0 {
 			item.WriteString("\n")
 		}
-		if x%24 == 0 {
+		if x%20 == 0 {
 			item.WriteString("\n")
 		}
 		fmt.Fprint(w, fmt.Sprintf("%s", item.String()))
@@ -196,9 +195,29 @@ func formatSnippet(s *models.Snippet) string {
 	return snip
 }
 
+var statExt = []string{"txt", "path", "xml", "json", "yml", "toml"}
+
+func isExe(ext string) bool {
+	for _, v := range statExt {
+		if v == ext {
+			return false
+		}
+	}
+	return true
+}
+
+func statusString(s models.RunStatus) string {
+	if s == models.RunStatusSuccess {
+		return "⚡" //style.Fmt(style.Green, "●") //"✓"//
+	} else if s == models.RunStatusFail {
+		return "🔥" //style.Fmt(style.Red, "●") //
+	}
+	return   "📄" //"🔸"
+}
+
 func listLong(l []interface{}) []byte {
 	var buff bytes.Buffer
-	w := tabwriter.NewWriter(&buff, 35, 3, 1, ' ', tabwriter.DiscardEmptyColumns)
+	w := tabwriter.NewWriter(&buff, 7, 1, 3, ' ', tabwriter.TabIndent)
 	var item bytes.Buffer
 	item.WriteString("   ")
 	item.WriteString(style.Fmt(style.Subdued, "   Name"))
@@ -209,11 +228,12 @@ func listLong(l []interface{}) []byte {
 	for _, v := range l {
 		item.WriteString("   ")
 		if sn, ok := v.(*models.Snippet); ok {
-			item.WriteString("🔸")
+			item.WriteString(statusString(sn.RunStatus))
 			item.WriteString("  ")
 			item.WriteString(style.Fmt(style.Cyan, sn.SnipName.String()))
 			item.WriteString("\t")
 			item.WriteString(formatSnippet(sn))
+			item.WriteString("\t")
 		}
 		if pch, ok := v.(*models.Pouch); ok {
 			if models.Prefs().ListAll || !pch.MakePrivate {
@@ -225,14 +245,14 @@ func listLong(l []interface{}) []byte {
 				item.WriteString("  ")
 				item.WriteString(pch.Name)
 				item.WriteString(" ")
-				item.WriteString(style.Fmt(style.DarkGrey, fmt.Sprintf("%d", pch.SnipCount)))
+				//item.WriteString(style.Fmt(style.DarkGrey, fmt.Sprintf("%d", pch.SnipCount)))
 				item.WriteString("\t")
-				item.WriteString(" ")
+				item.WriteString("")
 			}
 		}
 		fmt.Fprint(w, fmt.Sprintf("%s", item.String()))
 		item.Reset()
-		fmt.Fprint(w, "\n")
+		fmt.Fprint(w, "\t\n")
 	}
 	w.Flush()
 	return buff.Bytes()

@@ -288,6 +288,8 @@ func (rs *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache b
 	model.RunCount = rpc.RunCount
 	model.CloneCount = rpc.CloneCount
 	model.Role = models.SnipRole(rpc.Role)
+	model.RunStatus = models.RunStatus(rpc.RunStatus)
+	model.RunStatusTime = rpc.RunStatusTime
 	if cache {
 		rs.persister.Upsert(LATEST_SNIPPET, model)
 	}
