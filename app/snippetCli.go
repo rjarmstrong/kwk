@@ -90,7 +90,7 @@ func (sc *SnippetCli) Run(distinctName string, args []string) {
 
 func (sc *SnippetCli) typeAhead(distinctName string, onSelect func(name string)) {
 	exe, _ := os.Executable()
-	opt := fzf.ParseOptionsAs(fmt.Sprintf("--preview=%s cat %s", exe, "{}"), "--preview-window=right:70%", "--header=   Suggestions:   ", "--query="+distinctName, "--reverse", "--margin=2,6,2,2", "--height=40%", "--no-mouse", "--color=prompt:008,header:0,headerbg:008,fg:255,hl:006,pointer:014,hl+:014,fg+:006,bg+:000")
+	opt := fzf.ParseOptionsAs(fmt.Sprintf("--preview=%s cat %s", exe, "{}"), "-1", "--preview-window=right:70%", "--header=   Suggestions:   ", "--query="+distinctName, "--reverse", "--margin=2,6,2,2", "--height=40%", "--no-mouse", "--color=prompt:008,header:0,headerbg:008,fg:255,hl:006,pointer:014,hl+:014,fg+:006,bg+:000")
 	opt.Printer = onSelect
 	fzf.Run(fmt.Sprintf("%s suggest %s", exe, distinctName), opt)
 }
@@ -331,8 +331,14 @@ type MoveResult struct {
 
 func (sc *SnippetCli) Cat(distinctName string) {
 	if list, a, err := sc.get(distinctName); err != nil {
-		//sc.suggest(distinctName)
-		sc.HandleErr(err)
+		if models.HasErrCode(err, models.Code_NotFound) {
+			sc.typeAhead(distinctName, func(str string) {
+				_ = sc.Dialog.FormField(fmt.Sprintf("kwk cat %s ", str))
+				sc.Cat(str)
+			})
+		} else {
+			sc.HandleErr(err)
+		}
 	} else {
 		if len(list.Items) == 0 {
 			//sc.suggest(distinctName)
