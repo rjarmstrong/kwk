@@ -104,7 +104,7 @@ func init() {
 	// errors
 	add("validation:title", "{{. | yellow }}\n", template.FuncMap{"yellow": yellow})
 	add("validation:multi-line", " - {{ .Desc | yellow }}\n", template.FuncMap{"yellow": yellow})
-	add("validation:one-line", style.Warning+"  {{ .Desc | yellow }} {{ .Code | yellow }}\n", template.FuncMap{"yellow": yellow})
+	add("validation:one-line", style.Warning+"  {{ .Desc | yellow }}\n", template.FuncMap{"yellow": yellow})
 
 	add("api:not-authenticated", "{{ \"Please login to continue: kwk login\" | yellow }}\n", template.FuncMap{"yellow": yellow})
 	add("api:not-implemented", "{{ \"The kwk cli is a greater version than supported by kwk API.\" | yellow }}\n", template.FuncMap{"yellow": yellow})

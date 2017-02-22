@@ -42,6 +42,9 @@ const (
 
 	Code_InvalidConfigSection Code = 6010
 	Code_EnvironmentNotSupported Code = 6020
+
+	//Runners
+	Code_RunnerExitError Code = 700
 )
 
 // ParseGrpcErr should be used at RPC service call level. i.e. the errors

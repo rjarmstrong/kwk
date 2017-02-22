@@ -17,6 +17,8 @@ import (
 	"io"
 	"os"
 	"bitbucket.com/sharingmachine/kwkcli/cache"
+	"context"
+	"bitbucket.com/sharingmachine/kwkcli/log"
 )
 
 type StdRunner struct {
@@ -52,7 +54,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	fi, _ := os.Stat(filePath)
 	openTime := fi.ModTime().UnixNano()
 
-	execSafe(cli[0], cli[1:]...)
+	execSafe(s.Alias, cli[0], cli[1:]...)
 
 	edited := false
 	for edited == false {
@@ -66,7 +68,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	closer := func() {
 		if runtime.GOOS == cache.OS_DARWIN {
 			// This assumes we are using iTerm, we'll have to get the active shell (echo $TERM_PROGRAM on Mac)
-			execSafe("osascript", "-e", "tell application \"iTerm2\" to activate")
+			execSafe(s.Alias,"osascript", "-e", "tell application \"iTerm2\" to activate")
 		} else if runtime.GOOS == cache.OS_WINDOWS {
 			//	// How will this work on:
 			//	- windows https://technet.microsoft.com/en-us/library/ee176882.aspx
@@ -116,9 +118,8 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 			_, compile := getSubSection(&comp, "compile")
 			if compile != nil {
 				replaceVariables(&compile, filePath, s)
-				// TODO: ADD TO LOG
-				fmt.Println("compile", compile)
-				rc, err := execSafe(compile[0], compile[1:]...)
+				log.Debug("COMPILE", compile)
+				rc, err := execSafe(s.Alias, compile[0], compile[1:]...)
 				if err != nil {
 					return err
 				}
@@ -127,10 +128,9 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 			_, run := getSubSection(&comp, "run")
 			replaceVariables(&run, filePath, s)
 
-			// TODO: ADD TO LOG
-			fmt.Println("run", run)
+			log.Debug("RUN", run)
 			run = append(run, args...)
-			rc, err := execSafe(run[0], run[1:]...)
+			rc, err := execSafe(s.Alias, run[0], run[1:]...)
 			if err != nil {
 				return err
 			}
@@ -144,7 +144,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 		}
 		interp = append(interp, args...)
 		//fmt.Println(runner)
-		rc, err := execSafe(interp[0], interp[1:]...)
+		rc, err := execSafe(s.Alias, interp[0], interp[1:]...)
 		if err != nil {
 			return err
 		}
@@ -153,8 +153,9 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 	return nil
 }
 
-func execSafe(name string, arg ...string) (io.ReadCloser, error) {
-	c := exec.Command(name, arg...)
+func execSafe(a models.Alias, name string, arg ...string) (io.ReadCloser, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	c := exec.CommandContext(ctx, name, arg...)
 	c.Stdin = os.Stdin
 	out, err := c.StdoutPipe()
 	if err != nil {
@@ -165,9 +166,17 @@ func execSafe(name string, arg ...string) (io.ReadCloser, error) {
 	c.Stderr = &stderr
 	err = c.Run()
 	if err != nil {
-		return nil, err
+		cancel()
+		desc := fmt.Sprintf("%s execution error: %s\n\n%s", strings.ToUpper(name), err.Error(), stderr.String())
+		logRun(a, "Run", err.Error(), models.Code_RunnerExitError)
+		return nil, models.ErrOneLine(models.Code_RunnerExitError, desc)
+	} else {
+		logRun(a, "Run", "0", 0)
+		return out, nil
 	}
-	return out, nil
+}
+
+func logRun(a models.Alias, verb string, exitCode string, clientErrCode models.Code){
 }
 
 func (r *StdRunner) getEnvSection(name string) (*yaml.MapSlice, error) {

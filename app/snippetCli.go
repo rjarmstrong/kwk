@@ -79,8 +79,7 @@ func (sc *SnippetCli) Run(distinctName string, args []string) {
 		if alias := sc.handleMultiResponse(distinctName, list); alias != nil {
 			//TODO: If username is not the current user or 'kwk' then prompt before executing.
 			if err = sc.runner.Run(alias, args); err != nil {
-				//TODO: Move to template
-				fmt.Println(err)
+				sc.HandleErr(err)
 			}
 		} else {
 			sc.typeAhead(distinctName, rerun)
