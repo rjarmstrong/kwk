@@ -21,6 +21,7 @@ func Env() *yaml.MapSlice {
 	return env
 }
 
+
 func SetPrefs(p *Preferences) {
 	prefs = p
 }
