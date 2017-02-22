@@ -50,6 +50,9 @@ func ParseGrpcErr(e error) error {
 	desc := grpc.ErrorDesc(e)
 	m := &ClientErr{}
 	m.remoteCode = grpc.Code(e)
+	if m.remoteCode == codes.NotFound {
+		return ErrOneLine(Code_NotFound, desc)
+	}
 	if err := json.Unmarshal([]byte(desc), m); err != nil {
 		m.Title = desc
 		return m
@@ -65,6 +68,14 @@ type ClientErr struct {
 	Msgs  []Msg
 	Title string
 	remoteCode codes.Code
+}
+
+func HasErrCode(err error, code Code) bool {
+	e, ok := err.(*ClientErr)
+	if !ok {
+		return false
+	}
+	return e.Contains(code)
 }
 
 func (c *ClientErr) Contains(code Code) bool{
