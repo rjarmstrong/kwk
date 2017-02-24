@@ -228,7 +228,7 @@ func chunkFormatSnippet(s *models.Snippet, expand int) string {
 				clipped = append(clipped, v)
 			}
 		}
-		clipped = clipped
+		code = clipped
 	}
 
 	crop := len(code) >= expand
