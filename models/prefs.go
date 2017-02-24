@@ -8,6 +8,12 @@ var prefs  *Preferences
 var env   *yaml.MapSlice
 
 func Prefs() *Preferences {
+	if prefs == nil {
+		return nil
+	}
+	if prefs.ExpandLines < 1 {
+		prefs.ExpandLines =DefaultPrefs().ExpandLines
+	}
 	return prefs
 }
 
@@ -36,7 +42,7 @@ func DefaultPrefs() *Preferences {
 	p.WipeTrail = false
 	p.SessionTimeout = 15
 	p.ListAll = true
-	p.ListLong = false
+	p.ExpandLines = 5
 	p.RegulateUpdates = true
 	return p
 }
@@ -51,11 +57,12 @@ type Preferences struct {
 	PersistedPrefs
 	Global  bool // TODO: Implement in search api SEARCH
 	//Quiet   bool // Only display fullNames (for multi deletes etc)
-	AutoYes bool //TODO: Security
-	Force   bool // TODO: Security Will squash warning messages e.g. when running third party snippets.
-	Encrypt bool // TODO: Security
-	Decrypt bool // TODO: Security
-	ListLong bool
+	AutoYes     bool //TODO: Security
+	Force       bool // TODO: Security Will squash warning messages e.g. when running third party snippets.
+	Encrypt     bool // TODO: Security
+	Decrypt     bool // TODO: Security
+	ExpandLines int
+	LastPouch   string
 }
 
 // PersistedPrefs are preferences which can be persistent.

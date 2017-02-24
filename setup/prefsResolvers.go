@@ -47,7 +47,7 @@ func (p *PrefsResolvers) Default() (string, error) {
 	if prefs, err := p.Fallback(); err != nil {
 		return "", err
 	} else {
-		if _, err := p.snippets.Create(prefs, p.a, models.RolePreferences); err != nil {
+		if _, err := p.snippets.Create(prefs, p.a, models.SnipRolePreferences); err != nil {
 			return "", err
 		}
 		return prefs, nil

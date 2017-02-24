@@ -13,6 +13,8 @@ import (
 	"strings"
 	"fmt"
 	"os"
+	"bufio"
+	"bytes"
 )
 
 type SnippetCli struct {
@@ -39,7 +41,7 @@ func (sc *SnippetCli) Search(args ...string) {
 }
 
 func (sc *SnippetCli) Share(distinctName string, destination string) {
-	if list, _, err := sc.get(distinctName); err != nil {
+	if list, _, err := sc.getSnippet(distinctName); err != nil {
 		sc.HandleErr(err)
 	} else {
 		if alias := sc.handleMultiResponse(distinctName, list); alias != nil {
@@ -68,7 +70,7 @@ func (sc *SnippetCli) Run(distinctName string, args []string) {
 	if err != nil {
 		sc.Render("validation:one-line", err)
 	}
-	rerun := func(selected string){
+	rerun := func(selected string) {
 		r := sc.Dialog.FormField(fmt.Sprintf("kwk %s ", selected))
 		argstr := r.Value.(string)
 		sc.Run(selected, strings.Split(argstr, " "))
@@ -94,12 +96,19 @@ func (sc *SnippetCli) typeAhead(distinctName string, onSelect func(name string))
 	fzf.Run(fmt.Sprintf("%s suggest %s", exe, distinctName), opt)
 }
 
+func stdInAsString() string {
+	scanner := bufio.NewScanner(os.Stdin)
+	in := bytes.Buffer{}
+	for scanner.Scan() {
+		in.WriteString(scanner.Text()+"\n")
+	}
+	return in.String()
+}
+
 func (sc *SnippetCli) Create(args []string) {
 	alias := &models.Alias{}
-	snippet := ""
-	if len(args) == 0 {
-		log.Debug("No args provided.")
-	} else if len(args) == 1 {
+	var snippet string
+	if len(args) == 1 {
 		a, err := models.ParseAlias(args[0])
 		if err != nil {
 			sc.HandleErr(err)
@@ -111,7 +120,7 @@ func (sc *SnippetCli) Create(args []string) {
 			a = &models.Alias{}
 		}
 		alias = a
-	} else {
+	} else if len(args) > 1 {
 		log.Debug("Assuming first arg is the snippet and second is alias.")
 		a, err := models.ParseAlias(args[1])
 		if err != nil {
@@ -121,8 +130,11 @@ func (sc *SnippetCli) Create(args []string) {
 		alias = a
 		snippet = args[0]
 	}
+	if snippet == "" {
+		snippet = stdInAsString()
+	}
 
-	if createAlias, err := sc.s.Create(snippet, *alias, models.RoleStandard); err != nil {
+	if createAlias, err := sc.s.Create(snippet, *alias, models.SnipRoleStandard); err != nil {
 		sc.HandleErr(err)
 	} else {
 		sc.List()
@@ -144,21 +156,38 @@ func (sc *SnippetCli) Create(args []string) {
 }
 
 func (sc *SnippetCli) Edit(distinctName string) {
+	innerEdit := func(s *models.Snippet) {
+		sc.Render("snippet:editing", s)
+		if err := sc.runner.Edit(s); err != nil {
+			sc.HandleErr(err)
+		} else {
+			sc.Render("snippet:edited", &s)
+		}
+	}
 	if distinctName == "env" {
 		distinctName = models.NewSetupAlias(distinctName, "yml", true).String()
 	}
-	if list, _, err := sc.get(distinctName); err != nil {
+	if list, _, err := sc.getSnippet(distinctName); err != nil {
+		if models.HasErrCode(err, models.Code_NotFound){
+			a, err := models.ParseAlias(distinctName)
+			if err != nil {
+				sc.HandleErr(err)
+			}
+			r := sc.Dialog.Modal("snippet:edit-prompt", a, false)
+			if r.Ok {
+				r, err := sc.s.Create("", *a, models.SnipRoleStandard)
+				if err != nil {
+					sc.HandleErr(err)
+				}
+				innerEdit(r.Snippet)
+			}
+			return
+		}
 		sc.HandleErr(err)
 	} else {
-		if alias := sc.handleMultiResponse(distinctName, list); alias != nil {
-			sc.Render("snippet:editing", alias)
-			if err := sc.runner.Edit(alias); err != nil {
-				sc.HandleErr(err)
-			} else {
-				sc.Render("snippet:edited", alias)
-			}
+		if snippet := sc.handleMultiResponse(distinctName, list); snippet != nil {
+			innerEdit(snippet)
 		} else {
-			//TODO: FIX
 			sc.Render("snippet:notfound", &models.Snippet{})
 		}
 	}
@@ -167,7 +196,7 @@ func (sc *SnippetCli) Edit(distinctName string) {
 func (sc *SnippetCli) Describe(distinctName string, description string) {
 	a, err := models.ParseAlias(distinctName)
 	if description == "" {
-		sc.typeAhead(distinctName, func(input string){
+		sc.typeAhead(distinctName, func(input string) {
 			cm := fmt.Sprintf("Enter new description for %s: ", input)
 			if res := sc.FormField(cm); res.Ok {
 				log.Debug("Form result: %+v", res.Value)
@@ -329,7 +358,7 @@ type MoveResult struct {
 }
 
 func (sc *SnippetCli) Cat(distinctName string) {
-	if list, a, err := sc.get(distinctName); err != nil {
+	if list, a, err := sc.getSnippet(distinctName); err != nil {
 		if models.HasErrCode(err, models.Code_NotFound) {
 			sc.typeAhead(distinctName, func(str string) {
 				_ = sc.Dialog.FormField(fmt.Sprintf("kwk cat %s ", str))
@@ -442,6 +471,7 @@ func (sc *SnippetCli) List(args ...string) {
 		return
 	}
 	if pouch == "" {
+		//sc.settings.Get("last-pouch", )
 		r, err := sc.s.GetRoot(username, models.Prefs().ListAll)
 		if err != nil {
 			sc.HandleErr(err)
@@ -483,7 +513,7 @@ func (sc *SnippetCli) handleMultiResponse(distinctName string, list *models.Snip
 	}
 }
 
-func (sc *SnippetCli) get(distinctName string) (*models.SnippetList, *models.Alias, error) {
+func (sc *SnippetCli) getSnippet(distinctName string) (*models.SnippetList, *models.Alias, error) {
 	a, err := models.ParseAlias(distinctName)
 	if err != nil {
 		return nil, nil, err

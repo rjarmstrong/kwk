@@ -28,6 +28,11 @@ const (
 	LightCyan    AnsiCode = 96
 	White        AnsiCode = 97
 
+	DarkGreyBg   AnsiCode = 100
+	LightBlueBg   AnsiCode = 104
+	GreyBg238   AnsiCode = 238
+	GreyBg236   AnsiCode = 236
+
 	Bold AnsiCode = 21
 	Dim AnsiCode = 22
 	Underline AnsiCode = 23
@@ -35,8 +40,13 @@ const (
 	ClearLine = "\033[1K"
 	MoveBack  = "\033[9D"
 	Block     = "2588"
+
 	Start     = "\033["
+	Start255     = "\033[48;5;"
 	End       = "\033[0m"
+	End255       = "\033[0;00m"
+
+
 	Space     = 20
 	UBlock    = "\u2588"
 
@@ -65,6 +75,10 @@ func Build(quant int, unicode string) string {
 	return str
 }
 
+func FmtStart(c AnsiCode, in interface{}) string {
+	return fmt.Sprintf("\033[%dm%v", c, in)
+}
+
 // Fmt formats output for the CLI.
 func Fmt(c AnsiCode, params ...interface{}) string {
 	var text string
@@ -74,8 +88,23 @@ func Fmt(c AnsiCode, params ...interface{}) string {
 	return fmt.Sprintf("\033[%dm%v\033[0m", c, text)
 }
 
+func Fmt256(c AnsiCode, bg bool, params ...interface{}) string {
+	var text string
+	for _, v := range params {
+		text = text + fmt.Sprintf("%v", v)
+	}
+	return fmt.Sprintf("\033[48;5;%dm%v\033[0;00m", c, text)
+}
+
 func ColourSpan(colour AnsiCode, text string, openTag string, closeTag string, surroundingColor AnsiCode) string {
 	text = strings.Replace(text, openTag, fmt.Sprintf("%s\033[%dm[", End, colour), -1)
 	text = strings.Replace(text, closeTag, fmt.Sprintf("\033[0m%s%dm", Start, surroundingColor), -1)
+	return text
+}
+
+func ColourSpan256(colour AnsiCode, text string, openTag string, closeTag string, surroundingColor AnsiCode) string {
+	text = Fmt256(surroundingColor, false, text)
+	text = strings.Replace(text, openTag, fmt.Sprintf("%s%s%dm", End255, Start255, colour), -1)
+	text = strings.Replace(text, closeTag, fmt.Sprintf("%s%s%dm", End255, Start255, surroundingColor), -1)
 	return text
 }

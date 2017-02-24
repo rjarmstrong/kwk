@@ -4,8 +4,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"github.com/dustin/go-humanize"
 	_ "github.com/dustin/go-humanize"
-	"github.com/olekukonko/tablewriter"
-	_ "github.com/olekukonko/tablewriter"
+	"github.com/rjarmstrong/tablewriter"
 	"bitbucket.com/sharingmachine/kwkcli/ui/style"
 	"encoding/json"
 	"text/template"
@@ -40,8 +39,9 @@ func init() {
 	add("snippet:new", "{{. | blue }} created "+style.OpenLock+"\n", template.FuncMap{"blue": blue})
 	add("snippet:newprivate", "{{.FullName | blue }} created "+style.Lock+"\n", template.FuncMap{"blue": blue})
 	add("snippet:cat", "{{.Snip | blue}}", template.FuncMap{"blue": blue})
-	add("snippet:edited", "Successfully updated {{ .FullName | blue }}", template.FuncMap{"blue": blue})
+	add("snippet:edited", "Successfully updated {{ .String | blue }}", template.FuncMap{"blue": blue})
 	add("snippet:editing", "{{ \"Editing... \" | blue }}\nPlease edit file and save.\n - NB: After saving, no changes will be saved until running kwk edit <name> again.\n - Ctrl+C to abort.\n", template.FuncMap{"blue": blue})
+	add("snippet:edit-prompt", "{{ .String | blue }} doesn't exist - would you like create it? [y/n] \n", template.FuncMap{"blue": blue})
 
 	add("snippet:ambiguouscat", "That snippet is ambiguous please run it again with the extension:\n{{range .Items}}{{.FullName | blue }}\n{{ end }}", template.FuncMap{"blue": blue})
 	add("snippet:list", "{{. | listSnippets }}", template.FuncMap{"listSnippets": listSnippets })
@@ -62,8 +62,7 @@ func init() {
 	add("snippet:create-pouch", "{{ \"Would you like to create the snippet in a new pouch? [y/n] \" | yellow }}?  ", template.FuncMap{"yellow": yellow})
 
 	add("snippet:inspect",
-		"\n{{range .Items}}"+"Name: {{.String}}"+"\nCreated: {{.Created}}"+"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+
-		"\nDescription: {{.Description}}"+"\nRun count: {{.RunCount}}"+"\nClone count: {{.CloneCount}}"+"\n{{ end }}\n\n", nil)
+		"\n{{range .Items}}"+"Name: {{.String}}"+"\nCreated: {{.Created}}"+"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+"\nDescription: {{.Description}}"+"\nRun count: {{.RunCount}}"+"\nClone count: {{.CloneCount}}"+"\n{{ end }}\n\n", nil)
 
 	add("pouch:not-deleted", "{{. | blue }} was NOT deleted.", template.FuncMap{"blue": blue})
 	add("pouch:deleted", "{{. | blue }} was deleted.", template.FuncMap{"blue": blue})
@@ -148,9 +147,11 @@ func listHorizontal(l []interface{}) []byte {
 			item.WriteString("   ")
 		}
 		if sn, ok := v.(*models.Snippet); ok {
-			item.WriteString(statusString(sn.RunStatus))
+			item.WriteString(statusString(sn))
 			item.WriteString("  ")
-			item.WriteString(sn.SnipName.String())
+			item.WriteString(style.Fmt(style.Cyan, sn.SnipName.Name))
+			item.WriteString(style.Fmt(style.Subdued, "."+sn.SnipName.Ext))
+			item.WriteString(" ")
 		}
 		if pch, ok := v.(*models.Pouch); ok {
 			if models.Prefs().ListAll || !pch.MakePrivate {
@@ -161,7 +162,7 @@ func listHorizontal(l []interface{}) []byte {
 				}
 				item.WriteString("  ")
 				item.WriteString(pch.Name)
-				item.WriteString(fmt.Sprintf(" (%d)", pch.SnipCount))
+				item.WriteString(style.Fmt(style.Subdued, fmt.Sprintf(" (%d)", pch.SnipCount)))
 			}
 		}
 
@@ -180,83 +181,147 @@ func listHorizontal(l []interface{}) []byte {
 	return buff.Bytes()
 }
 
-func formatSnippet(s *models.Snippet) string {
-	var snip string
-	if s.Role == models.RolePreferences {
-		snip = style.Fmt(style.Yellow, `(Global prefs) 'kwk edit prefs'`)
-	} else if s.Role == models.RoleEnvironment {
-		snip = style.Fmt(style.Yellow, `(Local environment) 'kwk edit env'`)
-	} else {
-		snip = fmt.Sprintf("%s", uri(s.Snip))
-	}
-	snip = strings.Replace(snip, "\t", " ", -1)
-	snip = strings.Replace(snip, "\n", " ", -1)
-	snip = strings.Replace(snip, "    ", " ", -1)
-	return snip
+var mainMarkers = map[string]string{
+	"go": "func main() {",
 }
 
-var statExt = []string{"txt", "path", "xml", "json", "yml", "toml"}
-
-func isExe(ext string) bool {
-	for _, v := range statExt {
-		if v == ext {
-			return false
-		}
-	}
-	return true
+type CodeLine struct {
+	Margin string
+	Body string
 }
 
-func statusString(s models.RunStatus) string {
-	if s == models.RunStatusSuccess {
-		return "⚡" //style.Fmt(style.Green, "●") //"✓"//
-	} else if s == models.RunStatusFail {
-		return "🔥" //style.Fmt(style.Red, "●") //
+func chunkFormatSnippet(s *models.Snippet, expand int) string {
+	if s.Snip == "" {
+		s.Snip = "<empty>"
 	}
-	return   "📄" //"🔸"
-}
+	chunks := strings.Split(s.Snip, "\n")
 
-func listLong(l []interface{}) []byte {
-	var buff bytes.Buffer
-	w := tabwriter.NewWriter(&buff, 7, 1, 3, ' ', tabwriter.TabIndent)
-	var item bytes.Buffer
-	item.WriteString("   ")
-	item.WriteString(style.Fmt(style.Subdued, "   Name"))
-	item.WriteString(" ")
-	item.WriteString("\t")
-	item.WriteString(style.Fmt(style.Subdued, "Snippet"))
-	item.WriteString("\n")
-	for _, v := range l {
-		item.WriteString("   ")
-		if sn, ok := v.(*models.Snippet); ok {
-			item.WriteString(statusString(sn.RunStatus))
-			item.WriteString("  ")
-			item.WriteString(style.Fmt(style.Cyan, sn.SnipName.String()))
-			item.WriteString("\t")
-			item.WriteString(formatSnippet(sn))
-			item.WriteString("\t")
-		}
-		if pch, ok := v.(*models.Pouch); ok {
-			if models.Prefs().ListAll || !pch.MakePrivate {
-				if pch.MakePrivate {
-					item.WriteString("🔒")
-				} else {
-					item.WriteString("👝")
-				}
-				item.WriteString("  ")
-				item.WriteString(pch.Name)
-				item.WriteString(" ")
-				//item.WriteString(style.Fmt(style.DarkGrey, fmt.Sprintf("%d", pch.SnipCount)))
-				item.WriteString("\t")
-				item.WriteString("")
+	// Return any non code previews
+	if s.Role == models.SnipRolePreferences {
+		return `(Global prefs) 'kwk edit prefs'`
+	} else if s.Role == models.SnipRoleEnvironment {
+		return `(Local environment) 'kwk edit env'`
+	} else if s.Ext == "url" {
+		return uri(s.Snip)
+	}
+
+	code := []CodeLine{}
+	// Add line numbers and pad
+	for i, v := range chunks {
+		code = append(code, CodeLine{
+			Margin: style.FmtStart(style.Subdued, fmt.Sprintf("%3d ", i+1)),
+			Body:   fmt.Sprintf("    %s", strings.Replace(v, "\t", "  ", -1)),
+		})
+	}
+	lastLine := code[len(chunks)-1]
+
+	// Add to preview starting from most important line
+	marker := mainMarkers[s.Ext]
+	if marker != "" {
+		var clipped []CodeLine
+		var from int
+		for i, v := range code {
+			if strings.Contains(v.Body, marker) {
+				from = i
+			}
+			if from > 0 {
+				clipped = append(clipped, v)
 			}
 		}
-		fmt.Fprint(w, fmt.Sprintf("%s", item.String()))
-		item.Reset()
-		fmt.Fprint(w, "\t\n")
+		clipped = clipped
 	}
-	w.Flush()
-	return buff.Bytes()
+
+	crop := len(code) >= expand
+
+	// crop width
+	var preview []CodeLine
+	if crop {
+		preview = code[0:expand]
+	} else {
+		preview = code
+	}
+
+	// Add page tear and last line
+	if crop && expand < len(code) {
+		preview = append(preview, CodeLine{"----", strings.Repeat("-", 70)})
+		preview = append(preview, lastLine)
+	}
+
+	buff := bytes.Buffer{}
+	for _, v := range preview {
+		// Pad
+		var width = 60
+		pad := width - len(v.Body)
+		if pad > 0 {
+			v.Body = v.Body + strings.Repeat(" ", pad)
+		} else {
+			v.Body = v.Body[0:width]
+		}
+		// Style
+		m := style.Fmt256(style.GreyBg238, true, v.Margin)
+		b := style.Fmt256(style.GreyBg236, true, v.Body)
+		buff.WriteString(m)
+		buff.WriteString(b)
+		buff.WriteString("\n")
+	}
+
+	return buff.String()
 }
+
+func statusString(s *models.Snippet) string {
+	if s.Ext == "url" {
+		return "🌎" //"🌐"
+	}
+	if s.RunStatus == models.RunStatusSuccess {
+		return "⚡" //style.Fmt(style.Green, "●") //"✓"//
+	} else if s.RunStatus == models.RunStatusFail {
+		return "🔥" //style.Fmt(style.Red, "●") //
+	}
+	return "📄" //"🔸"
+}
+
+//func listLong(l []interface{}) []byte {
+//	var buff bytes.Buffer
+//	w := tabwriter.NewWriter(&buff, 7, 1, 3, ' ', tabwriter.TabIndent)
+//	var item bytes.Buffer
+//	item.WriteString("   ")
+//	item.WriteString(style.Fmt(style.Subdued, "   Name"))
+//	item.WriteString(" ")
+//	item.WriteString("\t")
+//	item.WriteString(style.Fmt(style.Subdued, "Snippet"))
+//	item.WriteString("\n")
+//	for _, v := range l {
+//		item.WriteString("   ")
+//		if sn, ok := v.(*models.Snippet); ok {
+//			item.WriteString(statusString(sn.RunStatus))
+//			item.WriteString("  ")
+//			item.WriteString(style.Fmt(style.Cyan, sn.SnipName.String()))
+//			item.WriteString("\t")
+//			item.WriteString(formatSnippet(sn))
+//			item.WriteString("\t")
+//		}
+//		if pch, ok := v.(*models.Pouch); ok {
+//			if models.Prefs().ListAll || !pch.MakePrivate {
+//				if pch.MakePrivate {
+//					item.WriteString("🔒")
+//				} else {
+//					item.WriteString("👝")
+//				}
+//				item.WriteString("  ")
+//				item.WriteString(pch.Name)
+//				item.WriteString(" ")
+//				//item.WriteString(style.Fmt(style.DarkGrey, fmt.Sprintf("%d", pch.SnipCount)))
+//				item.WriteString("\t")
+//				item.WriteString("")
+//			}
+//		}
+//		fmt.Fprint(w, fmt.Sprintf("%s", item.String()))
+//		item.Reset()
+//		fmt.Fprint(w, "\t\n")
+//	}
+//	w.Flush()
+//	return buff.Bytes()
+//}
 
 func listRoot(r *models.Root) string {
 	var buff bytes.Buffer
@@ -275,11 +340,8 @@ func listRoot(r *models.Root) string {
 		}
 	}
 
-	if models.Prefs().ListLong {
-		buff.Write(listLong(all))
-	} else {
-		buff.Write(listHorizontal(all))
-	}
+	//buff.Write(listSnippets())
+	buff.Write(listHorizontal(all))
 
 	buff.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("\n\n   %d/50 Pouches", len(r.Pouches)-1)))
 	if models.ClientIsNew(r.LastUpdate) {
@@ -304,57 +366,57 @@ func listRoot(r *models.Root) string {
 	return buff.String()
 }
 
+func formatDescription(in string) string {
+	w := strings.Split(style.WrapString(in, 25), "\n")
+	for i, v :=  range w {
+		w[i] = style.Fmt(style.Subdued, v)
+	}
+	join := strings.Join(w, "\n")
+	if len(join) > 25 * 4 {
+		join = join[0:(25*4)]
+		i := strings.LastIndex(join, " ")
+		if i > 0 {
+			join = join[0:]
+		}
+
+	}
+	return join
+}
+
 func listSnippets(list *models.SnippetList) string {
 	buf := new(bytes.Buffer)
 	buf.WriteString("\n")
-
 	fmt.Fprint(buf, style.Fmt(style.Cyan, "kwk.co/"+list.Username+"/")+list.Pouch+"/\n\n")
-
 	tbl := tablewriter.NewWriter(buf)
-	tbl.SetHeader([]string{"Name", "Version", "Snippet", "Tags", "Runs", ""})
+	tbl.SetHeader([]string{"Name", "Status", "Preview"})
 	tbl.SetAutoWrapText(false)
 	tbl.SetBorder(false)
 	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
 	tbl.SetCenterSeparator("")
-	tbl.SetColumnSeparator("")
+	tbl.SetColumnSeparator(" ")
+	tbl.SetRowLine(true)
 	tbl.SetAutoFormatHeaders(false)
 	tbl.SetHeaderLine(true)
+	tbl.SetColWidth(5)
+
 	tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
 
 	for _, v := range list.Items {
-		var tags = []string{}
-		for _, v := range v.Tags {
-			if v == "error" {
-				tags = append(tags, style.Fmt(style.Magenta, v))
-			} else {
-				tags = append(tags, v)
-			}
-		}
-
-		var name string
-		name = style.Fmt(style.Cyan, v.Name) + style.Fmt(style.Subdued, "."+v.Ext)
-
-		var snip string
-		if v.Role == models.RolePreferences {
-			snip = style.Fmt(style.Yellow, `(Global prefs) 'kwk edit prefs'`)
-		} else if v.Role == models.RoleEnvironment {
-			snip = style.Fmt(style.Yellow, `(Local environment) 'kwk edit env'`)
+		var executed string
+		if v.RunStatusTime > 0 {
+			executed = fmt.Sprintf("%s  %s", statusString(v), style.Fmt(style.Subdued, humanize.Time(time.Unix(v.RunStatusTime, 0))))
 		} else {
-			snip = fmt.Sprintf("%s", uri(v.Snip))
+			executed = statusString(v)
 		}
-
+		preview := chunkFormatSnippet(v, models.Prefs().ExpandLines)
 		tbl.Append([]string{
-			"  🔸  " + name,
-			fmt.Sprintf("%d", v.Version),
-			snip,
-			strings.Join(tags, ", "),
-			fmt.Sprintf("%d", v.RunCount),
-			humanize.Time(v.Created),
+			style.Fmt(style.Cyan, v.SnipName.String()) + "\n\n" + formatDescription(v.Description),
+			executed + "\n" + style.Fmt(style.Subdued, fmt.Sprintf("↻ %2d", v.RunCount)),
+			//strings.Join(v.Tags, ", "),
+			preview,
 		})
-
 	}
 	tbl.Render()
-
 	if len(list.Items) == 0 {
 		fmt.Println(style.Fmt(style.Yellow, "Create some snippets to fill this view!\n"))
 	}
@@ -419,12 +481,8 @@ func uri(text string) string {
 	text = strings.Replace(text, "https://", "", 1)
 	text = strings.Replace(text, "http://", "", 1)
 	text = strings.Replace(text, "www.", "", 1)
-	text = strings.Replace(text, "\n", " ", -1)
 	if len(text) >= 40 {
-		text = text[0:10] + style.Fmt(style.Subdued, "...") + text[len(text)-30:]
-	}
-	if text == "" {
-		text = "<empty>"
+		text = text[0:10] + "..." + text[len(text)-30:]
 	}
 	return text
 }

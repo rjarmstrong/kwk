@@ -56,9 +56,9 @@ const (
 	RunStatusSuccess RunStatus = 1
 	RunStatusFail    RunStatus = 2
 
-	RoleStandard    SnipRole = 0
-	RolePreferences SnipRole = 1
-	RoleEnvironment SnipRole = 2
+	SnipRoleStandard    SnipRole = 0
+	SnipRolePreferences SnipRole = 1
+	SnipRoleEnvironment SnipRole = 2
 )
 
 type CreateSnippetResponse struct {

@@ -54,7 +54,7 @@ func (e *EnvResolvers) Default() (string, error) {
 	if env, err := e.Fallback(); err != nil {
 		return "", err
 	} else {
-		if snip, err := e.snippets.Create(env, e.alias, models.RoleEnvironment); err != nil {
+		if snip, err := e.snippets.Create(env, e.alias, models.SnipRoleEnvironment); err != nil {
 			return "", err
 		} else {
 			return snip.Snippet.Snip, nil

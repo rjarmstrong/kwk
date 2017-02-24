@@ -95,10 +95,6 @@
 			"Rev": "d6bea18f789704b5f83375793155289da36a3c7f"
 		},
 		{
-			"ImportPath": "github.com/olekukonko/tablewriter",
-			"Rev": "daf2955e742cf123959884fdff4685aa79b63135"
-		},
-		{
 			"ImportPath": "github.com/rjarmstrong/fzf/src",
 			"Comment": "0.16.5-4-g2b5d860",
 			"Rev": "2b5d8608604a79441bb95dd2f19c119d760a7695"
@@ -117,6 +113,10 @@
 			"ImportPath": "github.com/rjarmstrong/fzf/src/util",
 			"Comment": "0.16.5-4-g2b5d860",
 			"Rev": "2b5d8608604a79441bb95dd2f19c119d760a7695"
+		},
+		{
+			"ImportPath": "github.com/rjarmstrong/tablewriter",
+			"Rev": "c20a68a2b103ef21a9adf2cbdb5bf50209bf39b9"
 		},
 		{
 			"ImportPath": "github.com/siddontang/go/num",
