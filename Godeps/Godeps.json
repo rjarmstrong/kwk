@@ -19,10 +19,6 @@
 			"Rev": "9f31c9cf863a3e5cb23138467185b1a2237c7466"
 		},
 		{
-			"ImportPath": "github.com/dustin/go-humanize",
-			"Rev": "2fcb5204cdc65b4bec9fd0a87606bb0d0e3c54e8"
-		},
-		{
 			"ImportPath": "github.com/gdamore/encoding",
 			"Rev": "b23993cbb6353f0e6aa98d0ee318a34728f628b9"
 		},
@@ -113,6 +109,10 @@
 			"ImportPath": "github.com/rjarmstrong/fzf/src/util",
 			"Comment": "0.16.5-4-g2b5d860",
 			"Rev": "2b5d8608604a79441bb95dd2f19c119d760a7695"
+		},
+		{
+			"ImportPath": "github.com/rjarmstrong/go-humanize",
+			"Rev": "bb51d970116b1562c46fbb3fe44006affc13d98c"
 		},
 		{
 			"ImportPath": "github.com/rjarmstrong/tablewriter",

@@ -70,6 +70,14 @@ func (sc *SnippetCli) Run(distinctName string, args []string) {
 	if err != nil {
 		sc.Render("validation:one-line", err)
 	}
+	v, err := sc.s.GetRoot("", true)
+	if err != nil {
+		log.Error("Error getting root, but not critical to 'run'",err)
+	} else if a.Ext == "" && v.IsPouch(a.Name) {
+		sc.List(a.Name)
+		return
+	}
+
 	rerun := func(selected string) {
 		r := sc.Dialog.FormField(fmt.Sprintf("kwk %s ", selected))
 		argstr := r.Value.(string)

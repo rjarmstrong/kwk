@@ -3,8 +3,7 @@ package tmpl
 import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/style"
 	"bitbucket.com/sharingmachine/kwkcli/models"
-	_ "github.com/dustin/go-humanize"
-	"github.com/dustin/go-humanize"
+	"github.com/rjarmstrong/go-humanize"
 	"encoding/json"
 	"text/template"
 	"strings"

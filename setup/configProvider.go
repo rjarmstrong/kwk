@@ -7,6 +7,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/models"
+	"bitbucket.com/sharingmachine/kwkcli/log"
 )
 
 type ConfigProvider struct {
@@ -64,6 +65,7 @@ func (cs *ConfigProvider) loadPrefs() {
 				return prefs, nil
 			}
 		}
+		log.Debug("Loaded prefs:%+v", c)
 		if res, err := parse(c); err != nil {
 			// TODO: USE TEMPLATE WRITER
 			cs.w.HandleErr(models.ErrOneLine(models.Code_InvalidConfigSection, "Invalid kwk *prefs.yml detected. `kwk edit prefs` to fix."))
@@ -71,6 +73,7 @@ func (cs *ConfigProvider) loadPrefs() {
 			fb, _ := cs.prefsResolvers.Fallback()
 			res, _ = parse(fb)
 		} else {
+			log.Debug("SETTING PREFS: %+v", res)
 			models.SetPrefs(res)
 		}
 	}

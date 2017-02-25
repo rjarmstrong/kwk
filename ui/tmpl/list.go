@@ -4,7 +4,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/style"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"github.com/rjarmstrong/tablewriter"
-	"github.com/dustin/go-humanize"
+	"github.com/rjarmstrong/go-humanize"
 	"text/tabwriter"
 	"strings"
 	"bytes"
@@ -24,10 +24,10 @@ type CodeLine struct {
 
 func statusString(s *models.Snippet) string {
 	if s.Ext == "url" {
-		return "🌎" //"🌐"
+		return "🌎"
 	}
 	if s.RunStatus == models.RunStatusSuccess {
-		return "⚡" //style.Fmt(style.Green, "●") //"✓"//
+		return "⚡"  //"✓"//
 	} else if s.RunStatus == models.RunStatusFail {
 		return "🔥" //style.Fmt(style.Red, "●") //
 	}
@@ -40,16 +40,13 @@ func listRoot(r *models.ListView) string {
 	fmtHeader(buff, r)
 
 	var all []interface{}
-	for _, v := range r.Snippets {
-		all = append(all, v)
-	}
 	for _, v := range r.Pouches {
 		if v.Name != "" {
 			all = append(all, v)
 		}
 	}
 
-	//buff.Write(listSnippets())
+	buff.WriteString(listPouch(r))
 	buff.Write(listHorizontal(all))
 
 	buff.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("\n\n   %d/50 Pouches", len(r.Pouches)-1)))
@@ -108,6 +105,11 @@ func listPouch(list *models.ListView) string {
 		if models.Prefs().AlwaysExpandLists {
 			name.WriteString("\n\n")
 			fmtDescription(name, v.Description, 25)
+		}
+		// Add special instructions:
+		if v.Role == models.SnipRoleEnvironment {
+			name.WriteString("\n\n")
+			name.WriteString(style.Fmt(style.Subdued,"short-cut: kwk edit env"))
 		}
 
 		// col2
@@ -233,18 +235,15 @@ func fmtPreview(s *models.Snippet) string {
 	}
 
 	buff := bytes.Buffer{}
-	for i, v := range preview {
+	for _, v := range preview {
 		// Style
 		m := style.Fmt256(style.GreyBg238, true, v.Margin)
 		b := style.Fmt256(style.GreyBg236, true, v.Body)
 		buff.WriteString(m)
 		buff.WriteString(b)
 		buff.WriteString("  ")
-		if i < len(preview)-1 {
-			buff.WriteString("\n")
-		}
+		buff.WriteString("\n")
 	}
-
 	return buff.String()
 }
 
@@ -302,46 +301,3 @@ func listHorizontal(l []interface{}) []byte {
 	w.Flush()
 	return buff.Bytes()
 }
-
-//func listLong(l []interface{}) []byte {
-//	var buff bytes.Buffer
-//	w := tabwriter.NewWriter(&buff, 7, 1, 3, ' ', tabwriter.TabIndent)
-//	var item bytes.Buffer
-//	item.WriteString("   ")
-//	item.WriteString(style.Fmt(style.Subdued, "   Name"))
-//	item.WriteString(" ")
-//	item.WriteString("\t")
-//	item.WriteString(style.Fmt(style.Subdued, "Snippet"))
-//	item.WriteString("\n")
-//	for _, v := range l {
-//		item.WriteString("   ")
-//		if sn, ok := v.(*models.Snippet); ok {
-//			item.WriteString(statusString(sn.RunStatus))
-//			item.WriteString("  ")
-//			item.WriteString(style.Fmt(style.Cyan, sn.SnipName.String()))
-//			item.WriteString("\t")
-//			item.WriteString(formatSnippet(sn))
-//			item.WriteString("\t")
-//		}
-//		if pch, ok := v.(*models.Pouch); ok {
-//			if models.Prefs().ListAll || !pch.MakePrivate {
-//				if pch.MakePrivate {
-//					item.WriteString("🔒")
-//				} else {
-//					item.WriteString("👝")
-//				}
-//				item.WriteString("  ")
-//				item.WriteString(pch.Name)
-//				item.WriteString(" ")
-//				//item.WriteString(style.Fmt(style.DarkGrey, fmt.Sprintf("%d", pch.SnipCount)))
-//				item.WriteString("\t")
-//				item.WriteString("")
-//			}
-//		}
-//		fmt.Fprint(w, fmt.Sprintf("%s", item.String()))
-//		item.Reset()
-//		fmt.Fprint(w, "\t\n")
-//	}
-//	w.Flush()
-//	return buff.Bytes()
-//}

@@ -31,5 +31,10 @@ func (rt *ListView) IsPouch(name string) bool {
 			return true
 		}
 	}
+	for _, v := range rt.Personal {
+		if name == v.Name {
+			return true
+		}
+	}
 	return false
 }

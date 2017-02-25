@@ -23,7 +23,6 @@
 
 		"github.com/olekukonko/tablewriter"
 	"strings"
-	"github.com/dustin/go-humanize"
 		snippet:list
 		fmt.Print(gui.Colour(gui.LightBlue, "\nkwk.co/" + "rjarmstrong/"))
 			fmt.Printf(gui.Build(102, " ") + "%d of %d records\n\n", len(list.Items), list.Total)

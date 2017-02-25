@@ -8,15 +8,9 @@ var prefs  *Preferences
 var env   *yaml.MapSlice
 
 func Prefs() *Preferences {
-	if prefs == nil {
-		return nil
-	}
-	if prefs.SlimLines < 1 {
-		prefs.SlimLines =DefaultPrefs().SlimLines
-	}
-	if prefs.ExpandedLines < 1 {
-		prefs.ExpandedLines = DefaultPrefs().ExpandedLines
-	}
+	//if prefs == nil {
+	//	prefs = DefaultPrefs()
+	//}
 	return prefs
 }
 
