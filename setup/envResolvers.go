@@ -43,10 +43,10 @@ func (e *EnvResolvers) Own() (string, error) {
 	if l, err := e.snippets.Get(e.alias); err != nil {
 		return "", err
 	} else {
-		if _, err := e.system.WriteToFile(SNIP_CACHE_PATH, e.alias.String(), l.Items[0].Snip, true); err != nil {
+		if _, err := e.system.WriteToFile(SNIP_CACHE_PATH, e.alias.String(), l.Snippets[0].Snip, true); err != nil {
 			return "", err
 		}
-		return l.Items[0].Snip, nil
+		return l.Snippets[0].Snip, nil
 	}
 }
 

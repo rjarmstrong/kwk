@@ -11,26 +11,26 @@ import (
 // version of the library will implement smarter wrapping. This means that
 // pathological cases can dramatically reach past the limit, such as a very
 // long word.
-func WrapString(s string, lim uint) string {
+func WrapString(s string, lim int) string {
 	// Initialize a buffer with a slightly larger size to account for breaks
 	init := make([]byte, 0, len(s))
 	buf := bytes.NewBuffer(init)
 
-	var current uint
+	var current int
 	var wordBuf, spaceBuf bytes.Buffer
 
 	for _, char := range s {
 		if char == '\n' {
 			if wordBuf.Len() == 0 {
-				if current+uint(spaceBuf.Len()) > lim {
+				if current+spaceBuf.Len() > lim {
 					current = 0
 				} else {
-					current += uint(spaceBuf.Len())
+					current += spaceBuf.Len()
 					spaceBuf.WriteTo(buf)
 				}
 				spaceBuf.Reset()
 			} else {
-				current += uint(spaceBuf.Len() + wordBuf.Len())
+				current += spaceBuf.Len() + wordBuf.Len()
 				spaceBuf.WriteTo(buf)
 				spaceBuf.Reset()
 				wordBuf.WriteTo(buf)
@@ -40,7 +40,7 @@ func WrapString(s string, lim uint) string {
 			current = 0
 		} else if unicode.IsSpace(char) {
 			if spaceBuf.Len() == 0 || wordBuf.Len() > 0 {
-				current += uint(spaceBuf.Len() + wordBuf.Len())
+				current += spaceBuf.Len() + wordBuf.Len()
 				spaceBuf.WriteTo(buf)
 				spaceBuf.Reset()
 				wordBuf.WriteTo(buf)
@@ -52,7 +52,7 @@ func WrapString(s string, lim uint) string {
 
 			wordBuf.WriteRune(char)
 
-			if current+uint(spaceBuf.Len()+wordBuf.Len()) > lim && uint(wordBuf.Len()) < lim {
+			if current+(spaceBuf.Len()+wordBuf.Len()) > lim && wordBuf.Len() < lim {
 				buf.WriteRune('\n')
 				current = 0
 				spaceBuf.Reset()
@@ -61,7 +61,7 @@ func WrapString(s string, lim uint) string {
 	}
 
 	if wordBuf.Len() == 0 {
-		if current+uint(spaceBuf.Len()) <= lim {
+		if current+spaceBuf.Len() <= lim {
 			spaceBuf.WriteTo(buf)
 		}
 	} else {

@@ -61,21 +61,22 @@ func (rs *RpcService) Update(a models.Alias, description string) (*models.Snippe
 }
 
 // since unix time in milliseconds
-func (rs *RpcService) List(l *models.ListParams) (*models.SnippetList, error) {
+func (rs *RpcService) List(l *models.ListParams) (*models.ListView, error) {
 	if res, err := rs.client.List(rs.h.Context(), &snipsRpc.ListRequest{Username: l.Username, Pouch: l.Pouch, Since: l.Since, Size: l.Size, Tags: l.Tags, All: l.All}); err != nil {
 		return nil, err
 	} else {
-		list := &models.SnippetList{}
+		list := &models.ListView{}
 		rs.mapSnippetList(res, list, true)
+		list.Pouch = l.Pouch
 		return list, nil
 	}
 }
 
-func (rs *RpcService) Get(k models.Alias) (*models.SnippetList, error) {
+func (rs *RpcService) Get(k models.Alias) (*models.ListView, error) {
 	if res, err := rs.client.Get(rs.h.Context(), &snipsRpc.GetRequest{Alias: mapAlias(k)}); err != nil {
 		return nil, err
 	} else {
-		list := &models.SnippetList{}
+		list := &models.ListView{}
 		rs.mapSnippetList(res, list, false)
 		return list, nil
 	}
@@ -189,18 +190,18 @@ func (rs *RpcService) UnTag(a models.Alias, tags ...string) (*models.Snippet, er
 	}
 }
 
-func (rs *RpcService) GetRoot(username string, all bool) (*models.Root, error) {
+func (rs *RpcService) GetRoot(username string, all bool) (*models.ListView, error) {
 	r, err := rs.pc.GetRoot(rs.h.Context(), &snipsRpc.RootRequest{Username: username, All: all})
 	if err != nil {
 		return nil, err
 	}
-	l := &models.SnippetList{}
+	l := &models.ListView{}
 	res := &snipsRpc.ListResponse{Items: r.Snips}
 	rs.mapSnippetList(res, l, true)
 	pl := rs.mapPouchList(r.Pouches)
 	perL := rs.mapPouchList(r.Personal)
 	record := &update.Record{}
-	root := &models.Root{Snippets: l.Items, Pouches: pl, Personal:perL, Username:r.Username}
+	root := &models.ListView{IsRoot: true, Snippets: l.Snippets, Pouches: pl, Personal: perL, Username: r.Username}
 	if e := rs.persister.Get(update.RecordFile, record, 0); e == nil {
 		root.LastUpdate = record.LastUpdate
 	}
@@ -298,7 +299,7 @@ func (rs *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache b
 const LATEST_SNIPPET = "latest-snippet.json"
 const DELETED_SNIPPET = "deleted-snippet.json"
 
-func (rs *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.SnippetList, isList bool) {
+func (rs *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.ListView, isList bool) {
 	model.Username = rpc.Username
 	model.Pouch = rpc.Pouch
 	model.Total = rpc.Total
@@ -312,7 +313,7 @@ func (rs *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.S
 	for _, v := range rpc.Items {
 		item := &models.Snippet{}
 		rs.mapSnip(v, item, false)
-		model.Items = append(model.Items, item)
+		model.Snippets = append(model.Snippets, item)
 		if item.Id == newSnip.Id {
 			isInList = true
 		}
@@ -320,7 +321,7 @@ func (rs *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.S
 	if isList && !isInList && newSnip.Alias.Name != "" {
 		// TODO: add to logger
 		fmt.Println("Adding from cache")
-		model.Items = append([]*models.Snippet{newSnip}, model.Items...)
+		model.Snippets = append([]*models.Snippet{newSnip}, model.Snippets...)
 	}
 }
 

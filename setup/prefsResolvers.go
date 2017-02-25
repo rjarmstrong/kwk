@@ -36,10 +36,10 @@ func (p *PrefsResolvers) Own() (string, error) {
 	if l, err := p.snippets.Get(p.a); err != nil {
 		return "", err
 	} else {
-		if _, err := p.system.WriteToFile(SNIP_CACHE_PATH, p.a.String(), l.Items[0].Snip, true); err != nil {
+		if _, err := p.system.WriteToFile(SNIP_CACHE_PATH, p.a.String(), l.Snippets[0].Snip, true); err != nil {
 			return "", err
 		}
-		return l.Items[0].Snip, nil
+		return l.Snippets[0].Snip, nil
 	}
 }
 

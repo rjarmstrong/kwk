@@ -34,9 +34,9 @@ func (sm *ServiceMock) Move(username string, sourcePouch string, targetPouch str
 	panic("not imp")
 }
 
-func (sm *ServiceMock) Get(a models.Alias) (*models.SnippetList, error) {
+func (sm *ServiceMock) Get(a models.Alias) (*models.ListView, error) {
 	sm.GetCalledWith = a
-	return &models.SnippetList{Items: sm.ReturnItemsForGet, Total: int64(len(sm.ReturnItemsForGet))}, nil
+	return &models.ListView{Snippets: sm.ReturnItemsForGet, Total: int64(len(sm.ReturnItemsForGet))}, nil
 }
 
 func (sm *ServiceMock) Create(snip string, a models.Alias, role models.SnipRole) (*models.CreateSnippetResponse, error) {
@@ -89,9 +89,9 @@ func (sm *ServiceMock) UnTag(a models.Alias, tag ...string) (*models.Snippet, er
 	return &models.Snippet{}, nil
 }
 
-func (sm *ServiceMock) List(l *models.ListParams) (*models.SnippetList, error) {
+func (sm *ServiceMock) List(l *models.ListParams) (*models.ListView, error) {
 	sm.ListCalledWith = l
-	return &models.SnippetList{}, nil
+	return &models.ListView{}, nil
 }
 
 func (sm *ServiceMock) CreatePouch(name string) (string, error) {
@@ -104,9 +104,9 @@ func (sm *ServiceMock) DeletePouch(name string) (bool, error) {
 	return true, nil
 }
 
-func (sm *ServiceMock) GetRoot (username string, all bool) (*models.Root, error){
+func (sm *ServiceMock) GetRoot (username string, all bool) (*models.ListView, error){
 	sm.GetRootCalledWith = []interface{}{username, all}
-	return &models.Root{}, nil
+	return &models.ListView{}, nil
 }
 func (sm *ServiceMock) RenamePouch (pouch string, newPouch string) (string, error){
 	sm.RenamePouchCalledWith = []string{pouch, newPouch}

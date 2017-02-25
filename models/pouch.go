@@ -13,21 +13,3 @@ type Pouch struct {
 	PouchId     string
 	UnOpened    int64
 }
-
-type Root struct {
-	LastUpdate  int64
-	HidePrivate bool
-	Username    string
-	Pouches     []*Pouch
-	Personal    []*Pouch
-	Snippets    []*Snippet
-}
-
-func (rt *Root) IsPouch(name string) bool {
-	for _, v := range rt.Pouches {
-		if name == v.Name {
-			return true
-		}
-	}
-	return false
-}

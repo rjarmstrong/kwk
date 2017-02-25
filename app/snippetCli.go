@@ -368,12 +368,12 @@ func (sc *SnippetCli) Cat(distinctName string) {
 			sc.HandleErr(err)
 		}
 	} else {
-		if len(list.Items) == 0 {
+		if len(list.Snippets) == 0 {
 			//sc.suggest(distinctName)
 			sc.Render("snippet:notfound", a)
-		} else if len(list.Items) == 1 {
+		} else if len(list.Snippets) == 1 {
 			// TODO: use echo instead so that we can do variable substitution
-			sc.Render("snippet:cat", list.Items[0])
+			sc.Render("snippet:cat", list.Snippets[0])
 		} else {
 			sc.Render("snippet:ambiguouscat", list)
 		}
@@ -501,11 +501,11 @@ func (sc *SnippetCli) List(args ...string) {
 	}
 }
 
-func (sc *SnippetCli) handleMultiResponse(distinctName string, list *models.SnippetList) *models.Snippet {
+func (sc *SnippetCli) handleMultiResponse(distinctName string, list *models.ListView) *models.Snippet {
 	if list.Total == 1 {
-		return list.Items[0]
+		return list.Snippets[0]
 	} else if list.Total > 1 {
-		r := sc.MultiChoice("dialog:choose", "Multiple matches. Choose a snippet to run:", list.Items)
+		r := sc.MultiChoice("dialog:choose", "Multiple matches. Choose a snippet to run:", list.Snippets)
 		s := r.Value.(models.Snippet)
 		return &s
 	} else {
@@ -513,7 +513,7 @@ func (sc *SnippetCli) handleMultiResponse(distinctName string, list *models.Snip
 	}
 }
 
-func (sc *SnippetCli) getSnippet(distinctName string) (*models.SnippetList, *models.Alias, error) {
+func (sc *SnippetCli) getSnippet(distinctName string) (*models.ListView, *models.Alias, error) {
 	a, err := models.ParseAlias(distinctName)
 	if err != nil {
 		return nil, nil, err

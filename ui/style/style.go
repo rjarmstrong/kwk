@@ -28,10 +28,12 @@ const (
 	LightCyan    AnsiCode = 96
 	White        AnsiCode = 97
 
-	DarkGreyBg   AnsiCode = 100
-	LightBlueBg   AnsiCode = 104
-	GreyBg238   AnsiCode = 238
+	DarkGreyBg  AnsiCode = 100
+	LightBlueBg AnsiCode = 104
+	GreyBg234   AnsiCode = 234
 	GreyBg236   AnsiCode = 236
+	GreyBg238   AnsiCode = 238
+	GreyBg241   AnsiCode = 241
 
 	Bold AnsiCode = 21
 	Dim AnsiCode = 22

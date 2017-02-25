@@ -23,9 +23,23 @@ func Snippets(s *SnippetCli) []cli.Command {
 					Name: "all, a",
 					Usage: "List all snippets.",
 				},
-				cli.IntFlag{
-					Name: "expand, x",
-					Usage: "Expand list item to N rows.",
+			},
+			Action: func(c *cli.Context) error {
+				all := c.Bool("all")
+				if all {
+					models.Prefs().ListAll = true
+				}
+				s.List([]string(c.Args())...)
+				return nil
+			},
+		},
+		{
+			Name:    "expand",
+			Aliases: []string{"x"},
+			Flags: []cli.Flag {
+				cli.BoolFlag{
+					Name: "all, a",
+					Usage: "List all snippets.",
 				},
 			},
 			Action: func(c *cli.Context) error {
@@ -33,10 +47,7 @@ func Snippets(s *SnippetCli) []cli.Command {
 				if all {
 					models.Prefs().ListAll = true
 				}
-				expand := c.Int("expand")
-				if expand > 0 {
-					models.Prefs().ExpandLines = expand
-				}
+				models.Prefs().AlwaysExpandLists = true
 				s.List([]string(c.Args())...)
 				return nil
 			},

@@ -11,15 +11,6 @@ const (
 	SETTINGS_POUCH  = "settings"
 )
 
-type SnippetList struct {
-	Username string
-	Pouch    string
-	Items    []*Snippet
-	Total    int64
-	Since    time.Time
-	Size     int64
-}
-
 func NewSnippet(snippet string) *Snippet {
 	return &Snippet{Snip: snippet, Alias: Alias{SnipName: SnipName{}}}
 }
