@@ -160,12 +160,14 @@ func fmtPreview(s *models.Snippet) string {
 	}
 	chunks := strings.Split(s.Snip, "\n")
 
-	// Return any non code previews
-	if s.Role == models.SnipRolePreferences {
-		return `(Global prefs) 'kwk edit prefs'`
-	} else if s.Role == models.SnipRoleEnvironment {
-		return `(Local environment) 'kwk edit env'`
-	} else if s.Ext == "url" {
+	//// Return any non code previews
+	//if s.Role == models.SnipRolePreferences {
+	//	return `(Global prefs) 'kwk edit prefs'`
+	//} else if s.Role == models.SnipRoleEnvironment {
+	//	return `(Local environment) 'kwk edit env'`
+	//} else
+
+	if s.Ext == "url" {
 		return uri(s.Snip)
 	}
 
