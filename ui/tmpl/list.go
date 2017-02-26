@@ -77,7 +77,7 @@ func listPouch(list *models.ListView) string {
 	fmtHeader(w, list)
 
 	tbl := tablewriter.NewWriter(w)
-	tbl.SetHeader([]string{"Name", "Status", "Preview"})
+	tbl.SetHeader([]string{"Name", "Status", "Snippet", "Preview"})
 	tbl.SetAutoWrapText(false)
 	tbl.SetBorder(false)
 	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
@@ -101,7 +101,7 @@ func listPouch(list *models.ListView) string {
 		// col1
 		name := &bytes.Buffer{}
 		name.WriteString(style.Fmt(style.Cyan, v.SnipName.String()))
-		name = pad(35, name.String())
+		name = pad(25, name.String())
 		if models.Prefs().AlwaysExpandLists {
 			name.WriteString("\n\n")
 			fmtDescription(name, v.Description, 25)
@@ -118,12 +118,14 @@ func listPouch(list *models.ListView) string {
 		status.WriteString("\n")
 		status.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("↻ %2d", v.RunCount)))
 
-		// //strings.Join(v.Tags, ", "),
+		//col3
 
+		// //strings.Join(v.Tags, ", "),
 		tbl.Append([]string{
 			name.String(),
 			status.String(),
 			fmtPreview(v),
+			fmtOutPreview(v),
 		})
 	}
 	tbl.Render()
@@ -154,6 +156,19 @@ func fmtHeader(w io.Writer, list *models.ListView) {
 		fmt.Print(w, "/")
 	}
 	fmt.Print(w, "\n\n")
+}
+
+func fmtOutPreview(s *models.Snippet) string{
+	chunks := strings.Split(s.Preview, "\n")
+	lines := []string{}
+	for i :=0; i < len(chunks) && i < 3; i ++ {
+		if chunks[i] == "" {
+			continue
+		}
+		l := style.Fmt(style.Subdued, pad(20, chunks[i]).String())
+		lines = append(lines, l)
+	}
+	return strings.Join(lines, "\n")
 }
 
 func fmtPreview(s *models.Snippet) string {

@@ -60,6 +60,18 @@ func (rs *RpcService) Update(a models.Alias, description string) (*models.Snippe
 	}
 }
 
+func (rs *RpcService) SetPreview(a models.Alias, p string) error {
+	if _, err := rs.client.SetPreview(rs.h.Context(), &snipsRpc.SetPreviewRequest{
+		Alias:mapAlias(a),
+		Preview:p,
+	}); err != nil {
+		return err
+	} else {
+		return nil
+	}
+}
+
+
 // since unix time in milliseconds
 func (rs *RpcService) List(l *models.ListParams) (*models.ListView, error) {
 	if res, err := rs.client.List(rs.h.Context(), &snipsRpc.ListRequest{Username: l.Username, Pouch: l.Pouch, Since: l.Since, Size: l.Size, Tags: l.Tags, All: l.All}); err != nil {
@@ -291,6 +303,7 @@ func (rs *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache b
 	model.Role = models.SnipRole(rpc.Role)
 	model.RunStatus = models.RunStatus(rpc.RunStatus)
 	model.RunStatusTime = rpc.RunStatusTime
+	model.Preview = rpc.Preview
 	if cache {
 		rs.persister.Upsert(LATEST_SNIPPET, model)
 	}

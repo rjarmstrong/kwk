@@ -26,6 +26,10 @@ func (sm *ServiceMock) LogRun(a models.Alias, s models.RunStatus) {
 	panic("not impl")
 }
 
+func (sm *ServiceMock) SetPreview(a models.Alias, p string) error {
+	panic("not impl")
+}
+
 func (sm *ServiceMock) AlphaSearch(term string) (*models.SearchTermResponse, error) {
 	panic("not impl")
 }

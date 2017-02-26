@@ -286,6 +286,7 @@ message Snip {
     Role role = 17;
     RunStatus runStatus = 18;
     int64 runStatusTime = 19;
+    string preview = 20;
 }
 
 enum RunStatus {

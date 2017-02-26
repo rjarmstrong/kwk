@@ -168,17 +168,25 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 		panic(err)
 	}
 	var stderr bytes.Buffer
-	c.Stdout = os.Stdout
+	stdout := &bytes.Buffer{}
+	c.Stdout = stdout
 	c.Stderr = &stderr
 	err = c.Run()
 	if err != nil {
 		cancel()
+		go func(){
+			index := strings.Index(stderr.String(), ":")
+			r.snippets.SetPreview(a, stderr.String()[index:])
+		}()
 		desc := fmt.Sprintf("%s execution error: %s\n\n%s", strings.ToUpper(name), err.Error(), stderr.String())
 		if isExe {
 			r.snippets.LogRun(a, models.RunStatusFail)
 		}
 		return nil, models.ErrOneLine(models.Code_RunnerExitError, desc)
 	} else {
+		// set preview
+		go r.snippets.SetPreview(a, stdout.String())
+		os.Stdout.Write(stdout.Bytes())
 		if isExe {
 			r.snippets.LogRun(a, models.RunStatusSuccess)
 		}

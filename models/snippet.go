@@ -25,6 +25,7 @@ type Snippet struct {
 	Version   int64
 	Media     string
 	Tags      []string
+	Preview   string
 	Created   time.Time
 
 	Description       string
