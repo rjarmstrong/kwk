@@ -61,8 +61,27 @@ func init() {
 	add("snippet:moved-pouch", "{{ .Quant | blue }} snippet(s) moved to pouch {{ .Pouch | blue }}", template.FuncMap{"blue": blue})
 	add("snippet:create-pouch", "{{ \"Would you like to create the snippet in a new pouch? [y/n] \" | yellow }}?  ", template.FuncMap{"yellow": yellow})
 
-	add("snippet:inspect",
-		"\n{{range .Items}}"+"Name: {{.String}}"+"\nCreated: {{.Created}}"+"\nTags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}"+"\nDescription: {{.Description}}"+"\nRun count: {{.RunCount}}"+"\nClone count: {{.CloneCount}}"+"\n{{ end }}\n\n", nil)
+	//add("snippet:inspect",
+	//	"\n{{range .Items}}"+"Name: {{.String}}"+"\nClone count: {{.CloneCount}}"+"\n{{ end }}\n\n", nil)
+
+	add("snippet:inspect", "" +
+		"{{ .String | blue }}\n" +
+		"{{ . | status }}\n" +
+		"Description: {{.Description}}\n\n"+
+		"Run count: {{.RunCount}}  Created: {{.Created | human}}\n\n" +
+		"Snippet:\n\n{{ . | snippet }}\n\n" +
+		"Preview:\n\n{{ . | preview }}\n\n" +
+		"Tags: {{range $index, $element := .Tags}}{{if $index}}, {{end}} {{$element}}{{ end }}\n\n",
+		template.FuncMap{"blue": blue,
+			"human" : humanTime,
+			"status" : statusString,
+			"snippet": func(s *models.Snippet) string {
+				return FmtSnippet(s, 100, 0)
+			},
+			"preview" : func(s *models.Snippet) string {
+				return FmtOutPreview(s)
+			},
+	})
 
 	add("pouch:not-deleted", "{{. | blue }} was NOT deleted.", template.FuncMap{"blue": blue})
 	add("pouch:deleted", "{{. | blue }} was deleted.", template.FuncMap{"blue": blue})

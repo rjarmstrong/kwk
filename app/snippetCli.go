@@ -234,7 +234,8 @@ func (sc *SnippetCli) Inspect(distinctName string) {
 	if list, err := sc.s.Get(*a); err != nil {
 		sc.HandleErr(err)
 	} else {
-		sc.Render("snippet:inspect", list)
+		s := sc.handleMultiResponse(distinctName, list)
+		sc.Render("snippet:inspect", s)
 	}
 }
 

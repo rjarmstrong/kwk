@@ -104,7 +104,7 @@ func listPouch(list *models.ListView) string {
 		name = pad(25, name.String())
 		if models.Prefs().AlwaysExpandLists {
 			name.WriteString("\n\n")
-			fmtDescription(name, v.Description, 25)
+			fmtDescription(name, v.Description, 20)
 		}
 		// Add special instructions:
 		if v.Role == models.SnipRoleEnvironment {
@@ -113,6 +113,12 @@ func listPouch(list *models.ListView) string {
 		}
 
 		// col2
+		var lines int
+		if models.Prefs().AlwaysExpandLists {
+			lines = models.Prefs().ExpandedLines
+		} else {
+			lines = models.Prefs().SlimLines
+		}
 		status := &bytes.Buffer{}
 		status.WriteString(executed)
 		status.WriteString("\n")
@@ -124,8 +130,8 @@ func listPouch(list *models.ListView) string {
 		tbl.Append([]string{
 			name.String(),
 			status.String(),
-			fmtPreview(v),
-			fmtOutPreview(v),
+			FmtSnippet(v, 60, lines),
+			FmtOutPreview(v),
 		})
 	}
 	tbl.Render()
@@ -158,7 +164,7 @@ func fmtHeader(w io.Writer, list *models.ListView) {
 	fmt.Print(w, "\n\n")
 }
 
-func fmtOutPreview(s *models.Snippet) string{
+func FmtOutPreview(s *models.Snippet) string{
 	chunks := strings.Split(s.Preview, "\n")
 	lines := []string{}
 	for i :=0; i < len(chunks) && i < 3; i ++ {
@@ -171,7 +177,7 @@ func fmtOutPreview(s *models.Snippet) string{
 	return strings.Join(lines, "\n")
 }
 
-func fmtPreview(s *models.Snippet) string {
+func FmtSnippet(s *models.Snippet, width int, lines int) string {
 	if s.Snip == "" {
 		s.Snip = "<empty>"
 	}
@@ -217,13 +223,7 @@ func fmtPreview(s *models.Snippet) string {
 		code = clipped
 	}
 
-	var lines int
-	if models.Prefs().AlwaysExpandLists {
-		lines = models.Prefs().ExpandedLines
-	} else {
-		lines = models.Prefs().SlimLines
-	}
-	crop := len(code) >= lines
+	crop := len(code) >= lines && lines != 0
 
 	// crop width
 	var preview []CodeLine
@@ -233,10 +233,11 @@ func fmtPreview(s *models.Snippet) string {
 		preview = code
 	}
 
-	var width = 60
 	rightTrim := style.FmtStart(style.Subdued, "|")
-	for i, v := range preview {
-		preview[i].Body = pad(width, v.Body).String() + rightTrim
+	if width > 0 {
+		for i, v := range preview {
+			preview[i].Body = pad(width, v.Body).String() + rightTrim
+		}
 	}
 
 	// Add page tear and last line

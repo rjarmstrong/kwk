@@ -1,9 +1,5 @@
 package models
 
-import (
-	"time"
-)
-
 const (
 	ProfileFullKey  = "profile.json"
 	TokenHeaderName = "token"
@@ -26,7 +22,7 @@ type Snippet struct {
 	Media     string
 	Tags      []string
 	Preview   string
-	Created   time.Time
+	Created   int64
 
 	Description       string
 	ClonedFromAlias   string

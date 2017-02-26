@@ -293,7 +293,7 @@ func (rs *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache b
 	model.Snip = rpc.Snip
 	model.Version = rpc.SnipVersion
 	model.Tags = rpc.Tags
-	model.Created = MillisToTime(rpc.Created)
+	model.Created = rpc.Created
 	model.Description = rpc.Description
 	model.ClonedFromAlias = rpc.ClonedFromAlias
 	model.ClonedFromVersion = rpc.ClonedFromVersion
