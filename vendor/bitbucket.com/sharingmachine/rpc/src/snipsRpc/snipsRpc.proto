@@ -11,8 +11,6 @@ service SnipsRpc {
     }
     rpc Update (UpdateRequest) returns (UpdateResponse) {
     }
-    rpc SetPreview (SetPreviewRequest) returns (SetPreviewResponse) {
-    }
     rpc Move (MoveRequest) returns (MoveResponse) {
     }
     rpc Rename (RenameRequest) returns (RenameResponse) {
@@ -55,6 +53,7 @@ service PouchesRpc {
 message LogRunRequest {
     Alias alias = 1;
     RunStatus status = 2;
+    string Preview =4;
     int64 time = 3;
 }
 
@@ -86,14 +85,6 @@ message CreatePouchRequest {
     string name  = 2;
     bool makePrivate = 3;
     bool encrypt = 4;
-}
-
-message SetPreviewRequest {
-    Alias alias = 1;
-    string preview = 2;
-}
-
-message SetPreviewResponse {
 }
 
 message CreatePouchResponse {

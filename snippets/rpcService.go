@@ -60,17 +60,6 @@ func (rs *RpcService) Update(a models.Alias, description string) (*models.Snippe
 	}
 }
 
-func (rs *RpcService) SetPreview(a models.Alias, p string) error {
-	if _, err := rs.client.SetPreview(rs.h.Context(), &snipsRpc.SetPreviewRequest{
-		Alias:mapAlias(a),
-		Preview:p,
-	}); err != nil {
-		return err
-	} else {
-		return nil
-	}
-}
-
 
 // since unix time in milliseconds
 func (rs *RpcService) List(l *models.ListParams) (*models.ListView, error) {
@@ -181,6 +170,17 @@ func (rs *RpcService) LogRun(a models.Alias, s models.RunStatus) {
 		log.Error("Error sending LogRun", err)
 	}
 }
+
+//func (rs *RpcService) SetPreview(a models.Alias, p string) error {
+//	if _, err := rs.client.SetPreview(rs.h.Context(), &snipsRpc.SetPreviewRequest{
+//		Alias:mapAlias(a),
+//		Preview:p,
+//	}); err != nil {
+//		return err
+//	} else {
+//		return nil
+//	}
+//}
 
 func (rs *RpcService) Tag(a models.Alias, tags ...string) (*models.Snippet, error) {
 	if res, err := rs.client.Tag(rs.h.Context(), &snipsRpc.TagRequest{Alias: mapAlias(a), Tags: tags}); err != nil {
