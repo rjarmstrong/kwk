@@ -180,7 +180,7 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 		}()
 		desc := fmt.Sprintf("%s execution error: %s\n\n%s", strings.ToUpper(name), err.Error(), stderr.String())
 		if isExe {
-			r.snippets.LogRun(a, models.RunStatusFail)
+			r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, "")
 		}
 		return nil, models.ErrOneLine(models.Code_RunnerExitError, desc)
 	} else {
@@ -188,14 +188,16 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 		//go r.snippets.SetPreview(a, stdout.String())
 		os.Stdout.Write(stdout.Bytes())
 		if isExe {
-			r.snippets.LogRun(a, models.RunStatusSuccess)
+			var preview string
+			if stdout.Len() > 100 {
+				preview = string(stdout.Bytes()[0:1000])
+			} else {
+				preview = stdout.String()
+			}
+			r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, preview)
 		}
 		return out, nil
 	}
-}
-
-func logRun(a models.Alias, verb string, exitCode string, clientErrCode models.Code){
-
 }
 
 func (r *StdRunner) getEnvSection(name string) (*yaml.MapSlice, error) {

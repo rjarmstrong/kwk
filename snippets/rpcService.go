@@ -163,9 +163,9 @@ func (rs *RpcService) Clone(a models.Alias, new models.Alias) (*models.Snippet, 
 	}
 }
 
-func (rs *RpcService) LogRun(a models.Alias, s models.RunStatus) {
-	_, err := rs.client.LogRun(rs.h.Context(), &snipsRpc.LogRunRequest{
-		Alias: mapAlias(a), Status: snipsRpc.RunStatus(s), Time: time.Now().Unix() })
+func (rs *RpcService) LogUse(a models.Alias, s models.UseStatus, u models.UseType, preview string) {
+	_, err := rs.client.LogUse(rs.h.Context(), &snipsRpc.LogUseRequest{
+		Alias: mapAlias(a), Status: snipsRpc.UseStatus(s), Preview: preview, Type:snipsRpc.UseType(u), Time: time.Now().Unix() })
 	if err != nil {
 		log.Error("Error sending LogRun", err)
 	}
@@ -301,7 +301,7 @@ func (rs *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache b
 	model.RunCount = rpc.RunCount
 	model.CloneCount = rpc.CloneCount
 	model.Role = models.SnipRole(rpc.Role)
-	model.RunStatus = models.RunStatus(rpc.RunStatus)
+	model.RunStatus = models.UseStatus(rpc.RunStatus)
 	model.RunStatusTime = rpc.RunStatusTime
 	model.Preview = rpc.Preview
 	if cache {

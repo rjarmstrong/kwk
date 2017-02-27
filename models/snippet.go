@@ -32,17 +32,24 @@ type Snippet struct {
 	RunCount          int64
 	Role              SnipRole
 
-	RunStatus     RunStatus
+	RunStatus     UseStatus
 	RunStatusTime int64
 }
 
 type SnipRole int32
-type RunStatus int64
+
+type UseType int64
+type UseStatus int64
 
 const (
-	RunStatusUnknown RunStatus = 0
-	RunStatusSuccess RunStatus = 1
-	RunStatusFail    RunStatus = 2
+	UseStatusUnknown UseStatus = 0
+	UseStatusSuccess UseStatus = 1
+	UseStatusFail    UseStatus = 2
+
+	UseTypeUnknown UseType = 0
+	UseTypeView    UseType = 1
+	UseTypeRun     UseType = 2
+	UseTypeClone   UseType = 3
 
 	SnipRoleStandard    SnipRole = 0
 	SnipRolePreferences SnipRole = 1

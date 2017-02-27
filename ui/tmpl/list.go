@@ -26,9 +26,9 @@ func statusString(s *models.Snippet) string {
 	if s.Ext == "url" {
 		return "🌎"
 	}
-	if s.RunStatus == models.RunStatusSuccess {
+	if s.RunStatus == models.UseStatusSuccess {
 		return "⚡"  //"✓"//
-	} else if s.RunStatus == models.RunStatusFail {
+	} else if s.RunStatus == models.UseStatusFail {
 		return "🔥" //style.Fmt(style.Red, "●") //
 	}
 	return "📄" //"🔸"

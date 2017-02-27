@@ -22,11 +22,7 @@ type ServiceMock struct {
 	MakePrivateCalledWith []interface{}
 }
 
-func (sm *ServiceMock) LogRun(a models.Alias, s models.RunStatus) {
-	panic("not impl")
-}
-
-func (sm *ServiceMock) SetPreview(a models.Alias, p string) error {
+func (sm *ServiceMock) LogUse(a models.Alias, s models.UseStatus, u models.UseType, preview string) {
 	panic("not impl")
 }
 

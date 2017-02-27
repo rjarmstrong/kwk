@@ -31,9 +31,11 @@ service SnipsRpc {
     }
     rpc Delete (DeleteRequest) returns (DeleteResponse) {
     }
-    rpc Alpha (AlphaRequest) returns (AlphaResponse) {}
+    rpc Alpha (AlphaRequest) returns (AlphaResponse) {
+    }
 
-    rpc LogRun (LogRunRequest) returns (LogRunResponse) {}
+    rpc LogUse (LogUseRequest) returns (LogUseResponse) {
+    }
 }
 
 service PouchesRpc {
@@ -50,14 +52,15 @@ service PouchesRpc {
     }
 }
 
-message LogRunRequest {
+message LogUseRequest {
     Alias alias = 1;
-    RunStatus status = 2;
-    string Preview =4;
-    int64 time = 3;
+    UseType type = 2;
+    UseStatus status = 3;
+    string preview = 4;
+    int64 time = 5;
 }
 
-message LogRunResponse {
+message LogUseResponse {
 
 }
 
@@ -82,7 +85,7 @@ message AlphaResult {
 
 message CreatePouchRequest {
     string username = 1;
-    string name  = 2;
+    string name = 2;
     bool makePrivate = 3;
     bool encrypt = 4;
 }
@@ -268,22 +271,32 @@ message Snip {
     string clonedFromAlias = 8;
     int64 clonedFromVersion = 9;
     bool private = 10;
-    int64 cloneCount = 11;
-    int64 runCount = 12;
+
     string snipChecksum = 13;
     string snipSignature = 14;
     bool encrypted = 15;
     string algorithm = 16;
     Role role = 17;
-    RunStatus runStatus = 18;
+
+    int64 viewCount = 21;
+    int64 cloneCount = 11;
+    int64 runCount = 12;
+    UseStatus runStatus = 18;
     int64 runStatusTime = 19;
     string preview = 20;
 }
 
-enum RunStatus {
-    Unknown = 0;
-    Success = 1;
-    Fail = 2;
+enum UseStatus {
+    UseStatusUnknown = 0;
+    UseStatusSuccess = 1;
+    UseStatusFail = 2;
+}
+
+enum UseType {
+    UseTypeUnknown = 0;
+    UseTypeView = 1;
+    UseTypeRun = 2;
+    UseTypeClone = 3;
 }
 
 enum Role {
