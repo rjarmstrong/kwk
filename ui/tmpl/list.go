@@ -27,7 +27,7 @@ func statusString(s *models.Snippet) string {
 		return "🌎"
 	}
 	if s.RunStatus == models.UseStatusSuccess {
-		return "⚡"  //"✓"//
+		return "⚡" //"✓"//
 	} else if s.RunStatus == models.UseStatusFail {
 		return "🔥" //style.Fmt(style.Red, "●") //
 	}
@@ -37,7 +37,7 @@ func statusString(s *models.Snippet) string {
 func listRoot(r *models.ListView) string {
 	buff := &bytes.Buffer{}
 
-	fmtHeader(buff, r)
+	fmtHeader(buff, r.Username, r.Pouch, nil)
 
 	var all []interface{}
 	for _, v := range r.Pouches {
@@ -74,7 +74,7 @@ func listRoot(r *models.ListView) string {
 
 func listPouch(list *models.ListView) string {
 	w := &bytes.Buffer{}
-	fmtHeader(w, list)
+	fmtHeader(w, list.Username, list.Pouch, nil)
 
 	tbl := tablewriter.NewWriter(w)
 	tbl.SetHeader([]string{"Name", "Status", "Snippet", "Preview"})
@@ -109,7 +109,7 @@ func listPouch(list *models.ListView) string {
 		// Add special instructions:
 		if v.Role == models.SnipRoleEnvironment {
 			name.WriteString("\n\n")
-			name.WriteString(style.Fmt(style.Subdued,"short-cut: kwk edit env"))
+			name.WriteString(style.Fmt(style.Subdued, "short-cut: kwk edit env"))
 		}
 
 		// col2
@@ -153,21 +153,40 @@ func fmtDescription(w io.Writer, in string, width int) {
 	fmt.Fprint(w, join)
 }
 
-func fmtHeader(w io.Writer, list *models.ListView) {
-	fmt.Print(w, "\n")
-	fmt.Print(MARGIN)
-	fmt.Print(w, style.Fmt(style.Cyan, "kwk.co/"+list.Username+"/"))
-	if !list.IsRoot {
-		fmt.Print(w, list.Pouch)
-		fmt.Print(w, "/")
+func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
+	fmt.Fprint(w, "\n")
+	fmt.Fprint(w, MARGIN)
+	fmt.Fprint(w, style.Start)
+	fmt.Fprintf(w, "%dm", style.Cyan)
+	fmt.Fprint(w, KWK_HOME)
+	fmt.Fprint(w, "/")
+	if pouch == "" && s == nil {
+		fmt.Fprint(w, style.End)
+		fmt.Fprint(w, username)
+		fmt.Fprint(w, FOOTER)
+		return
 	}
-	fmt.Print(w, "\n\n")
+	fmt.Fprint(w, username)
+	fmt.Fprint(w, "/")
+	if s == nil {
+		fmt.Fprint(w, style.End)
+		fmt.Fprint(w, pouch)
+		fmt.Fprint(w, FOOTER)
+		return
+	}
+	if pouch != "" {
+		fmt.Fprint(w, pouch)
+		fmt.Fprint(w,"/")
+	}
+	fmt.Fprint(w, style.End)
+	fmt.Fprint(w, s.String())
+	fmt.Fprint(w, FOOTER)
 }
 
-func FmtOutPreview(s *models.Snippet) string{
+func FmtOutPreview(s *models.Snippet) string {
 	chunks := strings.Split(s.Preview, "\n")
 	lines := []string{}
-	for i :=0; i < len(chunks) && i < 3; i ++ {
+	for i := 0; i < len(chunks) && i < 3; i ++ {
 		if chunks[i] == "" {
 			continue
 		}
