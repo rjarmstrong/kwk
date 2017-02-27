@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 set -ef -o pipefail
-KWK_VERSION=v1.2.16
+KWK_VERSION=v1.2.17
 BUILD_NUMBER=$1
 RELEASE_TIME=$(date +%s)
-RELEASE_NOTES="ui upgrades to lists.\n"
+RELEASE_NOTES="Better analytics recording.\n"
 
 echo -e "\n\n\n**** kwk-cli build ${KWK_VERSION}+${BUILD_NUMBER} *****\n\n\n"
 
