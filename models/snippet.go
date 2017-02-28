@@ -30,6 +30,7 @@ type Snippet struct {
 	Private           bool
 	CloneCount        int64
 	RunCount          int64
+	ViewCount          int64
 	Role              SnipRole
 
 	RunStatus     UseStatus

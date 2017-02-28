@@ -81,6 +81,21 @@ var fallbackMap = map[string]string{
 }
 
 const darwinAmd64 = `kwkenv: "1"
+editors:
+#  Specify one app for each file type to edit.
+#  sh: [vim]
+#  go: [gogland]
+#  py: [vscode]
+#  url: [textedit]
+  default: ["textedit"]
+apps:
+  webstorm: ["open", "-a", "webstorm", "$DIR"]
+  textedit: ["open", "-e", "$FULL_NAME"]
+  vscode: ["open", "-a", "Visual Studio Code", "$DIR"]
+  vim: ["vi", "$FULL_NAME" ]
+  emacs: ["emacs", "$FULL_NAME" ]
+  nano: ["nano", "$FULL_NAME" ]
+  default: ["open", "-t", "$FULL_NAME"]
 runners:
   sh: ["/bin/bash", "-c", "$SNIP"]
   url: ["open", "$SNIP"]
@@ -115,21 +130,6 @@ runners:
   json: ["echo", "$SNIP"]
   yml: ["echo", "$SNIP"]
   default: ["echo", "$SNIP"]
-apps:
-  webstorm: ["open", "-a", "webstorm", "$DIR"]
-  textedit: ["open", "-e", "$FULL_NAME"]
-  vscode: ["open", "-a", "Visual Studio Code", "$DIR"]
-  vim: ["vi", "$FULL_NAME" ]
-  emacs: ["emacs", "$FULL_NAME" ]
-  nano: ["nano", "$FULL_NAME" ]
-  default: ["open", "-t", "$FULL_NAME"]
-editors:
-#  Specify one app for each file type to edit.
-#  sh: [vim]
-#  go: [gogland]
-#  py: [vscode]
-#  url: [textedit]
-  default: ["vim"]
 security: #https://gist.github.com/pmarreck/5388643
   encrypt: []
   decrypt: []
@@ -137,6 +137,18 @@ security: #https://gist.github.com/pmarreck/5388643
   verify: []`
 
 const linuxAmd64 = `kwkenv: "1"
+editors:
+#  Specify one app for each file type to edit.
+#  sh: [vim]
+#  go: [emacs]
+#  py: [nano]
+#  url: [vim]
+  default: ["vim"]
+apps:
+  vim: ["vi", "$FULL_NAME"]
+  emacs: ["emacs", "$FULL_NAME" ]
+  nano: ["nano", "$FULL_NAME" ]
+  default: ["vi", "$FULL_NAME"]
 runners:
   sh: ["/bin/bash", "-c", "$SNIP"]
   url: ["open", "$SNIP"]
@@ -167,18 +179,6 @@ runners:
   json: ["echo", "$SNIP"]
   yml: ["echo", "$SNIP"]
   default: ["echo", "$SNIP"]
-apps:
-  vim: ["vi", "$FULL_NAME"]
-  emacs: ["emacs", "$FULL_NAME" ]
-  nano: ["nano", "$FULL_NAME" ]
-  default: ["vi", "$FULL_NAME"]
-editors:
-#  Specify one app for each file type to edit.
-#  sh: [vim]
-#  go: [emacs]
-#  py: [nano]
-#  url: [vim]
-  default: ["vim"]
 security: #https://gist.github.com/pmarreck/5388643
   encrypt: []
   decrypt: []

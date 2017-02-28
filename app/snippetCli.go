@@ -70,14 +70,6 @@ func (sc *SnippetCli) Run(distinctName string, args []string) {
 	if err != nil {
 		sc.Render("validation:one-line", err)
 	}
-	v, err := sc.s.GetRoot("", true)
-	if err != nil {
-		log.Error("Error getting root, but not critical to 'run'",err)
-	} else if a.Ext == "" && v.IsPouch(a.Name) {
-		sc.List(a.Name)
-		return
-	}
-
 	rerun := func(selected string) {
 		r := sc.Dialog.FormField(fmt.Sprintf("kwk %s ", selected))
 		argstr := r.Value.(string)
@@ -97,25 +89,12 @@ func (sc *SnippetCli) Run(distinctName string, args []string) {
 	}
 }
 
-func (sc *SnippetCli) typeAhead(distinctName string, onSelect func(name string)) {
-	exe, _ := os.Executable()
-	opt := fzf.ParseOptionsAs(fmt.Sprintf("--preview=%s cat %s", exe, "{}"), "-1", "--preview-window=right:70%", "--header=   Suggestions:   ", "--query="+distinctName, "--reverse", "--margin=2,6,2,2", "--height=40%", "--no-mouse", "--color=prompt:008,header:0,headerbg:008,fg:255,hl:006,pointer:014,hl+:014,fg+:006,bg+:000")
-	opt.Printer = onSelect
-	fzf.Run(fmt.Sprintf("%s suggest %s", exe, distinctName), opt)
-}
-
-func stdInAsString() string {
-	scanner := bufio.NewScanner(os.Stdin)
-	in := bytes.Buffer{}
-	for scanner.Scan() {
-		in.WriteString(scanner.Text()+"\n")
-	}
-	return in.String()
-}
-
 func (sc *SnippetCli) Create(args []string) {
 	alias := &models.Alias{}
 	var snippet string
+	// TODO: 'http://www.fileformat.info/info/unicode/char/1f526/index.htm'
+	// When there is only one argument a path or url will incorrectly be guessed as being an alias
+	// suggest that if has more than 3 segments then we treat as the snippet instead.
 	if len(args) == 1 {
 		a, err := models.ParseAlias(args[0])
 		if err != nil {
@@ -228,6 +207,13 @@ func (sc *SnippetCli) Describe(distinctName string, description string) {
 
 func (sc *SnippetCli) Inspect(distinctName string) {
 	a, err := models.ParseAlias(distinctName)
+	v, err := sc.s.GetRoot("", true)
+	if err != nil {
+		log.Error("Error getting root, but not critical to 'run'",err)
+	} else if a.Ext == "" && v.IsPouch(a.Name) {
+		sc.List(a.Name)
+		return
+	}
 	if err != nil {
 		sc.Render("validation:one-line", err)
 	}
@@ -251,38 +237,6 @@ func (sc *SnippetCli) Delete(args []string) {
 	sc.deleteSnippet(args)
 }
 
-func (sc *SnippetCli) deleteSnippet(args []string) {
-	as, pouch, err := models.ParseMany(args)
-	if err != nil {
-		sc.HandleErr(err)
-		return
-	}
-	if r := sc.Modal("snippet:check-delete", as, models.Prefs().AutoYes); r.Ok {
-		if err := sc.s.Delete("", pouch, as); err != nil {
-			sc.HandleErr(err)
-			return
-		}
-		sc.List()
-		sc.Render("snippet:deleted", pouch)
-	} else {
-		sc.Render("snippet:not-deleted", pouch)
-	}
-}
-
-func (sc *SnippetCli) deletePouch(pouch string) {
-	res := sc.Dialog.Modal("pouch:check-delete", pouch, false)
-	if res.Ok {
-		_, err := sc.s.DeletePouch(pouch)
-		if err != nil {
-			sc.HandleErr(err)
-			return
-		}
-		sc.List()
-		sc.Render("pouch:deleted", pouch)
-	} else {
-		sc.Render("pouch:not-deleted", pouch)
-	}
-}
 
 func (sc *SnippetCli) Lock(pouch string) {
 	_, err := sc.s.MakePrivate(pouch, true)
@@ -510,6 +464,22 @@ func (sc *SnippetCli) List(args ...string) {
 	}
 }
 
+func (sc *SnippetCli) typeAhead(distinctName string, onSelect func(name string)) {
+	exe, _ := os.Executable()
+	opt := fzf.ParseOptionsAs(fmt.Sprintf("--preview=%s cat %s", exe, "{}"), "-1", "--preview-window=right:70%", "--header=   Suggestions:   ", "--query="+distinctName, "--reverse", "--margin=2,6,2,2", "--height=40%", "--no-mouse", "--color=prompt:008,header:0,headerbg:008,fg:255,hl:006,pointer:014,hl+:014,fg+:006,bg+:000")
+	opt.Printer = onSelect
+	fzf.Run(fmt.Sprintf("%s suggest %s", exe, distinctName), opt)
+}
+
+func stdInAsString() string {
+	scanner := bufio.NewScanner(os.Stdin)
+	in := bytes.Buffer{}
+	for scanner.Scan() {
+		in.WriteString(scanner.Text()+"\n")
+	}
+	return in.String()
+}
+
 func (sc *SnippetCli) handleMultiResponse(distinctName string, list *models.ListView) *models.Snippet {
 	if list.Total == 1 {
 		return list.Snippets[0]
@@ -552,5 +522,38 @@ func (sc *SnippetCli) rename(distinctName string, newSnipName string) {
 			"originalName": original.String(),
 			"newName":      snip.SnipName.String(),
 		})
+	}
+}
+
+func (sc *SnippetCli) deleteSnippet(args []string) {
+	as, pouch, err := models.ParseMany(args)
+	if err != nil {
+		sc.HandleErr(err)
+		return
+	}
+	if r := sc.Modal("snippet:check-delete", as, models.Prefs().AutoYes); r.Ok {
+		if err := sc.s.Delete("", pouch, as); err != nil {
+			sc.HandleErr(err)
+			return
+		}
+		sc.List()
+		sc.Render("snippet:deleted", pouch)
+	} else {
+		sc.Render("snippet:not-deleted", pouch)
+	}
+}
+
+func (sc *SnippetCli) deletePouch(pouch string) {
+	res := sc.Dialog.Modal("pouch:check-delete", pouch, false)
+	if res.Ok {
+		_, err := sc.s.DeletePouch(pouch)
+		if err != nil {
+			sc.HandleErr(err)
+			return
+		}
+		sc.List()
+		sc.Render("pouch:deleted", pouch)
+	} else {
+		sc.Render("pouch:not-deleted", pouch)
 	}
 }

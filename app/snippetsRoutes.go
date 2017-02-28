@@ -103,10 +103,14 @@ func Snippets(s *SnippetCli) []cli.Command {
 			},
 		},
 		{
-			Name:    "inspect",
-			Aliases: []string{"i"},
+			Name:    "run",
+			Aliases: []string{"r"},
 			Action: func(c *cli.Context) error {
-				s.Inspect(c.Args().First())
+				covert := c.Bool("covert")
+				if covert {
+					models.Prefs().Covert = true
+				}
+				s.Run(c.Args().First(), []string(c.Args())[1:])
 				return nil
 			},
 		},

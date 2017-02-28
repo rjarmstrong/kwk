@@ -66,12 +66,22 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 
 	snipCli := NewSnippetCli(a, r, s, d, w, t)
 	app.Commands = append(app.Commands, Snippets(snipCli)...)
-	app.CommandNotFound = func(c *cli.Context, fullKey string) {
-		covert := c.Bool("covert")
-		if covert {
-			models.Prefs().Covert = true
+	app.CommandNotFound = func(c *cli.Context, distinctName string) {
+		switch c.Args().Get(1) {
+		case "run":
+			snipCli.Run(c.Args().First(), []string(c.Args())[2:])
+			return
+		case "r":
+			snipCli.Run(c.Args().First(), []string(c.Args())[2:])
+			return
+		case "edit":
+			snipCli.Edit(c.Args().First())
+			return
+		case "e":
+			snipCli.Edit(c.Args().First())
+			return
 		}
-		snipCli.Run(fullKey, []string(c.Args())[1:])
+		snipCli.Inspect(c.Args().First())
 	}
 
 	return &KwkApp{

@@ -22,62 +22,89 @@ type CodeLine struct {
 	Body   string
 }
 
-func statusString(s *models.Snippet) string {
+func statusString(s *models.Snippet, includeText bool) string {
 	if s.Ext == "url" {
+		if includeText {
+			return "🌎  Bookmark"
+		}
 		return "🌎"
 	}
 	if s.RunStatus == models.UseStatusSuccess {
+		if includeText {
+			return "⚡  Success"
+		}
 		return "⚡" //"✓"//
 	} else if s.RunStatus == models.UseStatusFail {
+		if includeText {
+			return "🔥  Error"
+		}
 		return "🔥" //style.Fmt(style.Red, "●") //
+	}
+	if includeText {
+		return "📄  Not run/runnable"
 	}
 	return "📄" //"🔸"
 }
 
+func fmtLocked(locked bool, includeText bool) string {
+	if locked {
+		if includeText {
+			return "🔒  Private"
+		}
+		return "🔒"
+	}
+	if includeText {
+		return "🔓  Public"
+	}
+	return "🔓"
+}
+
 func listRoot(r *models.ListView) string {
-	buff := &bytes.Buffer{}
-
-	fmtHeader(buff, r.Username, r.Pouch, nil)
-
+	w := &bytes.Buffer{}
 	var all []interface{}
 	for _, v := range r.Pouches {
 		if v.Name != "" {
 			all = append(all, v)
 		}
 	}
-
-	buff.WriteString(listPouch(r))
-	buff.Write(listHorizontal(all))
-
-	buff.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("\n\n   %d/50 Pouches", len(r.Pouches)-1)))
-	if models.ClientIsNew(r.LastUpdate) {
-		buff.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("          kwk auto-updated to %s %s", models.Client.Version, humanTime(r.LastUpdate))))
-	} else {
-		buff.WriteString("\n")
-	}
-	buff.WriteString("\n\n")
 	for _, v := range r.Personal {
-		if v.Name == "inbox" {
-			if v.UnOpened > 0 {
-				buff.WriteString(fmt.Sprintf(" 📬 Inbox %d", v.UnOpened))
-
-			} else {
-				buff.WriteString(" 📪  inbox")
-			}
-		} else if v.Name == "settings" {
-			buff.WriteString("   ⚙  settings")
-		}
+		all = append(all, v)
 	}
-	buff.WriteString("\n\n")
-	return buff.String()
+
+	fmtHeader(w, r.HidePrivate, r.Username, r.Pouch, nil)
+	w.Write(listHorizontal(all))
+
+	if len(r.Snippets) > 0 {
+		fmt.Fprint(w, listPouchSnippets(r))
+	}
+
+	//w.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("%d/50 Pouches", len(r.Pouches)-1)))
+	if models.ClientIsNew(r.LastUpdate) {
+		w.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("          kwk auto-updated to %s %s", models.Client.Version, humanTime(r.LastUpdate))))
+	} else {
+		w.WriteString("\n")
+	}
+	w.WriteString("\n\n")
+	return w.String()
 }
 
 func listPouch(list *models.ListView) string {
 	w := &bytes.Buffer{}
-	fmtHeader(w, list.Username, list.Pouch, nil)
+	fmtHeader(w, list.HidePrivate, list.Username, list.Pouch, nil)
+	fmt.Fprint(w, listPouchSnippets(list))
+	return w.String()
+}
+
+func listPouchSnippets(list *models.ListView) string {
+	w := &bytes.Buffer{}
+
+	//fmt.Fprintf(w,"%s", fmtLocked(list.HidePrivate, false))
+	//if list.Pouch != "" {
+	//	fmt.Fprintf(w, "%s👝  \n", MARGIN)
+	//}
 
 	tbl := tablewriter.NewWriter(w)
-	tbl.SetHeader([]string{"Name", "Status", "Snippet", "Preview"})
+	tbl.SetHeader([]string{"", "", "", ""})
 	tbl.SetAutoWrapText(false)
 	tbl.SetBorder(false)
 	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
@@ -93,9 +120,9 @@ func listPouch(list *models.ListView) string {
 	for _, v := range list.Snippets {
 		var executed string
 		if v.RunStatusTime > 0 {
-			executed = fmt.Sprintf("%s  %s", statusString(v), style.Fmt(style.Subdued, humanize.Time(time.Unix(v.RunStatusTime, 0))))
+			executed = fmt.Sprintf("%s  %s", statusString(v, false), style.Fmt(style.Subdued, humanize.Time(time.Unix(v.RunStatusTime, 0))))
 		} else {
-			executed = statusString(v)
+			executed = statusString(v, false)
 		}
 
 		// col1
@@ -135,10 +162,27 @@ func listPouch(list *models.ListView) string {
 		})
 	}
 	tbl.Render()
+
 	if len(list.Snippets) == 0 {
-		fmt.Println(style.Fmt(style.Yellow, "Create some snippets to fill this view!\n"))
+		fmt.Fprint(w, MARGIN)
+		fmt.Fprint(w, style.Fmt(style.Subdued, "<empty pouch>\n"))
 	}
-	fmt.Fprintf(w, "\n%d of %d records\n\n", len(list.Snippets), list.Total)
+
+	fmt.Fprint(w, "\n")
+
+	//fmt.Fprint(w, style.Start)
+	//fmt.Fprintf(w, "%dm", style.Subdued)
+	//fmt.Fprint(w, MARGIN)
+	//fmt.Fprintf(w,"Expand list: `kwk expand %s`", list.Pouch)
+	//fmt.Fprint(w, MARGIN)
+	//fmt.Fprint(w, style.End)
+	////fmt.Fprint(w, style.Start)
+	//fmt.Fprintf(w, "%dm", style.Subdued)
+	//fmt.Fprint(w, MARGIN)
+	//fmt.Fprintf(w, "%d of max 32 snippets in pouch", len(list.Snippets))
+	//fmt.Fprint(w, style.End)
+
+
 	fmt.Fprint(w, "\n\n")
 
 	return w.String()
@@ -153,7 +197,7 @@ func fmtDescription(w io.Writer, in string, width int) {
 	fmt.Fprint(w, join)
 }
 
-func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
+func fmtHeader(w io.Writer, locked bool, username string, pouch string, s *models.SnipName) {
 	fmt.Fprint(w, "\n")
 	fmt.Fprint(w, MARGIN)
 	fmt.Fprint(w, style.Start)
@@ -170,7 +214,7 @@ func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
 	fmt.Fprint(w, "/")
 	if s == nil {
 		fmt.Fprint(w, style.End)
-		fmt.Fprint(w, pouch)
+		fmt.Fprint(w,  pouch)
 		fmt.Fprint(w, FOOTER)
 		return
 	}
@@ -300,10 +344,10 @@ func listHorizontal(l []interface{}) []byte {
 	var item bytes.Buffer
 	for i, v := range l {
 		if i%5 == 0 {
-			item.WriteString("   ")
+			item.WriteString("  ")
 		}
 		if sn, ok := v.(*models.Snippet); ok {
-			item.WriteString(statusString(sn))
+			item.WriteString(statusString(sn, false))
 			item.WriteString("  ")
 			item.WriteString(style.Fmt(style.Cyan, sn.SnipName.Name))
 			item.WriteString(style.Fmt(style.Subdued, "."+sn.SnipName.Ext))
@@ -311,11 +355,20 @@ func listHorizontal(l []interface{}) []byte {
 		}
 		if pch, ok := v.(*models.Pouch); ok {
 			if models.Prefs().ListAll || !pch.MakePrivate {
-				if pch.MakePrivate {
+				if pch.Name == "inbox" {
+					if pch.UnOpened > 0 {
+						item.WriteString(fmt.Sprintf("📬%d", pch.UnOpened))
+					} else {
+						item.WriteString("📪")
+					}
+				} else if pch.Name == "settings" {
+					item.WriteString("⚙")
+				} else if pch.MakePrivate {
 					item.WriteString("🔒")
 				} else {
 					item.WriteString("👝")
 				}
+
 				item.WriteString("  ")
 				item.WriteString(pch.Name)
 				item.WriteString(style.Fmt(style.Subdued, fmt.Sprintf(" (%d)", pch.SnipCount)))

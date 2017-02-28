@@ -251,7 +251,7 @@ func (t *Table) AppendBulk(rows [][]string) {
 
 func (t Table) printLine(nl bool) {
 	fmt.Fprint(t.out, t.pCenter)
-	fmt.Fprint(t.out, "\033[2m")
+	fmt.Fprint(t.out, "  \033[2m")
 	for i := 0; i < len(t.cs); i++ {
 		v := t.cs[i]
 		fmt.Fprintf(t.out, "%s%s%s%s",

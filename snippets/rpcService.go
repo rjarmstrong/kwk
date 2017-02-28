@@ -299,6 +299,7 @@ func (rs *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache b
 	model.ClonedFromVersion = rpc.ClonedFromVersion
 	model.Private = rpc.Private
 	model.RunCount = rpc.RunCount
+	model.ViewCount = rpc.ViewCount
 	model.CloneCount = rpc.CloneCount
 	model.Role = models.SnipRole(rpc.Role)
 	model.RunStatus = models.UseStatus(rpc.RunStatus)

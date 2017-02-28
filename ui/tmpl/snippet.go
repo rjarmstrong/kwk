@@ -8,36 +8,71 @@ import (
 	"fmt"
 	"time"
 	"strings"
+	"bitbucket.com/sharingmachine/kwkcli/ui/style"
 )
 
 func inspect(s *models.Snippet) string {
 
 	w := &bytes.Buffer{}
-	fmtHeader(w, s.Username, s.Pouch, &s.SnipName)
+	fmtHeader(w, s.Private, s.Username, s.Pouch, &s.SnipName)
+
+	p := tablewriter.NewWriter(w)
+	p.SetAutoWrapText(false)
+	p.SetBorder(false)
+	p.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
+	p.SetCenterSeparator("")
+	p.SetColumnSeparator("")
+	p.SetRowLine(false)
+	p.SetAutoFormatHeaders(false)
+	p.SetHeaderLine(false)
+	p.SetColWidth(5)
+	p.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
+	p.Append([]string{ FmtSnippet(s, 100, 0)})
+	p.Render()
 
 	tbl := tablewriter.NewWriter(w)
-	tbl.SetHeader([]string{"", ""})
 	tbl.SetAutoWrapText(false)
 	tbl.SetBorder(false)
 	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
 	tbl.SetCenterSeparator("")
-	tbl.SetColumnSeparator("|")
+	tbl.SetColumnSeparator("")
 	tbl.SetRowLine(true)
 	tbl.SetAutoFormatHeaders(false)
 	tbl.SetHeaderLine(false)
-	tbl.SetColWidth(5)
-	tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
+	tbl.SetColWidth(20)
 
-	tbl.Append([]string{"Run Status", statusString(s)})
-	tbl.Append([]string{"Last Run", humanize.Time(time.Unix(s.RunStatusTime, 0))})
-	tbl.Append([]string{"Run Count ", fmt.Sprintf("↻ %2d", s.RunCount)})
-	tbl.Append([]string{"Description", fmtEmpty(s.Description)})
-	tbl.Append([]string{"Tags", strings.Join(s.Tags, ", ")})
-	tbl.Append([]string{"Snippet", FmtSnippet(s, 100, 0)})
+	tbl.Append([]string{style.Fmt(style.Cyan,"Snippet Details:"), "", "", ""})
+	tbl.Append([]string{
+		style.Fmt(style.Subdued,"Run Status:"), pad(20, statusString(s, true)).String(),
+		style.Fmt(style.Subdued,"Last Run:"), pad(20, humanize.Time(time.Unix(s.RunStatusTime, 0))).String(),
+	})
+	tbl.Append([]string{
+		style.Fmt(style.Subdued,"Run Count: "), fmt.Sprintf("↻ %2d", s.RunCount),
+		style.Fmt(style.Subdued,"View count:") , fmt.Sprintf("🔦  %2d", s.ViewCount )}) //👁 👀
+	tbl.Append([]string{
+		style.Fmt(style.Subdued,"Description:"), fmtEmpty(s.Description), "", ""})
+	tbl.Append([]string{
+		style.Fmt(style.Subdued,"Tags:"), fmtTags(s.Tags), "", ""})
 
 	tbl.Render()
-	fmt.Fprint(w, )
+
+	//fmt.Fprint(w, style.Start)
+	//fmt.Fprintf(w, "%dm", style.Subdued)
+	//fmt.Fprint(w, MARGIN)
+	//fmt.Fprint(w,"Snippet details: `kwk <name>`")
+	//fmt.Fprint(w, MARGIN)
+	//fmt.Fprint(w,"Run snippet: `kwk run <name>`")
+	//fmt.Fprint(w, MARGIN)
+	//fmt.Fprint(w, style.End)
+	fmt.Fprint(w,"\n")
+
 	return w.String()
+}
+func fmtTags(tags []string) string {
+	if len(tags) == 0 {
+		return fmtEmpty("")
+	}
+	return strings.Join(tags, ", ")
 }
 
 func fmtEmpty(in string) string {

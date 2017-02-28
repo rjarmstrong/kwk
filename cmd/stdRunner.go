@@ -54,6 +54,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	fi, _ := os.Stat(filePath)
 	openTime := fi.ModTime().UnixNano()
 
+	log.Debug("EDITING:%v %v", s.Alias, cli)
 	r.exec(s.Alias, false, cli[0], cli[1:]...)
 
 	edited := false
@@ -142,6 +143,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 
 		isExe := true
 		if len(interp) > 1 && interp[0] == "echo" && interp[1] == "$SNIP" {
+			fmt.Println("Not executable. Printing to screen.")
 			isExe = false
 		}
 		for i, v := range interp {
@@ -168,8 +170,9 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 		panic(err)
 	}
 	var stderr bytes.Buffer
-	stdout := &bytes.Buffer{}
-	c.Stdout = stdout
+	outBuff := &bytes.Buffer{}
+	mw := io.MultiWriter(os.Stdout, outBuff)
+	c.Stdout = mw
 	c.Stderr = &stderr
 	err = c.Run()
 	if err != nil {
@@ -184,15 +187,12 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 		}
 		return nil, models.ErrOneLine(models.Code_RunnerExitError, desc)
 	} else {
-		// set preview
-		//go r.snippets.SetPreview(a, stdout.String())
-		os.Stdout.Write(stdout.Bytes())
 		if isExe {
 			var preview string
-			if stdout.Len() > 100 {
-				preview = string(stdout.Bytes()[0:1000])
+			if outBuff.Len() > 100 {
+				preview = string(outBuff.Bytes()[0:1000])
 			} else {
-				preview = stdout.String()
+				preview = outBuff.String()
 			}
 			r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, preview)
 		}
