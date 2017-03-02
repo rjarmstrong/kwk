@@ -5,11 +5,10 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/rpc/src/snipsRpc"
-	"google.golang.org/grpc"
-	"time"
-	"fmt"
 	"bitbucket.com/sharingmachine/kwkcli/update"
 	"bitbucket.com/sharingmachine/kwkcli/log"
+	"google.golang.org/grpc"
+	"time"
 )
 
 type RpcService struct {
@@ -305,13 +304,7 @@ func (rs *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache b
 	model.RunStatus = models.UseStatus(rpc.RunStatus)
 	model.RunStatusTime = rpc.RunStatusTime
 	model.Preview = rpc.Preview
-	if cache {
-		rs.persister.Upsert(LATEST_SNIPPET, model)
-	}
 }
-
-const LATEST_SNIPPET = "latest-snippet.json"
-const DELETED_SNIPPET = "deleted-snippet.json"
 
 func (rs *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.ListView, isList bool) {
 	model.Username = rpc.Username
@@ -319,23 +312,11 @@ func (rs *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.L
 	model.Total = rpc.Total
 	model.Since = time.Unix(rpc.Since/1000, 0)
 	model.Size = rpc.Size
-	newSnip := &models.Snippet{}
-	// TODO: Monitor eventual consistency and tweak cache duration.
 	// Test with: go build;./kwkcli new "dong1" zing.sh;./kwkcli ls;sleep 11;./kwkcli ls;
-	rs.persister.Get(LATEST_SNIPPET, newSnip, time.Now().Unix()-10)
-	isInList := false
 	for _, v := range rpc.Items {
 		item := &models.Snippet{}
 		rs.mapSnip(v, item, false)
 		model.Snippets = append(model.Snippets, item)
-		if item.Id == newSnip.Id {
-			isInList = true
-		}
-	}
-	if isList && !isInList && newSnip.Alias.Name != "" {
-		// TODO: add to logger
-		fmt.Println("Adding from cache")
-		model.Snippets = append([]*models.Snippet{newSnip}, model.Snippets...)
 	}
 }
 
