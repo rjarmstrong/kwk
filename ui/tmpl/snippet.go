@@ -54,7 +54,7 @@ func inspect(s *models.Snippet) string {
 	tbl.Append([]string{
 		style.Fmt(style.Subdued,"Tags:"), fmtTags(s.Tags), "", ""})
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"sha256:"), pad(7, s.CheckSum).String() + "...", fmtVerified(s)})
+		style.Fmt(style.Subdued,"sha256:"), fmtVerified(s) })
 
 	tbl.Render()
 
@@ -71,11 +71,16 @@ func inspect(s *models.Snippet) string {
 	return w.String()
 }
 func fmtVerified(s *models.Snippet) string {
+	var buff bytes.Buffer
 	if s.VerifySnippet() {
-		return "✓ Verified"
+		buff.WriteString(style.Fmt(style.Green, "✓  "))
+		buff.WriteString(pad(12, s.CheckSum).String())
+		buff.WriteString("...")
 	} else {
-		return "Not verified. Edit snippet or delete it. Check computer security."
+		buff.WriteString(" ☠  Invalid Checksum: ")
+		buff.WriteString(fmtEmpty(s.CheckSum))
 	}
+	return buff.String()
 }
 
 func fmtTags(tags []string) string {
