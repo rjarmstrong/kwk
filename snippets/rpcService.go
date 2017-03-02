@@ -304,6 +304,7 @@ func (rs *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache b
 	model.RunStatus = models.UseStatus(rpc.RunStatus)
 	model.RunStatusTime = rpc.RunStatusTime
 	model.Preview = rpc.Preview
+	model.CheckSum = rpc.SnipChecksum
 }
 
 func (rs *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.ListView, isList bool) {

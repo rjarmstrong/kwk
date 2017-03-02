@@ -91,14 +91,10 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	}
 }
 
-func Verify(snippet string, signature string) bool {
-	return true
-}
-
 
 func (r *StdRunner) Run(s *models.Snippet, args []string) error {
-	if !Verify(s.Snip, s.Signature) {
-		return models.ErrOneLine(models.Code_SnippetNotVerified, "The snippet is not verified by the kwk signature.")
+	if !s.VerifySnippet() {
+		return models.ErrOneLine(models.Code_SnippetNotVerified, "The checksum doesn't match the snippet.")
 	}
 	rs, err := r.getEnvSection("runners")
 	if err != nil {
@@ -177,10 +173,6 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 	err = c.Run()
 	if err != nil {
 		cancel()
-		go func(){
-			//index := strings.Index(stderr.String(), ":")
-			//r.snippets.SetPreview(a, stderr.String()[index:])
-		}()
 		desc := fmt.Sprintf("%s execution error: %s\n\n%s", strings.ToUpper(name), err.Error(), stderr.String())
 		if isExe {
 			r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, "")
@@ -189,7 +181,7 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 	} else {
 		if isExe {
 			var preview string
-			if outBuff.Len() > 100 {
+			if outBuff.Len() > 1000 {
 				preview = string(outBuff.Bytes()[0:1000])
 			} else {
 				preview = outBuff.String()

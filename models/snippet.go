@@ -1,5 +1,11 @@
 package models
 
+import (
+	"crypto/sha256"
+	"fmt"
+	"bitbucket.com/sharingmachine/kwkcli/log"
+)
+
 const (
 	ProfileFullKey  = "profile.json"
 	TokenHeaderName = "token"
@@ -35,6 +41,15 @@ type Snippet struct {
 
 	RunStatus     UseStatus
 	RunStatusTime int64
+
+	CheckSum string
+}
+
+func (st *Snippet) VerifySnippet() bool {
+	s := sha256.Sum256([]byte(st.Snip))
+	actual := fmt.Sprintf("%x", s)
+	log.Debug("VERIFY CHECKSUM:%s = %s", actual, st.CheckSum)
+	return actual == st.CheckSum
 }
 
 type SnipRole int32

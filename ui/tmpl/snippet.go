@@ -53,6 +53,8 @@ func inspect(s *models.Snippet) string {
 		style.Fmt(style.Subdued,"Description:"), fmtEmpty(s.Description), "", ""})
 	tbl.Append([]string{
 		style.Fmt(style.Subdued,"Tags:"), fmtTags(s.Tags), "", ""})
+	tbl.Append([]string{
+		style.Fmt(style.Subdued,"sha256:"), pad(7, s.CheckSum).String() + "...", fmtVerified(s)})
 
 	tbl.Render()
 
@@ -68,6 +70,14 @@ func inspect(s *models.Snippet) string {
 
 	return w.String()
 }
+func fmtVerified(s *models.Snippet) string {
+	if s.VerifySnippet() {
+		return "✓ Verified"
+	} else {
+		return "Not verified. Edit snippet or delete it. Check computer security."
+	}
+}
+
 func fmtTags(tags []string) string {
 	if len(tags) == 0 {
 		return fmtEmpty("")
