@@ -53,6 +53,30 @@ func (u *StdManager) Get() (*models.User, error) {
 	}
 }
 
+func (u *StdManager) ResetPassword(email string) (bool, error){
+	req := &usersRpc.ResetRequest{Email:email}
+	_, err := u.client.ResetPassword(u.headers.Context(), req)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func (u *StdManager) ChangePassword(p models.ChangePasswordParams) (bool, error) {
+	req := &usersRpc.ChangeRequest{
+		Email:p.Email, //Required if no email
+		Username: p.Username, //Required if no email
+		ExistingPassword:p.ExistingPassword, // Required if no ResetToken
+		NewPassword:p.NewPassword, // Required
+		ResetToken:p.ResetToken, // Required if no Existing password
+	}
+	_, err := u.client.ChangePassword(u.headers.Context(), req)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 func (u *StdManager) HasValidCredentials() bool {
 	if user, err := u.Get(); err != nil {
 		return false

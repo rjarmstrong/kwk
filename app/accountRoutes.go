@@ -41,14 +41,14 @@ func Accounts(a *AccountCli) []cli.Command {
 		{
 			Name: "reset-password",
 			Action: func(c *cli.Context) error {
-				panic("not implemented.")
+				a.ResetPassword(c.Args().First())
 				return nil
 			},
 		},
 		{
 			Name: "change-password",
 			Action: func(c *cli.Context) error {
-				panic("not implemented.")
+				a.ChangePassword()
 				return nil
 			},
 		},

@@ -12,3 +12,11 @@ type User struct {
 	ClonedCount int64
 	Created     time.Time
 }
+
+type ChangePasswordParams struct {
+	Username         string
+	Email            string
+	ResetToken       string
+	ExistingPassword string
+	NewPassword      string
+}

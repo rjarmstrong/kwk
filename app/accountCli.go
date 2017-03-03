@@ -71,3 +71,30 @@ func (c *AccountCli) SignOut() {
 	}
 	c.Render("account:signedout", nil)
 }
+
+func (c *AccountCli) ChangePassword() {
+	p := models.ChangePasswordParams{}
+	res := c.Dialog.FormField("Please provide an email or username:")
+	p.Email = res.Value.(string)
+	res = c.Dialog.TemplateFormField("account:passwordfield", nil, true)
+	p.ExistingPassword = res.Value.(string)
+	res = c.Dialog.TemplateFormField("account:passwordfield", nil, true)
+	p.NewPassword = res.Value.(string)
+	_, err := c.service.ChangePassword(p)
+	if err != nil {
+		c.HandleErr(err)
+	}
+	c.Render("account:password-changed", nil)
+}
+
+func (c *AccountCli) ResetPassword(email string) {
+	if email == "" {
+		res := c.Dialog.TemplateFormField("account:signup:email", nil , false)
+		email = res.Value.(string)
+	}
+	_, err := c.service.ResetPassword(email)
+	if err != nil {
+		c.HandleErr(err)
+	}
+	c.Render("account:reset-sent", email)
+}

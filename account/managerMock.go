@@ -37,3 +37,11 @@ func (a *ManagerMock) Signout() error {
 func (u *ManagerMock) HasValidCredentials() bool {
 	return false
 }
+
+func (u *ManagerMock) ResetPassword(email string) (bool, error){
+	panic("not imple")
+}
+
+func (u *ManagerMock) ChangePassword(p models.ChangePasswordParams) (bool, error) {
+	panic("not imple")
+}

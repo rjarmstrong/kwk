@@ -1,6 +1,8 @@
 package account
 
-import "bitbucket.com/sharingmachine/kwkcli/models"
+import (
+	"bitbucket.com/sharingmachine/kwkcli/models"
+)
 
 type Manager interface {
 	SignIn(username string, password string) (*models.User, error)
@@ -8,4 +10,6 @@ type Manager interface {
 	Get() (*models.User, error)
 	Signout() error
 	HasValidCredentials() bool
+	ResetPassword(email string) (bool, error)
+	ChangePassword(p models.ChangePasswordParams) (bool, error)
 }

@@ -83,9 +83,14 @@ func init() {
 	add("account:signedup", "Welcome to kwk {{.Username | blue }}!\n You're signed in already.\n", template.FuncMap{"blue": blue})
 	addColor("account:usernamefield", "Your Kwk Username: ", blue)
 	addColor("account:passwordfield", "Your Password: ", blue)
+	addColor("account:password-changed", "You password has been changed for next login.", blue)
 	add("account:signedin", "Welcome back {{.Username | blue }}!\n", template.FuncMap{"blue": blue})
 	addColor("account:signedout", "And you're signed out.\n", blue)
 	add("account:profile", "You are: {{.Username | blue}}!\n", template.FuncMap{"blue": blue})
+	add("account:reset-sent", "Password reset instructions have been sent to: {{ .  | blue }}\n" +
+		"*****\n" +
+		"Use `kwk change-password` once you have received instructions.\n" +
+		"*****\n", template.FuncMap{"blue": blue})
 
 	add("dialog:choose", "{{. | multiChoice }}\n", template.FuncMap{"multiChoice": multiChoice})
 	add("dialog:header", "{{.| blue }}\n", template.FuncMap{"blue": blue})
