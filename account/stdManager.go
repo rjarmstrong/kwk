@@ -29,8 +29,8 @@ func (u *StdManager) SignIn(username string, password string) (*models.User, err
 	}
 }
 
-func (u *StdManager) SignUp(email string, username string, password string) (*models.User, error) {
-	if res, err := u.client.SignUp(u.headers.Context(), &usersRpc.SignUpRequest{Username: username, Email: email, Password: password}); err != nil {
+func (u *StdManager) SignUp(email string, username string, password string, inviteCode string) (*models.User, error) {
+	if res, err := u.client.SignUp(u.headers.Context(), &usersRpc.SignUpRequest{Username: username, Email: email, Password: password, InviteCode:inviteCode}); err != nil {
 		return nil, err
 	} else {
 		model := &models.User{}

@@ -33,7 +33,6 @@ func DefaultPrefs() *Preferences {
 		AutoYes:false,
 		Force:  false,
 	}
-	p.Debug = false
 	p.Covert = false
 	p.DisableRun = false
 	p.WipeTrail = false
@@ -62,13 +61,13 @@ type Preferences struct {
 	Encrypt           bool // TODO: Security
 	Decrypt           bool // TODO: Security
 	LastPouch         string
+	Naked		  bool
 }
 
 // PersistedPrefs are preferences which can be persistent.
 type PersistedPrefs struct {
 	Covert         bool  // Always opens browser in covert mode, when set to true flag should have no effect. TODO: Update env/darwin.yml
 	ListAll        bool  //List all pouches including private. TODO: implement on api in search SEARCH.
-	Debug          bool  // Displays more detailed output. TODO: Logging
 	DisableRun     bool  //Completely disabled running scripts even if using -f TODO: Security
 	WipeTrail      bool  //deletes the history each time a command is run TODO: Security
 	SessionTimeout int64 // 0 = no timeout, TODO: Implement on api SECURITY

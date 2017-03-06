@@ -40,7 +40,7 @@ func init() {
 	add("snippet:cloned", "Cloned as {{.Username}}/{{.FullName | blue}}\n", template.FuncMap{"blue": blue})
 	add("snippet:new", "{{. | blue }} created "+style.OpenLock+"\n", template.FuncMap{"blue": blue})
 	add("snippet:newprivate", "{{.FullName | blue }} created "+style.Lock+"\n", template.FuncMap{"blue": blue})
-	add("snippet:cat", "{{.Snip | blue}}", template.FuncMap{"blue": blue})
+	add("snippet:cat", "{{.Snip}}", nil)
 	add("snippet:edited", "Successfully updated {{ .String | blue }}", template.FuncMap{"blue": blue})
 	add("snippet:editing", "{{ \"Editing... \" | blue }}\nPlease edit file and save.\n - NB: After saving, no changes will be saved until running kwk edit <name> again.\n - Ctrl+C to abort.\n", template.FuncMap{"blue": blue})
 	add("snippet:edit-prompt", "{{ .String | blue }} doesn't exist - would you like create it? [y/n] \n", template.FuncMap{"blue": blue})
@@ -100,6 +100,7 @@ func init() {
 	addColor("account:signup:email", "What's your email? ", blue)
 	addColor("account:signup:username", "Choose a great username: ", blue)
 	addColor("account:signup:password", "And enter a password (1 num, 1 cap, 8 chars): ", blue)
+	addColor("account:signup:invite-code", "Your kwk invite code: ", blue)
 
 	add("search:alpha", "\n\033[7m  \"{{ .Term }}\" found in {{ .Total }} results in {{ .Took }} ms  \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{ . | formatSearchResult}}\n{{end}}", template.FuncMap{"formatSearchResult": alphaSearchResult, "blue": blue, "subdued": subdued})
 	add("search:alphaSuggest", "\n\033[7m Suggestions: \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{end}}\n", template.FuncMap{"blue": blue, "subdued": subdued})

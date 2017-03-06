@@ -16,8 +16,8 @@ func Snippets(s *SnippetCli) []cli.Command {
 			},
 		},
 		{
-			Name:    "list",
-			Aliases: []string{"ls"},
+			Name:    "flatten",
+			Aliases: []string{""},
 			Flags: []cli.Flag {
 				cli.BoolFlag{
 					Name: "all, a",
@@ -29,7 +29,7 @@ func Snippets(s *SnippetCli) []cli.Command {
 				if all {
 					models.Prefs().ListAll = true
 				}
-				s.List([]string(c.Args())...)
+				s.Flatten(c.Args().First())
 				return nil
 			},
 		},
@@ -53,8 +53,8 @@ func Snippets(s *SnippetCli) []cli.Command {
 			},
 		},
 		{
-			Name:    "mkpouch",
-			Aliases: []string{"mkdir"},
+			Name:    "mkdir",
+			Aliases: []string{""},
 			Action: func(c *cli.Context) error {
 				s.CreatePouch(c.Args().First())
 				return nil
@@ -90,6 +90,24 @@ func Snippets(s *SnippetCli) []cli.Command {
 				return nil
 			},
 		},
+		{
+			Name:    "popular",
+			Aliases: []string{"pop"},
+			Action: func(c *cli.Context) error {
+				args := []string(c.Args())
+				s.ListCategory("popular", args...)
+				return nil
+			},
+		},
+		{
+			Name:    "stale",
+			Aliases: []string{"old"},
+			Action: func(c *cli.Context) error {
+				args := []string(c.Args())
+				s.ListCategory("stale", args...)
+				return nil
+			},
+		},
 
 
 		/*
@@ -115,8 +133,16 @@ func Snippets(s *SnippetCli) []cli.Command {
 			},
 		},
 		{
-			Name:    "cat",
-			Aliases: []string{"raw", "read", "print", "get"},
+			Name:    "view",
+			Aliases: []string{"get"},
+			Action: func(c *cli.Context) error {
+				s.InspectOrList(c.Args().First())
+				return nil
+			},
+		},
+		{
+			Name:    "raw",
+			Aliases: []string{"cat"},
 			Action: func(c *cli.Context) error {
 				s.Cat(c.Args().First())
 				return nil

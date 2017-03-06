@@ -32,8 +32,9 @@ func (c *AccountCli) SignUp() {
 	email := c.TemplateFormField("account:signup:email", nil, false).Value.(string)
 	username := c.TemplateFormField("account:signup:username", nil, false).Value.(string)
 	password := c.TemplateFormField("account:signup:password", nil, true).Value.(string)
+	inviteCode := c.TemplateFormField("account:signup:invite-code", nil, false).Value.(string)
 
-	if u, err := c.service.SignUp(email, username, password); err != nil {
+	if u, err := c.service.SignUp(email, username, password, inviteCode); err != nil {
 		c.HandleErr(err)
 	} else {
 		if len(u.Token) > 50 {

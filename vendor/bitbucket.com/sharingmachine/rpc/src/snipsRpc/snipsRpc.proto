@@ -220,6 +220,8 @@ message ListRequest {
     repeated string extensions = 5;
     bool all = 6;
     string pouch = 7;
+    bool ignorePouches = 8;
+    string category = 9;
 }
 
 message RootRequest {

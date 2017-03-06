@@ -40,6 +40,33 @@ func (sc *SnippetCli) Search(args ...string) {
 	}
 }
 
+func (sc *SnippetCli) ListCategory(category string, args ...string) {
+	username, pouch, err := models.ParsePouch(args[0])
+	if err != nil {
+		sc.HandleErr(err)
+		return
+	}
+	var size int64
+	//var tags = []string{}
+	//for i, v := range args {
+	//	if num, err := strconv.Atoi(v); err == nil {
+	//		size = int64(num)
+	//	} else {
+	//		if i == 0 && v[len(v)-1:] == "/" {
+	//			username = strings.Replace(v, "/", "", -1)
+	//		} else {
+	//			tags = append(tags, v)
+	//		}
+	//	}
+	//}
+	p := &models.ListParams{Category: category, Username: username, Pouch: pouch, Size: size, All: models.Prefs().ListAll}
+	if list, err := sc.s.List(p); err != nil {
+		sc.HandleErr(err)
+	} else {
+		sc.Render("snippet:list", list)
+	}
+}
+
 func (sc *SnippetCli) Share(distinctName string, destination string) {
 	if list, _, err := sc.getSnippet(distinctName); err != nil {
 		sc.HandleErr(err)
@@ -155,7 +182,7 @@ func (sc *SnippetCli) Edit(distinctName string) {
 		distinctName = models.NewSetupAlias(distinctName, "yml", true).String()
 	}
 	if list, _, err := sc.getSnippet(distinctName); err != nil {
-		if models.HasErrCode(err, models.Code_NotFound){
+		if models.HasErrCode(err, models.Code_NotFound) {
 			a, err := models.ParseAlias(distinctName)
 			if err != nil {
 				sc.HandleErr(err)
@@ -205,11 +232,11 @@ func (sc *SnippetCli) Describe(distinctName string, description string) {
 	}
 }
 
-func (sc *SnippetCli) Inspect(distinctName string) {
+func (sc *SnippetCli) InspectOrList(distinctName string) {
 	a, err := models.ParseAlias(distinctName)
 	v, err := sc.s.GetRoot("", true)
 	if err != nil {
-		log.Error("Error getting root, but not critical to 'run'",err)
+		log.Error("Error getting root, but not critical to 'run'", err)
 	} else if a.Ext == "" && v.IsPouch(a.Name) {
 		sc.List(a.Name)
 		return
@@ -236,7 +263,6 @@ func (sc *SnippetCli) Delete(args []string) {
 	}
 	sc.deleteSnippet(args)
 }
-
 
 func (sc *SnippetCli) Lock(pouch string) {
 	_, err := sc.s.MakePrivate(pouch, true)
@@ -410,6 +436,15 @@ func (sc *SnippetCli) CreatePouch(name string) {
 	}
 }
 
+func (sc *SnippetCli) Flatten(username string) {
+	p := &models.ListParams{Username: username, IgnorePouches: true, All: models.Prefs().ListAll}
+	if list, err := sc.s.List(p); err != nil {
+		sc.HandleErr(err)
+	} else {
+		sc.Render("snippet:list", list)
+	}
+}
+
 // List
 // Use root list:
 // kwk ls /richard
@@ -475,7 +510,7 @@ func stdInAsString() string {
 	scanner := bufio.NewScanner(os.Stdin)
 	in := bytes.Buffer{}
 	for scanner.Scan() {
-		in.WriteString(scanner.Text()+"\n")
+		in.WriteString(scanner.Text() + "\n")
 	}
 	return in.String()
 }

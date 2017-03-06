@@ -24,7 +24,7 @@ func (a *ManagerMock) SignIn(username string, password string) (*models.User, er
 	return a.SignInResponse, nil
 }
 
-func (a *ManagerMock) SignUp(email string, username string, password string) (*models.User, error) {
+func (a *ManagerMock) SignUp(email string, username string, password string, inviteCode string) (*models.User, error) {
 	a.SignupCalledWith = []string{email, username, password}
 	return &models.User{}, nil
 }

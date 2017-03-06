@@ -12,6 +12,7 @@ import (
 	"github.com/urfave/cli"
 	"bitbucket.com/sharingmachine/kwkcli/setup"
 	"bitbucket.com/sharingmachine/kwkcli/models"
+	"bitbucket.com/sharingmachine/kwkcli/log"
 )
 
 type KwkApp struct {
@@ -30,17 +31,22 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 	d dlg.Dialog, w tmpl.Writer, api rpc.Service, su setup.Provider) *KwkApp {
 
 	app := cli.NewApp()
-	app.Version = models.Client.String()
-	dash := NewDashBoard(w, a)
-	cli.HelpPrinter = dash.GetWriter()
+
 	app.Flags = []cli.Flag {
 		cli.BoolFlag{
 			Name: "covert, x",
 			Usage: "Open browser in covert mode.",
+			Destination:&models.Prefs().Covert,
 		},
 		cli.BoolFlag{
 			Name: "debug, d",
 			Usage: "Debug.",
+			Destination:&log.EnableDebug,
+		},
+		cli.BoolFlag {
+			Name: "naked, n",
+			Usage: "list without styles",
+			Destination:&models.Prefs().Naked,
 		},
 
 		//cli.BoolFlag{
@@ -56,6 +62,10 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 		//	Usage: "When viewing a snippet decrypt if necc.",
 		//},
 	}
+
+	app.Version = models.Client.String()
+	dash := NewDashBoard(w, a)
+	cli.HelpPrinter = dash.GetWriter()
 
 
 	accCli := NewAccountCli(u, t, w, d)
@@ -81,7 +91,7 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 			snipCli.Edit(c.Args().First())
 			return
 		}
-		snipCli.Inspect(c.Args().First())
+		snipCli.InspectOrList(c.Args().First())
 	}
 
 	return &KwkApp{

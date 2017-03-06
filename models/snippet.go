@@ -93,4 +93,6 @@ type ListParams struct {
 	Size     int64
 	Since    int64
 	Tags     []string
+	IgnorePouches bool
+	Category string
 }

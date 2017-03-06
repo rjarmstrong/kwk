@@ -42,6 +42,7 @@ message SignUpRequest {
     string username = 1;
     string email = 2;
     string password = 3;
+    string inviteCode = 4;
 }
 
 message SignInRequest {

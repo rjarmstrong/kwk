@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"fmt"
-	"flag"
 	"path"
 	"bitbucket.com/sharingmachine/kwkcli/cache"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -17,17 +16,17 @@ var dbg = log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
 
 // This flag is specified here since we don't wan't to have to depend on urfave global flags.
 // That flag will also work throughout the app.
-var dbgFlag = flag.Bool("debug", false, "Show debug trace.")
+
+var EnableDebug bool
 
 func init() {
-	flag.Parse()
 	output := &lumberjack.Logger{
 		Filename:   path.Join(cache.Path(), "kwk.log"),
 		MaxSize:    3, // megabytes
 		MaxBackups: 2,
 		MaxAge:     5, //days
 	}
-	if !*dbgFlag {
+	if !EnableDebug {
 		setOutput(output)
 	} else {
 		Debug("--debug")

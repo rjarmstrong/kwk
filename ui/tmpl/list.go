@@ -22,7 +22,19 @@ type CodeLine struct {
 	Body   string
 }
 
-func statusString(s *models.Snippet, includeText bool) string {
+func StatusText(s *models.Snippet) string {
+	if s.Ext == "url" {
+		return "bookmark"
+	}
+	if s.RunStatus == models.UseStatusSuccess {
+		return "success"
+	} else if s.RunStatus == models.UseStatusFail {
+		return "error"
+	}
+	return "static"
+}
+
+func FmtStatus(s *models.Snippet, includeText bool) string {
 	if s.Ext == "url" {
 		if includeText {
 			return "🌎  Bookmark"
@@ -75,7 +87,7 @@ func listRoot(r *models.ListView) string {
 	w.Write(listHorizontal(all))
 
 	if len(r.Snippets) > 0 {
-		fmt.Fprint(w, listPouchSnippets(r))
+		fmt.Fprint(w, listSnippets(r))
 	}
 
 	//w.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("%d/50 Pouches", len(r.Pouches)-1)))
@@ -90,12 +102,53 @@ func listRoot(r *models.ListView) string {
 
 func listPouch(list *models.ListView) string {
 	w := &bytes.Buffer{}
-	fmtHeader(w, list.HidePrivate, list.Username, list.Pouch, nil)
-	fmt.Fprint(w, listPouchSnippets(list))
+	if models.Prefs().Naked {
+		fmt.Fprint(w, listNaked(list))
+	} else {
+		fmtHeader(w, list.HidePrivate, list.Username, list.Pouch, nil)
+		fmt.Fprint(w, listSnippets(list))
+	}
+
 	return w.String()
 }
 
-func listPouchSnippets(list *models.ListView) string {
+const timeLayout = "2 Jan 15:04 06"
+func listNaked(list *models.ListView) interface{} {
+	w := &bytes.Buffer{}
+	tbl := tablewriter.NewWriter(w)
+	tbl.SetHeader([]string{"Name", "Private", "Run status", "Run count", "View count", "Updated"})
+	tbl.SetAutoWrapText(false)
+	tbl.SetBorder(false)
+	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
+	tbl.SetCenterSeparator("")
+	tbl.SetColumnSeparator("")
+	tbl.SetRowLine(false)
+	tbl.SetAutoFormatHeaders(false)
+	tbl.SetHeaderLine(false)
+	tbl.SetColWidth(5)
+	tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
+	for _, v := range list.Snippets {
+		t := time.Unix(v.Created, 0)
+		var private string
+		if v.Private {
+			private = "private"
+		} else {
+			private = "public"
+		}
+		tbl.Append([]string{
+			v.String(),
+			private,
+			StatusText(v),
+			fmt.Sprintf("%d", v.RunCount),
+			fmt.Sprintf("%d", v.ViewCount),
+			t.Format(timeLayout),
+		})
+	}
+	tbl.Render()
+	return w.String()
+}
+
+func listSnippets(list *models.ListView) string {
 	w := &bytes.Buffer{}
 
 	//fmt.Fprintf(w,"%s", fmtLocked(list.HidePrivate, false))
@@ -120,9 +173,9 @@ func listPouchSnippets(list *models.ListView) string {
 	for _, v := range list.Snippets {
 		var executed string
 		if v.RunStatusTime > 0 {
-			executed = fmt.Sprintf("%s  %s", statusString(v, false), style.Fmt(style.Subdued, humanize.Time(time.Unix(v.RunStatusTime, 0))))
+			executed = fmt.Sprintf("%s  %s", FmtStatus(v, false), style.Fmt(style.Subdued, humanize.Time(time.Unix(v.RunStatusTime, 0))))
 		} else {
-			executed = statusString(v, false)
+			executed = FmtStatus(v, false)
 		}
 
 		// col1
@@ -347,7 +400,7 @@ func listHorizontal(l []interface{}) []byte {
 			item.WriteString("  ")
 		}
 		if sn, ok := v.(*models.Snippet); ok {
-			item.WriteString(statusString(sn, false))
+			item.WriteString(FmtStatus(sn, false))
 			item.WriteString("  ")
 			item.WriteString(style.Fmt(style.Cyan, sn.SnipName.Name))
 			item.WriteString(style.Fmt(style.Subdued, "."+sn.SnipName.Ext))

@@ -59,10 +59,18 @@ func (rs *RpcService) Update(a models.Alias, description string) (*models.Snippe
 	}
 }
 
-
 // since unix time in milliseconds
 func (rs *RpcService) List(l *models.ListParams) (*models.ListView, error) {
-	if res, err := rs.client.List(rs.h.Context(), &snipsRpc.ListRequest{Username: l.Username, Pouch: l.Pouch, Since: l.Since, Size: l.Size, Tags: l.Tags, All: l.All}); err != nil {
+	if res, err := rs.client.List(rs.h.Context(), &snipsRpc.ListRequest{
+		Username: l.Username,
+		Pouch: l.Pouch,
+		Since: l.Since,
+		Size: l.Size,
+		Tags: l.Tags,
+		IgnorePouches: l.IgnorePouches,
+		Category: l.Category,
+		All: l.All,
+	}); err != nil {
 		return nil, err
 	} else {
 		list := &models.ListView{}

@@ -43,7 +43,7 @@ func inspect(s *models.Snippet) string {
 
 	tbl.Append([]string{style.Fmt(style.Cyan,"Snippet Details:"), "", "", ""})
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"Run Status:"), pad(20, statusString(s, true)).String(),
+		style.Fmt(style.Subdued,"Run Status:"), pad(20, FmtStatus(s, true)).String(),
 		style.Fmt(style.Subdued,"Last Run:"), pad(20, humanize.Time(time.Unix(s.RunStatusTime, 0))).String(),
 	})
 	tbl.Append([]string{
