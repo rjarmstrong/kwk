@@ -75,7 +75,6 @@ func (rs *RpcService) List(l *models.ListParams) (*models.ListView, error) {
 	} else {
 		list := &models.ListView{}
 		rs.mapSnippetList(res, list, true)
-		list.Pouch = l.Pouch
 		return list, nil
 	}
 }
@@ -222,7 +221,7 @@ func (rs *RpcService) GetRoot(username string, all bool) (*models.ListView, erro
 	record := &update.Record{}
 	root := &models.ListView{IsRoot: true, Snippets: l.Snippets, Pouches: pl, Personal: perL, Username: r.Username}
 	if e := rs.persister.Get(update.RecordFile, record, 0); e == nil {
-		root.LastUpdate = record.LastUpdate
+		root.LastUpgrade = record.LastUpdate
 	}
 	return root, err
 }
@@ -317,11 +316,10 @@ func (rs *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache b
 
 func (rs *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.ListView, isList bool) {
 	model.Username = rpc.Username
-	model.Pouch = rpc.Pouch
+	model.Pouch = mapPouch(rpc.Pouch)
 	model.Total = rpc.Total
 	model.Since = time.Unix(rpc.Since/1000, 0)
 	model.Size = rpc.Size
-	// Test with: go build;./kwkcli new "dong1" zing.sh;./kwkcli ls;sleep 11;./kwkcli ls;
 	for _, v := range rpc.Items {
 		item := &models.Snippet{}
 		rs.mapSnip(v, item, false)
@@ -334,5 +332,22 @@ func mapAlias(a models.Alias) *snipsRpc.Alias {
 		Username: a.Username,
 		Pouch:    a.Pouch,
 		SnipName: &snipsRpc.SnipName{Name: a.Name, Extension: a.Ext},
+	}
+}
+
+func mapPouch(p *snipsRpc.Pouch) *models.Pouch {
+	if p == nil {
+		return nil
+	}
+	return &models.Pouch{
+		Encrypt:p.Encrypt,
+		MakePrivate:p.MakePrivate,
+		Modified:time.Unix(p.Modified, 0),
+		Name:p.Name,
+		PouchId:p.PouchId,
+		SharedWith:p.SharedWith,
+		SnipCount:p.SnipCount,
+		UnOpened:p.UnOpened,
+		Username:p.Username,
 	}
 }

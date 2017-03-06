@@ -260,6 +260,8 @@ message Pouch {
     repeated string sharedWith = 6;
     int64 modified = 7;
     string pouchId = 8;
+    int64 unOpened = 9;
+    bool personal = 10;
 }
 
 message Snip {
@@ -322,6 +324,6 @@ message ListResponse {
     int64 total = 2;
     int64 since = 3;
     int64 size = 4;
-    string pouch = 5;
-    string username = 6;
+    string username = 5; // There are cases where pouch will be nil thus username is still relevant here.
+    Pouch pouch = 6;
 }

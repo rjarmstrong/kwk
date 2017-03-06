@@ -83,7 +83,8 @@ func listRoot(r *models.ListView) string {
 		all = append(all, v)
 	}
 
-	fmtHeader(w, r.HidePrivate, r.Username, r.Pouch, nil)
+	fmtHeader(w, r.Username, "", nil)
+	fmt.Fprint(w, FOOTER)
 	w.Write(listHorizontal(all))
 
 	if len(r.Snippets) > 0 {
@@ -91,8 +92,8 @@ func listRoot(r *models.ListView) string {
 	}
 
 	//w.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("%d/50 Pouches", len(r.Pouches)-1)))
-	if models.ClientIsNew(r.LastUpdate) {
-		w.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("          kwk auto-updated to %s %s", models.Client.Version, humanTime(r.LastUpdate))))
+	if models.ClientIsNew(r.LastUpgrade) {
+		w.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("          kwk auto-updated to %s %s", models.Client.Version, humanTime(r.LastUpgrade))))
 	} else {
 		w.WriteString("\n")
 	}
@@ -105,7 +106,9 @@ func listPouch(list *models.ListView) string {
 	if models.Prefs().Naked {
 		fmt.Fprint(w, listNaked(list))
 	} else {
-		fmtHeader(w, list.HidePrivate, list.Username, list.Pouch, nil)
+		fmtHeader(w, list.Username, list.Pouch.Name, nil)
+		fmt.Fprint(w, MARGIN, MARGIN, fmtLocked(list.Pouch.MakePrivate, true))
+		fmt.Fprint(w, "\n")
 		fmt.Fprint(w, listSnippets(list))
 	}
 
@@ -150,11 +153,6 @@ func listNaked(list *models.ListView) interface{} {
 
 func listSnippets(list *models.ListView) string {
 	w := &bytes.Buffer{}
-
-	//fmt.Fprintf(w,"%s", fmtLocked(list.HidePrivate, false))
-	//if list.Pouch != "" {
-	//	fmt.Fprintf(w, "%s👝  \n", MARGIN)
-	//}
 
 	tbl := tablewriter.NewWriter(w)
 	tbl.SetHeader([]string{"", "", "", ""})
@@ -250,7 +248,7 @@ func fmtDescription(w io.Writer, in string, width int) {
 	fmt.Fprint(w, join)
 }
 
-func fmtHeader(w io.Writer, locked bool, username string, pouch string, s *models.SnipName) {
+func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
 	fmt.Fprint(w, "\n")
 	fmt.Fprint(w, MARGIN)
 	fmt.Fprint(w, style.Start)
@@ -260,7 +258,6 @@ func fmtHeader(w io.Writer, locked bool, username string, pouch string, s *model
 	if pouch == "" && s == nil {
 		fmt.Fprint(w, style.End)
 		fmt.Fprint(w, username)
-		fmt.Fprint(w, FOOTER)
 		return
 	}
 	fmt.Fprint(w, username)
@@ -268,7 +265,6 @@ func fmtHeader(w io.Writer, locked bool, username string, pouch string, s *model
 	if s == nil {
 		fmt.Fprint(w, style.End)
 		fmt.Fprint(w,  pouch)
-		fmt.Fprint(w, FOOTER)
 		return
 	}
 	if pouch != "" {
@@ -277,7 +273,6 @@ func fmtHeader(w io.Writer, locked bool, username string, pouch string, s *model
 	}
 	fmt.Fprint(w, style.End)
 	fmt.Fprint(w, s.String())
-	fmt.Fprint(w, FOOTER)
 }
 
 func FmtOutPreview(s *models.Snippet) string {

@@ -14,8 +14,8 @@ import (
 func inspect(s *models.Snippet) string {
 
 	w := &bytes.Buffer{}
-	fmtHeader(w, s.Private, s.Username, s.Pouch, &s.SnipName)
-
+	fmtHeader(w,  s.Username, s.Pouch, &s.SnipName)
+	fmt.Fprint(w, FOOTER)
 	p := tablewriter.NewWriter(w)
 	p.SetAutoWrapText(false)
 	p.SetBorder(false)

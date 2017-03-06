@@ -9,11 +9,10 @@ is an empty string.
  */
 type ListView struct {
 	IsRoot bool
-	Pouch    string
+	Pouch    *Pouch
 
-	LastUpdate  int64
-	HidePrivate bool
-	Expanded bool
+	LastUpgrade int64
+	Expanded    bool
 
 	Username    string
 	Pouches     []*Pouch
