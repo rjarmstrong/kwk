@@ -52,6 +52,8 @@ func inspect(s *models.Snippet) string {
 	tbl.Append([]string{
 		style.Fmt(style.Subdued,"Description:"), fmtEmpty(s.Description), "", ""})
 	tbl.Append([]string{
+		style.Fmt(style.Subdued,"Preview:"), FmtOutPreview(s.Preview), "", ""})
+	tbl.Append([]string{
 		style.Fmt(style.Subdued,"Tags:"), fmtTags(s.Tags), "", ""})
 	tbl.Append([]string{
 		style.Fmt(style.Subdued,"sha256:"), fmtVerified(s) })

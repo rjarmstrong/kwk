@@ -11,6 +11,8 @@ import (
 	"time"
 	"fmt"
 	"io"
+	"sort"
+	"golang.org/x/text/unicode/norm"
 )
 
 var mainMarkers = map[string]string{
@@ -106,12 +108,23 @@ func listPouch(list *models.ListView) string {
 	if models.Prefs().Naked {
 		fmt.Fprint(w, listNaked(list))
 	} else {
+		sort.Slice(list.Snippets, func(i, j int) bool {
+			return list.Snippets[i].Created <= list.Snippets[j].Created
+		})
+
 		fmtHeader(w, list.Username, list.Pouch.Name, nil)
 		fmt.Fprint(w, MARGIN, MARGIN, fmtLocked(list.Pouch.MakePrivate, true))
+		fmt.Fprint(w, MARGIN, MARGIN, len(list.Snippets), " snippets")
 		fmt.Fprint(w, "\n")
 		fmt.Fprint(w, listSnippets(list))
+		if len(list.Snippets) > 10 {
+			fmtHeader(w, list.Username, list.Pouch.Name, nil)
+			fmt.Fprint(w, MARGIN, MARGIN, fmtLocked(list.Pouch.MakePrivate, true))
+			fmt.Fprint(w, MARGIN, MARGIN, len(list.Snippets), " snippets")
+			fmt.Fprint(w, "\n")
+		}
+		fmt.Fprint(w, "\n")
 	}
-
 	return w.String()
 }
 
@@ -178,8 +191,8 @@ func listSnippets(list *models.ListView) string {
 
 		// col1
 		name := &bytes.Buffer{}
-		name.WriteString(style.Fmt(style.Cyan, v.SnipName.String()))
-		name = pad(25, name.String())
+		nt := style.Fmt(style.Cyan, v.SnipName.String())
+		name.WriteString(nt)
 		if models.Prefs().AlwaysExpandLists {
 			name.WriteString("\n\n")
 			fmtDescription(name, v.Description, 20)
@@ -209,7 +222,7 @@ func listSnippets(list *models.ListView) string {
 			name.String(),
 			status.String(),
 			FmtSnippet(v, 60, lines),
-			FmtOutPreview(v),
+			FmtOutPreview(v.Preview),
 		})
 	}
 	tbl.Render()
@@ -218,8 +231,6 @@ func listSnippets(list *models.ListView) string {
 		fmt.Fprint(w, MARGIN)
 		fmt.Fprint(w, style.Fmt(style.Subdued, "<empty pouch>\n"))
 	}
-
-	fmt.Fprint(w, "\n")
 
 	//fmt.Fprint(w, style.Start)
 	//fmt.Fprintf(w, "%dm", style.Subdued)
@@ -232,9 +243,6 @@ func listSnippets(list *models.ListView) string {
 	//fmt.Fprint(w, MARGIN)
 	//fmt.Fprintf(w, "%d of max 32 snippets in pouch", len(list.Snippets))
 	//fmt.Fprint(w, style.End)
-
-
-	fmt.Fprint(w, "\n\n")
 
 	return w.String()
 }
@@ -275,17 +283,18 @@ func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
 	fmt.Fprint(w, s.String())
 }
 
-func FmtOutPreview(s *models.Snippet) string {
-	chunks := strings.Split(s.Preview, "\n")
-	lines := []string{}
-	for i := 0; i < len(chunks) && i < 3; i ++ {
-		if chunks[i] == "" {
-			continue
-		}
-		l := style.Fmt(style.Subdued, pad(20, chunks[i]).String())
-		lines = append(lines, l)
-	}
-	return strings.Join(lines, "\n")
+func FmtOutPreview(in string) string {
+	return style.WrapString(pad(50, in).String(), 26)
+	//chunks := strings.Split(s.Preview, "\n")
+	//lines := []string{}
+	//for i := 0; i < len(chunks) && i < 3; i ++ {
+	//	if chunks[i] == "" {
+	//		continue
+	//	}
+	//	l := style.Fmt(style.Subdued, pad(20, chunks[i]).String())
+	//	lines = append(lines, l)
+	//}
+	//return strings.Join(lines, "\n")
 }
 
 func FmtSnippet(s *models.Snippet, width int, lines int) string {
@@ -376,12 +385,18 @@ func FmtSnippet(s *models.Snippet, width int, lines int) string {
 
 func pad(width int, in string) *bytes.Buffer {
 	buff := &bytes.Buffer{}
-	diff := width - len(in)
+	diff := width - len([]rune(in))
 	if diff > 0 {
 		buff.WriteString(in)
 		buff.WriteString(strings.Repeat(" ", diff))
 	} else {
-		buff.WriteString(in[0:width])
+		var ia norm.Iter
+		ia.InitString(norm.NFKD, in)
+		nc := 0
+		for !ia.Done() && nc < width  {
+			nc += 1
+			buff.Write(ia.Next())
+		}
 	}
 	return buff
 }
@@ -390,6 +405,7 @@ func listHorizontal(l []interface{}) []byte {
 	var buff bytes.Buffer
 	w := tabwriter.NewWriter(&buff, 20, 3, 2, ' ', tabwriter.DiscardEmptyColumns)
 	var item bytes.Buffer
+	colWidths := map[int]int{}
 	for i, v := range l {
 		if i%5 == 0 {
 			item.WriteString("  ")
@@ -403,6 +419,9 @@ func listHorizontal(l []interface{}) []byte {
 		}
 		if pch, ok := v.(*models.Pouch); ok {
 			if models.Prefs().ListAll || !pch.MakePrivate {
+				if colWidths[i%5] < len(pch.Name) {
+					colWidths[i%5] = len(pch.Name)
+				}
 				if pch.Name == "inbox" {
 					if pch.UnOpened > 0 {
 						item.WriteString(fmt.Sprintf("📬%d", pch.UnOpened))
@@ -423,14 +442,17 @@ func listHorizontal(l []interface{}) []byte {
 			}
 		}
 
-		item.WriteString(" \t")
 		x := i + 1
-		if x%5 == 0 {
-			item.WriteString("\n")
-		}
 		if x%20 == 0 {
+			item.WriteString(MARGIN)
+			item.WriteString("\n\t\t\t\t")
 			item.WriteString("\n")
+		} else if x%5 == 0 {
+			item.WriteString("\n")
+		} else {
+			item.WriteString("\t")
 		}
+
 		fmt.Fprint(w, fmt.Sprintf("%s", item.String()))
 		item.Reset()
 	}

@@ -23,6 +23,7 @@ func (d *Dashboard) writer(out io.Writer, templ string, data interface{}) {
 	r, err := d.s.GetRoot("", true)
 	if err != nil {
 		d.HandleErr(err)
+		return
 	}
 	d.Render("dashboard", r)
 }

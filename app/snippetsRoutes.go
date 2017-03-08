@@ -16,7 +16,7 @@ func Snippets(s *SnippetCli) []cli.Command {
 			},
 		},
 		{
-			Name:    "flatten",
+			Name:    "enchilada",
 			Aliases: []string{""},
 			Flags: []cli.Flag {
 				cli.BoolFlag{
