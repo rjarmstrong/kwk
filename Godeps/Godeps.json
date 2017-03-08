@@ -248,6 +248,10 @@
 			"Rev": "f28f36722d5ef2f9655ad3de1f248e3e52ad5ebd"
 		},
 		{
+			"ImportPath": "golang.org/x/text/unicode/norm",
+			"Rev": "f28f36722d5ef2f9655ad3de1f248e3e52ad5ebd"
+		},
+		{
 			"ImportPath": "google.golang.org/grpc",
 			"Comment": "v1.0.5-52-gd0c32ee",
 			"Rev": "d0c32ee6a441117d49856d6120ca9552af413ee0"
