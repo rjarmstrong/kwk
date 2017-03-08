@@ -48,7 +48,8 @@ func Snippets(s *SnippetCli) []cli.Command {
 					models.Prefs().ListAll = true
 				}
 				models.Prefs().AlwaysExpandLists = true
-				s.List([]string(c.Args())...)
+				// TODO: This is not quite right as it means we can't expand other users lists
+				s.List("", c.Args().First())
 				return nil
 			},
 		},

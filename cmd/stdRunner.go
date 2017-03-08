@@ -20,6 +20,7 @@ import (
 	"context"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
+	"bitbucket.com/sharingmachine/kwkcli/ui/style"
 )
 
 type StdRunner struct {
@@ -182,7 +183,7 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 	} else {
 		if isExe {
 			preview := tmpl.FmtOutPreview(outBuff.String())
-			r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, preview)
+			r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, preview + style.End)
 		}
 		return out, nil
 	}

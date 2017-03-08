@@ -13,6 +13,8 @@ type User struct {
 	Created     time.Time
 }
 
+var Principal *User
+
 type ChangePasswordParams struct {
 	Username         string
 	Email            string

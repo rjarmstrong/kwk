@@ -86,8 +86,28 @@ func listRoot(r *models.ListView) string {
 	}
 
 	fmtHeader(w, r.Username, "", nil)
+	fmt.Fprint(w, strings.Repeat(" ", 90), "👤  ", models.Principal.Username)
 	fmt.Fprint(w, FOOTER)
 	w.Write(listHorizontal(all))
+	fmt.Fprint(w, "\n", MARGIN, style.Fmt(style.Subdued, "Community"),  "\n")
+
+	com := []interface{}{}
+	com = append(com, &models.Pouch{
+		Name: "/kwk/unicode",
+		Username: "kwk",
+		SnipCount: 12,
+	}, &models.Pouch{
+		Name:      "/kwk/news",
+		Username:  "kwk",
+		SnipCount: 10,
+	},
+	&models.Pouch{
+		Name:      "/kwk/devops",
+		Username:  "kwk",
+		SnipCount: 18,
+	})
+	w.Write(listHorizontal(com))
+	w.WriteString("\n")
 
 	if len(r.Snippets) > 0 {
 		fmt.Fprint(w, listSnippets(r))
@@ -213,7 +233,7 @@ func listSnippets(list *models.ListView) string {
 		status := &bytes.Buffer{}
 		status.WriteString(executed)
 		status.WriteString("\n")
-		status.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("↻ %2d", v.RunCount)))
+		status.WriteString(fmtRunCount(v.RunCount))
 
 		//col3
 
@@ -245,6 +265,9 @@ func listSnippets(list *models.ListView) string {
 	//fmt.Fprint(w, style.End)
 
 	return w.String()
+}
+func fmtRunCount(count int64) string {
+	return style.Fmt(style.Subdued, fmt.Sprintf("↻ %2d", count))
 }
 
 func fmtDescription(w io.Writer, in string, width int) {
@@ -284,17 +307,9 @@ func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
 }
 
 func FmtOutPreview(in string) string {
+	in = strings.Replace(in, "\n\n", "\n", -1)
+	in = strings.TrimSpace(in)
 	return style.WrapString(pad(50, in).String(), 26)
-	//chunks := strings.Split(s.Preview, "\n")
-	//lines := []string{}
-	//for i := 0; i < len(chunks) && i < 3; i ++ {
-	//	if chunks[i] == "" {
-	//		continue
-	//	}
-	//	l := style.Fmt(style.Subdued, pad(20, chunks[i]).String())
-	//	lines = append(lines, l)
-	//}
-	//return strings.Join(lines, "\n")
 }
 
 func FmtSnippet(s *models.Snippet, width int, lines int) string {

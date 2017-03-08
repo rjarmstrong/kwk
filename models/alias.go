@@ -114,7 +114,7 @@ func ParseAlias(distinctName string) (*Alias, error) {
 	}
 	if len(t) == 1 {
 		if isOtherUserAlias {
-			return nil, ErrOneLine(Code_IncompleteAlias, "Incomplete alias for another user must comprise at least /username/snippet")
+			return NewAlias(distinctName, ROOT_POUCH, "", ""), nil
 		}
 		// If its just the name
 		return NewAlias("", ROOT_POUCH, sn.Name, sn.Ext), nil

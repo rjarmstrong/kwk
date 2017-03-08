@@ -77,7 +77,8 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 	snipCli := NewSnippetCli(a, r, s, d, w, t)
 	app.Commands = append(app.Commands, Snippets(snipCli)...)
 	app.CommandNotFound = func(c *cli.Context, distinctName string) {
-		switch c.Args().Get(1) {
+		i := c.Args().Get(1)
+		switch i {
 		case "run":
 			snipCli.Run(c.Args().First(), []string(c.Args())[2:])
 			return

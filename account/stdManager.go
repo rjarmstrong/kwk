@@ -39,17 +39,15 @@ func (u *StdManager) SignUp(email string, username string, password string, invi
 	}
 }
 
-var user *models.User
-
 func (u *StdManager) Get() (*models.User, error) {
-	if user != nil && user.Id != "" {
-		return user, nil
+	if models.Principal != nil && models.Principal.Id != "" {
+		return models.Principal, nil
 	}
-	user = &models.User{}
-	if err := u.settings.Get(models.ProfileFullKey, user, 0); err != nil {
+	models.Principal = &models.User{}
+	if err := u.settings.Get(models.ProfileFullKey, models.Principal, 0); err != nil {
 		return nil, err
 	} else {
-		return user, nil
+		return models.Principal, nil
 	}
 }
 
@@ -89,6 +87,8 @@ func (u *StdManager) HasValidCredentials() bool {
 
 func (u *StdManager) Signout() error {
 	// Implement service call which would be more informational/analytical in nature
+	// TODO: Delete local token
+	// Clear variables
 	return nil
 }
 

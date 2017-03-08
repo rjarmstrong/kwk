@@ -151,7 +151,7 @@ func (sc *SnippetCli) Create(args []string) {
 	if createAlias, err := sc.s.Create(snippet, *alias, models.SnipRoleStandard); err != nil {
 		sc.HandleErr(err)
 	} else {
-		sc.List()
+		sc.List("", models.ROOT_POUCH)
 		sc.Render("snippet:new", createAlias.Snippet.String())
 		// TODO: Add similarity prompt here
 		//} else {
@@ -234,16 +234,18 @@ func (sc *SnippetCli) Describe(distinctName string, description string) {
 
 func (sc *SnippetCli) InspectOrList(distinctName string) {
 	a, err := models.ParseAlias(distinctName)
-	v, err := sc.s.GetRoot("", true)
+	v, err := sc.s.GetRoot(a.Username, true)
 	if err != nil {
 		log.Error("Error getting root, but not critical to 'run'", err)
 	} else if a.Ext == "" && v.IsPouch(a.Name) {
-		sc.List(a.Name)
+		// GET POUCH (or root)
+		sc.List(a.Username, a.Name)
 		return
 	}
 	if err != nil {
 		sc.Render("validation:one-line", err)
 	}
+	// GET SNIPPET
 	if list, err := sc.s.Get(*a); err != nil {
 		sc.HandleErr(err)
 	} else {
@@ -311,12 +313,12 @@ func (sc *SnippetCli) Move(args []string) {
 			sc.HandleErr(err)
 			return
 		}
-		sc.List()
+		sc.List("", models.ROOT_POUCH)
 		sc.Render("pouch:renamed", p)
 		return
 	} else if !root.IsPouch(last) && len(args) == 2 {
 		// rename single snippet
-		sc.List()
+		sc.List("", models.ROOT_POUCH)
 		sc.rename(args[0], args[1])
 		return
 	}
@@ -332,10 +334,10 @@ func (sc *SnippetCli) Move(args []string) {
 		return
 	}
 	if last == "" {
-		sc.List()
+		sc.List("", models.ROOT_POUCH)
 		sc.Render("snippet:moved-root", MoveResult{Quant: len(as)})
 	} else {
-		sc.List()
+		sc.List("", models.ROOT_POUCH)
 		sc.Render("snippet:moved-pouch", MoveResult{Pouch: p, Quant: len(as)})
 	}
 
@@ -397,7 +399,7 @@ func (sc *SnippetCli) Clone(distinctName string, newFullName string) {
 	if alias, err := sc.s.Clone(*a, *newA); err != nil {
 		sc.HandleErr(err)
 	} else {
-		sc.List()
+		sc.List("", models.ROOT_POUCH)
 		sc.Render("snippet:cloned", alias)
 	}
 }
@@ -447,15 +449,15 @@ func (sc *SnippetCli) Flatten(username string) {
 
 // List
 // Use root list:
-// kwk ls /richard
-// kwk ls
+// kwk /richard
+// kwk
 //
 // Use snippet list:
-// kwk ls richard (this is a pouch in this case)
-// kwk ls /richard/examples
-func (sc *SnippetCli) List(args ...string) {
-	if len(args) == 0 {
-		r, err := sc.s.GetRoot("", models.Prefs().ListAll)
+// kwk richard (this is a pouch in this case)
+// kwk /richard/examples
+func (sc *SnippetCli) List(username string, pouch string) {
+	if pouch == "" {
+		r, err := sc.s.GetRoot(username, models.Prefs().ListAll)
 		if err != nil {
 			sc.HandleErr(err)
 			return
@@ -463,34 +465,7 @@ func (sc *SnippetCli) List(args ...string) {
 		sc.Render("pouch:list-root", r)
 		return
 	}
-	username, pouch, err := models.ParsePouch(args[0])
-	if err != nil {
-		sc.HandleErr(err)
-		return
-	}
-	if pouch == "" {
-		//sc.settings.Get("last-pouch", )
-		r, err := sc.s.GetRoot(username, models.Prefs().ListAll)
-		if err != nil {
-			sc.HandleErr(err)
-		}
-		sc.Render("pouch:list-root", r)
-		return
-	}
-
 	var size int64
-	//var tags = []string{}
-	//for i, v := range args {
-	//	if num, err := strconv.Atoi(v); err == nil {
-	//		size = int64(num)
-	//	} else {
-	//		if i == 0 && v[len(v)-1:] == "/" {
-	//			username = strings.Replace(v, "/", "", -1)
-	//		} else {
-	//			tags = append(tags, v)
-	//		}
-	//	}
-	//}
 	p := &models.ListParams{Username: username, Pouch: pouch, Size: size, All: models.Prefs().ListAll}
 	if list, err := sc.s.List(p); err != nil {
 		sc.HandleErr(err)
@@ -571,7 +546,7 @@ func (sc *SnippetCli) deleteSnippet(args []string) {
 			sc.HandleErr(err)
 			return
 		}
-		sc.List()
+		sc.List("", models.ROOT_POUCH)
 		sc.Render("snippet:deleted", pouch)
 	} else {
 		sc.Render("snippet:not-deleted", pouch)
@@ -586,7 +561,7 @@ func (sc *SnippetCli) deletePouch(pouch string) {
 			sc.HandleErr(err)
 			return
 		}
-		sc.List()
+		sc.List("", models.ROOT_POUCH)
 		sc.Render("pouch:deleted", pouch)
 	} else {
 		sc.Render("pouch:not-deleted", pouch)
