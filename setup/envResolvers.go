@@ -150,6 +150,7 @@ apps:
   nano: ["nano", "$FULL_NAME" ]
   default: ["vi", "$FULL_NAME"]
 runners:
+  jl: ["julia", "-e", "$SNIP"]
   sh: ["/bin/bash", "-c", "$SNIP"]
   url: ["open", "$SNIP"]
   js: ["node", "-e", "$SNIP"] #nodejs
