@@ -178,12 +178,6 @@ Multi-language
 ### FAQ
 
 
-### Limitations
-
-- Autocompletion
-- Windows
-- Terminal colors
-- Executables can only run if the runtime is installed!
 
 ### Security
 
