@@ -288,6 +288,9 @@ message Snip {
     UseStatus runStatus = 18;
     int64 runStatusTime = 19;
     string preview = 20;
+
+    repeated string dependencies = 22;
+    string attribution = 23;
 }
 
 enum UseStatus {
