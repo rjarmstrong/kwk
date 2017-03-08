@@ -42,6 +42,7 @@ type Snippet struct {
 	RunStatus     UseStatus
 	RunStatusTime int64
 	Dependencies []string
+	Attribution string
 
 	CheckSum string
 }
