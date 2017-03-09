@@ -100,6 +100,7 @@ type ListParams struct {
 	Category string
 }
 
+//TODO: Optimise this
 func ScanVulnerabilities(snip string) error {
 	if strings.Contains(snip, "rm -rf") || strings.Contains(snip, "rm ") {
 		return ErrOneLine(Code_SnippetVulnerable, "kwk constraint: Shell scripts cannot contain 'rm '.")
@@ -118,6 +119,9 @@ func ScanVulnerabilities(snip string) error {
 	}
 	if strings.Contains(snip, "| sh") || strings.Contains(snip, "| bash") {
 		return ErrOneLine(Code_SnippetVulnerable, "kwk constraint: piping directly into terminal not allowed in scripts.")
+	}
+	if strings.Contains(snip, "nohup") {
+		return ErrOneLine(Code_SnippetVulnerable, "kwk constraint: 'nohup' command is not allowed.")
 	}
 	return nil
 }
