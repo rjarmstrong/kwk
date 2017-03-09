@@ -192,6 +192,7 @@ func (sc *SnippetCli) Edit(distinctName string) {
 				r, err := sc.s.Create("", *a, models.SnipRoleStandard)
 				if err != nil {
 					sc.HandleErr(err)
+					return
 				}
 				innerEdit(r.Snippet)
 			}

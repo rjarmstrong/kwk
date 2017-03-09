@@ -95,7 +95,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 
 
 func (r *StdRunner) Run(s *models.Snippet, args []string) error {
-	if !s.VerifySnippet() {
+	if !s.VerifyChecksum() {
 		return models.ErrOneLine(models.Code_SnippetNotVerified, "The checksum doesn't match the snippet.")
 	}
 	rs, err := r.getEnvSection("runners")
@@ -160,6 +160,11 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 }
 
 func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string) (io.ReadCloser, error) {
+	toCheck := strings.Join(arg, " ")
+	err := models.ScanVulnerabilities(toCheck)
+	if err != nil {
+		return nil, err
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	c := exec.CommandContext(ctx, name, arg...)
 	c.Stdin = os.Stdin

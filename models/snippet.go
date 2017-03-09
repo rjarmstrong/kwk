@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"bitbucket.com/sharingmachine/kwkcli/log"
+	"strings"
 )
 
 const (
@@ -47,7 +48,7 @@ type Snippet struct {
 	CheckSum string
 }
 
-func (st *Snippet) VerifySnippet() bool {
+func (st *Snippet) VerifyChecksum() bool {
 	s := sha256.Sum256([]byte(st.Snip))
 	actual := fmt.Sprintf("%x", s)
 	log.Debug("VERIFY CHECKSUM:%s = %s", actual, st.CheckSum)
@@ -97,4 +98,26 @@ type ListParams struct {
 	Tags     []string
 	IgnorePouches bool
 	Category string
+}
+
+func ScanVulnerabilities(snip string) error {
+	if strings.Contains(snip, "rm -rf") || strings.Contains(snip, "rm ") {
+		return ErrOneLine(Code_SnippetVulnerable, "kwk constraint: Shell scripts cannot contain 'rm '.")
+	}
+	if strings.Contains(snip, ":(){") || strings.Contains(snip, "./$0|./$0&"){
+		return ErrOneLine(Code_SnippetVulnerable, "kwk constraint: Fork bomb detected.")
+	}
+	if strings.Contains(snip, "fork") {
+		return ErrOneLine(Code_SnippetVulnerable, "kwk constraint: the word 'fork' is not allowed in scripts.")
+	}
+	if strings.Contains(snip, "/dev/sd") {
+		return ErrOneLine(Code_SnippetVulnerable, "kwk constraint: '/dev/sd' is not allowed in scripts.")
+	}
+	if strings.Contains(snip, "/dev/null") {
+		return ErrOneLine(Code_SnippetVulnerable, "kwk constraint: '/dev/null' is not allowed in scripts.")
+	}
+	if strings.Contains(snip, "| sh") || strings.Contains(snip, "| bash") {
+		return ErrOneLine(Code_SnippetVulnerable, "kwk constraint: piping directly into terminal not allowed in scripts.")
+	}
+	return nil
 }

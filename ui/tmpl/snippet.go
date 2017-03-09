@@ -76,7 +76,7 @@ func inspect(s *models.Snippet) string {
 }
 func fmtVerified(s *models.Snippet) string {
 	var buff bytes.Buffer
-	if s.VerifySnippet() {
+	if s.VerifyChecksum() {
 		buff.WriteString(style.Fmt(style.Green, "✓  "))
 		buff.WriteString(pad(12, s.CheckSum).String())
 		buff.WriteString("...")
