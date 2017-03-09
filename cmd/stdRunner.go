@@ -136,13 +136,14 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 			rc.Close()
 		}
 	} else {
-		//fmt.Println(runner)
-		// TODO: MULTI-STEP
-
 		isExe := true
 		if len(interp) > 1 && interp[0] == "echo" && interp[1] == "$SNIP" {
 			fmt.Println("Not executable. Printing to screen.")
 			isExe = false
+		}
+		if s.Ext == "sh" || s.Ext == "bash" {
+			// Set unofficial safe-mode
+			s.Snip = "set -euo pipefail;\n\n" + s.Snip
 		}
 		for i, v := range interp {
 			interp[i] = strings.Replace(v, "$SNIP", s.Snip, -1)
@@ -159,13 +160,19 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 	return nil
 }
 
+/*
+exec
+isExe differentiates between editing and running
+ */
 func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string) (io.ReadCloser, error) {
 	toCheck := strings.Join(arg, " ")
-	err := models.ScanVulnerabilities(toCheck)
-	if err != nil {
-		return nil, err
+	if isExe {
+		err := models.ScanVulnerabilities(toCheck)
+		if err != nil {
+			return nil, err
+		}
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	c := exec.CommandContext(ctx, name, arg...)
 	c.Stdin = os.Stdin
 	out, err := c.StdoutPipe()
@@ -182,7 +189,7 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 		cancel()
 		desc := fmt.Sprintf("%s execution error: %s\n\n%s", strings.ToUpper(name), err.Error(), stderr.String())
 		if isExe {
-			r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, "")
+			r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, tmpl.FmtOutPreview(stderr.String()))
 		}
 		return nil, models.ErrOneLine(models.Code_RunnerExitError, desc)
 	} else {
