@@ -15,6 +15,10 @@ func inspect(s *models.Snippet) string {
 
 	w := &bytes.Buffer{}
 	fmtHeader(w,  s.Username, s.Pouch, &s.SnipName)
+	if s.IsApp() {
+		w.WriteString(strings.Repeat(" ", 4))
+		w.WriteString(style.Fmt(style.Subdued, "💫  App"))
+	}
 	fmt.Fprint(w, FOOTER)
 	p := tablewriter.NewWriter(w)
 	p.SetAutoWrapText(false)
@@ -41,7 +45,13 @@ func inspect(s *models.Snippet) string {
 	tbl.SetHeaderLine(false)
 	tbl.SetColWidth(20)
 
-	tbl.Append([]string{style.Fmt(style.Cyan,"Snippet Details:"), "", "", ""})
+	if s.IsApp() {
+		tbl.Append([]string{style.Fmt(style.Cyan, "App Details:"), "", "", ""})
+	} else {
+		tbl.Append([]string{style.Fmt(style.Cyan, "Snippet Details:"), "", "", ""})
+	}
+
+
 	tbl.Append([]string{
 		style.Fmt(style.Subdued,"Run Status:"), pad(20, FmtStatus(s, true)).String(),
 		style.Fmt(style.Subdued,"Last Run:"), pad(20, humanize.Time(time.Unix(s.RunStatusTime, 0))).String(),
@@ -54,7 +64,7 @@ func inspect(s *models.Snippet) string {
 	tbl.Append([]string{
 		style.Fmt(style.Subdued,"Preview:"), FmtOutPreview(s.Preview), "", ""})
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"Dependencies:"), strings.Join(s.Dependencies, ", "), "", ""})
+		style.Fmt(style.Subdued,"App Dependencies:"), strings.Join(s.Dependencies, ", "), "", ""})
 	tbl.Append([]string{
 		style.Fmt(style.Subdued,"Tags:"), fmtTags(s.Tags), "", ""})
 	tbl.Append([]string{

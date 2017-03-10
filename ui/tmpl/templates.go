@@ -136,7 +136,7 @@ func addColor(name string, text string, color ColorFunc) {
 	add(name, fmt.Sprintf("{{ %q | color }}", text), template.FuncMap{"color": color})
 }
 
-func multiChoice(list []models.Snippet) string {
+func multiChoice(list []*models.Snippet) string {
 	var options string
 	for i, v := range list {
 		options = options + fmt.Sprintf("[%s] %s   ", style.Fmt(style.Cyan, i+1), v.SnipName.String())

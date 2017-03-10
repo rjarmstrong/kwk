@@ -48,6 +48,10 @@ type Snippet struct {
 	CheckSum string
 }
 
+func (st *Snippet) IsApp() bool {
+	return len(st.Dependencies) > 0
+}
+
 func (st *Snippet) VerifyChecksum() bool {
 	s := sha256.Sum256([]byte(st.Snip))
 	actual := fmt.Sprintf("%x", s)
@@ -109,7 +113,7 @@ func ScanVulnerabilities(snip string) error {
 		return ErrOneLine(Code_SnippetVulnerable, "kwk constraint: Fork bomb detected.")
 	}
 	if strings.Contains(snip, "fork") {
-		return ErrOneLine(Code_SnippetVulnerable, "kwk constraint: the word 'fork' is not allowed in scripts.")
+		return ErrOneLine(Code_SnippetVulnerable, "kwk constraint: 'fork' not allowed in script.")
 	}
 	if strings.Contains(snip, "/dev/sd") {
 		return ErrOneLine(Code_SnippetVulnerable, "kwk constraint: '/dev/sd' is not allowed in scripts.")

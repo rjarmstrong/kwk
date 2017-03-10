@@ -496,8 +496,8 @@ func (sc *SnippetCli) handleMultiResponse(distinctName string, list *models.List
 		return list.Snippets[0]
 	} else if list.Total > 1 {
 		r := sc.MultiChoice("dialog:choose", "Multiple matches. Choose a snippet to run:", list.Snippets)
-		s := r.Value.(models.Snippet)
-		return &s
+		s := r.Value.(*models.Snippet)
+		return s
 	} else {
 		return nil
 	}

@@ -1,5 +1,7 @@
 package dlg
 
+import "bitbucket.com/sharingmachine/kwkcli/models"
+
 type DialogMock struct {
 	LastModalCalledWith   []interface{}
 	CallHistory           []interface{}
@@ -29,7 +31,7 @@ func (d *DialogMock) FormField(label string) *DialogResponse {
   panic("not impl")
 }
 
-func (d *DialogMock) MultiChoice(templateName string, header interface{}, options interface{}) *DialogResponse {
-	d.MultiChoiceCalledWith = []interface{}{templateName, header, options}
+func (d *DialogMock) MultiChoice(templateName string, header interface{}, list []*models.Snippet) *DialogResponse {
+	d.MultiChoiceCalledWith = []interface{}{templateName, header, list}
 	return d.MultiChoiceResponse
 }

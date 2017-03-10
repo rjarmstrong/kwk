@@ -1,5 +1,7 @@
 package dlg
 
+import "bitbucket.com/sharingmachine/kwkcli/models"
+
 // Dialogue creates CLI ui elements to perform common interactions.
 type Dialog interface {
 
@@ -12,5 +14,5 @@ type Dialog interface {
 	FormField(label string) *DialogResponse
 
 	// MultiChoice is a special modal with multiple possible choices.
-	MultiChoice(templateName string, header interface{}, options interface{}) *DialogResponse
+	MultiChoice(templateName string, header interface{}, list []*models.Snippet) *DialogResponse
 }

@@ -211,6 +211,9 @@ func listSnippets(list *models.ListView) string {
 
 		// col1
 		name := &bytes.Buffer{}
+		if v.IsApp() {
+			name.WriteString("💫  ")
+		}
 		nt := style.Fmt(style.Cyan, v.SnipName.String())
 		name.WriteString(nt)
 		if models.Prefs().AlwaysExpandLists {

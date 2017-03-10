@@ -84,7 +84,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 		return err
 	} else {
 		// else save and close the app
-		if s, err = r.snippets.Patch(s.Alias, s.Snip, text); err != nil {
+		if _, err = r.snippets.Patch(s.Alias, s.Snip, text); err != nil {
 			closer()
 			return err
 		}
