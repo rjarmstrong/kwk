@@ -36,28 +36,19 @@ func StatusText(s *models.Snippet) string {
 	return "static"
 }
 
-func FmtStatus(s *models.Snippet, includeText bool) string {
-	if s.Ext == "url" {
-		if includeText {
-			return "🌎  Bookmark"
-		}
-		return "🌎"
-	}
+func printStatus(s *models.Snippet, includeText bool) string {
 	if s.RunStatus == models.UseStatusSuccess {
 		if includeText {
-			return "⚡  Success"
+			return style.Fmt(style.Green, "✔") + "  Success"
 		}
-		return "⚡" //"✓"//
+		return style.Fmt(style.Green, "✔") //"⚡" //"✓"//
 	} else if s.RunStatus == models.UseStatusFail {
 		if includeText {
 			return "🔥  Error"
 		}
 		return "🔥" //style.Fmt(style.Red, "●") //
 	}
-	if includeText {
-		return "📄  Not run/runnable"
-	}
-	return "📄" //"🔸"
+	return "-" //"🔸"
 }
 
 func fmtLocked(locked bool, includeText bool) string {
@@ -89,20 +80,20 @@ func listRoot(r *models.ListView) string {
 	fmt.Fprint(w, strings.Repeat(" ", 90), "👤  ", models.Principal.Username)
 	fmt.Fprint(w, FOOTER)
 	w.Write(listHorizontal(all))
-	fmt.Fprint(w, "\n", MARGIN, style.Fmt(style.Subdued, "Community"),  "\n")
+	fmt.Fprint(w, "\n\n", MARGIN, style.Fmt(style.Subdued, "Community"),  "\n")
 
 	com := []interface{}{}
 	com = append(com, &models.Pouch{
-		Name: "/kwk/unicode",
+		Name: style.Fmt(style.Cyan, "/kwk/") + "unicode",
 		Username: "kwk",
 		SnipCount: 12,
 	}, &models.Pouch{
-		Name:      "/kwk/news",
+		Name:      style.Fmt(style.Cyan, "/kwk/") +"news",
 		Username:  "kwk",
 		SnipCount: 10,
 	},
 	&models.Pouch{
-		Name:      "/kwk/devops",
+		Name:      style.Fmt(style.Cyan, "/kwk/") +"devops",
 		Username:  "kwk",
 		SnipCount: 18,
 	})
@@ -123,6 +114,14 @@ func listRoot(r *models.ListView) string {
 	return w.String()
 }
 
+func printPouchHeadAndFoot(w *bytes.Buffer, list *models.ListView) {
+	fmtHeader(w, list.Username, list.Pouch.Name, nil)
+	fmt.Fprint(w, MARGIN, MARGIN, fmtLocked(list.Pouch.MakePrivate, true))
+	fmt.Fprint(w, " Pouch")
+	fmt.Fprint(w, MARGIN, MARGIN, len(list.Snippets), " snippets")
+	fmt.Fprint(w, "\n")
+}
+
 func listPouch(list *models.ListView) string {
 	w := &bytes.Buffer{}
 	if models.Prefs().Naked {
@@ -131,17 +130,10 @@ func listPouch(list *models.ListView) string {
 		sort.Slice(list.Snippets, func(i, j int) bool {
 			return list.Snippets[i].Created <= list.Snippets[j].Created
 		})
-
-		fmtHeader(w, list.Username, list.Pouch.Name, nil)
-		fmt.Fprint(w, MARGIN, MARGIN, fmtLocked(list.Pouch.MakePrivate, true))
-		fmt.Fprint(w, MARGIN, MARGIN, len(list.Snippets), " snippets")
-		fmt.Fprint(w, "\n")
+		printPouchHeadAndFoot(w, list)
 		fmt.Fprint(w, listSnippets(list))
 		if len(list.Snippets) > 10 {
-			fmtHeader(w, list.Username, list.Pouch.Name, nil)
-			fmt.Fprint(w, MARGIN, MARGIN, fmtLocked(list.Pouch.MakePrivate, true))
-			fmt.Fprint(w, MARGIN, MARGIN, len(list.Snippets), " snippets")
-			fmt.Fprint(w, "\n")
+			printPouchHeadAndFoot(w, list)
 		}
 		fmt.Fprint(w, "\n")
 	}
@@ -204,16 +196,15 @@ func listSnippets(list *models.ListView) string {
 	for _, v := range list.Snippets {
 		var executed string
 		if v.RunStatusTime > 0 {
-			executed = fmt.Sprintf("%s  %s", FmtStatus(v, false), style.Fmt(style.Subdued, humanize.Time(time.Unix(v.RunStatusTime, 0))))
+			executed = fmt.Sprintf("%s  %s", printStatus(v, false), style.Fmt(style.Subdued, humanize.Time(time.Unix(v.RunStatusTime, 0))))
 		} else {
-			executed = FmtStatus(v, false)
+			executed = printStatus(v, false)
 		}
 
 		// col1
 		name := &bytes.Buffer{}
-		if v.IsApp() {
-			name.WriteString("💫  ")
-		}
+		name.WriteString(printIcon(v))
+		name.WriteString("  ")
 		nt := style.Fmt(style.Cyan, v.SnipName.String())
 		name.WriteString(nt)
 		if models.Prefs().AlwaysExpandLists {
@@ -234,8 +225,10 @@ func listSnippets(list *models.ListView) string {
 			lines = models.Prefs().SlimLines
 		}
 		status := &bytes.Buffer{}
-		status.WriteString(executed)
-		status.WriteString("\n")
+		if v.RunCount > 0 {
+			status.WriteString(executed)
+			status.WriteString("\n")
+		}
 		status.WriteString(fmtRunCount(v.RunCount))
 
 		//col3
@@ -269,6 +262,17 @@ func listSnippets(list *models.ListView) string {
 
 	return w.String()
 }
+func printIcon(v *models.Snippet) string {
+	if v.IsApp() {
+		return "💫" // 📦
+	} else if v.Ext == "url" {
+		return "🌎"
+	} else if v.RunCount > 0 {
+		return  "🔸" //"⚡" //☰
+	} else {
+		return "📄"
+	}
+}
 func fmtRunCount(count int64) string {
 	return style.Fmt(style.Subdued, fmt.Sprintf("↻ %2d", count))
 }
@@ -286,33 +290,43 @@ func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
 	fmt.Fprint(w, "\n")
 	fmt.Fprint(w, MARGIN)
 	fmt.Fprint(w, style.Start)
-	fmt.Fprintf(w, "%dm", style.Cyan)
+	fmt.Fprint(w, "7m")
+	fmt.Fprint(w, " ❯ ")
 	fmt.Fprint(w, KWK_HOME)
 	fmt.Fprint(w, "/")
 	if pouch == "" && s == nil {
-		fmt.Fprint(w, style.End)
+		fmt.Fprint(w, style.Start)
+		fmt.Fprint(w, "1m")
 		fmt.Fprint(w, username)
+		fmt.Fprint(w, " ")
+		fmt.Fprint(w, style.End)
 		return
 	}
 	fmt.Fprint(w, username)
 	fmt.Fprint(w, "/")
 	if s == nil {
-		fmt.Fprint(w, style.End)
+		fmt.Fprint(w, style.Start)
+		fmt.Fprint(w, "1m")
 		fmt.Fprint(w,  pouch)
+		fmt.Fprint(w, " ")
+		fmt.Fprint(w, style.End)
 		return
 	}
 	if pouch != "" {
 		fmt.Fprint(w, pouch)
 		fmt.Fprint(w,"/")
 	}
-	fmt.Fprint(w, style.End)
+	fmt.Fprint(w, style.Start)
+	fmt.Fprint(w, "1m")
 	fmt.Fprint(w, s.String())
+	fmt.Fprint(w, " ")
+	fmt.Fprint(w, style.End)
 }
 
 func FmtOutPreview(in string) string {
 	in = strings.Replace(in, "\n\n", "\n", -1)
 	in = strings.TrimSpace(in)
-	return style.WrapString(pad(50, in).String(), 26)
+	return style.WrapString(pad(30, in).String(), 30)
 }
 
 func FmtSnippet(s *models.Snippet, width int, lines int) string {
@@ -429,7 +443,7 @@ func listHorizontal(l []interface{}) []byte {
 			item.WriteString("  ")
 		}
 		if sn, ok := v.(*models.Snippet); ok {
-			item.WriteString(FmtStatus(sn, false))
+			item.WriteString(printStatus(sn, false))
 			item.WriteString("  ")
 			item.WriteString(style.Fmt(style.Cyan, sn.SnipName.Name))
 			item.WriteString(style.Fmt(style.Subdued, "."+sn.SnipName.Ext))

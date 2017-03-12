@@ -14,11 +14,20 @@ import (
 func inspect(s *models.Snippet) string {
 
 	w := &bytes.Buffer{}
+	w.WriteString("\n")
+	w.WriteString(MARGIN)
+	//w.WriteString(style.Fmt(style.Subdued, strings.Repeat("▔", 75)))
 	fmtHeader(w,  s.Username, s.Pouch, &s.SnipName)
+	w.WriteString(strings.Repeat(" ", 4))
+	w.WriteString(printIcon(s))
 	if s.IsApp() {
-		w.WriteString(strings.Repeat(" ", 4))
-		w.WriteString(style.Fmt(style.Subdued, "💫  App"))
+		w.WriteString(style.Fmt(style.Subdued,"  App"))
+	} else if s.Ext == "url" {
+		w.WriteString(style.Fmt(style.Subdued, "  Link"))
+	} else {
+		w.WriteString(style.Fmt(style.Subdued, "  Snippet"))
 	}
+	fmt.Fprint(w,"\n")
 	fmt.Fprint(w, FOOTER)
 	p := tablewriter.NewWriter(w)
 	p.SetAutoWrapText(false)
@@ -47,24 +56,34 @@ func inspect(s *models.Snippet) string {
 
 	if s.IsApp() {
 		tbl.Append([]string{style.Fmt(style.Cyan, "App Details:"), "", "", ""})
+	} else if s.Ext == "url" {
+		tbl.Append([]string{style.Fmt(style.Cyan, "Link Details:"), "", "", ""})
 	} else {
 		tbl.Append([]string{style.Fmt(style.Cyan, "Snippet Details:"), "", "", ""})
 	}
 
-
+	var lastRun string
+	if s.RunCount < 1 {
+		lastRun = "never"
+	} else {
+		lastRun = pad(20, humanize.Time(time.Unix(s.RunStatusTime, 0))).String()
+	}
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"Run Status:"), pad(20, FmtStatus(s, true)).String(),
-		style.Fmt(style.Subdued,"Last Run:"), pad(20, humanize.Time(time.Unix(s.RunStatusTime, 0))).String(),
+		style.Fmt(style.Subdued,"Run Status:"), pad(20, printStatus(s, true)).String(),
+		style.Fmt(style.Subdued,"Last Run:"), lastRun,
 	})
 	tbl.Append([]string{
 		style.Fmt(style.Subdued,"Run Count: "), fmt.Sprintf("↻ %2d", s.RunCount),
 		style.Fmt(style.Subdued,"View count:") , fmt.Sprintf("🔦  %2d", s.ViewCount )}) //👁 👀
+	if s.IsApp() {
+		tbl.Append([]string{
+			style.Fmt(style.Subdued,"App Dependencies:"), strings.Join(s.Dependencies, ", "), "", ""})
+	}
 	tbl.Append([]string{
 		style.Fmt(style.Subdued,"Description:"), fmtEmpty(s.Description), "", ""})
 	tbl.Append([]string{
 		style.Fmt(style.Subdued,"Preview:"), FmtOutPreview(s.Preview), "", ""})
-	tbl.Append([]string{
-		style.Fmt(style.Subdued,"App Dependencies:"), strings.Join(s.Dependencies, ", "), "", ""})
+
 	tbl.Append([]string{
 		style.Fmt(style.Subdued,"Tags:"), fmtTags(s.Tags), "", ""})
 	tbl.Append([]string{

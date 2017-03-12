@@ -35,13 +35,13 @@ func init() {
 	// Aliases
 	add("dashboard", style.Fmt(style.Cyan, logo)+"{{. | listRoot }}", template.FuncMap{"listRoot": listRoot })
 
-	add("snippet:updated", "Description updated:\n{{ .Description | blue }}", template.FuncMap{"blue": blue})
+	add("snippet:updated", MARGIN+ "👍  Description updated:\n{{ .Description | blue }}\n\n", template.FuncMap{"blue": blue})
 	add("api:not-found", "{{. | yellow }} Not found\n", template.FuncMap{"yellow": yellow})
-	add("snippet:cloned", "Cloned as {{.Username}}/{{.FullName | blue}}\n", template.FuncMap{"blue": blue})
-	add("snippet:new", "{{. | blue }} created "+style.OpenLock+"\n", template.FuncMap{"blue": blue})
-	add("snippet:newprivate", "{{.FullName | blue }} created "+style.Lock+"\n", template.FuncMap{"blue": blue})
+	add("snippet:cloned", MARGIN +"👍  Cloned as {{.Username}}/{{.FullName | blue}}\n\n", template.FuncMap{"blue": blue})
+	add("snippet:new", MARGIN+ "👍  {{. | blue }} created "+style.OpenLock+"\n\n", template.FuncMap{"blue": blue})
+	add("snippet:newprivate", MARGIN+ "👍  {{.FullName | blue }} created "+style.Lock+"\n\n", template.FuncMap{"blue": blue})
 	add("snippet:cat", "{{.Snip}}", nil)
-	add("snippet:edited", "Successfully updated {{ .String | blue }}", template.FuncMap{"blue": blue})
+	add("snippet:edited", MARGIN + "👍  Successfully updated {{ .String | blue }}\n\n", template.FuncMap{"blue": blue})
 	add("snippet:editing", "{{ \"Editing... \" | blue }}\nPlease edit file and save.\n - NB: After saving, no changes will be saved until running kwk edit <name> again.\n - Ctrl+C to abort.\n", template.FuncMap{"blue": blue})
 	add("snippet:edit-prompt", "{{ .String | blue }} doesn't exist - would you like create it? [y/n] \n", template.FuncMap{"blue": blue})
 
@@ -139,7 +139,7 @@ func addColor(name string, text string, color ColorFunc) {
 func multiChoice(list []*models.Snippet) string {
 	var options string
 	for i, v := range list {
-		options = options + fmt.Sprintf("[%s] %s   ", style.Fmt(style.Cyan, i+1), v.SnipName.String())
+		options = options + fmt.Sprintf("[%s] %s   ", style.Fmt(style.Cyan, i+1), v.String())
 	}
 	return options
 }

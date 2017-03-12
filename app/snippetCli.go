@@ -237,7 +237,9 @@ func (sc *SnippetCli) InspectOrList(distinctName string) {
 	a, err := models.ParseAlias(distinctName)
 	v, err := sc.s.GetRoot(a.Username, true)
 	if err != nil {
+		sc.HandleErr(err)
 		log.Error("Error getting root, but not critical to 'run'", err)
+		return
 	} else if a.Ext == "" && v.IsPouch(a.Name) {
 		// GET POUCH (or root)
 		sc.List(a.Username, a.Name)
@@ -338,7 +340,7 @@ func (sc *SnippetCli) Move(args []string) {
 		sc.List("", models.ROOT_POUCH)
 		sc.Render("snippet:moved-root", MoveResult{Quant: len(as)})
 	} else {
-		sc.List("", models.ROOT_POUCH)
+		sc.List("", last)
 		sc.Render("snippet:moved-pouch", MoveResult{Pouch: p, Quant: len(as)})
 	}
 
@@ -400,7 +402,7 @@ func (sc *SnippetCli) Clone(distinctName string, newFullName string) {
 	if alias, err := sc.s.Clone(*a, *newA); err != nil {
 		sc.HandleErr(err)
 	} else {
-		sc.List("", models.ROOT_POUCH)
+		sc.List("", newA.Pouch)
 		sc.Render("snippet:cloned", alias)
 	}
 }
@@ -547,7 +549,7 @@ func (sc *SnippetCli) deleteSnippet(args []string) {
 			sc.HandleErr(err)
 			return
 		}
-		sc.List("", models.ROOT_POUCH)
+		sc.List("", pouch)
 		sc.Render("snippet:deleted", pouch)
 	} else {
 		sc.Render("snippet:not-deleted", pouch)
