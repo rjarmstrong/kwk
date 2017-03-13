@@ -172,7 +172,7 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 			return nil, err
 		}
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(models.Prefs().CommandTimeout)*time.Second)
 	c := exec.CommandContext(ctx, name, arg...)
 	c.Stdin = os.Stdin
 	out, err := c.StdoutPipe()

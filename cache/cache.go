@@ -3,8 +3,8 @@ package cache
 import (
 	"os/user"
 	"runtime"
-	"fmt"
 	"os"
+	"fmt"
 )
 
 const (
@@ -26,20 +26,14 @@ func Path() string {
 		// TODO: Write friendly
 		panic(err)
 	}
+	p = fmt.Sprintf("%s/.kwk", u.HomeDir)
 	if runtime.GOOS == OS_WINDOWS {
 		// use AppDir instead
 		p = "%LocalAppData%\\kwk"
-	} else if runtime.GOOS == OS_LINUX {
-		p = fmt.Sprintf("/%s/.kwk", u.Username)
 	} else if runtime.GOOS == OS_DARWIN {
 		if u.Username == "root" {
 			p = "/var/root/.kwk"
-		} else {
-			p = fmt.Sprintf("/Users/%s/.kwk", u.Username)
 		}
-	} else {
-		// TODO: Write friendly
-		panic("OS not supported.")
 	}
 	if err := os.MkdirAll(p, StandardFilePermission); err != nil {
 		if os.IsExist(err) {

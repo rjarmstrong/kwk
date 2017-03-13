@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc"
 	"io"
+	"fmt"
 )
 
 /*
@@ -79,7 +80,8 @@ func (w *StdWriter) handleClientError(e *models.ClientErr) {
 	} else if len(e.Msgs) == 1 {
 		w.Render("validation:one-line", e.Msgs[0])
 	} else {
-		panic(e)
+		log.Error("Unhandled error", e)
+		fmt.Println(e.Error())
 	}
 }
 

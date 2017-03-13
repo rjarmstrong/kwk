@@ -152,7 +152,8 @@ apps:
 runners:
   jl: ["julia", "-e", "$SNIP"]
   sh: ["/bin/bash", "-c", "$SNIP"]
-  url: ["open", "$SNIP"]
+  url: ["firefox", "--new-tab", "$SNIP"]
+  url-covert: ["firefox", "--private-window", "$SNIP"]
   js: ["node", "-e", "$SNIP"] #nodejs
   py: ["python", "-c", "$SNIP"] #python
   php: ["php", "-r", "$SNIP"] #php

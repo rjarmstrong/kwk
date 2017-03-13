@@ -43,6 +43,7 @@ func DefaultPrefs() *Preferences {
 	p.SlimLines = 3
 	p.ExpandedLines = 15
 	p.AlwaysExpandLists = false
+	p.CommandTimeout = 60
 	return p
 }
 
@@ -78,4 +79,5 @@ type PersistedPrefs struct {
 	// Not always as the name suggests as this is used as a flag,
 	// but it makes sense from a configuration file point of view.
 	AlwaysExpandLists bool
+	CommandTimeout int64
 }
