@@ -27,8 +27,8 @@ const logo = `
 
 const(
 	KWK_HOME = "kwk.co"
-	MARGIN = "  "
-	FOOTER = "\n\n"
+	MARGIN   = "  "
+	TWOLINES = "\n\n"
 )
 
 func init() {

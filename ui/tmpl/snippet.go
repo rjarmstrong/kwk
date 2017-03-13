@@ -28,7 +28,7 @@ func inspect(s *models.Snippet) string {
 		w.WriteString(style.Fmt(style.Subdued, "  Snippet"))
 	}
 	fmt.Fprint(w,"\n")
-	fmt.Fprint(w, FOOTER)
+	fmt.Fprint(w, TWOLINES)
 	p := tablewriter.NewWriter(w)
 	p.SetAutoWrapText(false)
 	p.SetBorder(false)

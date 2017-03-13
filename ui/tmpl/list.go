@@ -78,7 +78,7 @@ func listRoot(r *models.ListView) string {
 
 	fmtHeader(w, r.Username, "", nil)
 	fmt.Fprint(w, strings.Repeat(" ", 90), "👤  ", models.Principal.Username)
-	fmt.Fprint(w, FOOTER)
+	fmt.Fprint(w, TWOLINES)
 	w.Write(listHorizontal(all))
 	fmt.Fprint(w, "\n\n", MARGIN, style.Fmt(style.Subdued, "Community"),  "\n")
 
@@ -179,6 +179,18 @@ func listNaked(list *models.ListView) interface{} {
 func listSnippets(list *models.ListView) string {
 	w := &bytes.Buffer{}
 
+	if len(list.Snippets) == 0 {
+		fmt.Fprint(w, "\n")
+		fmt.Fprint(w, MARGIN)
+		fmt.Fprint(w, style.Fmt(style.Subdued, "<empty pouch>"))
+		fmt.Fprint(w, TWOLINES)
+		fmt.Fprint(w, MARGIN)
+		fmt.Fprint(w, style.Fmt(style.Cyan, "Add new snippets to this pouch: "))
+		fmt.Fprintf(w, "`kwk new <snippet> %s/<name>.<ext>`", list.Pouch.Name)
+		fmt.Fprint(w, "\n")
+		return w.String()
+	}
+
 	tbl := tablewriter.NewWriter(w)
 	tbl.SetHeader([]string{"", "", "", ""})
 	tbl.SetAutoWrapText(false)
@@ -243,10 +255,6 @@ func listSnippets(list *models.ListView) string {
 	}
 	tbl.Render()
 
-	if len(list.Snippets) == 0 {
-		fmt.Fprint(w, MARGIN)
-		fmt.Fprint(w, style.Fmt(style.Subdued, "<empty pouch>\n"))
-	}
 
 	//fmt.Fprint(w, style.Start)
 	//fmt.Fprintf(w, "%dm", style.Subdued)
