@@ -19,7 +19,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/cache"
 	"context"
 	"bitbucket.com/sharingmachine/kwkcli/log"
-	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/ui/style"
 )
 
@@ -189,13 +188,13 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 		cancel()
 		desc := fmt.Sprintf("%s execution error: %s\n\n%s", strings.ToUpper(name), err.Error(), stderr.String())
 		if isExe {
-			r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, tmpl.FmtOutPreview(stderr.String()))
+			r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, style.LimitPreview(stderr.String(), 200))
 		}
 		return nil, models.ErrOneLine(models.Code_RunnerExitError, desc)
 	} else {
 		if isExe {
-			preview := tmpl.FmtOutPreview(outBuff.String())
-			r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, preview + style.End)
+			preview := style.LimitPreview(outBuff.String(), 50)
+			r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, preview)
 		}
 		return out, nil
 	}

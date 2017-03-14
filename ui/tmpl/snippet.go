@@ -16,7 +16,6 @@ func inspect(s *models.Snippet) string {
 	w := &bytes.Buffer{}
 	w.WriteString("\n")
 	w.WriteString(MARGIN)
-	//w.WriteString(style.Fmt(style.Subdued, strings.Repeat("▔", 75)))
 	fmtHeader(w,  s.Username, s.Pouch, &s.SnipName)
 	w.WriteString(strings.Repeat(" ", 4))
 	w.WriteString(printIcon(s))
@@ -29,19 +28,8 @@ func inspect(s *models.Snippet) string {
 	}
 	fmt.Fprint(w,"\n")
 	fmt.Fprint(w, TWOLINES)
-	p := tablewriter.NewWriter(w)
-	p.SetAutoWrapText(false)
-	p.SetBorder(false)
-	p.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
-	p.SetCenterSeparator("")
-	p.SetColumnSeparator("")
-	p.SetRowLine(false)
-	p.SetAutoFormatHeaders(false)
-	p.SetHeaderLine(false)
-	p.SetColWidth(5)
-	p.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
-	p.Append([]string{ FmtSnippet(s, 100, 0)})
-	p.Render()
+	fmt.Fprint(w, FmtSnippet(s, 100, 0))
+	fmt.Fprint(w,"\n")
 
 	tbl := tablewriter.NewWriter(w)
 	tbl.SetAutoWrapText(false)
@@ -80,9 +68,10 @@ func inspect(s *models.Snippet) string {
 			style.Fmt(style.Subdued,"App Dependencies:"), strings.Join(s.Dependencies, ", "), "", ""})
 	}
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"Description:"), fmtEmpty(s.Description), "", ""})
+		style.Fmt(style.Subdued,"Description:"), style.FmtBox(fmtEmpty(s.Description), 25, 3), "", ""})
+
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"Preview:"), FmtOutPreview(s.Preview), "", ""})
+		style.Fmt(style.Subdued,"Preview:"), style.FmtBox(s.Preview, 25, 2), "", ""})
 
 	tbl.Append([]string{
 		style.Fmt(style.Subdued,"Tags:"), fmtTags(s.Tags), "", ""})
@@ -90,6 +79,8 @@ func inspect(s *models.Snippet) string {
 		style.Fmt(style.Subdued,"sha256:"), fmtVerified(s) })
 
 	tbl.Render()
+
+
 
 	//fmt.Fprint(w, style.Start)
 	//fmt.Fprintf(w, "%dm", style.Subdued)

@@ -221,7 +221,7 @@ func listSnippets(list *models.ListView) string {
 		name.WriteString(nt)
 		if models.Prefs().AlwaysExpandLists {
 			name.WriteString("\n\n")
-			fmtDescription(name, v.Description, 20)
+			name.WriteString(style.FmtBox(v.Description, 25, 3))
 		}
 		// Add special instructions:
 		if v.Role == models.SnipRoleEnvironment {
@@ -250,7 +250,7 @@ func listSnippets(list *models.ListView) string {
 			name.String(),
 			status.String(),
 			FmtSnippet(v, 60, lines),
-			FmtOutPreview(v.Preview),
+			style.FmtBox(v.Preview, 18, 2),
 		})
 	}
 	tbl.Render()
@@ -283,15 +283,6 @@ func printIcon(v *models.Snippet) string {
 }
 func fmtRunCount(count int64) string {
 	return style.Fmt(style.Subdued, fmt.Sprintf("↻ %2d", count))
-}
-
-func fmtDescription(w io.Writer, in string, width int) {
-	t := strings.Split(style.WrapString(in, width), "\n")
-	for i, v := range t {
-		t[i] = style.Fmt(style.Subdued, v)
-	}
-	join := strings.Join(t, "\n")
-	fmt.Fprint(w, join)
 }
 
 func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
@@ -331,29 +322,14 @@ func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
 	fmt.Fprint(w, style.End)
 }
 
-func FmtOutPreview(in string) string {
-	in = strings.Replace(in, "\n\n", "\n", -1)
-	in = strings.TrimSpace(in)
-	return style.WrapString(pad(30, in).String(), 30)
-}
-
 func FmtSnippet(s *models.Snippet, width int, lines int) string {
 	if s.Snip == "" {
 		s.Snip = "<empty>"
 	}
 	chunks := strings.Split(s.Snip, "\n")
-
-	//// Return any non code previews
-	//if s.Role == models.SnipRolePreferences {
-	//	return `(Global prefs) 'kwk edit prefs'`
-	//} else if s.Role == models.SnipRoleEnvironment {
-	//	return `(Local environment) 'kwk edit env'`
-	//} else
-
 	if s.Ext == "url" {
 		return uri(s.Snip)
 	}
-
 	code := []CodeLine{}
 	// Add line numbers and pad
 	for i, v := range chunks {
@@ -417,7 +393,7 @@ func FmtSnippet(s *models.Snippet, width int, lines int) string {
 		b := style.Fmt256(style.GreyBg236, true, v.Body)
 		buff.WriteString(m)
 		buff.WriteString(b)
-		buff.WriteString("  ")
+		buff.WriteString(" ")
 		buff.WriteString("\n")
 	}
 	return buff.String()

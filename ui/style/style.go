@@ -3,6 +3,7 @@ package style
 import (
 	"fmt"
 	"strings"
+	"bytes"
 )
 
 type AnsiCode int
@@ -91,6 +92,10 @@ func Fmt(c AnsiCode, params ...interface{}) string {
 	return fmt.Sprintf("\033[%dm%v\033[0m", c, text)
 }
 
+func FmtFgBg(in string, fg AnsiCode, bg AnsiCode) string {
+	return fmt.Sprintf("%s%d;%dm%s%s", Start, fg, bg, in, End)
+}
+
 func Fmt256(c AnsiCode, bg bool, params ...interface{}) string {
 	var text string
 	for _, v := range params {
@@ -105,9 +110,89 @@ func ColourSpan(colour AnsiCode, text string, openTag string, closeTag string, s
 	return text
 }
 
-func ColourSpan256(colour AnsiCode, text string, openTag string, closeTag string, surroundingColor AnsiCode) string {
-	text = Fmt256(surroundingColor, false, text)
-	text = strings.Replace(text, openTag, fmt.Sprintf("%s%s%dm", End255, Start255, colour), -1)
-	text = strings.Replace(text, closeTag, fmt.Sprintf("%s%s%dm", End255, Start255, surroundingColor), -1)
-	return text
+//func ColourSpan256(colour AnsiCode, text string, openTag string, closeTag string, surroundingColor AnsiCode) string {
+//	text = Fmt256(surroundingColor, false, text)
+//	text = strings.Replace(text, openTag, fmt.Sprintf("%s%s%dm", End255, Start255, colour), -1)
+//	text = strings.Replace(text, closeTag, fmt.Sprintf("%s%s%dm", End255, Start255, surroundingColor), -1)
+//	return text
+//}
+
+/*
+ StyleLines formats each line with a foreground and background color.
+ */
+func AnsiLinesFgBg(in string, fg AnsiCode, bg AnsiCode) string {
+	t := strings.Split(in, "\n")
+	for i, v := range t {
+		t[i] = FmtFgBg(v, fg, bg)
+	}
+	join := strings.Join(t, "\n")
+	return join
+}
+
+/*
+ StyleLines formats each line with a foreground  color.
+ */
+func AnsiLines(in string, fg AnsiCode) string {
+	t := strings.Split(in, "\n")
+	for i, v := range t {
+		t[i] = Fmt(fg, v)
+	}
+	join := strings.Join(t, "\n")
+	return join
+}
+
+func Limit(in string, length int) string {
+	in = strings.Replace(in, "\n", "  ", -1)
+	in = strings.TrimSpace(in)
+	var numRunes = 0
+	b := bytes.Buffer{}
+	for _, r := range in {
+		if numRunes == length {
+			return strings.TrimSpace(b.String())
+		}
+		numRunes++
+		if r == '\n' {
+			b.WriteRune(' ')
+			b.WriteRune(' ')
+			continue
+		}
+		b.WriteRune(r)
+	}
+	return strings.TrimSpace(b.String())
+}
+
+/*
+ Limits a preview adding an ascii escape at the end and fixing the length.
+ */
+func LimitPreview(in string, length int) string {
+	return Limit(in, length-3) + End
+}
+
+/*
+ Creates a text box constrained by width (number of runes) and number of lines.
+ */
+func FmtBox(in string, wrapAt int, lines int) string {
+	in = strings.Replace(in, "\n", "  ", -1)
+	in = strings.TrimSpace(in)
+	var numRunes = 0
+	b := bytes.Buffer{}
+	var trim bool
+	lineCount := 1
+	for _, r := range in {
+		numRunes++
+		if trim && r == ' ' {
+			continue
+		}
+		trim = false
+		b.WriteRune(r)
+		if numRunes%wrapAt == 0 {
+			if lineCount >= lines {
+				return strings.TrimSpace(b.String())
+			}
+			b.WriteString("\n")
+			lineCount++
+			trim = true
+		}
+	}
+	return strings.TrimSpace(b.String())
 }

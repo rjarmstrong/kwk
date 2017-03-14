@@ -56,7 +56,7 @@ func init() {
 
 	add("snippet:check-delete", "Are you sure you want to delete snippet {{. | yellow }}? [y/n] ", template.FuncMap{"yellow": yellow})
 	add("snippet:deleted", "Snippets {{. | blue }} deleted.", template.FuncMap{"blue": blue})
-	add("snippet:not-deleted", "Snippets {{. | blue }} NOT deleted.", template.FuncMap{"blue": blue})
+	add("snippet:not-deleted", "Snippets {{. | blue }} NOT deleted.\n", template.FuncMap{"blue": blue})
 
 	add("snippet:moved-root", "{{ .Quant | blue }} snippet(s) moved to root.", template.FuncMap{"blue": blue})
 	add("snippet:moved-pouch", "{{ .Quant | blue }} snippet(s) moved to pouch {{ .Pouch | blue }}", template.FuncMap{"blue": blue})
@@ -108,13 +108,13 @@ func init() {
 	// errors
 	add("validation:title", "{{. | yellow }}\n", template.FuncMap{"yellow": yellow})
 	add("validation:multi-line", " - {{ .Desc | yellow }}\n", template.FuncMap{"yellow": yellow})
-	add("validation:one-line", style.Warning+"  {{ .Desc | yellow }}\n", template.FuncMap{"yellow": yellow})
+	add("validation:one-line", style.Warning + "  {{ .Desc | yellow }}\n", template.FuncMap{"yellow": yellow})
 
 	add("api:not-authenticated", "{{ \"Please login to continue: kwk login\" | yellow }}\n", template.FuncMap{"yellow": yellow})
 	add("api:not-implemented", "{{ \"The kwk cli is a greater version than supported by kwk API.\" | yellow }}\n", template.FuncMap{"yellow": yellow})
 	add("api:denied", "{{ \"Permission denied\" | yellow }}\n", template.FuncMap{"yellow": yellow})
-	addColor("api:error", "\n"+style.Fire+"  We have a code RED error. \n- To report type: kwk upload-errors \n- You can also try to upgrade: npm update kwkcli -g\n", red)
-	addColor("api:not-available", style.Ambulance+"  Kwk is DOWN! Please try again in a bit.\n", yellow)
+	addColor("api:error", "\n"+style.Fire + "  We have a code RED error. \n- To report type: kwk upload-errors \n- You can also try to upgrade: npm update kwkcli -g\n", red)
+	addColor("api:not-available", style.Ambulance + "  Kwk is DOWN! Please try again in a bit.\n", yellow)
 	add("api:exists", "{{ \"That item already exists.\" | yellow }}\n", template.FuncMap{"yellow": yellow})
 	add("free-text", "{{.}}", nil)
 }
