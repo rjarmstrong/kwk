@@ -29,12 +29,25 @@ const (
 	LightCyan    AnsiCode = 96
 	White        AnsiCode = 97
 
-	DarkGreyBg  AnsiCode = 100
-	LightBlueBg AnsiCode = 104
-	GreyBg234   AnsiCode = 234
-	GreyBg236   AnsiCode = 236
-	GreyBg238   AnsiCode = 238
-	GreyBg241   AnsiCode = 241
+	LightBlue104 AnsiCode = 104
+	Black0     AnsiCode = 0
+	Black231     AnsiCode = 231
+	Black232     AnsiCode = 232
+	Black233     AnsiCode = 233
+	Black234     AnsiCode = 234
+	Grey234      AnsiCode = 234
+	Grey236      AnsiCode = 236
+	Grey238      AnsiCode = 238
+	Grey240      AnsiCode = 240
+	Grey241      AnsiCode = 241
+	Grey243      AnsiCode = 243
+	White15      AnsiCode = 15
+	OffWhite248  AnsiCode = 248
+	OffWhite249  AnsiCode = 249
+	OffWhite250  AnsiCode = 250
+	OffWhite253  AnsiCode = 253
+	OffWhite254  AnsiCode = 254
+	OffWhite255  AnsiCode = 255
 
 	Bold AnsiCode = 21
 	Dim AnsiCode = 22
@@ -93,7 +106,7 @@ func Fmt(c AnsiCode, params ...interface{}) string {
 }
 
 func FmtFgBg(in string, fg AnsiCode, bg AnsiCode) string {
-	return fmt.Sprintf("%s%d;%dm%s%s", Start, fg, bg, in, End)
+	return fmt.Sprintf("%s38;5;%dm%s48;5;%dm%s%s", Start, fg, Start, bg, in, End)
 }
 
 func Fmt256(c AnsiCode, bg bool, params ...interface{}) string {
@@ -165,7 +178,7 @@ func Limit(in string, length int) string {
  Limits a preview adding an ascii escape at the end and fixing the length.
  */
 func LimitPreview(in string, length int) string {
-	return Limit(in, length-3) + End
+	return Limit(in, length-5) + End
 }
 
 /*

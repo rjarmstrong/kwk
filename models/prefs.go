@@ -40,10 +40,12 @@ func DefaultPrefs() *Preferences {
 	p.ListAll = true
 	p.RegulateUpdates = true
 
-	p.SlimLines = 3
-	p.ExpandedLines = 15
-	p.AlwaysExpandLists = false
+	p.SlimRows = 3
+	p.ExpandedRows = 15
+	p.AlwaysExpandRows = false
 	p.CommandTimeout = 60
+	p.RowSpaces = true
+	p.RowLines = false
 	return p
 }
 
@@ -69,15 +71,16 @@ type Preferences struct {
 type PersistedPrefs struct {
 	Covert         bool  // Always opens browser in covert mode, when set to true flag should have no effect. TODO: Update env/darwin.yml
 	ListAll        bool  //List all pouches including private. TODO: implement on api in search SEARCH.
-	DisableRun     bool  //Completely disabled running scripts even if using -f TODO: Security
-	WipeTrail      bool  //deletes the history each time a command is run TODO: Security
-	SessionTimeout int64 // 0 = no timeout, TODO: Implement on api SECURITY
-	AutoEncrypt    bool  //Encrypts all snippets when created. TODO: SECURITY
+	DisableRun      bool  //Completely disabled running scripts even if using -f TODO: Security
+	WipeTrail       bool  //deletes the history each time a command is run TODO: Security
+	SessionTimeout  int64 // 0 = no timeout, TODO: Implement on api SECURITY
+	AutoEncrypt     bool  //Encrypts all snippets when created. TODO: SECURITY
 	RegulateUpdates bool //Updates based on the recommended schedule. If false get updates as soon as available.
-	SlimLines         int
-	ExpandedLines     int
-	// Not always as the name suggests as this is used as a flag,
-	// but it makes sense from a configuration file point of view.
-	AlwaysExpandLists bool
-	CommandTimeout int64
+	CommandTimeout   int64
+
+	SlimRows         int
+	ExpandedRows     int
+	AlwaysExpandRows bool
+	RowSpaces        bool
+	RowLines         bool
 }

@@ -198,14 +198,17 @@ func listSnippets(list *models.ListView) string {
 	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
 	tbl.SetCenterSeparator("")
 	tbl.SetColumnSeparator(" ")
-	tbl.SetRowLine(true)
+	if models.Prefs().RowLines {
+		tbl.SetRowLine(true)
+	}
+
 	tbl.SetAutoFormatHeaders(false)
 	tbl.SetHeaderLine(true)
 	tbl.SetColWidth(5)
 
 	tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
 
-	for _, v := range list.Snippets {
+	for i, v := range list.Snippets {
 		var executed string
 		if v.RunStatusTime > 0 {
 			executed = fmt.Sprintf("%s  %s", printStatus(v, false), style.Fmt(style.Subdued, humanize.Time(time.Unix(v.RunStatusTime, 0))))
@@ -219,7 +222,7 @@ func listSnippets(list *models.ListView) string {
 		name.WriteString("  ")
 		nt := style.Fmt(style.Cyan, v.SnipName.String())
 		name.WriteString(nt)
-		if models.Prefs().AlwaysExpandLists {
+		if models.Prefs().AlwaysExpandRows {
 			name.WriteString("\n\n")
 			name.WriteString(style.FmtBox(v.Description, 25, 3))
 		}
@@ -231,26 +234,30 @@ func listSnippets(list *models.ListView) string {
 
 		// col2
 		var lines int
-		if models.Prefs().AlwaysExpandLists {
-			lines = models.Prefs().ExpandedLines
+		if models.Prefs().AlwaysExpandRows {
+			lines = models.Prefs().ExpandedRows
 		} else {
-			lines = models.Prefs().SlimLines
+			lines = models.Prefs().SlimRows
 		}
 		status := &bytes.Buffer{}
 		if v.RunCount > 0 {
 			status.WriteString(executed)
-			status.WriteString("\n")
+			status.WriteString(" ")
 		}
 		status.WriteString(fmtRunCount(v.RunCount))
 
 		//col3
+		snip := FmtSnippet(v, 60, lines, (i+1)%2==0)
+		if models.Prefs().RowSpaces {
+			snip = snip + "\n"
+		}
 
 		// //strings.Join(v.Tags, ", "),
 		tbl.Append([]string{
 			name.String(),
 			status.String(),
-			FmtSnippet(v, 60, lines),
-			style.FmtBox(v.Preview, 18, 2),
+			snip,
+			style.FmtBox(v.Preview, 18, 1),
 		})
 	}
 	tbl.Render()
@@ -282,7 +289,7 @@ func printIcon(v *models.Snippet) string {
 	}
 }
 func fmtRunCount(count int64) string {
-	return style.Fmt(style.Subdued, fmt.Sprintf("↻ %2d", count))
+	return style.Fmt(style.Subdued, fmt.Sprintf("↻ %d", count))
 }
 
 func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
@@ -322,82 +329,6 @@ func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
 	fmt.Fprint(w, style.End)
 }
 
-func FmtSnippet(s *models.Snippet, width int, lines int) string {
-	if s.Snip == "" {
-		s.Snip = "<empty>"
-	}
-	chunks := strings.Split(s.Snip, "\n")
-	if s.Ext == "url" {
-		return uri(s.Snip)
-	}
-	code := []CodeLine{}
-	// Add line numbers and pad
-	for i, v := range chunks {
-		code = append(code, CodeLine{
-			Margin: style.FmtStart(style.Subdued, fmt.Sprintf("%3d ", i+1)),
-			Body:   fmt.Sprintf("    %s", strings.Replace(v, "\t", "  ", -1)),
-		})
-	}
-
-	lastLine := code[len(chunks)-1]
-
-	// Add to preview starting from most important line
-	marker := mainMarkers[s.Ext]
-	if marker != "" {
-		var clipped []CodeLine
-		var startPreview int
-		for i, v := range code {
-			if strings.Contains(v.Body, marker) {
-				startPreview = i
-			}
-		}
-		for i, v := range code {
-			if startPreview <= i {
-				clipped = append(clipped, v)
-			}
-		}
-		code = clipped
-	}
-
-	crop := len(code) >= lines && lines != 0
-
-	// crop width
-	var preview []CodeLine
-	if crop {
-		preview = code[0:lines]
-	} else {
-		preview = code
-	}
-
-	rightTrim := style.FmtStart(style.Subdued, "|")
-	if width > 0 {
-		for i, v := range preview {
-			preview[i].Body = pad(width, v.Body).String() + rightTrim
-		}
-	}
-
-	// Add page tear and last line
-	if models.Prefs().AlwaysExpandLists && crop && lines < len(code) {
-		preview = append(preview, CodeLine{
-			style.FmtStart(style.Subdued, "----"),
-			style.FmtStart(style.Subdued, strings.Repeat("-", width)+"|"),
-		})
-		lastLine.Body = pad(width, lastLine.Body).String() + rightTrim
-		preview = append(preview, lastLine)
-	}
-
-	buff := bytes.Buffer{}
-	for _, v := range preview {
-		// Style
-		m := style.Fmt256(style.GreyBg238, true, v.Margin)
-		b := style.Fmt256(style.GreyBg236, true, v.Body)
-		buff.WriteString(m)
-		buff.WriteString(b)
-		buff.WriteString(" ")
-		buff.WriteString("\n")
-	}
-	return buff.String()
-}
 
 func pad(width int, in string) *bytes.Buffer {
 	buff := &bytes.Buffer{}

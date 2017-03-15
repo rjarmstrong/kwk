@@ -162,13 +162,13 @@ func subdued(in interface{}) string {
 }
 
 func uri(text string) string {
-	text = strings.Replace(text, "https://", "", 1)
-	text = strings.Replace(text, "http://", "", 1)
+	//text = strings.Replace(text, "https://", "", 1)
+	//text = strings.Replace(text, "http://", "", 1)
 	text = strings.Replace(text, "www.", "", 1)
 	if len(text) >= 40 {
 		text = text[0:10] + "..." + text[len(text)-30:]
 	}
-	return text
+	return " " + text
 }
 
 func PrettyPrint(obj interface{}) {

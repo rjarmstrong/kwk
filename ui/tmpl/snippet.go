@@ -28,7 +28,7 @@ func inspect(s *models.Snippet) string {
 	}
 	fmt.Fprint(w,"\n")
 	fmt.Fprint(w, TWOLINES)
-	fmt.Fprint(w, FmtSnippet(s, 100, 0))
+	fmt.Fprint(w, FmtSnippet(s, 100, 0, false))
 	fmt.Fprint(w,"\n")
 
 	tbl := tablewriter.NewWriter(w)
@@ -105,6 +105,91 @@ func fmtVerified(s *models.Snippet) string {
 		buff.WriteString(fmtEmpty(s.CheckSum))
 	}
 	return buff.String()
+}
+
+func FmtSnippet(s *models.Snippet, width int, lines int, odd bool) string {
+	if s.Snip == "" {
+		s.Snip = "<empty>"
+	}
+	chunks := strings.Split(s.Snip, "\n")
+	//if s.Ext == "url" {
+	//	return uri(s.Snip)
+	//}
+	code := []CodeLine{}
+	// Add line numbers and pad
+	for i, v := range chunks {
+		code = append(code, CodeLine{
+			Margin: style.FmtStart(style.Subdued, fmt.Sprintf("%3d ", i+1)),
+			Body:   fmt.Sprintf("    %s", strings.Replace(v, "\t", "  ", -1)),
+		})
+	}
+
+	lastLine := code[len(chunks)-1]
+
+	// Add to preview starting from most important line
+	marker := mainMarkers[s.Ext]
+	if marker != "" {
+		var clipped []CodeLine
+		var startPreview int
+		for i, v := range code {
+			if strings.Contains(v.Body, marker) {
+				startPreview = i
+			}
+		}
+		for i, v := range code {
+			if startPreview <= i {
+				clipped = append(clipped, v)
+			}
+		}
+		code = clipped
+	}
+
+	crop := len(code) >= lines && lines != 0
+
+	// crop width
+	var preview []CodeLine
+	if crop {
+		preview = code[0:lines]
+	} else {
+		preview = code
+	}
+
+	rightTrim := style.FmtStart(style.Subdued, "|")
+	if width > 0 {
+		for i, v := range preview {
+			preview[i].Body = pad(width, v.Body).String() + rightTrim
+		}
+	}
+
+	// Add page tear and last line
+	if models.Prefs().AlwaysExpandRows && crop && lines < len(code) {
+		preview = append(preview, CodeLine{
+			style.FmtStart(style.Subdued, "----"),
+			style.FmtStart(style.Subdued, strings.Repeat("-", width)+"|"),
+		})
+		lastLine.Body = pad(width, lastLine.Body).String() + rightTrim
+		preview = append(preview, lastLine)
+	}
+
+	buff := bytes.Buffer{}
+	for i, v := range preview {
+		// Style
+		var m, b string
+		if odd {
+			m = style.FmtFgBg(v.Margin, style.OffWhite248, style.Grey240)
+			b = style.FmtFgBg(v.Body, style.OffWhite250, style.Grey238)
+		} else {
+			m = style.FmtFgBg(v.Margin, style.OffWhite248, style.Grey238)
+			b = style.FmtFgBg(v.Body, style.OffWhite250, style.Grey236)
+		}
+		buff.WriteString(m)
+		buff.WriteString(b)
+		buff.WriteString(" ")
+		if i < len(preview) - 1 {
+			buff.WriteString("\n")
+		}
+	}
+	return buff.String() // fmt.Sprintf("%q", buff.String())
 }
 
 func fmtTags(tags []string) string {
