@@ -29,7 +29,7 @@ func inspect(s *models.Snippet) string {
 	fmt.Fprint(w,"\n")
 	fmt.Fprint(w, TWOLINES)
 	fmt.Fprint(w, FmtSnippet(s, 100, 0, false))
-	fmt.Fprint(w,"\n")
+	fmt.Fprint(w,"\n\n")
 
 	tbl := tablewriter.NewWriter(w)
 	tbl.SetAutoWrapText(false)
