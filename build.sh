@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -ef -o pipefail
-KWK_VERSION=v1.2.26
+KWK_VERSION=v1.2.27
 BUILD_NUMBER=$1
 RELEASE_TIME=$(date +%s)
 RELEASE_NOTES="Linux fixes.\n"
