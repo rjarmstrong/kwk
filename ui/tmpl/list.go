@@ -378,9 +378,18 @@ func listHorizontal(l []interface{}) []byte {
 				} else if pch.Name == "settings" {
 					item.WriteString("⚙")
 				} else if pch.MakePrivate {
-					item.WriteString("🔒")
+					item.WriteString(style.Fmt(style.DarkGrey, "ⓟ")) //"🔒")
 				} else {
-					item.WriteString("👝")
+					if pch.SnipCount == 0 {
+						item.WriteString(style.Fmt(style.DarkGrey, "▆") )
+					}
+					if pch.SnipCount > 0 && pch.SnipCount < 20 {
+						item.WriteString(style.Fmt(style.White, "▆") )
+					}
+					if pch.SnipCount > 20 {
+						item.WriteString(style.Fmt(style.LightRed, "▆") )
+					}
+					//item.WriteString(style.Fmt(style.LightRed, "▆") ) //▇") //👝 ▇")
 				}
 
 				item.WriteString("  ")
