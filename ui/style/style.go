@@ -209,3 +209,13 @@ func FmtBox(in string, wrapAt int, lines int) string {
 	}
 	return strings.TrimSpace(b.String())
 }
+
+/*
+ Squeeze pushes text into a given width truncating the middle.
+ */
+func Squeeze(text string) string {
+	if len(text) >= 40 {
+		text = text[0:10] + "..." + text[len(text)-30:]
+	}
+	return " " + text
+}

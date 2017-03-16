@@ -5,7 +5,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"github.com/rjarmstrong/tablewriter"
 	"github.com/rjarmstrong/go-humanize"
-	"text/tabwriter"
 	"strings"
 	"bytes"
 	"time"
@@ -77,7 +76,7 @@ func listRoot(r *models.ListView) string {
 	}
 
 	fmtHeader(w, r.Username, "", nil)
-	fmt.Fprint(w, strings.Repeat(" ", 90), "👤  ", models.Principal.Username)
+	fmt.Fprint(w, strings.Repeat(" ", 65), style.Fmt(style.Subdued, "◉  " + models.Principal.Username, "    TLS12")) //TLS ⇨ᗜ 🔑
 	fmt.Fprint(w, TWOLINES)
 	w.Write(listHorizontal(all))
 	fmt.Fprint(w, "\n\n", MARGIN, style.Fmt(style.Subdued, "Community"),  "\n")
@@ -277,6 +276,7 @@ func listSnippets(list *models.ListView) string {
 
 	return w.String()
 }
+
 func printIcon(v *models.Snippet) string {
 	if v.IsApp() {
 		return "💫" // 📦
@@ -288,6 +288,7 @@ func printIcon(v *models.Snippet) string {
 		return "📄"
 	}
 }
+
 func fmtRunCount(count int64) string {
 	return style.Fmt(style.Subdued, fmt.Sprintf("↻ %d", count))
 }
@@ -329,7 +330,6 @@ func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
 	fmt.Fprint(w, style.End)
 }
 
-
 func pad(width int, in string) *bytes.Buffer {
 	buff := &bytes.Buffer{}
 	diff := width - len([]rune(in))
@@ -346,72 +346,4 @@ func pad(width int, in string) *bytes.Buffer {
 		}
 	}
 	return buff
-}
-
-func listHorizontal(l []interface{}) []byte {
-	var buff bytes.Buffer
-	w := tabwriter.NewWriter(&buff, 20, 3, 2, ' ', tabwriter.DiscardEmptyColumns)
-	var item bytes.Buffer
-	colWidths := map[int]int{}
-	for i, v := range l {
-		if i%5 == 0 {
-			item.WriteString("  ")
-		}
-		if sn, ok := v.(*models.Snippet); ok {
-			item.WriteString(printStatus(sn, false))
-			item.WriteString("  ")
-			item.WriteString(style.Fmt(style.Cyan, sn.SnipName.Name))
-			item.WriteString(style.Fmt(style.Subdued, "."+sn.SnipName.Ext))
-			item.WriteString(" ")
-		}
-		if pch, ok := v.(*models.Pouch); ok {
-			if models.Prefs().ListAll || !pch.MakePrivate {
-				if colWidths[i%5] < len(pch.Name) {
-					colWidths[i%5] = len(pch.Name)
-				}
-				if pch.Name == "inbox" {
-					if pch.UnOpened > 0 {
-						item.WriteString(fmt.Sprintf("📬%d", pch.UnOpened))
-					} else {
-						item.WriteString("📪")
-					}
-				} else if pch.Name == "settings" {
-					item.WriteString("⚙")
-				} else if pch.MakePrivate {
-					item.WriteString(style.Fmt(style.DarkGrey, "ⓟ")) //"🔒")
-				} else {
-					if pch.SnipCount == 0 {
-						item.WriteString(style.Fmt(style.DarkGrey, "▆") )
-					}
-					if pch.SnipCount > 0 && pch.SnipCount < 20 {
-						item.WriteString(style.Fmt(style.White, "▆") )
-					}
-					if pch.SnipCount > 20 {
-						item.WriteString(style.Fmt(style.LightRed, "▆") )
-					}
-					//item.WriteString(style.Fmt(style.LightRed, "▆") ) //▇") //👝 ▇")
-				}
-
-				item.WriteString("  ")
-				item.WriteString(pch.Name)
-				item.WriteString(style.Fmt(style.Subdued, fmt.Sprintf(" (%d)", pch.SnipCount)))
-			}
-		}
-
-		x := i + 1
-		if x%20 == 0 {
-			item.WriteString(MARGIN)
-			item.WriteString("\n\t\t\t\t")
-			item.WriteString("\n")
-		} else if x%5 == 0 {
-			item.WriteString("\n")
-		} else {
-			item.WriteString("\t")
-		}
-
-		fmt.Fprint(w, fmt.Sprintf("%s", item.String()))
-		item.Reset()
-	}
-	w.Flush()
-	return buff.Bytes()
 }

@@ -4,9 +4,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/style"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"github.com/rjarmstrong/go-humanize"
-	"encoding/json"
 	"text/template"
-	"strings"
 	"fmt"
 	"time"
 )
@@ -159,21 +157,4 @@ func red(in interface{}) string {
 
 func subdued(in interface{}) string {
 	return style.Fmt(style.Subdued, fmt.Sprintf("%v", in))
-}
-
-func uri(text string) string {
-	//text = strings.Replace(text, "https://", "", 1)
-	//text = strings.Replace(text, "http://", "", 1)
-	text = strings.Replace(text, "www.", "", 1)
-	if len(text) >= 40 {
-		text = text[0:10] + "..." + text[len(text)-30:]
-	}
-	return " " + text
-}
-
-func PrettyPrint(obj interface{}) {
-	fmt.Println("")
-	p, _ := json.MarshalIndent(obj, "", "  ")
-	fmt.Print(string(p))
-	fmt.Print("\n\n")
 }
