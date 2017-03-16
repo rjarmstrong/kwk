@@ -24,27 +24,25 @@ func NewConfigProvider(ss snippets.Service, s sys.Manager, u account.Manager, w 
 }
 
 func (cs *ConfigProvider) Load(){
-	_, err := cs.loadEnv()
-	if err != nil {
-		cs.w.HandleErr(err)
-	}
+	cs.loadEnv()
 	cs.loadPrefs()
 }
 
-func (cs *ConfigProvider) loadEnv() (*yaml.MapSlice, error) {
+func (cs *ConfigProvider) loadEnv() *yaml.MapSlice {
 	if models.Env() != nil {
-		return models.Env(), nil
+		return models.Env()
 	}
 	envString, err := cs.GetConfig(cs.envResolvers)
 	if err != nil {
-		return nil, err
+		log.Error("Failed to load env settings.", err)
+		envString, _ = cs.envResolvers.Fallback()
 	}
 	env := &yaml.MapSlice{}
 	if err := yaml.Unmarshal([]byte(envString), env); err != nil {
-		return nil, err
+		log.Error("Failed to parse env settings.", err)
 	}
 	models.SetEnv(env)
-	return models.Env(), nil
+	return models.Env()
 }
 
 func (cs *ConfigProvider) loadPrefs() {
