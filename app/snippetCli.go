@@ -321,8 +321,15 @@ func (sc *SnippetCli) Move(args []string) {
 		return
 	} else if !root.IsPouch(last) && len(args) == 2 {
 		// rename single snippet
+		snip, original, err := sc.rename(args[0], args[1])
+		if err != nil {
+			sc.HandleErr(err)
+		}
 		sc.List("", models.ROOT_POUCH)
-		sc.rename(args[0], args[1])
+		sc.Render("snippet:renamed", &map[string]string{
+			"originalName": original.String(),
+			"newName":      snip.SnipName.String(),
+		})
 		return
 	}
 	as, source, err := models.ParseMany(args[0:len(args)-1])
@@ -517,25 +524,16 @@ func (sc *SnippetCli) getSnippet(distinctName string) (*models.ListView, *models
 	}
 }
 
-func (sc *SnippetCli) rename(distinctName string, newSnipName string) {
+func (sc *SnippetCli) rename(distinctName string, newSnipName string) (*models.Snippet, *models.SnipName, error) {
 	a, err := models.ParseAlias(distinctName)
 	if err != nil {
-		sc.HandleErr(err)
-		return
+		return nil, nil, err
 	}
 	sn, err := models.ParseSnipName(newSnipName)
 	if err != nil {
-		sc.HandleErr(err)
-		return
+		return nil, nil, err
 	}
-	if snip, original, err := sc.s.Rename(*a, *sn); err != nil {
-		sc.HandleErr(err)
-	} else {
-		sc.Render("snippet:renamed", &map[string]string{
-			"originalName": original.String(),
-			"newName":      snip.SnipName.String(),
-		})
-	}
+	return sc.s.Rename(*a, *sn)
 }
 
 func (sc *SnippetCli) deleteSnippet(args []string) {

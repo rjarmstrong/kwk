@@ -129,9 +129,11 @@ func listPouch(list *models.ListView) string {
 		sort.Slice(list.Snippets, func(i, j int) bool {
 			return list.Snippets[i].Created <= list.Snippets[j].Created
 		})
-		printPouchHeadAndFoot(w, list)
+		if list.Pouch != nil {
+			printPouchHeadAndFoot(w, list)
+		}
 		fmt.Fprint(w, listSnippets(list))
-		if len(list.Snippets) > 10 {
+		if list.Pouch != nil && len(list.Snippets) > 10 {
 			printPouchHeadAndFoot(w, list)
 		}
 		fmt.Fprint(w, "\n")
