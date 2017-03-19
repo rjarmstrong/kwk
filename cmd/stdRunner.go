@@ -19,7 +19,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/cache"
 	"context"
 	"bitbucket.com/sharingmachine/kwkcli/log"
-	"bitbucket.com/sharingmachine/kwkcli/ui/style"
 )
 
 type StdRunner struct {
@@ -188,13 +187,12 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 		cancel()
 		desc := fmt.Sprintf("%s execution error: %s\n\n%s", strings.ToUpper(name), err.Error(), stderr.String())
 		if isExe {
-			r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, style.LimitPreview(stderr.String(), 200))
+			r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, stderr.String())
 		}
 		return nil, models.ErrOneLine(models.Code_RunnerExitError, desc)
 	} else {
 		if isExe {
-			preview := style.LimitPreview(outBuff.String(), 50)
-			r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, preview)
+			r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, outBuff.String())
 		}
 		return out, nil
 	}

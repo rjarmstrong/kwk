@@ -171,22 +171,19 @@ func (rs *RpcService) Clone(a models.Alias, new models.Alias) (*models.Snippet, 
 
 func (rs *RpcService) LogUse(a models.Alias, s models.UseStatus, u models.UseType, preview string) {
 	_, err := rs.client.LogUse(rs.h.Context(), &snipsRpc.LogUseRequest{
-		Alias: mapAlias(a), Status: snipsRpc.UseStatus(s), Preview: preview, Type:snipsRpc.UseType(u), Time: time.Now().Unix() })
+		Alias: mapAlias(a), Status: snipsRpc.UseStatus(s), Preview: LimitPreview(preview, 50), Type:snipsRpc.UseType(u), Time: time.Now().Unix() })
 	if err != nil {
 		log.Error("Error sending LogRun", err)
 	}
 }
 
-//func (rs *RpcService) SetPreview(a models.Alias, p string) error {
-//	if _, err := rs.client.SetPreview(rs.h.Context(), &snipsRpc.SetPreviewRequest{
-//		Alias:mapAlias(a),
-//		Preview:p,
-//	}); err != nil {
-//		return err
-//	} else {
-//		return nil
-//	}
-//}
+/*
+ Limits a preview adding an ascii escape at the end and fixing the length.
+ */
+func LimitPreview(in string, length int) string {
+	return models.Limit(in, length-5) + "\033[0m"
+}
+
 
 func (rs *RpcService) Tag(a models.Alias, tags ...string) (*models.Snippet, error) {
 	if res, err := rs.client.Tag(rs.h.Context(), &snipsRpc.TagRequest{Alias: mapAlias(a), Tags: tags}); err != nil {

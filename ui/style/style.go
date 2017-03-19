@@ -154,33 +154,6 @@ func AnsiLines(in string, fg AnsiCode) string {
 	return join
 }
 
-func Limit(in string, length int) string {
-	in = strings.Replace(in, "\n", "  ", -1)
-	in = strings.TrimSpace(in)
-	var numRunes = 0
-	b := bytes.Buffer{}
-	for _, r := range in {
-		if numRunes == length {
-			return strings.TrimSpace(b.String())
-		}
-		numRunes++
-		if r == '\n' {
-			b.WriteRune(' ')
-			b.WriteRune(' ')
-			continue
-		}
-		b.WriteRune(r)
-	}
-	return strings.TrimSpace(b.String())
-}
-
-/*
- Limits a preview adding an ascii escape at the end and fixing the length.
- */
-func LimitPreview(in string, length int) string {
-	return Limit(in, length-5) + End
-}
-
 /*
  Creates a text box constrained by width (number of runes) and number of lines.
  */

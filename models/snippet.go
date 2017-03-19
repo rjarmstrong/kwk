@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"strings"
+	"bytes"
 )
 
 const (
@@ -102,6 +103,26 @@ type ListParams struct {
 	Tags     []string
 	IgnorePouches bool
 	Category string
+}
+
+func Limit(in string, length int) string {
+	in = strings.Replace(in, "\n", "  ", -1)
+	in = strings.TrimSpace(in)
+	var numRunes = 0
+	b := bytes.Buffer{}
+	for _, r := range in {
+		if numRunes == length {
+			return strings.TrimSpace(b.String())
+		}
+		numRunes++
+		if r == '\n' {
+			b.WriteRune(' ')
+			b.WriteRune(' ')
+			continue
+		}
+		b.WriteRune(r)
+	}
+	return strings.TrimSpace(b.String())
 }
 
 //TODO: Optimise this
