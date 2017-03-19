@@ -18,6 +18,7 @@ type ListView struct {
 	Pouches     []*Pouch
 	Personal    []*Pouch
 	Snippets    []*Snippet
+	UserStats
 
 	Total    int64
 	Since    time.Time

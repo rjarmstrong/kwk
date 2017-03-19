@@ -216,7 +216,18 @@ func (rs *RpcService) GetRoot(username string, all bool) (*models.ListView, erro
 	pl := rs.mapPouchList(r.Pouches)
 	perL := rs.mapPouchList(r.Personal)
 	record := &update.Record{}
-	root := &models.ListView{IsRoot: true, Snippets: l.Snippets, Pouches: pl, Personal: perL, Username: r.Username}
+	root := &models.ListView{
+		IsRoot: true,
+		Snippets: l.Snippets,
+		Pouches: pl,
+		Personal: perL,
+		Username: r.Username,
+		UserStats: models.UserStats{
+		 RecentPouches:r.Stats.RecentPouches,
+		 MaxUsePerPouch:r.Stats.MaxUsePerPouch,
+		 MaxSnipsPerPouch:r.Stats.MaxSnipsPerPouch,
+		},
+	}
 	if e := rs.persister.Get(update.RecordFile, record, 0); e == nil {
 		root.LastUpgrade = record.LastUpdate
 	}
@@ -265,22 +276,7 @@ func MillisToTime(in int64) time.Time {
 func (rs *RpcService) mapPouchList(in []*snipsRpc.Pouch) []*models.Pouch {
 	out := []*models.Pouch{}
 	for _, v := range in {
-		p := &models.Pouch{
-			Name:        v.Name,
-			Username:    v.Username,
-			Encrypt:     v.Encrypt,
-			MakePrivate: v.MakePrivate,
-			SharedWith:  v.SharedWith,
-			PouchStats:   models.PouchStats{
-				Views:v.Stats.Views,
-				Snips:v.Stats.Snips,
-				Broke:v.Stats.Broke,
-				Clones:v.Stats.Clones,
-				Runs:v.Stats.Runs,
-			},
-			Modified:    MillisToTime(v.Modified),
-			PouchId:     v.PouchId,
-		}
+		p := mapPouch(v)
 		out = append(out, p)
 	}
 	return out
@@ -353,10 +349,12 @@ func mapPouch(p *snipsRpc.Pouch) *models.Pouch {
 		PouchId:p.PouchId,
 		SharedWith:p.SharedWith,
 		PouchStats: models.PouchStats{
+			Use: p.Stats.Use,
 			Runs:p.Stats.Runs,
 			Views:p.Stats.Views,
 			Clones:p.Stats.Clones,
-			Broke:p.Stats.Broke,
+			Green:p.Stats.Green,
+			Red:p.Stats.Red,
 			Snips:p.Stats.Snips,
 		},
 		UnOpened:p.UnOpened,

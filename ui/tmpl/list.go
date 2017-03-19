@@ -78,7 +78,7 @@ func listRoot(r *models.ListView) string {
 	fmtHeader(w, r.Username, "", nil)
 	fmt.Fprint(w, strings.Repeat(" ", 65), style.Fmt(style.Subdued, "◉  " + models.Principal.Username, "    TLS12")) //TLS ⇨ᗜ 🔑
 	fmt.Fprint(w, TWOLINES)
-	w.Write(listHorizontal(all))
+	w.Write(listHorizontal(all, r.UserStats))
 	fmt.Fprint(w, "\n\n", MARGIN, style.Fmt(style.Subdued, "Community"),  "\n")
 
 	com := []interface{}{}
@@ -96,7 +96,7 @@ func listRoot(r *models.ListView) string {
 		Username:  "kwk",
 		PouchStats: models.PouchStats{Runs:12},
 	})
-	w.Write(listHorizontal(com))
+	w.Write(listHorizontal(com, r.UserStats))
 	w.WriteString("\n")
 
 	if len(r.Snippets) > 0 {

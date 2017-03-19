@@ -234,6 +234,13 @@ message RootResponse {
     repeated Pouch pouches = 2;
     repeated Pouch personal = 3;
     string Username = 4;
+    UserStats stats = 5;
+}
+
+message UserStats {
+    int64 maxUsePerPouch = 1;
+    int64 maxSnipsPerPouch = 2;
+    repeated string recentPouches = 3;
 }
 
 message DeleteRequest {
@@ -268,8 +275,10 @@ message PouchCounts {
     int64 views = 1;
     int64 runs = 2;
     int64 clones = 3;
-    int64 broke = 4;
     int64 snips = 5;
+    int64 use = 6;
+    int64 red = 4;
+    int64 green = 7;
 }
 
 message Snip {
