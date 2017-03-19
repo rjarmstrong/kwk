@@ -40,13 +40,13 @@ func listHorizontal(l []interface{}) []byte {
 				} else if pch.MakePrivate {
 					item.WriteString(style.Fmt(style.DarkGrey, "ⓟ")) //"🔒")
 				} else {
-					if pch.SnipCount == 0 {
+					if pch.PouchStats.Snips == 0 {
 						item.WriteString(style.Fmt(style.DarkGrey, "▆") )
 					}
-					if pch.SnipCount > 0 && pch.SnipCount < 20 {
+					if pch.PouchStats.Snips > 0 && pch.PouchStats.Snips < 20 {
 						item.WriteString(style.Fmt(style.White, "▆") )
 					}
-					if pch.SnipCount > 20 {
+					if pch.PouchStats.Snips > 20 {
 						item.WriteString(style.Fmt(style.LightRed, "▆") )
 					}
 					//item.WriteString(style.Fmt(style.LightRed, "▆") ) //▇") //👝 ▇")
@@ -54,7 +54,7 @@ func listHorizontal(l []interface{}) []byte {
 
 				item.WriteString("  ")
 				item.WriteString(pch.Name)
-				item.WriteString(style.Fmt(style.Subdued, fmt.Sprintf(" (%d)", pch.SnipCount)))
+				item.WriteString(style.Fmt(style.Subdued, fmt.Sprintf(" (%d)", pch.PouchStats.Snips )))
 			}
 		}
 

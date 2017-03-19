@@ -256,19 +256,27 @@ message Pouch {
     string name = 2;
     bool makePrivate = 3;
     bool encrypt = 4;
-    int64 snipCount = 5;
     repeated string sharedWith = 6;
     int64 modified = 7;
     string pouchId = 8;
     int64 unOpened = 9;
     bool personal = 10;
+    PouchCounts stats = 11;
+}
+
+message PouchCounts {
+    int64 views = 1;
+    int64 runs = 2;
+    int64 clones = 3;
+    int64 broke = 4;
+    int64 snips = 5;
 }
 
 message Snip {
     Alias alias = 1;
     string snipId = 2;
-    string snip = 3;
     int64 snipVersion = 4;
+    string snip = 3;
     repeated string tags = 5;
     int64 created = 6;
     string description = 7;
@@ -282,15 +290,20 @@ message Snip {
     string algorithm = 16;
     Role role = 17;
 
-    int64 viewCount = 21;
-    int64 cloneCount = 11;
-    int64 runCount = 12;
+    SnipCounts stats = 21;
     UseStatus runStatus = 18;
     int64 runStatusTime = 19;
+
     string preview = 20;
 
     repeated string dependencies = 22;
     string attribution = 23;
+}
+
+message SnipCounts {
+    int64 views = 1;
+    int64 clones = 2;
+    int64 runs = 3;
 }
 
 enum UseStatus {

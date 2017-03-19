@@ -85,16 +85,16 @@ func listRoot(r *models.ListView) string {
 	com = append(com, &models.Pouch{
 		Name: style.Fmt(style.Cyan, "/kwk/") + "unicode",
 		Username: "kwk",
-		SnipCount: 12,
+		PouchStats: models.PouchStats{Runs:12},
 	}, &models.Pouch{
 		Name:      style.Fmt(style.Cyan, "/kwk/") +"news",
 		Username:  "kwk",
-		SnipCount: 10,
+		PouchStats: models.PouchStats{Runs:12},
 	},
 	&models.Pouch{
 		Name:      style.Fmt(style.Cyan, "/kwk/") +"devops",
 		Username:  "kwk",
-		SnipCount: 18,
+		PouchStats: models.PouchStats{Runs:12},
 	})
 	w.Write(listHorizontal(com))
 	w.WriteString("\n")

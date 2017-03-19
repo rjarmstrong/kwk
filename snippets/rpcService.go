@@ -274,7 +274,13 @@ func (rs *RpcService) mapPouchList(in []*snipsRpc.Pouch) []*models.Pouch {
 			Encrypt:     v.Encrypt,
 			MakePrivate: v.MakePrivate,
 			SharedWith:  v.SharedWith,
-			SnipCount:   v.SnipCount,
+			PouchStats:   models.PouchStats{
+				Views:v.Stats.Views,
+				Snips:v.Stats.Snips,
+				Broke:v.Stats.Broke,
+				Clones:v.Stats.Clones,
+				Runs:v.Stats.Runs,
+			},
 			Modified:    MillisToTime(v.Modified),
 			PouchId:     v.PouchId,
 		}
@@ -304,9 +310,10 @@ func (rs *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache b
 	model.ClonedFromAlias = rpc.ClonedFromAlias
 	model.ClonedFromVersion = rpc.ClonedFromVersion
 	model.Private = rpc.Private
-	model.RunCount = rpc.RunCount
-	model.ViewCount = rpc.ViewCount
-	model.CloneCount = rpc.CloneCount
+	model.RunCount = rpc.Stats.Runs
+	model.ViewCount = rpc.Stats.Views
+	model.CloneCount = rpc.Stats.Clones
+
 	model.Role = models.SnipRole(rpc.Role)
 	model.RunStatus = models.UseStatus(rpc.RunStatus)
 	model.RunStatusTime = rpc.RunStatusTime
@@ -348,7 +355,13 @@ func mapPouch(p *snipsRpc.Pouch) *models.Pouch {
 		Name:p.Name,
 		PouchId:p.PouchId,
 		SharedWith:p.SharedWith,
-		SnipCount:p.SnipCount,
+		PouchStats: models.PouchStats{
+			Runs:p.Stats.Runs,
+			Views:p.Stats.Views,
+			Clones:p.Stats.Clones,
+			Broke:p.Stats.Broke,
+			Snips:p.Stats.Snips,
+		},
 		UnOpened:p.UnOpened,
 		Username:p.Username,
 	}
