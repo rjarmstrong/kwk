@@ -2,6 +2,9 @@
 	"ImportPath": "bitbucket.com/sharingmachine/kwkcli",
 	"GoVersion": "go1.8",
 	"GodepVersion": "v79",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
 		{
 			"ImportPath": "bitbucket.com/sharingmachine/rpc/src/snipsRpc",
@@ -28,6 +31,10 @@
 			"Rev": "69b215d01a5606c843240eab4937eab3acee6530"
 		},
 		{
+			"ImportPath": "github.com/gopherjs/gopherjs/js",
+			"Rev": "e34a5cd6a1bc7c4fde759f2d3039852fc68b5fcc"
+		},
+		{
 			"ImportPath": "github.com/howeyc/gopass",
 			"Rev": "f5387c492211eb133053880d23dfae62aa14123d"
 		},
@@ -42,6 +49,11 @@
 		{
 			"ImportPath": "github.com/inconshreveable/go-update/internal/osext",
 			"Rev": "8152e7eb6ccf8679a64582a66b78519688d156ad"
+		},
+		{
+			"ImportPath": "github.com/jtolds/gls",
+			"Comment": "v4.2.0-1-gbb0351a",
+			"Rev": "bb0351aa7eb6f322f32667d51375f26a2bca6628"
 		},
 		{
 			"ImportPath": "github.com/junegunn/go-isatty",
@@ -109,6 +121,46 @@
 		{
 			"ImportPath": "github.com/siddontang/go/num",
 			"Rev": "a30862d58df2fab27e2463adc1648ab092f8f8a0"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/assertions",
+			"Comment": "1.6.0-14-g26acb92",
+			"Rev": "26acb9229f421449ac63d014995b282d59261a8b"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/assertions/internal/go-render/render",
+			"Comment": "1.6.0-14-g26acb92",
+			"Rev": "26acb9229f421449ac63d014995b282d59261a8b"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/assertions/internal/oglematchers",
+			"Comment": "1.6.0-14-g26acb92",
+			"Rev": "26acb9229f421449ac63d014995b282d59261a8b"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/assertions/should",
+			"Comment": "1.6.0-14-g26acb92",
+			"Rev": "26acb9229f421449ac63d014995b282d59261a8b"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/goconvey/convey",
+			"Comment": "1.6.2-17-g3bd662e",
+			"Rev": "3bd662eac601ad6436e64776af2e112069eb2edc"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/goconvey/convey/gotest",
+			"Comment": "1.6.2-17-g3bd662e",
+			"Rev": "3bd662eac601ad6436e64776af2e112069eb2edc"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/goconvey/convey/reporting",
+			"Comment": "1.6.2-17-g3bd662e",
+			"Rev": "3bd662eac601ad6436e64776af2e112069eb2edc"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/goconvey/web/server/system",
+			"Comment": "1.6.2-17-g3bd662e",
+			"Rev": "3bd662eac601ad6436e64776af2e112069eb2edc"
 		},
 		{
 			"ImportPath": "github.com/urfave/cli",
