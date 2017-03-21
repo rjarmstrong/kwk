@@ -47,10 +47,10 @@ func listHorizontal(l []interface{}, stats models.UserStats) []byte {
 					//item.WriteString(fmt.Sprintf("[%d]", pch.Use))
 					item.WriteString(colorPouch8(
 						contains(stats.RecentPouches, pch.PouchId),
-						pch.Use, stats.MaxUsePerPouch, pch.Green, pch.Red, "▆"))
+						pch.Use, stats.MaxUsePerPouch, pch.Green, pch.Red, "▆ "))
 				}
 
-				item.WriteString("  ")
+				item.WriteString(" ")
 				item.WriteString(pch.Name)
 				item.WriteString(style.Fmt(style.Subdued, fmt.Sprintf(" %d", pch.PouchStats.Snips)))
 			}

@@ -40,14 +40,14 @@ func printStatus(s *models.Snippet, includeText bool) string {
 		if includeText {
 			return style.Fmt(style.Green, "✔") + "  Success"
 		}
-		return style.Fmt(style.Green, "✔") //"⚡" //"✓"//
+		return style.Fmt(style.Green, "✔")
 	} else if s.RunStatus == models.UseStatusFail {
 		if includeText {
 			return "🔥  Error"
 		}
-		return "🔥" //style.Fmt(style.Red, "●") //
+		return "🔥"
 	}
-	return "-" //"🔸"
+	return style.Fmt(style.Subdued, "? ")
 }
 
 func fmtLocked(locked bool, includeText bool) string {
@@ -76,7 +76,7 @@ func listRoot(r *models.ListView) string {
 	}
 
 	fmtHeader(w, r.Username, "", nil)
-	fmt.Fprint(w, strings.Repeat(" ", 65), style.Fmt(style.Subdued, "◉  " + models.Principal.Username, "    TLS12")) //TLS ⇨ᗜ 🔑
+	fmt.Fprint(w, strings.Repeat(" ", 65), style.Fmt(style.Subdued, "◉  " + models.Principal.Username, "    TLS12"))
 	fmt.Fprint(w, TWOLINES)
 	w.Write(listHorizontal(all, r.UserStats))
 	fmt.Fprint(w, "\n\n", MARGIN, style.Fmt(style.Subdued, "Community"),  "\n")
@@ -241,10 +241,8 @@ func listSnippets(list *models.ListView) string {
 			lines = models.Prefs().SlimRows
 		}
 		status := &bytes.Buffer{}
-		if v.RunCount > 0 {
-			status.WriteString(executed)
-			status.WriteString(" ")
-		}
+		status.WriteString(executed)
+		status.WriteString(" ")
 		status.WriteString(fmtRunCount(v.RunCount))
 
 		//col3
