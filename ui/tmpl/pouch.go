@@ -52,7 +52,7 @@ func listHorizontal(l []interface{}, stats models.UserStats) []byte {
 
 				item.WriteString("  ")
 				item.WriteString(pch.Name)
-				item.WriteString(style.Fmt(style.Subdued, fmt.Sprintf(" (%d)", pch.PouchStats.Snips)))
+				item.WriteString(style.Fmt(style.Subdued, fmt.Sprintf(" %d", pch.PouchStats.Snips)))
 			}
 		}
 
