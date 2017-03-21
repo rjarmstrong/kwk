@@ -258,7 +258,7 @@ func listSnippets(list *models.ListView) string {
 			name.String(),
 			status.String(),
 			snip,
-			style.FmtBox(v.Preview, 18, 1),
+			style.FmtPreview(v.Preview, 18, 1),
 		})
 	}
 	tbl.Render()
