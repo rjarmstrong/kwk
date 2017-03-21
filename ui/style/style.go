@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"bytes"
+	"bitbucket.com/sharingmachine/kwkcli/models"
 )
 
 type AnsiCode int
@@ -11,6 +12,7 @@ type AnsiCode int
 const (
 	BrightWhite  AnsiCode = 1
 	Subdued      AnsiCode = 2
+
 	Black        AnsiCode = 30
 	Red          AnsiCode = 31
 	Green        AnsiCode = 32
@@ -19,6 +21,8 @@ const (
 	Magenta      AnsiCode = 35
 	Cyan         AnsiCode = 36
 	LightGrey    AnsiCode = 37
+	White        AnsiCode = 38
+
 	CyanBg       AnsiCode = 46
 	DarkGrey     AnsiCode = 90
 	LightRed     AnsiCode = 91
@@ -27,7 +31,7 @@ const (
 	LightBlue    AnsiCode = 94
 	LightMagenta AnsiCode = 95
 	LightCyan    AnsiCode = 96
-	White        AnsiCode = 97
+	White97      AnsiCode = 97
 
 	LightBlue104 AnsiCode = 104
 	Black0     AnsiCode = 0
@@ -81,7 +85,7 @@ const (
 	Pouch          = "\xF0\x9F\x91\x9D"
 	BlueDiamond    = "\xF0\x9F\x94\xB9"
 	YelloDiamond   = "\xF0\x9F\x94\xB8"
-	// help 🔰
+	// help 🔰 👝 🔒
 )
 
 func Build(quant int, unicode string) string {
@@ -102,19 +106,16 @@ func Fmt(c AnsiCode, params ...interface{}) string {
 	for _, v := range params {
 		text = text + fmt.Sprintf("%v", v)
 	}
-	return fmt.Sprintf("\033[%dm%v\033[0m", c, text)
+	return fmt.Sprintf("\033[%0dm%v\033[0m", c, text)
 }
 
 func FmtFgBg(in string, fg AnsiCode, bg AnsiCode) string {
-	return fmt.Sprintf("%s38;5;%dm%s48;5;%dm%s%s", Start, fg, Start, bg, in, End)
+	r := fmt.Sprintf("%s38;5;%dm%s48;5;%dm%s%s", Start, fg, Start, bg, in, End)
+	return r
 }
 
-func Fmt256(c AnsiCode, bg bool, params ...interface{}) string {
-	var text string
-	for _, v := range params {
-		text = text + fmt.Sprintf("%v", v)
-	}
-	return fmt.Sprintf("\033[48;5;%dm%v\033[0;00m", c, text)
+func Fmt256(c AnsiCode, in interface{}) string {
+	return fmt.Sprintf("%s38;5;%00dm%s%s", Start, c, in, End)
 }
 
 func ColourSpan(colour AnsiCode, text string, openTag string, closeTag string, surroundingColor AnsiCode) string {
@@ -152,6 +153,13 @@ func AnsiLines(in string, fg AnsiCode) string {
 	}
 	join := strings.Join(t, "\n")
 	return join
+}
+
+func FmtPreview (in string, wrapAt int, lines int) string {
+	if models.Prefs().DisablePreview {
+		return ""
+	}
+	return FmtBox(in, wrapAt, lines)
 }
 
 /*
