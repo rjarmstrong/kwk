@@ -325,7 +325,7 @@ func (sc *SnippetCli) Move(args []string) {
 		if err != nil {
 			sc.HandleErr(err)
 		}
-		sc.List("", models.ROOT_POUCH)
+		sc.List("", snip.Pouch)
 		sc.Render("snippet:renamed", &map[string]string{
 			"originalName": original.String(),
 			"newName":      snip.SnipName.String(),

@@ -13,6 +13,8 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/setup"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/log"
+	"strings"
+	"fmt"
 )
 
 type KwkApp struct {
@@ -78,6 +80,10 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 	app.Commands = append(app.Commands, Snippets(snipCli)...)
 	app.CommandNotFound = func(c *cli.Context, distinctName string) {
 		i := c.Args().Get(1)
+		if strings.HasPrefix(distinctName, "@") {
+			fmt.Println("listing", distinctName)
+			return
+		}
 		switch i {
 		case "run":
 			snipCli.Run(c.Args().First(), []string(c.Args())[2:])

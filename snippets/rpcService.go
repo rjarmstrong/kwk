@@ -348,6 +348,7 @@ func mapPouch(p *snipsRpc.Pouch) *models.Pouch {
 		Name:p.Name,
 		PouchId:p.PouchId,
 		SharedWith:p.SharedWith,
+		Type: models.PouchType(p.Type),
 		PouchStats: models.PouchStats{
 			Use: p.Stats.Use,
 			Runs:p.Stats.Runs,

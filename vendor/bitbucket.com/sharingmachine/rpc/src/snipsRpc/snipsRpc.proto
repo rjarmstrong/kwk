@@ -267,7 +267,7 @@ message Pouch {
     int64 modified = 7;
     string pouchId = 8;
     int64 unOpened = 9;
-    bool personal = 10;
+    PouchType type = 10;
     PouchCounts stats = 11;
 }
 
@@ -314,6 +314,14 @@ message SnipCounts {
     int64 clones = 2;
     int64 runs = 3;
 }
+
+enum PouchType {
+    Physical = 0;
+    Virtual= 1;
+    Personal = 2;
+    Community = 3;
+}
+
 
 enum UseStatus {
     UseStatusUnknown = 0;

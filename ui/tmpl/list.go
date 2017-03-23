@@ -65,6 +65,8 @@ func fmtLocked(locked bool, includeText bool) string {
 
 func listRoot(r *models.ListView) string {
 	w := &bytes.Buffer{}
+
+	//w.WriteString("\u001b[28F\n\n")
 	var all []interface{}
 	for _, v := range r.Pouches {
 		if v.Name != "" {
@@ -76,28 +78,11 @@ func listRoot(r *models.ListView) string {
 	}
 
 	fmtHeader(w, r.Username, "", nil)
-	fmt.Fprint(w, strings.Repeat(" ", 65), style.Fmt(style.Subdued, "◉  " + models.Principal.Username, "    TLS12"))
+	fmt.Fprint(w, strings.Repeat(" ", 50), style.Fmt(style.Subdued, "◉  " + models.Principal.Username, "    TLS12"))
 	fmt.Fprint(w, TWOLINES)
-	w.Write(listHorizontal(all, r.UserStats))
-	fmt.Fprint(w, "\n\n", MARGIN, style.Fmt(style.Subdued, "Community"),  "\n")
+	w.Write(listHorizontal(all, &r.UserStats))
 
-	com := []interface{}{}
-	com = append(com, &models.Pouch{
-		Name: style.Fmt(style.Cyan, "/kwk/") + "unicode",
-		Username: "kwk",
-		PouchStats: models.PouchStats{Runs:12},
-	}, &models.Pouch{
-		Name:      style.Fmt(style.Cyan, "/kwk/") +"news",
-		Username:  "kwk",
-		PouchStats: models.PouchStats{Runs:12},
-	},
-	&models.Pouch{
-		Name:      style.Fmt(style.Cyan, "/kwk/") +"devops",
-		Username:  "kwk",
-		PouchStats: models.PouchStats{Runs:12},
-	})
-	w.Write(listHorizontal(com, r.UserStats))
-	w.WriteString("\n")
+	//printCommunity(w)
 
 	if len(r.Snippets) > 0 {
 		fmt.Fprint(w, listSnippets(r))
@@ -111,6 +96,27 @@ func listRoot(r *models.ListView) string {
 	}
 	w.WriteString("\n\n")
 	return w.String()
+}
+
+func printCommunity(w *bytes.Buffer) {
+	fmt.Fprint(w, "\n", MARGIN, style.Fmt(style.Subdued, "Community"),  "\n")
+	com := []interface{}{}
+	com = append(com, &models.Pouch{
+		Name: style.Fmt(style.Cyan, "/kwk/") + "unicode",
+		Username: "kwk",
+		PouchStats: models.PouchStats{Runs:12},
+	}, &models.Pouch{
+		Name:      style.Fmt(style.Cyan, "/kwk/") +"news",
+		Username:  "kwk",
+		PouchStats: models.PouchStats{Runs:12},
+	},
+		&models.Pouch{
+			Name:      style.Fmt(style.Cyan, "/kwk/") +"devops",
+			Username:  "kwk",
+			PouchStats: models.PouchStats{Runs:12},
+		})
+	w.Write(listHorizontal(com, nil))
+	w.WriteString("\n")
 }
 
 func printPouchHeadAndFoot(w *bytes.Buffer, list *models.ListView) {
