@@ -35,6 +35,7 @@ func DefaultPrefs() *Preferences {
 	}
 	p.Covert = false
 	p.DisableRun = false
+	p.RequireRunKeyword = true
 	p.WipeTrail = false
 	p.SessionTimeout = 15
 	p.ListAll = true
@@ -72,6 +73,7 @@ type PersistedPrefs struct {
 	Covert          bool  // Always opens browser in covert mode, when set to true flag should have no effect. TODO: Update env/darwin.yml
 	ListAll         bool  //List all pouches including private. TODO: implement on api in search SEARCH.
 	DisableRun      bool  //Completely disabled running scripts even if using -f TODO: Security
+	RequireRunKeyword bool //If false then `kwk <snipname>` will execute the snippet without the `run|r` parameter. In this case `view|v` command will be required to view the details of a snippet`
 	DisablePreview  bool
 	WipeTrail       bool  //deletes the history each time a command is run TODO: Security
 	SessionTimeout  int64 // 0 = no timeout, TODO: Implement on api SECURITY

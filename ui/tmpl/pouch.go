@@ -62,11 +62,14 @@ func listHorizontal(l []interface{}, stats *models.UserStats) []byte {
 				}
 
 				item.WriteString(" ")
+				if stats.LastPouch == pch.PouchId {
+					item.WriteString(style.Fmt(style.Underline, pch.Name))
+				} else {
+					item.WriteString(style.Fmt(style.Regular, pch.Name))
+				}
 				if pch.Type == models.PouchType_Virtual {
-					item.WriteString(pch.Name)
 					item.WriteString(gs)
 				} else {
-					item.WriteString(pch.Name)
 					item.WriteString(style.Fmt256(238, fmt.Sprintf(" %d", pch.PouchStats.Snips)))
 				}
 			}

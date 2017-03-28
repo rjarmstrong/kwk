@@ -241,6 +241,7 @@ message UserStats {
     int64 maxUsePerPouch = 1;
     int64 maxSnipsPerPouch = 2;
     repeated string recentPouches = 3;
+    string lastPouch = 4;
 }
 
 message DeleteRequest {

@@ -36,6 +36,7 @@ type PouchStats struct {
 }
 
 type UserStats struct {
+	LastPouch string
 	MaxUsePerPouch int64
 	MaxSnipsPerPouch int64
 	RecentPouches []string

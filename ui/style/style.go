@@ -53,9 +53,10 @@ const (
 	OffWhite254  AnsiCode = 254
 	OffWhite255  AnsiCode = 255
 
-	Bold AnsiCode = 21
+	Bold AnsiCode = 1
 	Dim AnsiCode = 22
-	Underline AnsiCode = 23
+	Regular AnsiCode = 5
+	Underline AnsiCode = 4
 
 	ClearLine = "\033[1K"
 	MoveBack  = "\033[9D"

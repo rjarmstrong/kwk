@@ -223,6 +223,7 @@ func (rs *RpcService) GetRoot(username string, all bool) (*models.ListView, erro
 		Personal: perL,
 		Username: r.Username,
 		UserStats: models.UserStats{
+		 LastPouch:r.Stats.LastPouch,
 		 RecentPouches:r.Stats.RecentPouches,
 		 MaxUsePerPouch:r.Stats.MaxUsePerPouch,
 		 MaxSnipsPerPouch:r.Stats.MaxSnipsPerPouch,
