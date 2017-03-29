@@ -8,15 +8,15 @@
 	"Deps": [
 		{
 			"ImportPath": "bitbucket.com/sharingmachine/rpc/src/snipsRpc",
-			"Rev": "49e9849cae90fbbf1feaf6fdcc191f051edbef86"
+			"Rev": "cb23200b7bc139e9baee051aa6b494724745f946"
 		},
 		{
 			"ImportPath": "bitbucket.com/sharingmachine/rpc/src/sysRpc",
-			"Rev": "49e9849cae90fbbf1feaf6fdcc191f051edbef86"
+			"Rev": "cb23200b7bc139e9baee051aa6b494724745f946"
 		},
 		{
 			"ImportPath": "bitbucket.com/sharingmachine/rpc/src/usersRpc",
-			"Rev": "49e9849cae90fbbf1feaf6fdcc191f051edbef86"
+			"Rev": "cb23200b7bc139e9baee051aa6b494724745f946"
 		},
 		{
 			"ImportPath": "github.com/gdamore/encoding",

@@ -343,12 +343,13 @@ func mapPouch(p *snipsRpc.Pouch) *models.Pouch {
 		return nil
 	}
 	return &models.Pouch{
-		Encrypt:p.Encrypt,
-		MakePrivate:p.MakePrivate,
-		Modified:time.Unix(p.Modified, 0),
-		Name:p.Name,
-		PouchId:p.PouchId,
-		SharedWith:p.SharedWith,
+		Encrypt:     p.Encrypt,
+		MakePrivate: p.MakePrivate,
+		Modified:    time.Unix(p.Modified, 0),
+		Name:        p.Name,
+		PouchId:     p.PouchId,
+		SharedWith:  p.SharedWith,
+		LastUse:     p.LastUse,
 		Type: models.PouchType(p.Type),
 		PouchStats: models.PouchStats{
 			Use: p.Stats.Use,

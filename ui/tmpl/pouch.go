@@ -8,11 +8,27 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"math"
 	"strings"
+	"time"
 )
 
-var gs2 = strings.Repeat(style.Fmt256(100," "), 2)
-var gs = strings.Repeat(style.Fmt256(100," "), 1)
-var gs16 = strings.Repeat(style.Fmt(0,"  "), 1)
+var Pad_1_2 = strings.Repeat(style.Fmt256(100," "), 2)
+var Pad_2_2 = strings.Repeat(style.Fmt256(100,"  "), 2)
+var Pad_1_1 = strings.Repeat(style.Fmt256(100," "), 1)
+var Pad_0_0 = strings.Repeat(style.Fmt256(30,""), 1)
+
+var Pad16_0_0 = strings.Repeat(style.Fmt(0,""), 1)
+var Pad16_1_1 = strings.Repeat(style.Fmt(0," "), 1)
+var Pad16_2_1 = strings.Repeat(style.Fmt(0,"  "), 1)
+var Pad16_3_1 = strings.Repeat(style.Fmt(0,"   "), 1)
+var Pad16_4_1 = strings.Repeat(style.Fmt(0,"    "), 1)
+var Pad16_1_2 = strings.Repeat(style.Fmt(0," "), 2)
+var Pad16_2_2 = strings.Repeat(style.Fmt(0,"  "), 2)
+var Pad16_3_2 = strings.Repeat(style.Fmt(0,"   "), 2)
+var Pad16_3_4 = strings.Repeat(style.Fmt(0," "), 4)
+
+const oneMin = int64(60)
+const oneHour = oneMin*60
+const oneDay  =  oneHour*24
 
 
 func listHorizontal(l []interface{}, stats *models.UserStats) []byte {
@@ -48,27 +64,27 @@ func listHorizontal(l []interface{}, stats *models.UserStats) []byte {
 				} else if pch.Name == "settings" {
 					item.WriteString("⚙ ")
 				} else if stats == nil {
-					item.WriteString(colorPouch8(false,
-						0, 0, 0, 0, "▆ "))
+					item.WriteString(colorPouch(stats.LastPouch == pch.PouchId, pch.LastUse,0, "▆ "))
 				} else if pch.MakePrivate {
-					item.WriteString(colorPouch8(
-						contains(stats.RecentPouches, pch.PouchId),
-						pch.Use, stats.MaxUsePerPouch, pch.Green, pch.Red, "Ⓟ ")) //"PV"))
+					item.WriteString(colorPouch(stats.LastPouch == pch.PouchId, pch.LastUse, pch.Red, "Ⓟ "))
 				} else {
-					//item.WriteString(fmt.Sprintf("[%d]", pch.Use))
-					item.WriteString(colorPouch8(
-						contains(stats.RecentPouches, pch.PouchId),
-						pch.Use, stats.MaxUsePerPouch, pch.Green, pch.Red, "▆ "))
+					item.WriteString(colorPouch(stats.LastPouch == pch.PouchId, pch.LastUse, pch.Red, "▆ "))
 				}
 
+				//	if pch.Red>0 {
+				// item.WriteString(style.Fmt256(196, "·"))
 				item.WriteString(" ")
 				if stats.LastPouch == pch.PouchId {
 					item.WriteString(style.Fmt(style.Underline, pch.Name))
 				} else {
-					item.WriteString(style.Fmt(style.Regular, pch.Name))
+					item.WriteString(style.Fmt256(decayColor(pch.LastUse), pch.Name))
 				}
-				if pch.Type == models.PouchType_Virtual {
-					item.WriteString(gs)
+
+				if stats.LastPouch == pch.PouchId {
+					item.WriteString(style.Fmt256(58, fmt.Sprintf(" %d ", pch.PouchStats.Snips)))
+					item.WriteString(Pad16_0_0)
+				} else if pch.Type == models.PouchType_Virtual {
+					item.WriteString(Pad_1_1)
 				} else {
 					item.WriteString(style.Fmt256(238, fmt.Sprintf(" %d", pch.PouchStats.Snips)))
 				}
@@ -90,7 +106,7 @@ func listHorizontal(l []interface{}, stats *models.UserStats) []byte {
 }
 
 func insertGridLine(b *bytes.Buffer) {
-	b.WriteString(fmt.Sprintf("\n%s\t%s\t%s\t%s\t%s\t%s\n", MARGIN,  gs2, gs2, gs2, gs2, gs2))
+	b.WriteString(fmt.Sprintf("\n%s\t%s\t%s\t%s\t%s\t%s\n", MARGIN,  Pad_1_2, Pad_1_2, Pad_1_2, Pad_1_2, Pad_1_2))
 }
 
 //var matrix = [][]int{
@@ -113,18 +129,35 @@ func contains(in []string, val string) bool {
 	return false
 }
 
-func colorPouch8(recent bool, use int64, maxUse int64, greeny int64, reddy int64, icon string) string {
+func colorPouch(lastPouch bool, lastUsed int64, reddy int64, icon string) string {
 	var color style.AnsiCode
-	if reddy > 0 && recent {
-		color = 196
-	} else if reddy > 0  {
-		color =  160
-	} else if recent {
+	if lastPouch && reddy > 0 {
+		color = 160
+	} else if lastPouch {
 		color = 122
+	} else if reddy > 0 {
+		color =  124
 	} else {
-		color = usageColor(maxUse, use)
+		color = decayColor(lastUsed)
 	}
 	return style.Fmt256(color, icon)
+}
+
+func newerThan(unix int64, seconds int64) bool {
+	return time.Now().Unix() - unix <  5*seconds
+}
+
+func decayColor(unix int64) style.AnsiCode {
+	if newerThan(unix, oneHour) {
+		return style.AnsiCode(252)
+	}
+	if newerThan(unix, 48*oneHour) {
+		return style.AnsiCode(248)
+	}
+	if newerThan(unix, 7*oneDay) {
+		return style.AnsiCode(244)
+	}
+	return style.AnsiCode(238)
 }
 
 func usageColor(maxUse int64, use int64) style.AnsiCode {

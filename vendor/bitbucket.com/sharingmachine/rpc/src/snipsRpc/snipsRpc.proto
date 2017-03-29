@@ -270,6 +270,7 @@ message Pouch {
     int64 unOpened = 9;
     PouchType type = 10;
     PouchCounts stats = 11;
+    int64 lastUse = 12;
 }
 
 message PouchCounts {

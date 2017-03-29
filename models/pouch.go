@@ -8,12 +8,12 @@ type Pouch struct {
 	MakePrivate bool  // Shape
 	Encrypt     bool  // Shape
 	PouchStats
-	LastUsed   int64  // Last time any snippet was used. = Brightness
-	SharedWith []string
-	Modified   time.Time
-	PouchId    string
-	UnOpened   int64
-	Type PouchType
+	LastUse     int64 // Last time any snippet was used. = Brightness
+	SharedWith  []string
+	Modified    time.Time
+	PouchId     string
+	UnOpened    int64
+	Type        PouchType
 }
 
 type PouchType int64
