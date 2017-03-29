@@ -73,7 +73,7 @@ func listHorizontal(l []interface{}, stats *models.UserStats) []byte {
 
 				item.WriteString(" ")
 				if stats.LastPouch == pch.PouchId {
-					item.WriteString(style.Fmt256(style.AnsiCode(254), pch.Name))
+					item.WriteString(style.Fmt256(style.AnsiCode(254),  "▸ " +pch.Name))
 				} else {
 					item.WriteString(style.Fmt256(decayColor(pch.LastUse, true), pch.Name))
 				}
