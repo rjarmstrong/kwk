@@ -98,11 +98,7 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 			snipCli.Edit(c.Args().First())
 			return
 		}
-		if models.Prefs().RequireRunKeyword {
-			snipCli.InspectOrList(c.Args().First())
-		} else {
-			snipCli.Run(distinctName, []string(c.Args())[:])
-		}
+		snipCli.InspectListOrRun(distinctName, false, []string(c.Args())[:]...)
 	}
 
 	return &KwkApp{

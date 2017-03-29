@@ -137,7 +137,7 @@ func Snippets(s *SnippetCli) []cli.Command {
 			Name:    "view",
 			Aliases: []string{"get"},
 			Action: func(c *cli.Context) error {
-				s.InspectOrList(c.Args().First())
+				s.InspectListOrRun(c.Args().First(), true)
 				return nil
 			},
 		},

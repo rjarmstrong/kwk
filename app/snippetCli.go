@@ -233,7 +233,8 @@ func (sc *SnippetCli) Describe(distinctName string, description string) {
 	}
 }
 
-func (sc *SnippetCli) InspectOrList(distinctName string) {
+
+func (sc *SnippetCli) InspectListOrRun(distinctName string, forceInspect bool, args ...string) {
 	a, err := models.ParseAlias(distinctName)
 	v, err := sc.s.GetRoot(a.Username, true)
 	if err != nil {
@@ -253,7 +254,11 @@ func (sc *SnippetCli) InspectOrList(distinctName string) {
 		sc.HandleErr(err)
 	} else {
 		s := sc.handleMultiResponse(distinctName, list)
-		sc.Render("snippet:inspect", s)
+		if forceInspect || models.Prefs().RequireRunKeyword {
+			sc.Render("snippet:inspect", s)
+		} else {
+			sc.Run(distinctName, args)
+		}
 	}
 }
 
