@@ -486,13 +486,13 @@ func (sc *SnippetCli) List(username string, pouch string) {
 		sc.HandleErr(err)
 	} else {
 		a := models.NewAlias(username, pouch, "", "")
-		go sc.s.LogUse(
+		sc.Render("snippet:list", list)
+		sc.s.LogUse(
 			*a,
 			models.UseStatusSuccess,
 			models.UseTypeView,
 			"",
 		)
-		sc.Render("snippet:list", list)
 	}
 }
 

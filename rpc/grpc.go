@@ -11,9 +11,9 @@ import (
 	"crypto/x509"
 	"google.golang.org/grpc/grpclog"
 	"os"
-	"time"
 	"runtime"
 	"bitbucket.com/sharingmachine/kwkcli/log"
+	"time"
 )
 
 // /etc/ssl/certs/COMODO_RSA_Certification_Authority.pem
@@ -67,7 +67,7 @@ func GetConn(serverAddress string, trustAllCerts bool) (*grpc.ClientConn, error)
 	})
 	opts = append(opts, grpc.WithTransportCredentials(creds))
 	opts = append(opts, grpc.WithUnaryInterceptor(errorInterceptor))
-	opts = append(opts, grpc.WithTimeout(time.Second*3))
+	opts = append(opts, grpc.WithTimeout(time.Second*10))
 	opts = append(opts, grpc.WithBlock())
 	grpclog.SetLogger(log.GetDebugLog())
 

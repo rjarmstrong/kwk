@@ -71,19 +71,13 @@ func listHorizontal(l []interface{}, stats *models.UserStats) []byte {
 					item.WriteString(colorPouch(stats.LastPouch == pch.PouchId, pch.LastUse, pch.Red, "▆ "))
 				}
 
-				//	if pch.Red>0 {
-				// item.WriteString(style.Fmt256(196, "·"))
 				item.WriteString(" ")
 				if stats.LastPouch == pch.PouchId {
-					item.WriteString(style.Fmt(style.Underline, pch.Name))
+					item.WriteString(style.Fmt256(style.AnsiCode(254), pch.Name))
 				} else {
-					item.WriteString(style.Fmt256(decayColor(pch.LastUse), pch.Name))
+					item.WriteString(style.Fmt256(decayColor(pch.LastUse, true), pch.Name))
 				}
-
-				if stats.LastPouch == pch.PouchId {
-					item.WriteString(style.Fmt256(58, fmt.Sprintf(" %d ", pch.PouchStats.Snips)))
-					item.WriteString(Pad16_0_0)
-				} else if pch.Type == models.PouchType_Virtual {
+				if pch.Type == models.PouchType_Virtual {
 					item.WriteString(Pad_1_1)
 				} else {
 					item.WriteString(style.Fmt256(238, fmt.Sprintf(" %d", pch.PouchStats.Snips)))
@@ -132,13 +126,13 @@ func contains(in []string, val string) bool {
 func colorPouch(lastPouch bool, lastUsed int64, reddy int64, icon string) string {
 	var color style.AnsiCode
 	if lastPouch && reddy > 0 {
-		color = 160
+		color = 196
 	} else if lastPouch {
 		color = 122
 	} else if reddy > 0 {
 		color =  124
 	} else {
-		color = decayColor(lastUsed)
+		color = decayColor(lastUsed, false)
 	}
 	return style.Fmt256(color, icon)
 }
@@ -147,16 +141,23 @@ func newerThan(unix int64, seconds int64) bool {
 	return time.Now().Unix() - unix <  5*seconds
 }
 
-func decayColor(unix int64) style.AnsiCode {
-	if newerThan(unix, oneHour) {
-		return style.AnsiCode(252)
+func decayColor(unix int64, whiteToday bool) style.AnsiCode {
+	local := time.Now()
+	pouchT := time.Unix(unix, 0)
+	today := local.YearDay() == pouchT.YearDay() && local.Year() == pouchT.Year()
+	if today {
+		if whiteToday {
+			return style.AnsiCode(250)
+		}
+		return style.AnsiCode(122)
 	}
-	if newerThan(unix, 48*oneHour) {
-		return style.AnsiCode(248)
+	yest := local.YearDay()-1 == pouchT.YearDay() && local.Year() == pouchT.Year()
+	if yest {
+		return style.AnsiCode(246)
 	}
-	if newerThan(unix, 7*oneDay) {
-		return style.AnsiCode(244)
-	}
+	//if newerThan(unix, 7*oneDay) {
+	//	return style.AnsiCode(244)
+	//}
 	return style.AnsiCode(238)
 }
 
