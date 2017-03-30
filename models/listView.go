@@ -24,6 +24,19 @@ type ListView struct {
 	Since    time.Time
 	Size     int64
 }
+func (rt *ListView) GetPouch(name string) *Pouch {
+	for _, v := range rt.Pouches {
+		if name == v.Name {
+			return v
+		}
+	}
+	for _, v := range rt.Personal {
+		if name == v.Name {
+			return v
+		}
+	}
+	return nil
+}
 
 func (rt *ListView) IsPouch(name string) bool {
 	for _, v := range rt.Pouches {

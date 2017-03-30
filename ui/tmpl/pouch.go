@@ -53,26 +53,28 @@ func listHorizontal(l []interface{}, stats *models.UserStats) []byte {
 				if colWidths[i%5] < len(pch.Name) {
 					colWidths[i%5] = len(pch.Name)
 				}
+				isLast := stats.LastPouch == pch.PouchId
 				if pch.Type == models.PouchType_Virtual {
-					item.WriteString(style.Fmt256(242, "▆ "))
+					item.WriteString(style.Fmt256(242, "▉ "))
 				//} else if pch.Name == "inbox" {
 				//	if pch.UnOpened > 0 {
 				//		item.WriteString(fmt.Sprintf("📬%d ", pch.UnOpened))
 				//	} else {
-				//		item.WriteString(style.Fmt256(242, "▆ "))
+				//		item.WriteString(style.Fmt256(242, "▉ "))
 				//	}
 				} else if pch.Name == "settings" {
-					item.WriteString("⚙ ")
+					item.WriteString("▉ ") //⚙
 				} else if stats == nil {
-					item.WriteString(colorPouch(stats.LastPouch == pch.PouchId, pch.LastUse,0, "▆ "))
+					item.WriteString(colorPouch(isLast, pch.LastUse,0, "▉ "))
 				} else if pch.MakePrivate {
-					item.WriteString(colorPouch(stats.LastPouch == pch.PouchId, pch.LastUse, pch.Red, "Ⓟ "))
+					item.WriteString(colorPouch(isLast, pch.LastUse, pch.Red, "◤ ")) //
 				} else {
-					item.WriteString(colorPouch(stats.LastPouch == pch.PouchId, pch.LastUse, pch.Red, "▆ "))
+					item.WriteString(
+						colorPouch(isLast, pch.LastUse, pch.Red,  "▉ "))
 				}
 
 				item.WriteString(" ")
-				if stats.LastPouch == pch.PouchId {
+				if isLast {
 					item.WriteString(style.Fmt256(style.AnsiCode(254),  "▸ " +pch.Name))
 				} else {
 					item.WriteString(style.Fmt256(decayColor(pch.LastUse, true), pch.Name))
@@ -151,14 +153,13 @@ func decayColor(unix int64, whiteToday bool) style.AnsiCode {
 		}
 		return style.AnsiCode(122)
 	}
-	yest := local.YearDay()-1 == pouchT.YearDay() && local.Year() == pouchT.Year()
-	if yest {
-		return style.AnsiCode(246)
+	if newerThan(unix, 7*oneDay) {
+		return style.AnsiCode(247)
 	}
-	//if newerThan(unix, 7*oneDay) {
-	//	return style.AnsiCode(244)
-	//}
-	return style.AnsiCode(238)
+	if newerThan(unix, 28*oneDay) {
+		return style.AnsiCode(245)
+	}
+	return style.AnsiCode(242)
 }
 
 func usageColor(maxUse int64, use int64) style.AnsiCode {

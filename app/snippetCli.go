@@ -242,8 +242,12 @@ func (sc *SnippetCli) InspectListOrRun(distinctName string, forceInspect bool, a
 		log.Error("Error getting root, but not critical to 'run'", err)
 		return
 	} else if a.Ext == "" && v.IsPouch(a.Name) {
-		// GET POUCH (or root)
-		sc.List(a.Username, a.Name)
+		p := v.GetPouch(a.Name)
+		if p.Type == models.PouchType_Virtual {
+			fmt.Println("List virtual.")
+		} else {
+			sc.List(a.Username, a.Name)
+		}
 		return
 	}
 	if err != nil {
