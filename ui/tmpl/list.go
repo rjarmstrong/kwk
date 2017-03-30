@@ -38,7 +38,7 @@ func StatusText(s *models.Snippet) string {
 func printStatus(s *models.Snippet, includeText bool) string {
 	if s.RunStatus == models.UseStatusSuccess {
 		if includeText {
-			return style.Fmt(style.Green, "✔") + "  Success"
+			return style.Fmt256(style.Green, "✔") + "  Success"
 		}
 		return style.Fmt(style.Green, "✔")
 	} else if s.RunStatus == models.UseStatusFail {
@@ -218,7 +218,7 @@ func listSnippets(list *models.ListView) string {
 	for i, v := range list.Snippets {
 		var executed string
 		if v.RunStatusTime > 0 {
-			executed = fmt.Sprintf("%s  %s", printStatus(v, false), style.Fmt(style.Subdued, humanize.Time(time.Unix(v.RunStatusTime, 0))))
+			executed = fmt.Sprintf("%s", style.Fmt(style.Subdued, humanize.Time(time.Unix(v.RunStatusTime, 0))))
 		} else {
 			executed = printStatus(v, false)
 		}
@@ -227,7 +227,7 @@ func listSnippets(list *models.ListView) string {
 		name := &bytes.Buffer{}
 		name.WriteString(printIcon(v))
 		name.WriteString("  ")
-		nt := style.Fmt(style.Cyan, v.SnipName.String())
+		nt := style.Fmt256(251, v.SnipName.String())
 		name.WriteString(nt)
 		if models.Prefs().AlwaysExpandRows {
 			name.WriteString("\n\n")
@@ -284,15 +284,18 @@ func listSnippets(list *models.ListView) string {
 }
 
 func printIcon(v *models.Snippet) string {
+	icon :=  "◆"
 	if v.IsApp() {
-		return "💫" // 📦
+		icon = "▚"
 	} else if v.Ext == "url" {
-		return "🌎"
-	} else if v.RunCount > 0 {
-		return  "🔸" //"⚡" //☰
-	} else {
-		return "📄"
+		icon = "⭑"
 	}
+	if v.RunStatus == models.UseStatusSuccess {
+		return style.Fmt256(119, icon)
+	} else if v.RunStatus == models.UseStatusFail {
+		return style.Fmt256(196, icon)
+	}
+	return style.Fmt(style.Subdued, icon)
 }
 
 func fmtRunCount(count int64) string {

@@ -116,7 +116,7 @@
 		},
 		{
 			"ImportPath": "github.com/rjarmstrong/tablewriter",
-			"Rev": "43c0666c3587f5fcb58e4cb3a7554a60c94b31e6"
+			"Rev": "3690789a8368dc45052142a5a7092fda40d5b755"
 		},
 		{
 			"ImportPath": "github.com/siddontang/go/num",
