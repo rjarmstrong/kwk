@@ -81,7 +81,8 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 	app.CommandNotFound = func(c *cli.Context, distinctName string) {
 		i := c.Args().Get(1)
 		if strings.HasPrefix(distinctName, "@") {
-			fmt.Println("listing", distinctName)
+			fmt.Println("listing:", distinctName)
+			snipCli.GetEra(distinctName)
 			return
 		}
 		switch i {

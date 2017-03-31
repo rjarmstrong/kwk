@@ -9,7 +9,6 @@ import (
 	"time"
 	"fmt"
 	"io"
-	"sort"
 	"golang.org/x/text/unicode/norm"
 )
 
@@ -127,9 +126,9 @@ func listPouch(list *models.ListView) string {
 	if models.Prefs().Naked {
 		fmt.Fprint(w, listNaked(list))
 	} else {
-		sort.Slice(list.Snippets, func(i, j int) bool {
-			return list.Snippets[i].Created <= list.Snippets[j].Created
-		})
+		//sort.Slice(list.Snippets, func(i, j int) bool {
+		//	return list.Snippets[i].Created <= list.Snippets[j].Created
+		//})
 		if list.Pouch != nil {
 			printPouchHeadAndFoot(w, list)
 		}
@@ -298,7 +297,7 @@ func snippetIcon(v *models.Snippet) string {
 		icon = "⭑"
 	}
 	if v.RunStatus == models.UseStatusSuccess {
-		return style.Fmt256(120, icon)
+		return style.Fmt256(122, icon)
 	} else if v.RunStatus == models.UseStatusFail {
 		return style.Fmt256(196, icon)
 	}
