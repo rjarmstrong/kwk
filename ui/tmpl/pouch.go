@@ -11,25 +11,24 @@ import (
 	"time"
 )
 
-var Pad_1_2 = strings.Repeat(style.Fmt256(100," "), 2)
-var Pad_2_2 = strings.Repeat(style.Fmt256(100,"  "), 2)
-var Pad_1_1 = strings.Repeat(style.Fmt256(100," "), 1)
-var Pad_0_0 = strings.Repeat(style.Fmt256(30,""), 1)
+var Pad_1_2 = strings.Repeat(style.Fmt256(100, " "), 2)
+var Pad_2_2 = strings.Repeat(style.Fmt256(100, "  "), 2)
+var Pad_1_1 = strings.Repeat(style.Fmt256(100, " "), 1)
+var Pad_0_0 = strings.Repeat(style.Fmt256(30, ""), 1)
 
-var Pad16_0_0 = strings.Repeat(style.Fmt(0,""), 1)
-var Pad16_1_1 = strings.Repeat(style.Fmt(0," "), 1)
-var Pad16_2_1 = strings.Repeat(style.Fmt(0,"  "), 1)
-var Pad16_3_1 = strings.Repeat(style.Fmt(0,"   "), 1)
-var Pad16_4_1 = strings.Repeat(style.Fmt(0,"    "), 1)
-var Pad16_1_2 = strings.Repeat(style.Fmt(0," "), 2)
-var Pad16_2_2 = strings.Repeat(style.Fmt(0,"  "), 2)
-var Pad16_3_2 = strings.Repeat(style.Fmt(0,"   "), 2)
-var Pad16_3_4 = strings.Repeat(style.Fmt(0," "), 4)
+var Pad16_0_0 = strings.Repeat(style.Fmt(0, ""), 1)
+var Pad16_1_1 = strings.Repeat(style.Fmt(0, " "), 1)
+var Pad16_2_1 = strings.Repeat(style.Fmt(0, "  "), 1)
+var Pad16_3_1 = strings.Repeat(style.Fmt(0, "   "), 1)
+var Pad16_4_1 = strings.Repeat(style.Fmt(0, "    "), 1)
+var Pad16_1_2 = strings.Repeat(style.Fmt(0, " "), 2)
+var Pad16_2_2 = strings.Repeat(style.Fmt(0, "  "), 2)
+var Pad16_3_2 = strings.Repeat(style.Fmt(0, "   "), 2)
+var Pad16_3_4 = strings.Repeat(style.Fmt(0, " "), 4)
 
 const oneMin = int64(60)
-const oneHour = oneMin*60
-const oneDay  =  oneHour*24
-
+const oneHour = oneMin * 60
+const oneDay = oneHour * 24
 
 func listHorizontal(l []interface{}, stats *models.UserStats) []byte {
 	//fmt.Printf("%+v\n\n", stats)
@@ -54,29 +53,11 @@ func listHorizontal(l []interface{}, stats *models.UserStats) []byte {
 					colWidths[i%5] = len(pch.Name)
 				}
 				isLast := stats.LastPouch == pch.PouchId
-				if pch.Type == models.PouchType_Virtual {
-					item.WriteString(style.Fmt256(242, "▉ "))
-				//} else if pch.Name == "inbox" {
-				//	if pch.UnOpened > 0 {
-				//		item.WriteString(fmt.Sprintf("📬%d ", pch.UnOpened))
-				//	} else {
-				//		item.WriteString(style.Fmt256(242, "▉ "))
-				//	}
-				} else if pch.Name == "settings" {
-					item.WriteString("▉ ") //⚙
-				} else if stats == nil {
-					item.WriteString(colorPouch(isLast, pch.LastUse,0, "▉ "))
-				} else if pch.MakePrivate {
-					item.WriteString(colorPouch(isLast, pch.LastUse, pch.Red, "◤ ")) //
-				} else {
-					item.WriteString(
-						colorPouch(isLast, pch.LastUse, pch.Red,  "▉ "))
-				}
-
-				item.WriteString(" ")
+				item.WriteString(pouchIcon(pch, isLast))
 				if isLast {
-					item.WriteString(style.Fmt256(style.AnsiCode(254),  "▸ " +pch.Name))
+					item.WriteString(style.Fmt256(style.AnsiCode(254), "  ❯ "+pch.Name))
 				} else {
+					item.WriteString("  ")
 					item.WriteString(style.Fmt256(decayColor(pch.LastUse, true), pch.Name))
 				}
 				if pch.Type == models.PouchType_Virtual {
@@ -102,7 +83,25 @@ func listHorizontal(l []interface{}, stats *models.UserStats) []byte {
 }
 
 func insertGridLine(b *bytes.Buffer) {
-	b.WriteString(fmt.Sprintf("\n%s\t%s\t%s\t%s\t%s\t%s\n", MARGIN,  Pad_1_2, Pad_1_2, Pad_1_2, Pad_1_2, Pad_1_2))
+	b.WriteString(fmt.Sprintf("\n%s\t%s\t%s\t%s\t%s\t%s\n", MARGIN, Pad_1_2, Pad_1_2, Pad_1_2, Pad_1_2, Pad_1_2))
+}
+
+func pouchIcon(pch *models.Pouch, isLast bool) string {
+	if pch.Type == models.PouchType_Virtual {
+		return style.Fmt256(242, "▉ ")
+		//} else if pch.Name == "inbox" {
+		//	if pch.UnOpened > 0 {
+		//		item.WriteString(fmt.Sprintf("📬%d ", pch.UnOpened))
+		//	} else {
+		//		item.WriteString(style.Fmt256(242, "▉ "))
+		//	}
+	} else if pch.Name == "settings" {
+		return "▉"
+	} else if pch.MakePrivate {
+		return colorPouch(isLast, pch.LastUse, pch.Red, "◤")
+	} else {
+		return colorPouch(isLast, pch.LastUse, pch.Red, "▉")
+	}
 }
 
 //var matrix = [][]int{
@@ -110,10 +109,9 @@ func insertGridLine(b *bytes.Buffer) {
 //	{52, 124, 196},
 //}
 
-
 var matrix = [][]int{
-		{15, 15, 15},
-		{15, 15, 15},
+	{15, 15, 15},
+	{15, 15, 15},
 }
 
 func contains(in []string, val string) bool {
@@ -132,7 +130,7 @@ func colorPouch(lastPouch bool, lastUsed int64, reddy int64, icon string) string
 	} else if lastPouch {
 		color = 122
 	} else if reddy > 0 {
-		color =  124
+		color = 124
 	} else {
 		color = decayColor(lastUsed, false)
 	}
@@ -140,7 +138,7 @@ func colorPouch(lastPouch bool, lastUsed int64, reddy int64, icon string) string
 }
 
 func newerThan(unix int64, seconds int64) bool {
-	return time.Now().Unix() - unix <  5*seconds
+	return time.Now().Unix()-unix < 5*seconds
 }
 
 func decayColor(unix int64, whiteToday bool) style.AnsiCode {
@@ -191,7 +189,7 @@ func colorPouch256(recent bool, use int64, maxUse int64, greeny int64, reddy int
 	var y int
 	if reddy > 0 {
 		y = 1
-	} else  {
+	} else {
 		y = 0
 	}
 	x := round(usage * 2)

@@ -4,7 +4,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/style"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"github.com/rjarmstrong/tablewriter"
-	"github.com/rjarmstrong/go-humanize"
 	"strings"
 	"bytes"
 	"time"
@@ -50,19 +49,6 @@ func printStatus(s *models.Snippet, includeText bool) string {
 	return style.Fmt(style.Subdued, "? ")
 }
 
-func fmtLocked(locked bool, includeText bool) string {
-	if locked {
-		if includeText {
-			return "🔒  Private"
-		}
-		return "🔒"
-	}
-	if includeText {
-		return "🔓  Public"
-	}
-	return "🔓"
-}
-
 func listRoot(r *models.ListView) string {
 	w := &bytes.Buffer{}
 
@@ -78,7 +64,7 @@ func listRoot(r *models.ListView) string {
 	}
 
 	fmtHeader(w, r.Username, "", nil)
-	fmt.Fprint(w, strings.Repeat(" ", 50), style.Fmt(style.Subdued, "◉  " + models.Principal.Username, "    TLS12"))
+	fmt.Fprint(w, strings.Repeat(" ", 50), style.Fmt(style.Subdued, "◉  "+models.Principal.Username, "    TLS12"))
 	fmt.Fprint(w, TWOLINES)
 	w.Write(listHorizontal(all, &r.UserStats))
 
@@ -99,21 +85,21 @@ func listRoot(r *models.ListView) string {
 }
 
 func printCommunity(w *bytes.Buffer) {
-	fmt.Fprint(w, "\n", MARGIN, style.Fmt(style.Subdued, "Community"),  "\n")
+	fmt.Fprint(w, "\n", MARGIN, style.Fmt(style.Subdued, "Community"), "\n")
 	com := []interface{}{}
 	com = append(com, &models.Pouch{
-		Name: style.Fmt(style.Cyan, "/kwk/") + "unicode",
-		Username: "kwk",
-		PouchStats: models.PouchStats{Runs:12},
+		Name:       style.Fmt(style.Cyan, "/kwk/") + "unicode",
+		Username:   "kwk",
+		PouchStats: models.PouchStats{Runs: 12},
 	}, &models.Pouch{
-		Name:      style.Fmt(style.Cyan, "/kwk/") +"news",
-		Username:  "kwk",
-		PouchStats: models.PouchStats{Runs:12},
+		Name:       style.Fmt(style.Cyan, "/kwk/") + "news",
+		Username:   "kwk",
+		PouchStats: models.PouchStats{Runs: 12},
 	},
 		&models.Pouch{
-			Name:      style.Fmt(style.Cyan, "/kwk/") +"devops",
-			Username:  "kwk",
-			PouchStats: models.PouchStats{Runs:12},
+			Name:       style.Fmt(style.Cyan, "/kwk/") + "devops",
+			Username:   "kwk",
+			PouchStats: models.PouchStats{Runs: 12},
 		})
 	w.Write(listHorizontal(com, nil))
 	w.WriteString("\n")
@@ -121,10 +107,19 @@ func printCommunity(w *bytes.Buffer) {
 
 func printPouchHeadAndFoot(w *bytes.Buffer, list *models.ListView) {
 	fmtHeader(w, list.Username, list.Pouch.Name, nil)
-	fmt.Fprint(w, MARGIN, MARGIN, fmtLocked(list.Pouch.MakePrivate, true))
+	fmt.Fprint(w, MARGIN, MARGIN, pouchIcon(list.Pouch, false))
+	fmt.Fprint(w, "  ")
+	fmt.Fprint(w, locked(list.Pouch.MakePrivate))
 	fmt.Fprint(w, " Pouch")
 	fmt.Fprint(w, MARGIN, MARGIN, len(list.Snippets), " snippets")
 	fmt.Fprint(w, "\n")
+}
+
+func locked(locked bool) string {
+	if locked {
+		return "Locked (Private)"
+	}
+	return "Public"
 }
 
 func listPouch(list *models.ListView) string {
@@ -148,6 +143,7 @@ func listPouch(list *models.ListView) string {
 }
 
 const timeLayout = "2 Jan 15:04 06"
+
 func listNaked(list *models.ListView) interface{} {
 	w := &bytes.Buffer{}
 	tbl := tablewriter.NewWriter(w)
@@ -216,16 +212,9 @@ func listSnippets(list *models.ListView) string {
 	tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
 
 	for i, v := range list.Snippets {
-		var executed string
-		if v.RunStatusTime > 0 {
-			executed = fmt.Sprintf("%s", style.Fmt(style.Subdued, humanize.Time(time.Unix(v.RunStatusTime, 0))))
-		} else {
-			executed = printStatus(v, false)
-		}
-
 		// col1
 		name := &bytes.Buffer{}
-		name.WriteString(printIcon(v))
+		name.WriteString(snippetIcon(v))
 		name.WriteString("  ")
 		nt := style.Fmt256(251, v.SnipName.String())
 		name.WriteString(nt)
@@ -247,12 +236,17 @@ func listSnippets(list *models.ListView) string {
 			lines = models.Prefs().SlimRows
 		}
 		status := &bytes.Buffer{}
-		status.WriteString(executed)
+		runCount := fmtRunCount(v.RunCount)
+		status.WriteString(PadRight(runCount, " ", 21))
 		status.WriteString(" ")
-		status.WriteString(fmtRunCount(v.RunCount))
+		if v.RunStatusTime > 0 {
+			h := PadLeft(style.Time(time.Unix(v.RunStatusTime, 0)), " ", 4)
+			t := fmt.Sprintf("%s", style.Fmt256(239, h))
+			status.WriteString(t)
+		}
 
 		//col3
-		snip := FmtSnippet(v, 60, lines, (i+1)%2==0)
+		snip := FmtSnippet(v, 60, lines, (i+1)%2 == 0)
 		if models.Prefs().RowSpaces {
 			snip = snip + "\n"
 		}
@@ -266,7 +260,6 @@ func listSnippets(list *models.ListView) string {
 		})
 	}
 	tbl.Render()
-
 
 	//fmt.Fprint(w, style.Start)
 	//fmt.Fprintf(w, "%dm", style.Subdued)
@@ -283,15 +276,29 @@ func listSnippets(list *models.ListView) string {
 	return w.String()
 }
 
-func printIcon(v *models.Snippet) string {
-	icon :=  "◆"
+func PadRight(str, pad string, length int) string {
+	if len(str) < length {
+		return str + strings.Repeat(pad, length-len(str))
+	}
+	return str
+}
+
+func PadLeft(str, pad string, length int) string {
+	if len(str) < length {
+		return strings.Repeat(pad, length-len(str)) + str
+	}
+	return str
+}
+
+func snippetIcon(v *models.Snippet) string {
+	icon := "◆"
 	if v.IsApp() {
 		icon = "▚"
 	} else if v.Ext == "url" {
 		icon = "⭑"
 	}
 	if v.RunStatus == models.UseStatusSuccess {
-		return style.Fmt256(119, icon)
+		return style.Fmt256(120, icon)
 	} else if v.RunStatus == models.UseStatusFail {
 		return style.Fmt256(196, icon)
 	}
@@ -299,7 +306,7 @@ func printIcon(v *models.Snippet) string {
 }
 
 func fmtRunCount(count int64) string {
-	return style.Fmt(style.Subdued, fmt.Sprintf("↻ %d", count))
+	return fmt.Sprintf(style.Fmt256(247, "↻ %0d"), count)
 }
 
 func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
@@ -323,14 +330,14 @@ func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
 	if s == nil {
 		fmt.Fprint(w, style.Start)
 		fmt.Fprint(w, "1m")
-		fmt.Fprint(w,  pouch)
+		fmt.Fprint(w, pouch)
 		fmt.Fprint(w, " ")
 		fmt.Fprint(w, style.End)
 		return
 	}
 	if pouch != "" {
 		fmt.Fprint(w, pouch)
-		fmt.Fprint(w,"/")
+		fmt.Fprint(w, "/")
 	}
 	fmt.Fprint(w, style.Start)
 	fmt.Fprint(w, "1m")
@@ -349,7 +356,7 @@ func pad(width int, in string) *bytes.Buffer {
 		var ia norm.Iter
 		ia.InitString(norm.NFKD, in)
 		nc := 0
-		for !ia.Done() && nc < width  {
+		for !ia.Done() && nc < width {
 			nc += 1
 			buff.Write(ia.Next())
 		}

@@ -1,10 +1,10 @@
-package humanize
+package style
 
 import (
-	"fmt"
-	"math"
-	"sort"
-	"time"
+"fmt"
+"math"
+"sort"
+"time"
 )
 
 // Seconds-based time units
@@ -46,22 +46,22 @@ type RelTimeMagnitude struct {
 
 var defaultMagnitudes = []RelTimeMagnitude{
 	{time.Second, "now", time.Second},
-	{2 * time.Second, "1 s", 1},
-	{time.Minute, "%d s", time.Second},
-	{2 * time.Minute, "1 min", 1},
-	{time.Hour, "%d mins", time.Minute},
-	{2 * time.Hour, "1 hr", 1},
-	{Day, "%d hrs", time.Hour},
-	{2 * Day, "1 d", 1},
-	{Week, "%d d", Day},
-	{2 * Week, "1 wk", 1},
-	{Month, "%d wks", Week},
-	{2 * Month, "1 mth", 1},
-	{Year, "%d mths", Month},
-	{18 * Month, "1 yr", 1},
-	{2 * Year, "2 yrs", 1},
-	{LongTime, "%d yrs", Year},
-	{math.MaxInt64, "a long while %s", 1},
+	{2 * time.Second, "1s", 1},
+	{time.Minute, "%ds", time.Second},
+	{2 * time.Minute, "1m", 1},
+	{time.Hour, "%dm", time.Minute},
+	{2 * time.Hour, "1h", 1},
+	{Day, "%dh", time.Hour},
+	{2 * Day, "1d", 1},
+	{Week, "%dd", Day},
+	{2 * Week, "1w", 1},
+	{Month, "%dw", Week},
+	{2 * Month, "1mth", 1},
+	{Year, "%dmth", Month},
+	{18 * Month, "1y", 1},
+	{2 * Year, "2y", 1},
+	{LongTime, "%dy", Year},
+	{math.MaxInt64, "old %s", 1},
 }
 
 // RelTime formats a time into a relative string.

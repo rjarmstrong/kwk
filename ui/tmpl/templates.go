@@ -3,7 +3,6 @@ package tmpl
 import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/style"
 	"bitbucket.com/sharingmachine/kwkcli/models"
-	"github.com/rjarmstrong/go-humanize"
 	"text/template"
 	"fmt"
 	"time"
@@ -118,7 +117,7 @@ func init() {
 }
 
 func humanTime(t int64) string {
-	return humanize.Time(time.Unix(t, 0))
+	return style.Time(time.Unix(t, 0))
 }
 
 func add(name string, templateText string, funcMap template.FuncMap) {

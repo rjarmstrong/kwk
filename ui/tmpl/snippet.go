@@ -3,7 +3,6 @@ package tmpl
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"github.com/rjarmstrong/tablewriter"
-	"github.com/rjarmstrong/go-humanize"
 	"bytes"
 	"fmt"
 	"time"
@@ -18,7 +17,7 @@ func inspect(s *models.Snippet) string {
 	w.WriteString(MARGIN)
 	fmtHeader(w,  s.Username, s.Pouch, &s.SnipName)
 	w.WriteString(strings.Repeat(" ", 4))
-	w.WriteString(printIcon(s))
+	w.WriteString(snippetIcon(s))
 	if s.IsApp() {
 		w.WriteString(style.Fmt(style.Subdued,"  App"))
 	} else if s.Ext == "url" {
@@ -54,7 +53,7 @@ func inspect(s *models.Snippet) string {
 	if s.RunCount < 1 {
 		lastRun = "never"
 	} else {
-		lastRun = pad(20, humanize.Time(time.Unix(s.RunStatusTime, 0))).String()
+		lastRun = pad(20, style.Time(time.Unix(s.RunStatusTime, 0))).String()
 	}
 	tbl.Append([]string{
 		style.Fmt(style.Subdued,"Run Status:"), pad(20, printStatus(s, true)).String(),

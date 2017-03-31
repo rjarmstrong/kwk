@@ -111,10 +111,6 @@
 			"Rev": "2b5d8608604a79441bb95dd2f19c119d760a7695"
 		},
 		{
-			"ImportPath": "github.com/rjarmstrong/go-humanize",
-			"Rev": "bb51d970116b1562c46fbb3fe44006affc13d98c"
-		},
-		{
 			"ImportPath": "github.com/rjarmstrong/tablewriter",
 			"Rev": "3690789a8368dc45052142a5a7092fda40d5b755"
 		},
