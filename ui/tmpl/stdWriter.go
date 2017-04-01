@@ -59,7 +59,6 @@ func (w *StdWriter) HandleErr(e error) {
 		w.Render("api:not-available", nil)
 	default:
 		log.Error("Unhandled err:", e)
-		panic(e)
 	}
 }
 
