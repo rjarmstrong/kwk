@@ -1,9 +1,6 @@
-
-// +build linux
-
 package style
 
 const (
-	Icon_Bookmark = "⭑" //2B51
-	Icon_Pouch = "▇"
+	Icon_Bookmark = "★" //2605
+	Icon_Pouch = "▆"
 )
