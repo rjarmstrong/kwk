@@ -86,6 +86,10 @@ const (
 	Pouch          = "\xF0\x9F\x91\x9D"
 	BlueDiamond    = "\xF0\x9F\x94\xB9"
 	YelloDiamond   = "\xF0\x9F\x94\xB8"
+
+	Icon_App     = "▚" //❖  ꌳ ⧓ ⧗ 〓 ⁘ ꌳ ⁑⁘ ⁙ ѧꊞ ▚ 囙"
+	Icon_Snippet = "◆"
+
 	// 🔰 👝 🔒 🔸 ⚡ ✓ ⇨ ᗜ 🔑 ● 🌎 ◯ ⚡ ☰ 💫 📦 ▻ ▸ ► ▷ ◦ ▲ ⚙ ⿳ ▣ ⬤ ⬜
 )
 

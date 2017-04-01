@@ -290,11 +290,11 @@ func PadLeft(str, pad string, length int) string {
 }
 
 func snippetIcon(v *models.Snippet) string {
-	icon := "◆" //⁕
+	icon := style.Icon_Snippet
 	if v.IsApp() {
-		icon = "▚" //❖  ꌳ ⧓ ⧗ 〓 ⁘ ꌳ ⁑⁘ ⁙ ѧꊞ ▚ 囙
+		icon = style.Icon_App
 	} else if v.Ext == "url" {
-		icon = "⭑"
+		icon = style.Icon_Bookmark
 	}
 	if v.RunStatus == models.UseStatusSuccess {
 		return style.Fmt256(122, icon)

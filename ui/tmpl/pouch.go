@@ -88,19 +88,17 @@ func insertGridLine(b *bytes.Buffer) {
 
 func pouchIcon(pch *models.Pouch, isLast bool) string {
 	if pch.Type == models.PouchType_Virtual {
-		return style.Fmt256(242, "▉ ")
+		return style.Fmt256(242, style.Icon_Pouch)
 		//} else if pch.Name == "inbox" {
 		//	if pch.UnOpened > 0 {
 		//		item.WriteString(fmt.Sprintf("📬%d ", pch.UnOpened))
 		//	} else {
 		//		item.WriteString(style.Fmt256(242, "▉ "))
 		//	}
-	} else if pch.Name == "settings" {
-		return "▉"
 	} else if pch.MakePrivate {
 		return colorPouch(isLast, pch.LastUse, pch.Red, "◤")
 	} else {
-		return colorPouch(isLast, pch.LastUse, pch.Red, "▉")
+		return colorPouch(isLast, pch.LastUse, pch.Red, style.Icon_Pouch)
 	}
 }
 
