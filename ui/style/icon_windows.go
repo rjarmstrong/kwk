@@ -1,3 +1,6 @@
+
+// +build windows
+
 package style
 
 const (

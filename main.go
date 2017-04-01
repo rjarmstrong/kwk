@@ -13,7 +13,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/update"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
-	"runtime/pprof"
+	//"runtime/pprof"
 	"bufio"
 	"os"
 	"strings"
@@ -78,14 +78,14 @@ func runKwk() {
 	kwkApp.App.Run(os.Args)
 }
 
-func profile() *os.File {
-	var cpuprofile = "kwkprofile"
-	f, err := os.Create(cpuprofile)
-	if err != nil {
-		panic(err)
-	}
-	if err := pprof.StartCPUProfile(f); err != nil {
-		panic(err)
-	}
-	return f
-}
+//func profile() *os.File {
+//	var cpuprofile = "kwkprofile"
+//	f, err := os.Create(cpuprofile)
+//	if err != nil {
+//		panic(err)
+//	}
+//	if err := pprof.StartCPUProfile(f); err != nil {
+//		panic(err)
+//	}
+//	return f
+//}
