@@ -9,6 +9,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"google.golang.org/grpc"
 	"time"
+	"github.com/lunixbochs/vtclean"
 )
 
 type RpcService struct {
@@ -181,6 +182,7 @@ func (rs *RpcService) LogUse(a models.Alias, s models.UseStatus, u models.UseTyp
  Limits a preview adding an ascii escape at the end and fixing the length.
  */
 func LimitPreview(in string, length int) string {
+	in = vtclean.Clean(in, true)
 	return models.Limit(in, length-5) + "\033[0m"
 }
 

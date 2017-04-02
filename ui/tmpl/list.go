@@ -33,25 +33,23 @@ func StatusText(s *models.Snippet) string {
 	return "static"
 }
 
-func printStatus(s *models.Snippet, includeText bool) string {
+func FStatus(s *models.Snippet, includeText bool) string {
 	if s.RunStatus == models.UseStatusSuccess {
 		if includeText {
-			return style.Fmt256(style.Green, "✔") + "  Success"
+			return style.Fmt256(style.Color_YesGreen, style.Icon_Tick) + "  Success"
 		}
-		return style.Fmt(style.Green, "✔")
+		return style.Fmt256(style.Color_YesGreen, style.Icon_Tick)
 	} else if s.RunStatus == models.UseStatusFail {
 		if includeText {
-			return "🔥  Error"
+			return style.Fmt256(style.Color_BrightRed, style.Icon_Broke) +  "  Error"
 		}
-		return "🔥"
+		return style.Fmt256(style.Color_BrightRed, style.Icon_Broke)
 	}
 	return style.Fmt(style.Subdued, "? ")
 }
 
 func listRoot(r *models.ListView) string {
 	w := &bytes.Buffer{}
-
-	//w.WriteString("\u001b[28F\n\n")
 	var all []interface{}
 	for _, v := range r.Pouches {
 		if v.Name != "" {
@@ -63,19 +61,16 @@ func listRoot(r *models.ListView) string {
 	}
 
 	fmtHeader(w, r.Username, "", nil)
-	fmt.Fprint(w, strings.Repeat(" ", 50), style.Fmt(style.Subdued, "◉  "+models.Principal.Username, "    TLS12"))
+	fmt.Fprint(w, strings.Repeat(" ", 50), style.Fmt(style.Subdued, "◉  "+models.Principal.Username + "    TLS12"))
 	fmt.Fprint(w, TWOLINES)
 	w.Write(listHorizontal(all, &r.UserStats))
-
-	//printCommunity(w)
 
 	if len(r.Snippets) > 0 {
 		fmt.Fprint(w, listSnippets(r))
 	}
 
-	//w.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("%d/50 Pouches", len(r.Pouches)-1)))
 	if models.ClientIsNew(r.LastUpgrade) {
-		w.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("          kwk auto-updated to %s %s", models.Client.Version, humanTime(r.LastUpgrade))))
+		w.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("\n%skwk auto-updated to %s %s", MARGIN, models.Client.Version, humanTime(r.LastUpgrade))))
 	} else {
 		w.WriteString("\n")
 	}
@@ -83,26 +78,26 @@ func listRoot(r *models.ListView) string {
 	return w.String()
 }
 
-func printCommunity(w *bytes.Buffer) {
-	fmt.Fprint(w, "\n", MARGIN, style.Fmt(style.Subdued, "Community"), "\n")
-	com := []interface{}{}
-	com = append(com, &models.Pouch{
-		Name:       style.Fmt(style.Cyan, "/kwk/") + "unicode",
-		Username:   "kwk",
-		PouchStats: models.PouchStats{Runs: 12},
-	}, &models.Pouch{
-		Name:       style.Fmt(style.Cyan, "/kwk/") + "news",
-		Username:   "kwk",
-		PouchStats: models.PouchStats{Runs: 12},
-	},
-		&models.Pouch{
-			Name:       style.Fmt(style.Cyan, "/kwk/") + "devops",
-			Username:   "kwk",
-			PouchStats: models.PouchStats{Runs: 12},
-		})
-	w.Write(listHorizontal(com, nil))
-	w.WriteString("\n")
-}
+//func printCommunity(w *bytes.Buffer) {
+//	fmt.Fprint(w, "\n", MARGIN, style.Fmt(style.Subdued, "Community"), "\n")
+//	com := []interface{}{}
+//	com = append(com, &models.Pouch{
+//		Name:       style.Fmt(style.Cyan, "/kwk/") + "unicode",
+//		Username:   "kwk",
+//		PouchStats: models.PouchStats{Runs: 12},
+//	}, &models.Pouch{
+//		Name:       style.Fmt(style.Cyan, "/kwk/") + "news",
+//		Username:   "kwk",
+//		PouchStats: models.PouchStats{Runs: 12},
+//	},
+//		&models.Pouch{
+//			Name:       style.Fmt(style.Cyan, "/kwk/") + "devops",
+//			Username:   "kwk",
+//			PouchStats: models.PouchStats{Runs: 12},
+//		})
+//	w.Write(listHorizontal(com, nil))
+//	w.WriteString("\n")
+//}
 
 func printPouchHeadAndFoot(w *bytes.Buffer, list *models.ListView) {
 	fmtHeader(w, list.Username, list.Pouch.Name, nil)
@@ -194,7 +189,7 @@ func listSnippets(list *models.ListView) string {
 	}
 
 	tbl := tablewriter.NewWriter(w)
-	tbl.SetHeader([]string{"", "", "", ""})
+	tbl.SetHeader([]string{"", "", ""})
 	tbl.SetAutoWrapText(false)
 	tbl.SetBorder(false)
 	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
@@ -206,7 +201,7 @@ func listSnippets(list *models.ListView) string {
 
 	tbl.SetAutoFormatHeaders(false)
 	tbl.SetHeaderLine(true)
-	tbl.SetColWidth(5)
+	tbl.SetColWidth(1)
 
 	tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
 
@@ -215,18 +210,14 @@ func listSnippets(list *models.ListView) string {
 		name := &bytes.Buffer{}
 		name.WriteString(snippetIcon(v))
 		name.WriteString("  ")
-		nt := style.Fmt256(251, v.SnipName.String())
+		nt := style.Fmt256(style.Color_BrighterWhite, v.SnipName.String())
 		name.WriteString(nt)
-		if models.Prefs().AlwaysExpandRows {
-			name.WriteString("\n\n")
-			name.WriteString(style.FmtBox(v.Description, 25, 3))
-		}
-		// Add special instructions:
+		name.WriteString("\n\n")
+		name.WriteString(style.Fmt(style.Subdued, style.FBox(v.Description, 25, 3)))
 		if v.Role == models.SnipRoleEnvironment {
 			name.WriteString("\n\n")
 			name.WriteString(style.Fmt(style.Subdued, "short-cut: kwk edit env"))
 		}
-
 		// col2
 		var lines int
 		if models.Prefs().AlwaysExpandRows {
@@ -243,19 +234,19 @@ func listSnippets(list *models.ListView) string {
 			t := fmt.Sprintf("%s", style.Fmt256(239, h))
 			status.WriteString(t)
 		}
-
 		//col3
-		snip := FmtSnippet(v, 60, lines, (i+1)%2 == 0)
+		snip := FCodeview(v, 60, lines, (i+1)%2 == 0)
 		if models.Prefs().RowSpaces {
 			snip = snip + "\n"
 		}
+		if len(v.Preview) >= 10 {
+			snip = snip + "\n\n" + MARGIN + style.Fmt256(style.Color_MonthGrey, style.FPreview(v.Preview, 120, 1))
+		}
 
-		// //strings.Join(v.Tags, ", "),
 		tbl.Append([]string{
 			name.String(),
 			status.String(),
 			snip,
-			style.FmtPreview(v.Preview, 18, 1),
 		})
 	}
 	tbl.Render()
@@ -307,6 +298,8 @@ func snippetIcon(v *models.Snippet) string {
 func fmtRunCount(count int64) string {
 	return fmt.Sprintf(style.Fmt256(247, "↻ %0d"), count)
 }
+
+
 
 func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
 	fmt.Fprint(w, "\n")

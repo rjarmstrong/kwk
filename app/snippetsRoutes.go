@@ -84,7 +84,7 @@ func Snippets(s *SnippetCli) []cli.Command {
 		},
 		{
 			Name:    "find",
-			Aliases: []string{"search"},
+			Aliases: []string{"f"},
 			Action: func(c *cli.Context) error {
 				args := []string(c.Args())
 				s.Search(args...)

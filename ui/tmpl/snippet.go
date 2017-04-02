@@ -11,23 +11,17 @@ import (
 )
 
 func inspect(s *models.Snippet) string {
-
 	w := &bytes.Buffer{}
 	w.WriteString("\n")
 	w.WriteString(MARGIN)
 	fmtHeader(w,  s.Username, s.Pouch, &s.SnipName)
 	w.WriteString(strings.Repeat(" ", 4))
 	w.WriteString(snippetIcon(s))
-	if s.IsApp() {
-		w.WriteString(style.Fmt(style.Subdued,"  App"))
-	} else if s.Ext == "url" {
-		w.WriteString(style.Fmt(style.Subdued, "  Link"))
-	} else {
-		w.WriteString(style.Fmt(style.Subdued, "  Snippet"))
-	}
+	w.WriteString("  ")
+	w.WriteString(FSnippetType(s))
 	fmt.Fprint(w,"\n")
 	fmt.Fprint(w, TWOLINES)
-	fmt.Fprint(w, FmtSnippet(s, 100, 0, false))
+	fmt.Fprint(w, FCodeview(s, 100, 0, false))
 	fmt.Fprint(w,"\n\n")
 
 	tbl := tablewriter.NewWriter(w)
@@ -40,14 +34,7 @@ func inspect(s *models.Snippet) string {
 	tbl.SetAutoFormatHeaders(false)
 	tbl.SetHeaderLine(false)
 	tbl.SetColWidth(20)
-
-	if s.IsApp() {
-		tbl.Append([]string{style.Fmt(style.Cyan, "App Details:"), "", "", ""})
-	} else if s.Ext == "url" {
-		tbl.Append([]string{style.Fmt(style.Cyan, "Link Details:"), "", "", ""})
-	} else {
-		tbl.Append([]string{style.Fmt(style.Cyan, "Snippet Details:"), "", "", ""})
-	}
+	tbl.Append([]string{style.Fmt256(style.Color_PouchCyan, FSnippetType(s) + " Details:"), "", "", ""})
 
 	var lastRun string
 	if s.RunCount < 1 {
@@ -56,26 +43,27 @@ func inspect(s *models.Snippet) string {
 		lastRun = pad(20, style.Time(time.Unix(s.RunStatusTime, 0))).String()
 	}
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"Run Status:"), pad(20, printStatus(s, true)).String(),
+		style.Fmt(style.Subdued,"Run Status:"), FStatus(s, true),
 		style.Fmt(style.Subdued,"Last Run:"), lastRun,
 	})
 	tbl.Append([]string{
 		style.Fmt(style.Subdued,"Run Count: "), fmt.Sprintf("↻ %2d", s.RunCount),
-		style.Fmt(style.Subdued,"View count:") , fmt.Sprintf("🔦  %2d", s.ViewCount )}) //👁 👀
+		style.Fmt(style.Subdued,"View count:") , fmt.Sprintf("%s  %2d", style.Icon_View, s.ViewCount )})
 	if s.IsApp() {
 		tbl.Append([]string{
-			style.Fmt(style.Subdued,"App Dependencies:"), strings.Join(s.Dependencies, ", "), "", ""})
+			style.Fmt(style.Subdued,"App Deps:"),
+			style.FBox(strings.Join(s.Dependencies, ", "), 50, 5)})
 	}
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"Description:"), style.FmtBox(fmtEmpty(s.Description), 25, 3), "", ""})
+		style.Fmt(style.Subdued,"Description:"), style.FBox(FEmpty(s.Description), 50, 3), "", ""})
 
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"Preview:"), style.FmtPreview(s.Preview, 25, 2), "", ""})
+		style.Fmt(style.Subdued,"Preview:"), style.FPreview(s.Preview, 50, 1), "", ""})
 
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"Tags:"), fmtTags(s.Tags), "", ""})
+		style.Fmt(style.Subdued,"Tags:"), FTags(s.Tags), "", ""})
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"sha256:"), fmtVerified(s) })
+		style.Fmt(style.Subdued,"sha256:"), FVerified(s) })
 	tbl.Append([]string{
 		style.Fmt(style.Subdued,"Updated:"), humanTime(s.Created) })
 
@@ -95,20 +83,29 @@ func inspect(s *models.Snippet) string {
 
 	return w.String()
 }
-func fmtVerified(s *models.Snippet) string {
+func FSnippetType(s *models.Snippet) string {
+	if s.IsApp() {
+		return "App"
+	} else if s.Ext == "url" {
+		return "Bookmark"
+	} else {
+		return "Snippet"
+	}
+}
+func FVerified(s *models.Snippet) string {
 	var buff bytes.Buffer
 	if s.VerifyChecksum() {
-		buff.WriteString(style.Fmt(style.Green, "✓  "))
+		buff.WriteString(style.Fmt256(style.Color_YesGreen,  style.Icon_Tick + " "))
 		buff.WriteString(pad(12, s.CheckSum).String())
 		buff.WriteString("...")
 	} else {
-		buff.WriteString(" ☠  Invalid Checksum: ")
-		buff.WriteString(fmtEmpty(s.CheckSum))
+		buff.WriteString(" " + style.Icon_Cross + "  Invalid Checksum: ")
+		buff.WriteString(FEmpty(s.CheckSum))
 	}
 	return buff.String()
 }
 
-func FmtSnippet(s *models.Snippet, width int, lines int, odd bool) string {
+func FCodeview(s *models.Snippet, width int, lines int, odd bool) string {
 	if s.Snip == "" {
 		s.Snip = "<empty>"
 	}
@@ -120,14 +117,14 @@ func FmtSnippet(s *models.Snippet, width int, lines int, odd bool) string {
 	// Add line numbers and pad
 	for i, v := range chunks {
 		code = append(code, CodeLine{
-			Margin: style.FmtStart(style.Subdued, fmt.Sprintf("%3d ", i+1)),
+			Margin: style.FStart(style.Subdued, fmt.Sprintf("%3d ", i+1)),
 			Body:   fmt.Sprintf("    %s", strings.Replace(v, "\t", "  ", -1)),
 		})
 	}
 
 	lastLine := code[len(chunks)-1]
 
-	// Add to preview starting from most important line
+	// Add to  starting from most important line
 	marker := mainMarkers[s.Ext]
 	if marker != "" {
 		var clipped []CodeLine
@@ -148,32 +145,32 @@ func FmtSnippet(s *models.Snippet, width int, lines int, odd bool) string {
 	crop := len(code) >= lines && lines != 0
 
 	// crop width
-	var preview []CodeLine
+	var codeview []CodeLine
 	if crop {
-		preview = code[0:lines]
+		codeview = code[0:lines]
 	} else {
-		preview = code
+		codeview = code
 	}
 
-	rightTrim := style.FmtStart(style.Subdued, "|")
+	rightTrim := style.FStart(style.Subdued, "|")
 	if width > 0 {
-		for i, v := range preview {
-			preview[i].Body = pad(width, v.Body).String() + rightTrim
+		for i, v := range codeview {
+			codeview[i].Body = pad(width, v.Body).String() + rightTrim
 		}
 	}
 
 	// Add page tear and last line
 	if models.Prefs().AlwaysExpandRows && crop && lines < len(code) {
-		preview = append(preview, CodeLine{
-			style.FmtStart(style.Subdued, "----"),
-			style.FmtStart(style.Subdued, strings.Repeat("-", width)+"|"),
+		codeview = append(codeview, CodeLine{
+			style.FStart(style.Subdued, "----"),
+			style.FStart(style.Subdued, strings.Repeat("-", width)+"|"),
 		})
 		lastLine.Body = pad(width, lastLine.Body).String() + rightTrim
-		preview = append(preview, lastLine)
+		codeview = append(codeview, lastLine)
 	}
 
 	buff := bytes.Buffer{}
-	for i, v := range preview {
+	for i, v := range codeview {
 		// Style
 		var m, b string
 		if odd {
@@ -185,24 +182,23 @@ func FmtSnippet(s *models.Snippet, width int, lines int, odd bool) string {
 		}
 		buff.WriteString(m)
 		buff.WriteString(b)
-		buff.WriteString(" ")
-		if i < len(preview) - 1 {
+		if i < len(codeview) - 1 {
 			buff.WriteString("\n")
 		}
 	}
-	return buff.String() // fmt.Sprintf("%q", buff.String())
+	return buff.String()
 }
 
-func fmtTags(tags []string) string {
+func FTags(tags []string) string {
 	if len(tags) == 0 {
-		return fmtEmpty("")
+		return FEmpty("")
 	}
 	return strings.Join(tags, ", ")
 }
 
-func fmtEmpty(in string) string {
+func FEmpty(in string) string {
 	if in == "" {
-		return "<none>"
+		return style.Fmt(style.Subdued, "<none>")
 	}
 	return in
 }

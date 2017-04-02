@@ -5,6 +5,7 @@ import (
 	"strings"
 	"bytes"
 	"bitbucket.com/sharingmachine/kwkcli/models"
+	"github.com/lunixbochs/vtclean"
 )
 
 type AnsiCode int
@@ -63,55 +64,68 @@ const (
 	Block     = "2588"
 
 	Start     = "\033["
-	Start255     = "\033[48;5;"
 	End       = "\033[0m"
+	Start255     = "\033[48;5;"
 	End255       = "\033[0;00m"
 
 
-	Space     = 20
-	UBlock    = "\u2588"
 
-	// UTF-8 Hex
-	Lock           = "\xF0\x9F\x94\x92"
-	OpenLock       = "\xF0\x9F\x94\x93"
 	Warning        = "\xE2\x9A\xA0"
 	Fire           = "\xF0\x9F\x94\xA5"
-	Tick           = "\xE2\x9C\x93"
 	Ambulance      = "\xF0\x9F\x9A\x91"
-	Glasses        = "\xF0\x9F\x91\x93"
 	InfoDeskPerson = "\xF0\x9F\x92\x81"
-	Folder         = "\xF0\x9F\x93\x81"
-	Task           = "\xE2\x98\xB0"
-	BriefCase      = "\xF0\x9F\x92\xBC"
-	Pouch          = "\xF0\x9F\x91\x9D"
-	BlueDiamond    = "\xF0\x9F\x94\xB9"
-	YelloDiamond   = "\xF0\x9F\x94\xB8"
 
 	Icon_App     = "▚" //❖  ꌳ ⧓ ⧗ 〓 ⁘ ꌳ ⁑⁘ ⁙ ѧꊞ ▚ 囙"
 	Icon_Snippet = "◆"
+	Icon_View = "❍"  // 274d
+	Icon_Tick = "✓"  // 2713
+	Icon_Cross = "✘" // 2718
+	Icon_PrivatePouch = "◤"
+	Icon_Broke = "▦"
 
-	// 🔰 👝 🔒 🔸 ⚡ ✓ ⇨ ᗜ 🔑 ● 🌎 ◯ ⚡ ☰ 💫 📦 ▻ ▸ ► ▷ ◦ ▲ ⚙ ⿳ ▣ ⬤ ⬜
+	Color_BrightRed = 196
+	Color_PouchCyan = 122
+	Color_DimRed = 124
+	Color_BrightWhite = 250
+	Color_BrighterWhite = 252
+	Color_BrightestWhite = 254
+	Color_WeekGrey = 247
+	Color_MonthGrey = 245
+	Color_OldGrey = 242
+	Color_DimStat = 238
+	Color_YesGreen = 119
+
+	// 🔰 👝 🔒 🔸 ⚡ ✓ ⇨ ᗜ 🔑 ● 🌎 ◯ ⚡ ☰ 💫 📦 ▻ ▸ ► ▷ ◦ ▲ ⚙ ⿳ ▣ ⬤ ⬜ 👁 👀
 )
 
-func Build(quant int, unicode string) string {
-	var str string
-	for i := 0; i <= quant; i++ {
-		str = str + unicode
-	}
-	return str
-}
+var(
+	Pad_1_2 = strings.Repeat(Fmt256(100, " "), 2)
+	Pad_2_2 = strings.Repeat(Fmt256(100, "  "), 2)
+	Pad_1_1 = strings.Repeat(Fmt256(100, " "), 1)
+	Pad_0_0 = strings.Repeat(Fmt256(30, ""), 1)
 
-func FmtStart(c AnsiCode, in interface{}) string {
+	Pad16_0_0 = strings.Repeat(Fmt(0, ""), 1)
+	Pad16_1_1 = strings.Repeat(Fmt(0, " "), 1)
+	Pad16_2_1 = strings.Repeat(Fmt(0, "  "), 1)
+	Pad16_3_1 = strings.Repeat(Fmt(0, "   "), 1)
+	Pad16_4_1 = strings.Repeat(Fmt(0, "    "), 1)
+	Pad16_1_2 = strings.Repeat(Fmt(0, " "), 2)
+	Pad16_2_2 = strings.Repeat(Fmt(0, "  "), 2)
+	Pad16_3_2 = strings.Repeat(Fmt(0, "   "), 2)
+	Pad16_3_4 = strings.Repeat(Fmt(0, " "), 4)
+)
+
+func FStart(c AnsiCode, in interface{}) string {
 	return fmt.Sprintf("\033[%dm%v", c, in)
 }
 
 // Fmt formats output for the CLI.
-func Fmt(c AnsiCode, params ...interface{}) string {
-	var text string
-	for _, v := range params {
-		text = text + fmt.Sprintf("%v", v)
+func Fmt(c AnsiCode, in interface{}) string {
+	a := strings.Split(fmt.Sprintf("%v", in), "\n")
+	for i, v := range a {
+		a[i] = fmt.Sprintf("\033[%0dm%v\033[0m", c, v)
 	}
-	return fmt.Sprintf("\033[%0dm%v\033[0m", c, text)
+	return strings.Join(a, "\n")
 }
 
 func FmtFgBg(in string, fg AnsiCode, bg AnsiCode) string {
@@ -129,48 +143,19 @@ func ColourSpan(colour AnsiCode, text string, openTag string, closeTag string, s
 	return text
 }
 
-//func ColourSpan256(colour AnsiCode, text string, openTag string, closeTag string, surroundingColor AnsiCode) string {
-//	text = Fmt256(surroundingColor, false, text)
-//	text = strings.Replace(text, openTag, fmt.Sprintf("%s%s%dm", End255, Start255, colour), -1)
-//	text = strings.Replace(text, closeTag, fmt.Sprintf("%s%s%dm", End255, Start255, surroundingColor), -1)
-//	return text
-//}
 
-/*
- StyleLines formats each line with a foreground and background color.
- */
-func AnsiLinesFgBg(in string, fg AnsiCode, bg AnsiCode) string {
-	t := strings.Split(in, "\n")
-	for i, v := range t {
-		t[i] = FmtFgBg(v, fg, bg)
-	}
-	join := strings.Join(t, "\n")
-	return join
-}
-
-/*
- StyleLines formats each line with a foreground  color.
- */
-func AnsiLines(in string, fg AnsiCode) string {
-	t := strings.Split(in, "\n")
-	for i, v := range t {
-		t[i] = Fmt(fg, v)
-	}
-	join := strings.Join(t, "\n")
-	return join
-}
-
-func FmtPreview (in string, wrapAt int, lines int) string {
+func FPreview(in string, wrapAt int, lines int) string {
 	if models.Prefs().DisablePreview {
 		return ""
 	}
-	return FmtBox(in, wrapAt, lines)
+	in = vtclean.Clean(in, false)
+	return FBox(in, wrapAt, lines) + End
 }
 
 /*
  Creates a text box constrained by width (number of runes) and number of lines.
  */
-func FmtBox(in string, wrapAt int, lines int) string {
+func FBox(in string, wrapAt int, lines int) string {
 	in = strings.Replace(in, "\n", "  ", -1)
 	in = strings.TrimSpace(in)
 	var numRunes = 0
