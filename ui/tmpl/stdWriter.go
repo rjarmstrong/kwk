@@ -3,7 +3,6 @@ package tmpl
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/log"
-
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc"
 	"io"
@@ -26,6 +25,14 @@ func (w *StdWriter) Render(templateName string, data interface{}) {
 		Templates[templateName].Execute(w.Writer, data)
 	} else {
 		panic("Template not found: " + templateName)
+	}
+}
+
+func (w *StdWriter) Out(templateName string, data interface{}) {
+	if t := Printers[templateName]; t != nil {
+		Printers[templateName](w.Writer, data)
+	} else {
+		w.HandleErr(models.ErrOneLine(models.Code_PrinterNotFound, "`%s` printer not found.", templateName))
 	}
 }
 

@@ -15,3 +15,7 @@ func (t *WriterMock) Render(templateName string, data interface{}) {
 	t.RenderCalledWith = []interface{}{templateName, data}
 }
 
+func (t *WriterMock) Out(templateName string, data interface{}) {
+
+}
+

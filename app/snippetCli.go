@@ -38,7 +38,7 @@ func (sc *SnippetCli) Search(args ...string) {
 		sc.HandleErr(err)
 	} else {
 		res.Term = term
-		sc.Render("search:alpha", res)
+		sc.Out("search:alpha", res)
 	}
 }
 

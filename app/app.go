@@ -99,7 +99,7 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 			snipCli.Edit(c.Args().First())
 			return
 		}
-		snipCli.InspectListOrRun(distinctName, false, []string(c.Args())[:]...)
+		snipCli.InspectListOrRun(c.Args().First(), false, []string(c.Args())[1:]...)
 	}
 
 	return &KwkApp{

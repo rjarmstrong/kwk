@@ -46,6 +46,9 @@ const (
 
 	//Runners
 	Code_RunnerExitError Code = 700
+
+	//Writers
+	Code_PrinterNotFound Code = 800
 )
 
 // ParseGrpcErr should be used at RPC service call level. i.e. the errors

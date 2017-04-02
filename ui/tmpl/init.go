@@ -6,9 +6,11 @@ import (
 	"text/template"
 	"fmt"
 	"time"
+	"io"
 )
 
 var Templates = map[string]*template.Template{}
+var Printers = map[string]func(w io.Writer, in interface{}){}
 
 //const logo = `
 //  ▋                         ▋
@@ -98,10 +100,6 @@ func init() {
 	addColor("account:signup:password", "And enter a password (1 num, 1 cap, 8 chars): ", blue)
 	addColor("account:signup:invite-code", "Your kwk invite code: ", blue)
 
-	add("search:alpha", "\n\033[7m  \"{{ .Term }}\" found in {{ .Total }} results in {{ .Took }} ms  \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{ . | formatSearchResult}}\n{{end}}", template.FuncMap{"formatSearchResult": alphaSearchResult, "blue": blue, "subdued": subdued})
-	add("search:alphaSuggest", "\n\033[7m Suggestions: \033[0m\n\n{{range .Results}}{{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{end}}\n", template.FuncMap{"blue": blue, "subdued": subdued})
-	add("search:typeahead", "{{range .Results}}{{ .String }}\n{{end}}", nil)
-
 	// errors
 	add("validation:title", "{{. | yellow }}\n", template.FuncMap{"yellow": yellow})
 	add("validation:multi-line", " - {{ .Desc | yellow }}\n", template.FuncMap{"yellow": yellow})
@@ -114,6 +112,11 @@ func init() {
 	addColor("api:not-available", style.Ambulance + "  Kwk is DOWN! Please try again in a bit.\n", yellow)
 	add("api:exists", "{{ \"That item already exists.\" | yellow }}\n", template.FuncMap{"yellow": yellow})
 	add("free-text", "{{.}}", nil)
+	addPrinters()
+}
+
+func addPrinters() {
+	Printers["search:alpha"] = alphaSearchResult
 }
 
 func humanTime(t int64) string {
