@@ -86,6 +86,10 @@
 			"Rev": "9c2852a141bf4711e4276f8f119c90d0f20a556c"
 		},
 		{
+			"ImportPath": "github.com/lunixbochs/vtclean",
+			"Rev": "4428d67a89b36ecae7998e983e5814d0d9c45a04"
+		},
+		{
 			"ImportPath": "github.com/mattn/go-runewidth",
 			"Comment": "v0.0.1",
 			"Rev": "d6bea18f789704b5f83375793155289da36a3c7f"
