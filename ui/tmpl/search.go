@@ -2,7 +2,6 @@ package tmpl
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
-	"bitbucket.com/sharingmachine/kwkcli/ui/style"
 	"strings"
 	"fmt"
 	"io"
@@ -28,21 +27,23 @@ func alphaSearchResult(w io.Writer, in interface{}) {
 	// {{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{ . | result}}\n
 
 	for _, v := range res.Results {
-		if v.Highlights == nil {
-			v.Highlights = map[string]string{}
-		}
-		if v.Highlights["snip"] == "" {
-			v.Highlights["snip"] = v.Snip
-		}
-		lines := highlightsToLines(v.Highlights)
-		f := ""
-		for _, line := range lines {
-			f = f + line.Key[:4] + "\u2847  " + line.Line + "\n"
-		}
-		f = style.Fmt(style.Subdued, f)
-		f = style.ColourSpan(style.Black, f, "<em>", "</em>", style.Subdued)
-		fmt.Fprint(w, f)
+		fmt.Fprintf(w, "%s%s\n", MARGIN, v.String())
+		//if v.Highlights == nil {
+		//	v.Highlights = map[string]string{}
+		//}
+		//if v.Highlights["snip"] == "" {
+		//	v.Highlights["snip"] = v.Snip
+		//}
+		//lines := highlightsToLines(v.Highlights)
+		//f := ""
+		//for _, line := range lines {
+		//	f = f + line.Key[:4] + "\u2847  " + line.Line + "\n"
+		//}
+		//f = style.Fmt(style.Subdued, f)
+		//f = style.ColourSpan(style.Black, f, "<em>", "</em>", style.Subdued)
+		//fmt.Fprint(w, f)
 	}
+	fmt.Fprint(w, "\n")
 }
 
 func highlightsToLines(highlights map[string]string) []SearchResultLine {
