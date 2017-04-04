@@ -141,7 +141,7 @@ const timeLayout = "2 Jan 15:04 06"
 func listNaked(list *models.ListView) interface{} {
 	w := &bytes.Buffer{}
 	tbl := tablewriter.NewWriter(w)
-	tbl.SetHeader([]string{"Name", "Private", "Run status", "Run count", "View count", "Updated"})
+	tbl.SetHeader([]string{"Name", "Private", "Run status", "Run count", "View count", "LastActive", "Updated"})
 	tbl.SetAutoWrapText(false)
 	tbl.SetBorder(false)
 	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
@@ -154,6 +154,7 @@ func listNaked(list *models.ListView) interface{} {
 	tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
 	for _, v := range list.Snippets {
 		t := time.Unix(v.Created, 0)
+		lr := time.Unix(v.RunStatusTime, 0)
 		var private string
 		if v.Private {
 			private = "private"
@@ -166,6 +167,7 @@ func listNaked(list *models.ListView) interface{} {
 			StatusText(v),
 			fmt.Sprintf("%d", v.RunCount),
 			fmt.Sprintf("%d", v.ViewCount),
+			lr.Format(timeLayout),
 			t.Format(timeLayout),
 		})
 	}

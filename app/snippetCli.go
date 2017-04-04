@@ -9,7 +9,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bitbucket.com/sharingmachine/kwkcli/log"
-	"github.com/rjarmstrong/fzf/src"
 	"strings"
 	"fmt"
 	"os"
@@ -94,18 +93,18 @@ func (sc *SnippetCli) Suggest(term string) {
 	}
 }
 
+func (sc *SnippetCli) run(selected *models.Snippet, args []string) {
+	sc.runner.Run(selected, args)
+}
+
 func (sc *SnippetCli) Run(distinctName string, args []string) {
 	a, err := models.ParseAlias(distinctName)
 	if err != nil {
 		sc.Render("validation:one-line", err)
 	}
-	rerun := func(selected string) {
-		r := sc.Dialog.FormField(fmt.Sprintf("kwk %s ", selected))
-		argstr := r.Value.(string)
-		sc.Run(selected, strings.Split(argstr, " "))
-	}
+
 	if list, err := sc.s.Get(*a); err != nil {
-		sc.typeAhead(distinctName, rerun)
+		sc.typeAhead(distinctName, sc.run)
 	} else {
 		if alias := sc.handleMultiResponse(distinctName, list); alias != nil {
 			//TODO: If username is not the current user or 'kwk' then prompt before executing.
@@ -113,7 +112,7 @@ func (sc *SnippetCli) Run(distinctName string, args []string) {
 				sc.HandleErr(err)
 			}
 		} else {
-			sc.typeAhead(distinctName, rerun)
+			sc.typeAhead(distinctName, sc.run)
 		}
 	}
 }
@@ -213,11 +212,11 @@ func (sc *SnippetCli) Edit(distinctName string) {
 func (sc *SnippetCli) Describe(distinctName string, description string) {
 	a, err := models.ParseAlias(distinctName)
 	if description == "" {
-		sc.typeAhead(distinctName, func(input string) {
-			cm := fmt.Sprintf("Enter new description for %s: ", input)
+		sc.typeAhead(distinctName, func(s *models.Snippet, args []string) {
+			cm := fmt.Sprintf("Enter new description for %s: ", s.SnipName.String())
 			if res := sc.FormField(cm); res.Ok {
 				log.Debug("Form result: %+v", res.Value)
-				sc.Describe(input, res.Value.(string))
+				sc.Describe(s.SnipName.String(), res.Value.(string))
 			} else {
 				log.Debug("not ok")
 			}
@@ -254,9 +253,11 @@ func (sc *SnippetCli) InspectListOrRun(distinctName string, forceInspect bool, a
 	if err != nil {
 		sc.Render("validation:one-line", err)
 	}
+
+
 	// GET SNIPPET
 	if list, err := sc.s.Get(*a); err != nil {
-		sc.HandleErr(err)
+		sc.typeAhead(distinctName, sc.run)
 	} else {
 		s := sc.handleMultiResponse(distinctName, list)
 		if forceInspect || models.Prefs().RequireRunKeyword {
@@ -371,16 +372,14 @@ type MoveResult struct {
 func (sc *SnippetCli) Cat(distinctName string) {
 	if list, a, err := sc.getSnippet(distinctName); err != nil {
 		if models.HasErrCode(err, models.Code_NotFound) {
-			sc.typeAhead(distinctName, func(str string) {
-				_ = sc.Dialog.FormField(fmt.Sprintf("kwk cat %s ", str))
-				sc.Cat(str)
+			sc.typeAhead(distinctName, func(s *models.Snippet, args []string) {
+				sc.Render("snippet:cat", s)
 			})
 		} else {
 			sc.HandleErr(err)
 		}
 	} else {
 		if len(list.Snippets) == 0 {
-			//sc.suggest(distinctName)
 			sc.Render("snippet:notfound", a)
 		} else if len(list.Snippets) == 1 {
 			// TODO: use echo instead so that we can do variable substitution
@@ -567,11 +566,20 @@ func (sc *SnippetCli) List(username string, pouch string) {
 	}
 }
 
-func (sc *SnippetCli) typeAhead(distinctName string, onSelect func(name string)) {
-	exe, _ := os.Executable()
-	opt := fzf.ParseOptionsAs(fmt.Sprintf("--preview=%s cat %s", exe, "{}"), "-1", "--preview-window=right:70%", "--header=   Suggestions:   ", "--query="+distinctName, "--reverse", "--margin=2,6,2,2", "--height=40%", "--no-mouse", "--color=prompt:008,header:0,headerbg:008,fg:255,hl:006,pointer:014,hl+:014,fg+:006,bg+:000")
-	opt.Printer = onSelect
-	fzf.Run(fmt.Sprintf("%s suggest %s", exe, distinctName), opt)
+func (sc *SnippetCli) typeAhead(term string, onSelect func(s *models.Snippet, args []string)) {
+	if res, err := sc.s.AlphaSearch(term); err != nil {
+		sc.HandleErr(err)
+	} else {
+		res.Term = term
+		snips := []*models.Snippet{}
+		for _, v := range res.Results {
+			snips = append(snips, v.Snippet)
+		}
+		res := sc.Dialog.MultiChoice("dialog:choose", "Please choose one:", snips)
+		if res != nil {
+			onSelect(res, nil)
+		}
+	}
 }
 
 func stdInAsString() string {
@@ -587,9 +595,7 @@ func (sc *SnippetCli) handleMultiResponse(distinctName string, list *models.List
 	if list.Total == 1 {
 		return list.Snippets[0]
 	} else if list.Total > 1 {
-		r := sc.MultiChoice("dialog:choose", "Multiple matches. Choose a snippet to run:", list.Snippets)
-		s := r.Value.(*models.Snippet)
-		return s
+		return sc.MultiChoice("dialog:choose", "Multiple matches. Choose a snippet to run:", list.Snippets)
 	} else {
 		return nil
 	}

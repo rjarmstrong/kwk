@@ -10,7 +10,7 @@ type DialogMock struct {
 	FieldResponse         *DialogResponse
 	FieldResponseMap map[string]interface{}
 	MultiChoiceCalledWith []interface{}
-	MultiChoiceResponse   *DialogResponse
+	MultiChoiceResponse   *models.Snippet
 }
 
 func (d *DialogMock) Modal(templateName string, data interface{}, autoYes bool) *DialogResponse {
@@ -31,7 +31,7 @@ func (d *DialogMock) FormField(label string) *DialogResponse {
   panic("not impl")
 }
 
-func (d *DialogMock) MultiChoice(templateName string, header interface{}, list []*models.Snippet) *DialogResponse {
+func (d *DialogMock) MultiChoice(templateName string, header interface{}, list []*models.Snippet) *models.Snippet {
 	d.MultiChoiceCalledWith = []interface{}{templateName, header, list}
 	return d.MultiChoiceResponse
 }

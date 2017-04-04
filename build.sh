@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -ef -o pipefail
-KWK_VERSION=v1.2.52
+KWK_VERSION=v1.2.53
 BUILD_NUMBER=$1
 RELEASE_TIME=$(date +%s)
 RELEASE_NOTES="Basic search results.\n"
@@ -46,7 +46,7 @@ function compile(){
 
   # COMPILE
   binary=${tmp}/bin/${file}
-  env GOOS=${os} GOARCH=${ARCH} go build -ldflags "-s -w -X main.version=${KWK_VERSION} -X main.build=${BUILD_NUMBER} -X main.releaseTime=${RELEASE_TIME}" -x -o ${binary}
+  env GOOS=${os} GOARCH=${ARCH} CGO_ENABLED=0 go build -ldflags "-s -w -X main.version=${KWK_VERSION} -X main.build=${BUILD_NUMBER} -X main.releaseTime=${RELEASE_TIME}" -x -o ${binary}
 
   # ZIP
   zipped=${binPath}/${file}.tar.gz

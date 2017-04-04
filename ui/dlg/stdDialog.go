@@ -31,7 +31,7 @@ func (d *StdDialog) Modal(templateName string, data interface{}, autoYes bool) *
 	return r
 }
 
-func (d *StdDialog) MultiChoice(templateName string, header interface{}, list []*models.Snippet) *DialogResponse {
+func (d *StdDialog) MultiChoice(templateName string, header interface{}, list []*models.Snippet) *models.Snippet {
 	d.writer.Render("dialog:header", header)
 	d.writer.Render(templateName, list)
 	input, _, _ := d.reader.ReadLine()
@@ -39,9 +39,7 @@ func (d *StdDialog) MultiChoice(templateName string, header interface{}, list []
 	if i > len(list) || err != nil {
 		return d.MultiChoice(templateName, "Please choose a number.", list)
 	}
-	return &DialogResponse{
-		Value: list[i-1],
-	}
+	return list[i-1]
 }
 
 func InterfaceSlice(slice interface{}) []interface{} {
