@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -ef -o pipefail
-KWK_VERSION=v1.2.53
+KWK_VERSION=v1.2.54
 BUILD_NUMBER=$1
 RELEASE_TIME=$(date +%s)
 RELEASE_NOTES="Basic search results.\n"
