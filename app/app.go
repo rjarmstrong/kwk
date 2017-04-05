@@ -50,6 +50,11 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 			Usage: "list without styles",
 			Destination:&models.Prefs().Naked,
 		},
+		cli.BoolFlag {
+			Name: "ansi",
+			Usage: "Prints ansi escape sequences for debugging purposes",
+			Destination:&models.Prefs().PrintAnsi,
+		},
 
 		//cli.BoolFlag{
 		//	Name: "global, g",

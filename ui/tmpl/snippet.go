@@ -43,29 +43,29 @@ func inspect(s *models.Snippet) string {
 		lastRun = pad(20, style.Time(time.Unix(s.RunStatusTime, 0))).String()
 	}
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"Run Status:"), FStatus(s, true),
-		style.Fmt(style.Subdued,"Last Run:"), lastRun,
+		style.Fmt16(style.Subdued,"Run Status:"), FStatus(s, true),
+		style.Fmt16(style.Subdued,"Last Run:"), lastRun,
 	})
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"Run Count: "), fmt.Sprintf("↻ %2d", s.RunCount),
-		style.Fmt(style.Subdued,"View count:") , fmt.Sprintf("%s  %2d", style.Icon_View, s.ViewCount )})
+		style.Fmt16(style.Subdued,"Run Count: "), fmt.Sprintf("↻ %2d", s.RunCount),
+		style.Fmt16(style.Subdued,"View count:") , fmt.Sprintf("%s  %2d", style.Icon_View, s.ViewCount )})
 	if s.IsApp() {
 		tbl.Append([]string{
-			style.Fmt(style.Subdued,"App Deps:"),
+			style.Fmt16(style.Subdued,"App Deps:"),
 			style.FBox(strings.Join(s.Dependencies, ", "), 50, 5)})
 	}
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"Description:"), style.FBox(FEmpty(s.Description), 50, 3), "", ""})
+		style.Fmt16(style.Subdued,"Description:"), style.FBox(FEmpty(s.Description), 50, 3), "", ""})
 
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"Preview:"), style.FPreview(s.Preview, 50, 1), "", ""})
+		style.Fmt16(style.Subdued,"Preview:"), style.FPreview(s.Preview, 50, 1), "", ""})
 
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"Tags:"), FTags(s.Tags), "", ""})
+		style.Fmt16(style.Subdued,"Tags:"), FTags(s.Tags), "", ""})
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"sha256:"), FVerified(s) })
+		style.Fmt16(style.Subdued,"sha256:"), FVerified(s) })
 	tbl.Append([]string{
-		style.Fmt(style.Subdued,"Updated:"), humanTime(s.Created) })
+		style.Fmt16(style.Subdued,"Updated:"), humanTime(s.Created) })
 
 	tbl.Render()
 
@@ -198,7 +198,7 @@ func FTags(tags []string) string {
 
 func FEmpty(in string) string {
 	if in == "" {
-		return style.Fmt(style.Subdued, "<none>")
+		return style.Fmt16(style.Subdued, "<none>")
 	}
 	return in
 }

@@ -67,14 +67,14 @@ func runKwk() {
 	h := rpc.NewHeaders(j)
 	a := account.NewStdManager(conn, j, h)
 	ss := snippets.New(conn, j, h)
-	su := setup.NewConfigProvider(ss, s, a, w)
-	su.Load()
+	conf := setup.NewConfigProvider(ss, s, a, w)
+	conf.Load()
 
-	o := cmd.NewStdRunner(s, ss, su)
+	o := cmd.NewStdRunner(s, ss, conf)
 	r := bufio.NewReader(os.Stdin)
 	d := dlg.New(w, r)
 	api := rpc.New(conn, h)
-	kwkApp := app.New(ss, s, j, o, a, d, w, api, su)
+	kwkApp := app.New(ss, s, j, o, a, d, w, api, conf)
 	kwkApp.App.Run(os.Args)
 }
 

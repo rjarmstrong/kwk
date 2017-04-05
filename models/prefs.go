@@ -32,6 +32,7 @@ func DefaultPrefs() *Preferences {
 		Global: false,
 		AutoYes:false,
 		Force:  false,
+		PrintAnsi: false,
 	}
 	p.Covert = false
 	p.DisableRun = false
@@ -66,6 +67,7 @@ type Preferences struct {
 	Decrypt           bool // TODO: Security
 	LastPouch         string
 	Naked		  bool
+	PrintAnsi	  bool //Prints ansi escape sequences for debugging purposes.
 }
 
 // PersistedPrefs are preferences which can be persistent.

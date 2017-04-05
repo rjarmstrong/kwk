@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 	"io"
+	"text/tabwriter"
 )
 
 var Templates = map[string]*template.Template{}
@@ -32,7 +33,7 @@ const(
 
 func init() {
 	// Aliases
-	add("dashboard", style.Fmt(style.Cyan, logo)+"{{. | listRoot }}", template.FuncMap{"listRoot": listRoot })
+	add("dashboard", style.Fmt16(style.Cyan, logo)+"{{. | listRoot }}", template.FuncMap{"listRoot": listRoot })
 
 	add("snippet:updated", MARGIN+ "👍  Description updated:\n{{ .Description | blue }}\n\n", template.FuncMap{"blue": blue})
 	add("api:not-found", "{{. | yellow }} Not found\n", template.FuncMap{"yellow": yellow})
@@ -90,9 +91,6 @@ func init() {
 		"Use `kwk change-password` once you have received instructions.\n" +
 		"*****\n", template.FuncMap{"blue": blue})
 
-	add("dialog:choose", "{{. | multiChoice }}\n", template.FuncMap{"multiChoice": multiChoice})
-	add("dialog:header", "{{.| blue }}\n", template.FuncMap{"blue": blue})
-
 	add("env:changed", style.InfoDeskPerson+"  {{ \"env.yml\" | blue }} set to: {{.| blue }}\n", template.FuncMap{"blue": blue})
 
 	addColor("account:signup:email", "What's your email? ", blue)
@@ -115,8 +113,10 @@ func init() {
 	addPrinters()
 }
 
+
 func addPrinters() {
 	Printers["search:alpha"] = alphaSearchResult
+	Printers["dialog:choose"] = multiChoice
 }
 
 func humanTime(t int64) string {
@@ -135,28 +135,46 @@ func addColor(name string, text string, color ColorFunc) {
 	add(name, fmt.Sprintf("{{ %q | color }}", text), template.FuncMap{"color": color})
 }
 
-func multiChoice(list []*models.Snippet) string {
-	var options string
-	for i, v := range list {
-		options = options + fmt.Sprintf("[%s] %s   ", style.Fmt(style.Cyan, i+1), v.String())
+func multiChoice(w io.Writer, in interface{}) {
+	list := in.([]*models.Snippet)
+	fmt.Fprint(w, "\n")
+	if len(list) == 1 {
+		fmt.Fprintf(w, "%sDid you mean: %s? y/n\n\n", MARGIN, style.Fmt256(style.Color_PouchCyan, list[0].String()))
+		return
 	}
-	return options
+	t := tabwriter.NewWriter(w, 5, 1, 3, ' ', tabwriter.TabIndent)
+	for i, v := range list {
+		if i%3 == 0 {
+			t.Write([]byte(MARGIN))
+		}
+		fmt256 := style.Fmt16(style.Cyan, i+1)
+		t.Write([]byte(fmt.Sprintf("%s %s", fmt256, v.SnipName.String())))
+		x := i + 1
+		if x%3 == 0 {
+			t.Write([]byte("\n"))
+		} else {
+			t.Write([]byte("\t"))
+		}
+	}
+	t.Write([]byte("\n\n"))
+	t.Flush()
+	fmt.Fprint(w, MARGIN + style.Fmt256(style.Color_PouchCyan, "Please select a snippet: "))
 }
 
 type ColorFunc func(int interface{}) string
 
 func blue(in interface{}) string {
-	return style.Fmt(style.Cyan, fmt.Sprintf("%v", in))
+	return style.Fmt16(style.Cyan, fmt.Sprintf("%v", in))
 }
 
 func yellow(in interface{}) string {
-	return style.Fmt(style.Yellow, fmt.Sprintf("%v", in))
+	return style.Fmt16(style.Yellow, fmt.Sprintf("%v", in))
 }
 
 func red(in interface{}) string {
-	return style.Fmt(style.Red, fmt.Sprintf("%v", in))
+	return style.Fmt16(style.Red, fmt.Sprintf("%v", in))
 }
 
 func subdued(in interface{}) string {
-	return style.Fmt(style.Subdued, fmt.Sprintf("%v", in))
+	return style.Fmt16(style.Subdued, fmt.Sprintf("%v", in))
 }

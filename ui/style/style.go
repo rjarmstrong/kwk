@@ -14,6 +14,7 @@ const (
 	BrightWhite  AnsiCode = 1
 	Subdued      AnsiCode = 2
 
+	// 16 COLORS
 	Black        AnsiCode = 30
 	Red          AnsiCode = 31
 	Green        AnsiCode = 32
@@ -34,6 +35,7 @@ const (
 	LightCyan    AnsiCode = 96
 	White97      AnsiCode = 97
 
+	// 256 COLORS
 	LightBlue104 AnsiCode = 104
 	Black0     AnsiCode = 0
 	Black231     AnsiCode = 231
@@ -67,8 +69,6 @@ const (
 	End       = "\033[0m"
 	Start255     = "\033[48;5;"
 	End255       = "\033[0;00m"
-
-
 
 	Warning        = "\xE2\x9A\xA0"
 	Fire           = "\xF0\x9F\x94\xA5"
@@ -104,45 +104,46 @@ var(
 	Pad_1_1 = strings.Repeat(Fmt256(100, " "), 1)
 	Pad_0_0 = strings.Repeat(Fmt256(30, ""), 1)
 
-	Pad16_0_0 = strings.Repeat(Fmt(0, ""), 1)
-	Pad16_1_1 = strings.Repeat(Fmt(0, " "), 1)
-	Pad16_2_1 = strings.Repeat(Fmt(0, "  "), 1)
-	Pad16_3_1 = strings.Repeat(Fmt(0, "   "), 1)
-	Pad16_4_1 = strings.Repeat(Fmt(0, "    "), 1)
-	Pad16_1_2 = strings.Repeat(Fmt(0, " "), 2)
-	Pad16_2_2 = strings.Repeat(Fmt(0, "  "), 2)
-	Pad16_3_2 = strings.Repeat(Fmt(0, "   "), 2)
-	Pad16_3_4 = strings.Repeat(Fmt(0, " "), 4)
+	Pad16_0_0 = strings.Repeat(Fmt16(0, ""), 1)
+	Pad16_1_1 = strings.Repeat(Fmt16(0, " "), 1)
+	Pad16_2_1 = strings.Repeat(Fmt16(0, "  "), 1)
+	Pad16_3_1 = strings.Repeat(Fmt16(0, "   "), 1)
+	Pad16_4_1 = strings.Repeat(Fmt16(0, "    "), 1)
+	Pad16_1_2 = strings.Repeat(Fmt16(0, " "), 2)
+	Pad16_2_2 = strings.Repeat(Fmt16(0, "  "), 2)
+	Pad16_3_2 = strings.Repeat(Fmt16(0, "   "), 2)
+	Pad16_3_4 = strings.Repeat(Fmt16(0, " "), 4)
 )
 
 func FStart(c AnsiCode, in interface{}) string {
 	return fmt.Sprintf("\033[%dm%v", c, in)
 }
 
-// Fmt formats output for the CLI.
-func Fmt(c AnsiCode, in interface{}) string {
+func fmtColor (c AnsiCode, in interface{}, ansiPattern string) string {
 	a := strings.Split(fmt.Sprintf("%v", in), "\n")
 	for i, v := range a {
-		a[i] = fmt.Sprintf("\033[%0dm%v\033[0m", c, v)
+		ansi := fmt.Sprintf("%s%s%dm%s%s", Start, ansiPattern, c, v, End)
+		if models.Prefs() != nil && models.Prefs().PrintAnsi {
+			a[i] = fmt.Sprintf("%q", ansi)
+		} else {
+			a[i] = ansi
+		}
 	}
 	return strings.Join(a, "\n")
+}
+
+func Fmt16(c AnsiCode, in interface{}) string {
+	return fmtColor(c, in,"")
+}
+
+func Fmt256(c AnsiCode, in interface{}) string {
+	return fmtColor(c, in,"38;5;")
 }
 
 func FmtFgBg(in string, fg AnsiCode, bg AnsiCode) string {
 	r := fmt.Sprintf("%s38;5;%dm%s48;5;%dm%s%s", Start, fg, Start, bg, in, End)
 	return r
 }
-
-func Fmt256(c AnsiCode, in interface{}) string {
-	return fmt.Sprintf("%s38;5;%00dm%s%s", Start, c, in, End)
-}
-
-func ColourSpan(colour AnsiCode, text string, openTag string, closeTag string, surroundingColor AnsiCode) string {
-	text = strings.Replace(text, openTag, fmt.Sprintf("%s\033[%dm[", End, colour), -1)
-	text = strings.Replace(text, closeTag, fmt.Sprintf("\033[0m%s%dm", Start, surroundingColor), -1)
-	return text
-}
-
 
 func FPreview(in string, wrapAt int, lines int) string {
 	if models.Prefs().DisablePreview {

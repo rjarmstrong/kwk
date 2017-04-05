@@ -45,7 +45,7 @@ func FStatus(s *models.Snippet, includeText bool) string {
 		}
 		return style.Fmt256(style.Color_BrightRed, style.Icon_Broke)
 	}
-	return style.Fmt(style.Subdued, "? ")
+	return style.Fmt16(style.Subdued, "? ")
 }
 
 func listRoot(r *models.ListView) string {
@@ -61,7 +61,7 @@ func listRoot(r *models.ListView) string {
 	}
 
 	fmtHeader(w, r.Username, "", nil)
-	fmt.Fprint(w, strings.Repeat(" ", 50), style.Fmt(style.Subdued, "◉  "+models.Principal.Username + "    TLS12"))
+	fmt.Fprint(w, strings.Repeat(" ", 50), style.Fmt16(style.Subdued, "◉  "+models.Principal.Username + "    TLS12"))
 	fmt.Fprint(w, TWOLINES)
 	w.Write(listHorizontal(all, &r.UserStats))
 
@@ -70,7 +70,7 @@ func listRoot(r *models.ListView) string {
 	}
 
 	if models.ClientIsNew(r.LastUpgrade) {
-		w.WriteString(style.Fmt(style.Subdued, fmt.Sprintf("\n%skwk auto-updated to %s %s", MARGIN, models.Client.Version, humanTime(r.LastUpgrade))))
+		w.WriteString(style.Fmt16(style.Subdued, fmt.Sprintf("\n%skwk auto-updated to %s %s", MARGIN, models.Client.Version, humanTime(r.LastUpgrade))))
 	} else {
 		w.WriteString("\n")
 	}
@@ -181,10 +181,10 @@ func listSnippets(list *models.ListView) string {
 	if len(list.Snippets) == 0 {
 		fmt.Fprint(w, "\n")
 		fmt.Fprint(w, MARGIN)
-		fmt.Fprint(w, style.Fmt(style.Subdued, "<empty pouch>"))
+		fmt.Fprint(w, style.Fmt16(style.Subdued, "<empty pouch>"))
 		fmt.Fprint(w, TWOLINES)
 		fmt.Fprint(w, MARGIN)
-		fmt.Fprint(w, style.Fmt(style.Cyan, "Add new snippets to this pouch: "))
+		fmt.Fprint(w, style.Fmt16(style.Cyan, "Add new snippets to this pouch: "))
 		fmt.Fprintf(w, "`kwk new <snippet> %s/<name>.<ext>`", list.Pouch.Name)
 		fmt.Fprint(w, "\n")
 		return w.String()
@@ -214,11 +214,13 @@ func listSnippets(list *models.ListView) string {
 		name.WriteString("  ")
 		nt := style.Fmt256(style.Color_BrighterWhite, v.SnipName.String())
 		name.WriteString(nt)
-		name.WriteString("\n\n")
-		name.WriteString(style.Fmt(style.Subdued, style.FBox(v.Description, 25, 3)))
+		if v.Description != "" {
+			name.WriteString("\n\n")
+			name.WriteString(style.Fmt256(style.Color_MonthGrey, style.FBox(v.Description, 25, 3)))
+		}
 		if v.Role == models.SnipRoleEnvironment {
 			name.WriteString("\n\n")
-			name.WriteString(style.Fmt(style.Subdued, "short-cut: kwk edit env"))
+			name.WriteString(style.Fmt16(style.Subdued, "short-cut: kwk edit env"))
 		}
 		// col2
 		var lines int
@@ -294,7 +296,7 @@ func snippetIcon(v *models.Snippet) string {
 	} else if v.RunStatus == models.UseStatusFail {
 		return style.Fmt256(196, icon)
 	}
-	return style.Fmt(style.Subdued, icon)
+	return style.Fmt16(style.Subdued, icon)
 }
 
 func fmtRunCount(count int64) string {
