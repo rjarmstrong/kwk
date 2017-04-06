@@ -66,6 +66,7 @@ func listRoot(r *models.ListView) string {
 	w.Write(listHorizontal(all, &r.UserStats))
 
 	if len(r.Snippets) > 0 {
+		fmt.Fprintf(w, "\n%sLast:", MARGIN)
 		fmt.Fprint(w, listSnippets(r))
 	}
 
@@ -141,7 +142,7 @@ const timeLayout = "2 Jan 15:04 06"
 func listNaked(list *models.ListView) interface{} {
 	w := &bytes.Buffer{}
 	tbl := tablewriter.NewWriter(w)
-	tbl.SetHeader([]string{"Name", "Private", "Run status", "Run count", "View count", "LastActive", "Updated"})
+	tbl.SetHeader([]string{"Name", "Username", "Pouch", "Name", "Ext", "Private", "Run status", "Run count", "View count", "LastActive", "Updated"})
 	tbl.SetAutoWrapText(false)
 	tbl.SetBorder(false)
 	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
@@ -162,7 +163,10 @@ func listNaked(list *models.ListView) interface{} {
 			private = "public"
 		}
 		tbl.Append([]string{
-			v.String(),
+			v.Name,
+			v.Username,
+			v.Pouch,
+			v.Ext,
 			private,
 			StatusText(v),
 			fmt.Sprintf("%d", v.RunCount),
