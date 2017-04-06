@@ -142,7 +142,7 @@ const timeLayout = "2 Jan 15:04 06"
 func listNaked(list *models.ListView) interface{} {
 	w := &bytes.Buffer{}
 	tbl := tablewriter.NewWriter(w)
-	tbl.SetHeader([]string{"Name", "Username", "Pouch", "Name", "Ext", "Private", "Run status", "Run count", "View count", "LastActive", "Updated"})
+	tbl.SetHeader([]string{"Name", "Username", "Pouch", "Ext", "Private", "Status", "Runs", "Views", "Deps", "LastActive", "Updated"})
 	tbl.SetAutoWrapText(false)
 	tbl.SetBorder(false)
 	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
@@ -171,6 +171,7 @@ func listNaked(list *models.ListView) interface{} {
 			StatusText(v),
 			fmt.Sprintf("%d", v.RunCount),
 			fmt.Sprintf("%d", v.ViewCount),
+			fmt.Sprintf("%d", len(v.Dependencies)),
 			lr.Format(timeLayout),
 			t.Format(timeLayout),
 		})
