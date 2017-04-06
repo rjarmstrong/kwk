@@ -26,8 +26,15 @@ func alphaSearchResult(w io.Writer, in interface{}) {
 	fmt.Fprint(w, "\n\n")
 	// {{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{ . | result}}\n
 
+	view := &models.ListView{Snippets: []*models.Snippet{}}
 	for _, v := range res.Results {
-		fmt.Fprintf(w, "%s%s\n", MARGIN, v.String())
+		view.Snippets = append(view.Snippets, v.Snippet)
+	}
+
+	fmt.Fprint(w, listSnippets(view))
+
+	//for _, v := range res.Results {
+	//	fmt.Fprintf(w, "%s%s\n", MARGIN, v.String())
 		//if v.Highlights == nil {
 		//	v.Highlights = map[string]string{}
 		//}
@@ -42,8 +49,8 @@ func alphaSearchResult(w io.Writer, in interface{}) {
 		//f = style.Fmt(style.Subdued, f)
 		//f = style.ColourSpan(style.Black, f, "<em>", "</em>", style.Subdued)
 		//fmt.Fprint(w, f)
-	}
-	fmt.Fprint(w, "\n")
+	//}
+	//fmt.Fprint(w, "\n")
 }
 
 func highlightsToLines(highlights map[string]string) []SearchResultLine {
