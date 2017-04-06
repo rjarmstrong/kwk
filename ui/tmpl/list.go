@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"golang.org/x/text/unicode/norm"
+	"sort"
 )
 
 var mainMarkers = map[string]string{
@@ -129,7 +130,7 @@ func listPouch(list *models.ListView) string {
 			printPouchHeadAndFoot(w, list)
 		}
 		fmt.Fprint(w, listSnippets(list))
-		if list.Pouch != nil && len(list.Snippets) > 10 {
+		if list.Pouch != nil && len(list.Snippets) > 10 && !models.Prefs().HorizontalLists {
 			printPouchHeadAndFoot(w, list)
 		}
 		fmt.Fprint(w, "\n")
@@ -181,6 +182,17 @@ func listNaked(list *models.ListView) interface{} {
 }
 
 func listSnippets(list *models.ListView) string {
+	if models.Prefs() != nil && models.Prefs().HorizontalLists {
+		sort.Slice(list.Snippets, func(i,j int) bool {
+			return list.Snippets[i].Name < list.Snippets[j].Name
+		})
+		l := []interface{}{}
+		for _, v := range list.Snippets {
+			l = append(l, v)
+		}
+		return "\n\n" + string(listHorizontal(l, nil)) + "\n\n"
+	}
+
 	w := &bytes.Buffer{}
 
 	if len(list.Snippets) == 0 {
@@ -301,14 +313,12 @@ func snippetIcon(v *models.Snippet) string {
 	} else if v.RunStatus == models.UseStatusFail {
 		return style.Fmt256(196, icon)
 	}
-	return style.Fmt16(style.Subdued, icon)
+	return style.Fmt256(style.Color_MonthGrey, icon)
 }
 
 func fmtRunCount(count int64) string {
 	return fmt.Sprintf(style.Fmt256(247, "↻ %0d"), count)
 }
-
-
 
 func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
 	fmt.Fprint(w, "\n")

@@ -77,7 +77,7 @@ const (
 	Ambulance      = "\xF0\x9F\x9A\x91"
 	InfoDeskPerson = "\xF0\x9F\x92\x81"
 
-	Icon_App     = "▚" //❖  ꌳ ⧓ ⧗ 〓 ⁘ ꌳ ⁑⁘ ⁙ ѧꊞ ▚ 囙"
+	Icon_App     = "✿" //✱ ▚ ❖  ꌳ ⧓ ⧗ 〓 ⁘ ꌳ ⁑⁘ ⁙ ѧꊞ ▚ 囙"
 	Icon_Snippet = "◆"
 	Icon_View = "❍"  // 274d
 	Icon_Tick = "✓"  // 2713

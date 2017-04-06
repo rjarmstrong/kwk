@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 set -ef -o pipefail
-KWK_VERSION=v1.2.57
+KWK_VERSION=v1.2.58
 BUILD_NUMBER=$1
 RELEASE_TIME=$(date +%s)
-RELEASE_NOTES="Extra cols in naked list.\n"
+RELEASE_NOTES="Restored ls command and changed the app icon.\n"
 
 echo -e "\n\n\n**** kwk-cli build ${KWK_VERSION}+${BUILD_NUMBER} *****\n\n\n"
 

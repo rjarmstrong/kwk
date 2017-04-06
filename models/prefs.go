@@ -48,6 +48,7 @@ func DefaultPrefs() *Preferences {
 	p.CommandTimeout = 60
 	p.RowSpaces = true
 	p.RowLines = false
+	p.HorizontalLists = false
 	return p
 }
 
@@ -61,13 +62,14 @@ type Preferences struct {
 	PersistedPrefs
 	Global  bool // TODO: Implement in search api SEARCH
 	//Quiet   bool // Only display fullNames (for multi deletes etc)
-	AutoYes           bool //TODO: Security
-	Force             bool // TODO: Security Will squash warning messages e.g. when running third party snippets.
-	Encrypt           bool // TODO: Security
-	Decrypt           bool // TODO: Security
-	LastPouch         string
-	Naked		  bool
-	PrintAnsi	  bool //Prints ansi escape sequences for debugging purposes.
+	AutoYes         bool //TODO: Security
+	Force           bool // TODO: Security Will squash warning messages e.g. when running third party snippets.
+	Encrypt         bool // TODO: Security
+	Decrypt         bool // TODO: Security
+	LastPouch       string
+	Naked           bool
+	PrintAnsi       bool //Prints ansi escape sequences for debugging purposes.
+	HorizontalLists bool
 }
 
 // PersistedPrefs are preferences which can be persistent.

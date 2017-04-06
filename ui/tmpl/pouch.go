@@ -23,11 +23,10 @@ func listHorizontal(l []interface{}, stats *models.UserStats) []byte {
 			item.WriteString("  ")
 		}
 		if sn, ok := v.(*models.Snippet); ok {
-			item.WriteString(FStatus(sn, false))
+			item.WriteString(snippetIcon(sn))
 			item.WriteString("  ")
-			item.WriteString(style.Fmt16(style.Cyan, sn.SnipName.Name))
-			item.WriteString(style.Fmt16(style.Subdued, "."+sn.SnipName.Ext))
-			item.WriteString(" ")
+			item.WriteString(style.Fmt256(style.Color_BrighterWhite, sn.SnipName.String()))
+			//item.WriteString(FStatus(sn, false))
 		}
 		if pch, ok := v.(*models.Pouch); ok {
 			if models.Prefs().ListAll || !pch.MakePrivate {

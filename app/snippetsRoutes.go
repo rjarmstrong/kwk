@@ -16,6 +16,14 @@ func Snippets(s *SnippetCli) []cli.Command {
 			},
 		},
 		{
+			Name:    "ls",
+			Action: func(c *cli.Context) error {
+				models.Prefs().HorizontalLists = true;
+				s.List("", c.Args().First())
+				return nil
+			},
+		},
+		{
 			Name:    "enchilada",
 			Aliases: []string{""},
 			Flags: []cli.Flag {
@@ -76,36 +84,11 @@ func Snippets(s *SnippetCli) []cli.Command {
 			},
 		},
 		{
-			Name:    "suggest",
-			Action: func(c *cli.Context) error {
-				s.Suggest(c.Args().First())
-				return nil
-			},
-		},
-		{
 			Name:    "find",
 			Aliases: []string{"f"},
 			Action: func(c *cli.Context) error {
 				args := []string(c.Args())
 				s.Search(args...)
-				return nil
-			},
-		},
-		{
-			Name:    "popular",
-			Aliases: []string{"pop"},
-			Action: func(c *cli.Context) error {
-				args := []string(c.Args())
-				s.ListCategory("popular", args...)
-				return nil
-			},
-		},
-		{
-			Name:    "stale",
-			Aliases: []string{"old"},
-			Action: func(c *cli.Context) error {
-				args := []string(c.Args())
-				s.ListCategory("stale", args...)
 				return nil
 			},
 		},
