@@ -167,6 +167,8 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 	if isExe {
 		err := models.ScanVulnerabilities(toCheck)
 		if err != nil {
+			e := err.(*models.ClientErr)
+			r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, e.Msgs[0].Desc)
 			return nil, err
 		}
 	}
