@@ -70,7 +70,7 @@ func listRoot(r *models.ListView) string {
 	}
 
 	if models.ClientIsNew(r.LastUpgrade) {
-		w.WriteString(style.Fmt16(style.Subdued, fmt.Sprintf("\n%skwk auto-updated to %s %s", MARGIN, models.Client.Version, humanTime(r.LastUpgrade))))
+		w.WriteString(style.Fmt16(style.Subdued, fmt.Sprintf("\n\n%skwk auto-updated to %s %s", MARGIN, models.Client.Version, humanTime(r.LastUpgrade))))
 	} else {
 		w.WriteString("\n")
 	}
