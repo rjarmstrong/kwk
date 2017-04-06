@@ -69,6 +69,8 @@ const (
 	End       = "\033[0m"
 	Start255     = "\033[48;5;"
 	End255       = "\033[0;00m"
+	HideCursor   = "\033[?25l"
+	ShowCursor   = "\033[?25h"
 
 	Warning        = "\xE2\x9A\xA0"
 	Fire           = "\xF0\x9F\x94\xA5"
