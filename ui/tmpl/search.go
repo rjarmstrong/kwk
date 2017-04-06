@@ -23,7 +23,7 @@ func alphaSearchResult(w io.Writer, in interface{}) {
 	res := in.(*models.SearchTermResponse)
 
 	fmt.Fprintf(w, "\n\033[7m  \"%s\" found in %d results in %d ms  \033[0m", res.Term, res.Total, res.Took)
-	fmt.Fprint(w, "\n\n")
+	//fmt.Fprint(w, "\n\n")
 	// {{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{ . | result}}\n
 
 	view := &models.ListView{Snippets: []*models.Snippet{}}
