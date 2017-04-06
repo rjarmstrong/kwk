@@ -6,8 +6,6 @@ import (
 	"github.com/howeyc/gopass"
 	"bufio"
 	"bitbucket.com/sharingmachine/kwkcli/models"
-	"fmt"
-	"os"
 )
 
 func New(w tmpl.Writer, reader *bufio.Reader) *StdDialog {
@@ -34,9 +32,7 @@ func (d *StdDialog) Modal(templateName string, data interface{}, autoYes bool) *
 
 func (d *StdDialog) MultiChoice(templateName string, header interface{}, list []*models.Snippet) *models.Snippet {
 	d.writer.Out(templateName, list)
-	fmt.Fprint(os.Stdout, "\033[?25l")
 	input, _, _ := d.reader.ReadLine()
-	fmt.Fprint(os.Stdout, "\033[?25h")
 	i, err := num.ParseInt(string(input))
 	if i > len(list) || err != nil {
 		return d.MultiChoice(templateName, "Please choose a number.", list)
