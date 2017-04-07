@@ -254,7 +254,6 @@ func (sc *SnippetCli) InspectListOrRun(distinctName string, forceInspect bool, a
 		sc.Render("validation:one-line", err)
 	}
 
-
 	// GET SNIPPET
 	if list, err := sc.s.Get(*a); err != nil {
 		sc.typeAhead(distinctName, sc.run)

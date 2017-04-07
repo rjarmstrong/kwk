@@ -75,7 +75,7 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 	cli.HelpPrinter = dash.GetWriter()
 
 
-	accCli := NewAccountCli(u, t, w, d)
+	accCli := NewAccountCli(u, t, w, d, dash)
 	app.Commands = append(app.Commands, Accounts(accCli)...)
 
 	sysCli := NewSystemCli(s, api, u, w, t)

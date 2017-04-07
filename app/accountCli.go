@@ -6,6 +6,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
+	"os"
 )
 
 type AccountCli struct {
@@ -13,10 +14,11 @@ type AccountCli struct {
 	settings config.Persister
 	tmpl.Writer
 	dlg.Dialog
+	dash *Dashboard
 }
 
-func NewAccountCli(u account.Manager, s config.Persister, w tmpl.Writer, d dlg.Dialog) *AccountCli {
-	return &AccountCli{service: u, settings: s, Writer: w, Dialog: d}
+func NewAccountCli(u account.Manager, s config.Persister, w tmpl.Writer, d dlg.Dialog, dash *Dashboard) *AccountCli {
+	return &AccountCli{service: u, settings: s, Writer: w, Dialog: d, dash: dash}
 }
 
 func (c *AccountCli) Get() {
@@ -57,6 +59,7 @@ func (c *AccountCli) SignIn(username string, password string) {
 		if len(u.Token) > 50 {
 			c.settings.Upsert(models.ProfileFullKey, u)
 			c.Render("account:signedin", u)
+			c.dash.GetWriter()(os.Stdout,"", nil)
 		}
 	}
 }
