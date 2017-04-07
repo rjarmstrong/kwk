@@ -8,7 +8,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"gopkg.in/yaml.v2"
 	"strings"
-	"runtime"
 	"os/exec"
 	"errors"
 	"bytes"
@@ -16,20 +15,20 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"bitbucket.com/sharingmachine/kwkcli/cache"
 	"context"
 	"bitbucket.com/sharingmachine/kwkcli/log"
+	"bufio"
 )
 
 type StdRunner struct {
 	snippets snippets.Service
 	system   sys.Manager
 	settings config.Persister
-	setup setup.Provider
+	setup    setup.Provider
 }
 
 func NewStdRunner(s sys.Manager, ss snippets.Service, setup setup.Provider) *StdRunner {
-	return &StdRunner{snippets: ss, system: s,  setup: setup}
+	return &StdRunner{snippets: ss, system: s, setup: setup}
 }
 
 func (r *StdRunner) Edit(s *models.Snippet) error {
@@ -51,46 +50,20 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 		return err
 	}
 	replaceVariables(&cli, filePath, s)
-	fi, _ := os.Stat(filePath)
-	openTime := fi.ModTime().UnixNano()
 
 	log.Debug("EDITING:%v %v", s.Alias, cli)
 	r.exec(s.Alias, false, cli[0], cli[1:]...)
 
-	edited := false
-	for edited == false {
-		if fi2, _ := os.Stat(filePath); fi2.ModTime().UnixNano() > openTime {
-			edited = true
-		} else {
-			time.Sleep(time.Millisecond * 100)
-		}
-	}
-
-	closer := func() {
-		if runtime.GOOS == cache.OS_DARWIN {
-			// This assumes we are using iTerm, we'll have to get the active shell (echo $TERM_PROGRAM on Mac)
-			r.exec(s.Alias,false,"osascript", "-e", "tell application \"iTerm2\" to activate")
-		} else if runtime.GOOS == cache.OS_WINDOWS {
-			//	// How will this work on:
-			//	- windows https://technet.microsoft.com/en-us/library/ee176882.aspx
-		}
-	}
+	rdr := bufio.NewReader(os.Stdin)
+	rdr.ReadLine()
 
 	if text, err := r.system.ReadFromFile(setup.SNIP_CACHE_PATH, s.String(), true, 0); err != nil {
-		// if there was an error close the application anyway
-		closer()
 		return err
-	} else {
-		// else save and close the app
-		if _, err = r.snippets.Patch(s.Alias, s.Snip, text); err != nil {
-			closer()
-			return err
-		}
-		closer()
-		return nil
+	} else if _, err = r.snippets.Patch(s.Alias, s.Snip, text); err != nil {
+		return err
 	}
+	return nil
 }
-
 
 func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 	if !s.VerifyChecksum() {
