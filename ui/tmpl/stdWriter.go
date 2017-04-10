@@ -92,7 +92,7 @@ func (w *StdWriter) handleClientError(e *models.ClientErr) {
 }
 
 var overrides = map[models.Code]string{
-	models.Code_MultipleSnippetsFound: "Multiple snippets found with that name",
+	//models.Code_MultipleSnippetsFound: "Multiple snippets found with that name",
 	models.Code_InvalidPassword:       "Password must have one upper, one lower and one numeric",
 	models.Code_InvalidUsername:       "Username must be bl",
 	models.Code_EmailTaken:            "That email has been taken",

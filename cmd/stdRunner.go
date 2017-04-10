@@ -18,6 +18,7 @@ import (
 	"context"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"bufio"
+	"strconv"
 )
 
 type StdRunner struct {
@@ -131,6 +132,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 	return nil
 }
 
+const LEVEL_ENV  = "KWK_PROCESS_LEVEL"
 /*
 exec
 isExe differentiates between editing and running
@@ -145,8 +147,15 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 			return nil, err
 		}
 	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(models.Prefs().CommandTimeout)*time.Second)
 	c := exec.CommandContext(ctx, name, arg...)
+	levelString, ok := os.LookupEnv(LEVEL_ENV)
+	var level int
+	if ok {
+		level, _ = strconv.Atoi(levelString)
+	}
+	c.Env = append(os.Environ(), fmt.Sprintf("%s=%d", LEVEL_ENV, level+1))
 	c.Stdin = os.Stdin
 	out, err := c.StdoutPipe()
 	if err != nil {
@@ -166,6 +175,7 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 		}
 		return nil, models.ErrOneLine(models.Code_RunnerExitError, desc)
 	} else {
+		fmt.Println("LEVEL", level)
 		if isExe {
 			r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, outBuff.String())
 		}

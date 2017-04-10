@@ -34,6 +34,9 @@ service SnipsRpc {
     rpc Alpha (AlphaRequest) returns (AlphaResponse) {
     }
 
+    rpc TypeAhead (TypeAheadRequest) returns (TypeAheadResponse) {
+    }
+
     rpc LogUse (LogUseRequest) returns (LogUseResponse) {
     }
 }
@@ -76,6 +79,24 @@ message AlphaResponse {
     repeated AlphaResult results = 1;
     int64 total = 2;
     int64 took = 3;
+}
+
+message TypeAheadRequest {
+    string term = 1;
+    string extension = 2;
+    string username = 3;
+    bool all = 4; // Search both private and public snippets.
+    bool global = 5; // Search everyones snippets.
+}
+
+message TypeAheadResponse {
+    repeated TypeAheadResult results = 1;
+    int64 total = 2;
+    int64 took = 3;
+}
+
+message TypeAheadResult {
+    Snip snippet = 1;
 }
 
 message AlphaResult {
