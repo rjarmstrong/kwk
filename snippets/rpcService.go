@@ -5,7 +5,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
 	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/rpc/src/snipsRpc"
-	"bitbucket.com/sharingmachine/kwkcli/update"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"google.golang.org/grpc"
 	"time"
@@ -217,7 +216,7 @@ func (rs *RpcService) GetRoot(username string, all bool) (*models.ListView, erro
 	rs.mapSnippetList(res, l, true)
 	pl := rs.mapPouchList(r.Pouches)
 	perL := rs.mapPouchList(r.Personal)
-	record := &update.Record{}
+	//record := &update.Record{}
 	root := &models.ListView{
 		IsRoot: true,
 		Snippets: l.Snippets,
@@ -231,9 +230,9 @@ func (rs *RpcService) GetRoot(username string, all bool) (*models.ListView, erro
 		 MaxSnipsPerPouch:r.Stats.MaxSnipsPerPouch,
 		},
 	}
-	if e := rs.persister.Get(update.RecordFile, record, 0); e == nil {
-		root.LastUpgrade = record.LastUpdate
-	}
+	//if e := rs.persister.Get(update.RecordFile, record, 0); e == nil {
+	//	root.LastUpgrade = record.LastUpdate
+	//}
 	return root, err
 }
 
