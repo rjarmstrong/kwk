@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
+	"bitbucket.com/sharingmachine/kwkcli/log"
 )
 
 ////go:generate

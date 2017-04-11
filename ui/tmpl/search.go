@@ -31,7 +31,7 @@ func alphaSearchResult(w io.Writer, in interface{}) {
 		view.Snippets = append(view.Snippets, v.Snippet)
 	}
 
-	fmt.Fprint(w, listSnippets(view))
+	fmt.Fprint(w, listSnippets(view, true))
 
 	//for _, v := range res.Results {
 	//	fmt.Fprintf(w, "%s%s\n", MARGIN, v.String())

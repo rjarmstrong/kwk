@@ -68,7 +68,7 @@ func listRoot(r *models.ListView) string {
 
 	if len(r.Snippets) > 0 {
 		fmt.Fprintf(w, "\n%sLast:", MARGIN)
-		fmt.Fprint(w, listSnippets(r))
+		fmt.Fprint(w, listSnippets(r, true))
 	}
 
 	if models.ClientIsNew(r.LastUpgrade) {
@@ -129,7 +129,7 @@ func listPouch(list *models.ListView) string {
 		if list.Pouch != nil {
 			printPouchHeadAndFoot(w, list)
 		}
-		fmt.Fprint(w, listSnippets(list))
+		fmt.Fprint(w, listSnippets(list, false))
 		if list.Pouch != nil && len(list.Snippets) > 10 && !models.Prefs().HorizontalLists {
 			printPouchHeadAndFoot(w, list)
 		}
@@ -181,7 +181,7 @@ func listNaked(list *models.ListView) interface{} {
 	return w.String()
 }
 
-func listSnippets(list *models.ListView) string {
+func listSnippets(list *models.ListView, fullName bool) string {
 	if models.Prefs() != nil && models.Prefs().HorizontalLists {
 		sort.Slice(list.Snippets, func(i,j int) bool {
 			return list.Snippets[i].Name < list.Snippets[j].Name
@@ -202,7 +202,9 @@ func listSnippets(list *models.ListView) string {
 		fmt.Fprint(w, TWOLINES)
 		fmt.Fprint(w, MARGIN)
 		fmt.Fprint(w, style.Fmt16(style.Cyan, "Add new snippets to this pouch: "))
-		fmt.Fprintf(w, "`kwk new <snippet> %s/<name>.<ext>`", list.Pouch.Name)
+		if list.Pouch != nil {
+			fmt.Fprintf(w, "`kwk new <snippet> %s/<name>.<ext>`", list.Pouch.Name)
+		}
 		fmt.Fprint(w, "\n")
 		return w.String()
 	}
@@ -229,7 +231,11 @@ func listSnippets(list *models.ListView) string {
 		name := &bytes.Buffer{}
 		name.WriteString(snippetIcon(v))
 		name.WriteString("  ")
-		nt := style.Fmt256(style.Color_BrighterWhite, v.SnipName.String())
+		sn := v.SnipName.String()
+		if fullName {
+			sn = v.String()
+		}
+		nt := style.Fmt256(style.Color_BrighterWhite, sn)
 		name.WriteString(nt)
 		if v.Description != "" {
 			name.WriteString("\n\n")
