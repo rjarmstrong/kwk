@@ -87,15 +87,14 @@ type Headers struct {
 }
 
 func (i *Headers) Context() context.Context {
-	u := &models.User{}
-	if err := i.persister.Get(models.ProfileFullKey, u, 0); err != nil {
+	if models.Principal == nil {
 		return context.Background()
 	} else {
 		hostname, _ := os.Hostname()
 		ctx := metadata.NewContext(
 			context.Background(),
 			metadata.Pairs(
-				models.TokenHeaderName, u.Token,
+				models.TokenHeaderName, models.Principal.Token,
 				"host", hostname,
 				"os", runtime.GOOS,
 				"agnt", "<not implemented>", //agent //ps -p $$ | tail -1 | awk '{print $NF}'
