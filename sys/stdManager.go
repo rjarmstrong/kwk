@@ -23,14 +23,14 @@ type StdManager struct {
 
 func (s *StdManager) WriteToFile(subDirName string, suffixPath string, snippet string, incHoldingDir bool) (filePath string, err error) {
 	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
-	log.Debug("Writing file: %s", fp)
+	log.Debug("WRITE: %s", fp)
 	err = ioutil.WriteFile(fp, []byte(snippet), cache.StandardFilePermission)
 	return fp, err
 }
 
 func (s *StdManager) ReadFromFile(subDirName string, suffixPath string, incHoldingDir bool, after int64) (string, error) {
 	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
-	log.Debug("Reading file: %s", fp)
+	log.Debug("READ: %s", fp)
 	if fi, err := os.Stat(fp); err != nil {
 		if os.IsNotExist(err) {
 			// TODO: PUT IN STANDARD ERROR
