@@ -66,7 +66,7 @@ func GetConn(serverAddress string, trustAllCerts bool) (*grpc.ClientConn, error)
 		SessionTicketsDisabled:     false,
 	})
 	opts = append(opts, grpc.WithTransportCredentials(creds))
-	opts = append(opts, grpc.WithUnaryInterceptor(errorInterceptor))
+	opts = append(opts, grpc.WithUnaryInterceptor(interceptor))
 	opts = append(opts, grpc.WithTimeout(time.Second*10))
 	opts = append(opts, grpc.WithBlock())
 	grpclog.SetLogger(log.GetDebugLog())
@@ -105,7 +105,8 @@ func (i *Headers) Context() context.Context {
 	}
 }
 
-func errorInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+func interceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+	log.Debug("GRPC: %s %+v", method, req)
 	err := invoker(ctx, method, req, reply, cc, opts...)
 	if err != nil {
 		return models.ParseGrpcErr(err)
