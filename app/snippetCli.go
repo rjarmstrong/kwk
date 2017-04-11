@@ -262,7 +262,9 @@ func (sc *SnippetCli) InspectListOrRun(distinctName string, forceInspect bool, a
 		if forceInspect || models.Prefs().RequireRunKeyword {
 			sc.Render("snippet:inspect", s)
 		} else {
-			sc.Run(distinctName, args)
+			if err = sc.runner.Run(s, args); err != nil {
+				sc.HandleErr(err)
+			}
 		}
 	}
 }
