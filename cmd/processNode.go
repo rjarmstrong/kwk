@@ -20,11 +20,12 @@ type ProcessNode struct {
 	NodeStart   int64 `msg:"nst" json:"nst"`
 	AppStart    int64 `msg:"ast" json:"ast"`
 	AppDuration int64 `msg:"ad" json:"ad"`
+	Pid         int `msg:"pid" json:"pid"`
 }
 
 
 func NewProcessNode(a models.Alias, args []string, caller *ProcessNode) *ProcessNode {
-	n := &ProcessNode{AliasString : a.String(), Args : args}
+	n := &ProcessNode{AliasString : a.String(), Args : args, Pid : os.Getpid() }
 	n.NodeStart = int64(time.Now().UnixNano())
 	if caller != nil {
 		n.Caller = caller
