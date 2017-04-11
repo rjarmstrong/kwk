@@ -18,6 +18,8 @@ import (
 	"context"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"bufio"
+	"os/signal"
+	"syscall"
 )
 
 type StdRunner struct {
@@ -52,7 +54,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	replaceVariables(&cli, filePath, s)
 
 	log.Debug("EDITING:%v %v", s.Alias, cli)
-	r.exec(s.Alias, nil,false, cli[0], cli[1:]...)
+	r.exec(s.Alias, nil, false, cli[0], cli[1:]...)
 
 	rdr := bufio.NewReader(os.Stdin)
 	rdr.ReadLine()
@@ -89,7 +91,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 			if compile != nil {
 				replaceVariables(&compile, filePath, s)
 				log.Debug("COMPILE", compile)
-				rc, err := r.exec(s.Alias, args,true, compile[0], compile[1:]...)
+				rc, err := r.exec(s.Alias, args, true, compile[0], compile[1:]...)
 				if err != nil {
 					return err
 				}
@@ -133,15 +135,16 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 
 const PROCESS_NODE = "PROCESS_NODE"
 
+
+
 /*
 exec
 isExe differentiates between editing and running
 realArgs are args that were passed to the snippet, and not the derived args which are passed to the runner.
  */
-func (r *StdRunner) exec(a models.Alias, snipArgs []string, isExe bool, name string, arg ...string) (io.ReadCloser, error) {
-	toCheck := strings.Join(arg, " ")
+func (r *StdRunner) exec(a models.Alias, snipArgs []string, isExe bool, runner string, arg ...string) (io.ReadCloser, error) {
 	if isExe {
-		err := models.ScanVulnerabilities(toCheck)
+		err := models.ScanVulnerabilities(strings.Join(arg, " "))
 		if err != nil {
 			e := err.(*models.ClientErr)
 			r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, e.Msgs[0].Desc)
@@ -149,7 +152,7 @@ func (r *StdRunner) exec(a models.Alias, snipArgs []string, isExe bool, name str
 		}
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(models.Prefs().CommandTimeout)*time.Second)
-	c := exec.CommandContext(ctx, name, arg...)
+	c := exec.CommandContext(ctx, runner, arg...)
 	node, err := getCurrentNode(a, snipArgs, c)
 	if node.Level > models.MaxProcessLevel {
 		return nil, models.ErrOneLine(models.Code_ProcessTooDeep,
@@ -158,6 +161,20 @@ func (r *StdRunner) exec(a models.Alias, snipArgs []string, isExe bool, name str
 	if err != nil {
 		return nil, err
 	}
+
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGINT)
+	go func(){
+		res := <-sigChan
+		var caller string
+		if node.Caller != nil {
+			caller = node.Caller.AliasString
+		}
+		log.Debug("%s|Level:%d|Caller:%s|Message:%s", node.AliasString, node.Level, caller, res.String())
+	}()
+
+
 	c.Stdin = os.Stdin
 	out, err := c.StdoutPipe()
 	if err != nil {
@@ -171,17 +188,21 @@ func (r *StdRunner) exec(a models.Alias, snipArgs []string, isExe bool, name str
 	err = c.Run()
 	if err != nil {
 		cancel()
-		desc := fmt.Sprintf("%s execution error: %s\n\n%s", strings.ToUpper(name), err.Error(), stderr.String())
+		_, ok := err.(*exec.ExitError)
+		if ok {
+			//fmt.Println("Interupted", exErr.UserTime())
+		} else {
+			desc := fmt.Sprintf("Error running '%s' (runner: %s %s)\n\n%s", a.String(), runner, err.Error(), stderr.String())
+			return nil, models.ErrOneLine(models.Code_RunnerExitError, desc)
+		}
 		if isExe {
 			r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, stderr.String())
 		}
-		return nil, models.ErrOneLine(models.Code_RunnerExitError, desc)
-	} else {
-		if isExe {
-			r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, outBuff.String())
-		}
-		return out, nil
 	}
+	if isExe {
+		r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, outBuff.String())
+	}
+	return out, nil
 }
 
 func (r *StdRunner) getEnvSection(name string) (*yaml.MapSlice, error) {
