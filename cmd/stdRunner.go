@@ -18,7 +18,6 @@ import (
 	"context"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"bufio"
-	"strconv"
 )
 
 type StdRunner struct {
@@ -53,7 +52,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	replaceVariables(&cli, filePath, s)
 
 	log.Debug("EDITING:%v %v", s.Alias, cli)
-	r.exec(s.Alias, false, cli[0], cli[1:]...)
+	r.exec(s.Alias, nil,false, cli[0], cli[1:]...)
 
 	rdr := bufio.NewReader(os.Stdin)
 	rdr.ReadLine()
@@ -90,7 +89,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 			if compile != nil {
 				replaceVariables(&compile, filePath, s)
 				log.Debug("COMPILE", compile)
-				rc, err := r.exec(s.Alias, true, compile[0], compile[1:]...)
+				rc, err := r.exec(s.Alias, args,true, compile[0], compile[1:]...)
 				if err != nil {
 					return err
 				}
@@ -101,7 +100,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 
 			log.Debug("RUN", run)
 			run = append(run, args...)
-			rc, err := r.exec(s.Alias, true, run[0], run[1:]...)
+			rc, err := r.exec(s.Alias, args, true, run[0], run[1:]...)
 			if err != nil {
 				return err
 			}
@@ -123,7 +122,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 		interp = append(interp, args...)
 		//fmt.Println(runner)
 
-		rc, err := r.exec(s.Alias, isExe, interp[0], interp[1:]...)
+		rc, err := r.exec(s.Alias, args, isExe, interp[0], interp[1:]...)
 		if err != nil {
 			return err
 		}
@@ -132,12 +131,14 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 	return nil
 }
 
-const LEVEL_ENV  = "KWK_PROCESS_LEVEL"
+const PROCESS_NODE = "PROCESS_NODE"
+
 /*
 exec
 isExe differentiates between editing and running
+realArgs are args that were passed to the snippet, and not the derived args which are passed to the runner.
  */
-func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string) (io.ReadCloser, error) {
+func (r *StdRunner) exec(a models.Alias, snipArgs []string, isExe bool, name string, arg ...string) (io.ReadCloser, error) {
 	toCheck := strings.Join(arg, " ")
 	if isExe {
 		err := models.ScanVulnerabilities(toCheck)
@@ -147,15 +148,16 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 			return nil, err
 		}
 	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(models.Prefs().CommandTimeout)*time.Second)
 	c := exec.CommandContext(ctx, name, arg...)
-	levelString, ok := os.LookupEnv(LEVEL_ENV)
-	var level int
-	if ok {
-		level, _ = strconv.Atoi(levelString)
+	node, err := getCurrentNode(a, snipArgs, c)
+	if node.Level > models.MaxProcessLevel {
+		return nil, models.ErrOneLine(models.Code_ProcessTooDeep,
+			"Maximum levels in an app is %d. Not executing:%s", models.MaxProcessLevel, node.AliasString)
 	}
-	c.Env = append(os.Environ(), fmt.Sprintf("%s=%d", LEVEL_ENV, level+1))
+	if err != nil {
+		return nil, err
+	}
 	c.Stdin = os.Stdin
 	out, err := c.StdoutPipe()
 	if err != nil {
@@ -175,7 +177,6 @@ func (r *StdRunner) exec(a models.Alias, isExe bool, name string, arg ...string)
 		}
 		return nil, models.ErrOneLine(models.Code_RunnerExitError, desc)
 	} else {
-		fmt.Println("LEVEL", level)
 		if isExe {
 			r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, outBuff.String())
 		}

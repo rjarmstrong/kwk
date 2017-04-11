@@ -9,7 +9,10 @@ import (
 
 type Code uint32
 
+
+
 const (
+	MaxProcessLevel = 3
 	Code_Unspecified Code = 0
 	Code_NotFound Code = 10
 	Code_InvalidArgument Code = 20
@@ -46,6 +49,7 @@ const (
 
 	//Runners
 	Code_RunnerExitError Code = 700
+	Code_ProcessTooDeep Code = 710
 
 	//Writers
 	Code_PrinterNotFound Code = 800

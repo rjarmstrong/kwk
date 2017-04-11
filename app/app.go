@@ -44,6 +44,7 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 			Name: "debug, d",
 			Usage: "Debug.",
 			Destination:&log.EnableDebug,
+			EnvVar:"DEBUG",
 		},
 		cli.BoolFlag {
 			Name: "naked, n",

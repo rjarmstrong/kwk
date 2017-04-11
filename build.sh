@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 set -ef -o pipefail
-KWK_VERSION=v1.2.61
+KWK_VERSION=v1.2.62
 BUILD_NUMBER=$1
 RELEASE_TIME=$(date +%s)
-RELEASE_NOTES="Removed file watcher and simplified editing.\n"
+RELEASE_NOTES="-Added DEBUG env variable.\n-Disabled 'update record'.\n-Added process node concept."
 
 echo -e "\n\n\n**** kwk-cli build ${KWK_VERSION}+${BUILD_NUMBER} *****\n\n\n"
 
