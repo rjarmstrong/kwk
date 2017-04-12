@@ -8,22 +8,23 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/log"
+	"fmt"
 )
 
 type ConfigProvider struct {
 	u              account.Manager
 	envResolvers   Resolvers
 	prefsResolvers Resolvers
-	w tmpl.Writer
+	w              tmpl.Writer
 }
 
 func NewConfigProvider(ss snippets.Service, s sys.Manager, u account.Manager, w tmpl.Writer) Provider {
 	env := NewEnvResolvers(ss, s, u)
 	prefs := NewPrefsResolvers(ss, s, u)
-	return &ConfigProvider{envResolvers:env, prefsResolvers:prefs, u:u, w:w}
+	return &ConfigProvider{envResolvers: env, prefsResolvers: prefs, u: u, w: w}
 }
 
-func (cs *ConfigProvider) Load(){
+func (cs *ConfigProvider) Load() {
 	cs.loadEnv()
 	cs.loadPrefs()
 }
@@ -38,8 +39,12 @@ func (cs *ConfigProvider) loadEnv() *yaml.MapSlice {
 		envString, _ = cs.envResolvers.Fallback()
 	}
 	env := &yaml.MapSlice{}
-	if err := yaml.Unmarshal([]byte(envString), env); err != nil {
-		log.Error("Failed to parse env settings.", err)
+	err = yaml.Unmarshal([]byte(envString), env)
+	if err != nil {
+		cs.w.HandleErr(models.ErrOneLine(models.Code_InvalidConfigSection,
+			fmt.Sprintf("Invalid kwk *env.yml detected. `kwk edit env` to fix. %s", err)))
+		envString, _ = cs.envResolvers.Fallback()
+		yaml.Unmarshal([]byte(envString), env)
 	}
 	models.SetEnv(env)
 	return models.Env()
@@ -49,32 +54,33 @@ func (cs *ConfigProvider) loadPrefs() {
 	if models.Prefs() != nil {
 		return
 	}
-	if c, err := cs.GetConfig(cs.prefsResolvers); err != nil {
+	c, err := cs.GetConfig(cs.prefsResolvers);
+	if err != nil {
 		cs.w.HandleErr(err)
 		return
-	} else {
-		prefs := &models.Preferences{PersistedPrefs:models.PersistedPrefs{}}
-		parse := func(p string) (*models.Preferences, error) {
-			ph := &models.PreferencesHolder{}
-			if err := yaml.Unmarshal([]byte(p), ph); err != nil {
-				return nil, err
-			} else {
-				prefs.PersistedPrefs = ph.Preferences
-				return prefs, nil
-			}
-		}
-		log.Debug("Loaded prefs:%+v", c)
-		if res, err := parse(c); err != nil {
-			// TODO: USE TEMPLATE WRITER
-			cs.w.HandleErr(models.ErrOneLine(models.Code_InvalidConfigSection, "Invalid kwk *prefs.yml detected. `kwk edit prefs` to fix."))
-			// The fallback is expected not to fail parsing
-			fb, _ := cs.prefsResolvers.Fallback()
-			res, _ = parse(fb)
+	}
+	prefs := &models.Preferences{PersistedPrefs: models.PersistedPrefs{}}
+	parse := func(p string) (*models.Preferences, error) {
+		ph := &models.PreferencesHolder{}
+		if err := yaml.Unmarshal([]byte(p), ph); err != nil {
+			return nil, err
 		} else {
-			log.Debug("SETTING PREFS: %+v", res)
-			models.SetPrefs(res)
+			prefs.PersistedPrefs = ph.Preferences
+			return prefs, nil
 		}
 	}
+	log.Debug("Loaded prefs:%+v", c)
+	res, err := parse(c)
+	if err != nil {
+		// TODO: USE TEMPLATE WRITER
+		cs.w.HandleErr(models.ErrOneLine(models.Code_InvalidConfigSection,
+			fmt.Sprintf("Invalid kwk *prefs.yml detected. `kwk edit prefs` to fix. %s", err)))
+		// The fallback is expected not to fail parsing
+		fb, _ := cs.prefsResolvers.Fallback()
+		res, _ = parse(fb)
+	}
+	log.Debug("SETTING PREFS: %+v", res)
+	models.SetPrefs(res)
 }
 
 func (cs *ConfigProvider) GetConfig(r Resolvers) (string, error) {
@@ -91,5 +97,3 @@ func (cs *ConfigProvider) GetConfig(r Resolvers) (string, error) {
 		return "", err
 	}
 }
-
-
