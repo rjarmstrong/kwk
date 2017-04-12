@@ -36,6 +36,7 @@ func (a *Alias) String() string {
 func NewSetupAlias(name string, ext string, uniquePerHost bool) *Alias {
 	if uniquePerHost {
 		s, _ := os.Hostname()
+		//u, _ := user.Current()
 		name = fmt.Sprintf("%s-%s", name, strings.ToLower(s))
 	}
 	return &Alias{
