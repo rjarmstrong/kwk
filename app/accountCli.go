@@ -31,10 +31,14 @@ func (c *AccountCli) Get() {
 
 func (c *AccountCli) SignUp() {
 
-	email := c.TemplateFormField("account:signup:email", nil, false).Value.(string)
-	username := c.TemplateFormField("account:signup:username", nil, false).Value.(string)
-	password := c.TemplateFormField("account:signup:password", nil, true).Value.(string)
-	inviteCode := c.TemplateFormField("account:signup:invite-code", nil, false).Value.(string)
+	res, _ := c.TemplateFormField("account:signup:email", nil, false)
+	email := res.Value.(string)
+	res, _ = c.TemplateFormField("account:signup:username", nil, false)
+	username := res.Value.(string)
+	res, _ = c.TemplateFormField("account:signup:password", nil, true)
+	password := res.Value.(string)
+	res, _ = c.TemplateFormField("account:signup:invite-code", nil, false)
+	inviteCode := res.Value.(string)
 
 	if u, err := c.service.SignUp(email, username, password, inviteCode); err != nil {
 		c.HandleErr(err)
@@ -48,10 +52,13 @@ func (c *AccountCli) SignUp() {
 
 func (c *AccountCli) SignIn(username string, password string) {
 	if username == "" {
-		username = c.TemplateFormField("account:usernamefield", nil, false).Value.(string)
+		res, _ := c.TemplateFormField("account:usernamefield", nil, false)
+		username = res.Value.(string)
+
 	}
 	if password == "" {
-		password = c.TemplateFormField("account:passwordfield", nil, true).Value.(string)
+		res, _ := c.TemplateFormField("account:passwordfield", nil, true)
+		password = res.Value.(string)
 	}
 	if u, err := c.service.SignIn(username, password); err != nil {
 		c.HandleErr(err)
@@ -78,11 +85,11 @@ func (c *AccountCli) SignOut() {
 
 func (c *AccountCli) ChangePassword() {
 	p := models.ChangePasswordParams{}
-	res := c.Dialog.FormField("Please provide an email or username:")
+	res, _ := c.Dialog.FormField("Please provide an email or username:")
 	p.Email = res.Value.(string)
-	res = c.Dialog.TemplateFormField("account:passwordfield", nil, true)
+	res, _ = c.Dialog.TemplateFormField("account:passwordfield", nil, true)
 	p.ExistingPassword = res.Value.(string)
-	res = c.Dialog.TemplateFormField("account:passwordfield", nil, true)
+	res, _ = c.Dialog.TemplateFormField("account:passwordfield", nil, true)
 	p.NewPassword = res.Value.(string)
 	_, err := c.service.ChangePassword(p)
 	if err != nil {
@@ -93,7 +100,7 @@ func (c *AccountCli) ChangePassword() {
 
 func (c *AccountCli) ResetPassword(email string) {
 	if email == "" {
-		res := c.Dialog.TemplateFormField("account:signup:email", nil , false)
+		res, _ := c.Dialog.TemplateFormField("account:signup:email", nil , false)
 		email = res.Value.(string)
 	}
 	_, err := c.service.ResetPassword(email)

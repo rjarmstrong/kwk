@@ -94,7 +94,8 @@ func (s *StdManager) getHoldingDirectory(subDirName string, fullName string) str
 	hd := strings.Replace(fullName, ".", "_", -1)
 	dirPath := path.Join(cache.Path(), subDirName, hd)
 	if e := s.upsertDirectory(dirPath); e != nil {
-		panic(e)
+		log.Error("Could not create directory", e)
+		return ""
 	}
 	return hd
 }

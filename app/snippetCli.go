@@ -214,13 +214,12 @@ func (sc *SnippetCli) Describe(distinctName string, description string) {
 	if description == "" {
 		sc.typeAhead(distinctName, func(s *models.Snippet, args []string) {
 			cm := fmt.Sprintf("Enter new description for %s: ", s.SnipName.String())
-			if res := sc.FormField(cm); res.Ok {
-				log.Debug("Form result: %+v", res.Value)
-				sc.Describe(s.SnipName.String(), res.Value.(string))
-			} else {
-				log.Debug("not ok")
+			res, err := sc.FormField(cm)
+			if err != nil {
+				sc.HandleErr(err)
 			}
-			return
+			log.Debug("Form result: %+v", res.Value)
+			sc.Describe(s.SnipName.String(), res.Value.(string))
 		})
 		return
 	}
@@ -471,7 +470,6 @@ func Bom(t time.Time) time.Time {
 	year, month, _ := t.Date()
 	return time.Date(year, month, 1, 0, 0, 0, 0, t.Location())
 }
-
 
 func Bod(t time.Time) time.Time {
 	year, month, day := t.Date()

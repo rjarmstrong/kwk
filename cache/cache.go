@@ -21,14 +21,9 @@ func Path() string {
 		return cachePath
 	}
 	var p string
-	u, err := user.Current()
-	if err != nil {
-		// TODO: Write friendly
-		panic(err)
-	}
+	u, _ := user.Current()
 	p = fmt.Sprintf("%s/.kwk", u.HomeDir)
 	if runtime.GOOS == OS_WINDOWS {
-		// use AppDir instead
 		p = "%LocalAppData%\\kwk"
 	} else if runtime.GOOS == OS_DARWIN {
 		if u.Username == "root" {
@@ -39,7 +34,8 @@ func Path() string {
 		if os.IsExist(err) {
 			return p
 		}
-		panic(err)
+		fmt.Println("kwk might not be able to run on your system please copy error and report to: https://github.com/kwk-cli/cli-issues", err)
+		return ""
 	}
 	cachePath = p
 	return cachePath

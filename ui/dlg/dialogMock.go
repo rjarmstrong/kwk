@@ -19,15 +19,15 @@ func (d *DialogMock) Modal(templateName string, data interface{}, autoYes bool) 
 	return d.ReturnItem
 }
 
-func (d *DialogMock) TemplateFormField(templateName string, data interface{}, mask bool) *DialogResponse {
+func (d *DialogMock) TemplateFormField(templateName string, data interface{}, mask bool) (*DialogResponse, error) {
 	d.FieldCallHistory = append(d.FieldCallHistory, []interface{}{templateName, data})
 	if d.FieldResponseMap[templateName] != nil {
-		return &DialogResponse{Value:d.FieldResponseMap[templateName], Ok:true}
+		return &DialogResponse{Value:d.FieldResponseMap[templateName], Ok:true}, nil
 	}
-	return d.FieldResponse
+	return d.FieldResponse, nil
 }
 
-func (d *DialogMock) FormField(label string) *DialogResponse {
+func (d *DialogMock) FormField(label string) (*DialogResponse, error) {
   panic("not impl")
 }
 

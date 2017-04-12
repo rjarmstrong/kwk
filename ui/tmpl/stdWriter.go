@@ -21,11 +21,12 @@ func NewWriter(w io.Writer) Writer {
 }
 
 func (w *StdWriter) Render(templateName string, data interface{}) {
-	if t := Templates[templateName]; t != nil {
+	t := Templates[templateName]
+	if t != nil {
 		Templates[templateName].Execute(w.Writer, data)
-	} else {
-		panic("Template not found: " + templateName)
+		return
 	}
+	w.HandleErr(models.ErrOneLine(models.Code_PrinterNotFound, "`%s` template not found.", templateName))
 }
 
 func (w *StdWriter) Out(templateName string, data interface{}) {

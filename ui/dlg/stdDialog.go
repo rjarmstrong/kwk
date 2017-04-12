@@ -40,22 +40,21 @@ func (d *StdDialog) MultiChoice(templateName string, header interface{}, list []
 	return list[i-1]
 }
 
-func (d *StdDialog) FormField(label string) *DialogResponse {
+func (d *StdDialog) FormField(label string) (*DialogResponse, error) {
 	d.writer.Render("free-text", label)
 	var value []byte
 	var err error
 	value, _, err = d.reader.ReadLine()
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
-	//d.reader.Reset(nil)
 	return &DialogResponse{
 		Ok:true,
 		Value: string(value),
-	}
+	}, nil
 }
 
-func (d *StdDialog) TemplateFormField(templateName string, data interface{}, mask bool) *DialogResponse {
+func (d *StdDialog) TemplateFormField(templateName string, data interface{}, mask bool) (*DialogResponse, error) {
 	d.writer.Render(templateName, data)
 	var value []byte
 	var err error
@@ -65,10 +64,10 @@ func (d *StdDialog) TemplateFormField(templateName string, data interface{}, mas
 		value, _, err = d.reader.ReadLine()
 	}
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 	//d.reader.Reset(nil)
 	return &DialogResponse{
 		Value: string(value),
-	}
+	}, nil
 }
