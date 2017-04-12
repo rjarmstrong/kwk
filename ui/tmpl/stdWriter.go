@@ -4,9 +4,8 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc"
 	"io"
-	"fmt"
+	"google.golang.org/grpc/status"
 )
 
 /*
@@ -39,14 +38,13 @@ func (w *StdWriter) Out(templateName string, data interface{}) {
 
 // Should be able to handle all types of errors not limited to grpc.rpcError and models.ClientErr
 func (w *StdWriter) HandleErr(e error) {
-	code := grpc.Code(e)
 	ce, ok := e.(*models.ClientErr)
 	if ok {
 		w.handleClientError(ce)
 		return
 	}
-
-	switch code {
+	sts, ok := status.FromError(e)
+	switch sts.Code() {
 	case codes.InvalidArgument:
 		log.Error("Unhandled err, requires mapping to client err.:", e)
 		panic(e)
@@ -79,16 +77,8 @@ func (w *StdWriter) handleClientError(e *models.ClientErr) {
 			e.Msgs[i].Desc = o
 		}
 	}
-	if len(e.Msgs) > 1 {
-		for _, m := range e.Msgs {
-			w.Render("validation:multi-line", m)
-		}
-
-	} else if len(e.Msgs) == 1 {
+	if len(e.Msgs) == 1 {
 		w.Render("validation:one-line", e.Msgs[0])
-	} else {
-		log.Error("Unhandled error", e)
-		fmt.Println(e.Error())
 	}
 }
 

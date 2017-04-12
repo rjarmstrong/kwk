@@ -1,10 +1,10 @@
 package models
 
 import (
-	"google.golang.org/grpc"
 	"encoding/json"
 	"fmt"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Code uint32
@@ -58,14 +58,14 @@ const (
 // ParseGrpcErr should be used at RPC service call level. i.e. the errors
 // returned by the GRPC stubs need to be converted to local errors.
 func ParseGrpcErr(e error) error {
-	desc := grpc.ErrorDesc(e)
+	sts, _ := status.FromError(e)
 	m := &ClientErr{}
-	m.remoteCode = grpc.Code(e)
+	m.remoteCode = sts.Code()
 	if m.remoteCode == codes.NotFound {
-		return ErrOneLine(Code_NotFound, desc)
+		return ErrOneLine(Code_NotFound, sts.Message())
 	}
-	if err := json.Unmarshal([]byte(desc), m); err != nil {
-		m.Title = desc
+	if err := json.Unmarshal([]byte(sts.Message()), m); err != nil {
+		m.Title = sts.Message()
 		return m
 	}
 	return m

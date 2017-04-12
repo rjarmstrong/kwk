@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
+	"bitbucket.com/sharingmachine/kwkcli/log"
 )
 
 // TODO: check yml version is compatible with this build else force upgrade.
@@ -40,6 +41,7 @@ func (e *EnvResolvers) Local() (string, error) {
 }
 
 func (e *EnvResolvers) Own() (string, error) {
+	log.Debug("GETTING ENV: %s", e.alias.String())
 	if l, err := e.snippets.Get(e.alias); err != nil {
 		return "", err
 	} else {

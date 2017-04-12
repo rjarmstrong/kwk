@@ -9,7 +9,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
 	"bitbucket.com/sharingmachine/kwkcli/sys"
-	"bitbucket.com/sharingmachine/kwkcli/setup"
 )
 
 func CreateAppStub() *KwkApp {
@@ -21,7 +20,6 @@ func CreateAppStub() *KwkApp {
 	w := &tmpl.WriterMock{}
 	d := &dlg.DialogMock{}
 	api := &rpc.SysMock{}
-	su := &setup.ProviderMock{}
-	app := New(a, s, t, o, u, d, w, api, su)
+	app := NewApp(a, s, t, o, u, d, w, api)
 	return app
 }

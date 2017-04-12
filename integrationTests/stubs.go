@@ -27,7 +27,7 @@ func createApp(conn *grpc.ClientConn, writer *bytes.Buffer, r *bufio.Reader) *ap
 	w := tmpl.NewWriter(writer)
 	d := dlg.New(w, r)
 	o := openers.New(s, a, w)
-	return app.New(a, s, t, o, u, d, w, ch)
+	return app.NewApp(a, s, t, o, u, d, w, ch)
 }
 
 const (

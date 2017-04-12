@@ -107,6 +107,9 @@ func (i *Headers) Context() context.Context {
 
 func interceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 	log.Debug("GRPC: %s %+v", method, req)
+	if models.Principal.Token == "" {
+		log.Debug("AUTH: No token in request.")
+	}
 	err := invoker(ctx, method, req, reply, cc, opts...)
 	if err != nil {
 		return models.ParseGrpcErr(err)

@@ -26,11 +26,10 @@ type StdRunner struct {
 	snippets snippets.Service
 	system   sys.Manager
 	settings config.Persister
-	setup    setup.Provider
 }
 
-func NewStdRunner(s sys.Manager, ss snippets.Service, setup setup.Provider) *StdRunner {
-	return &StdRunner{snippets: ss, system: s, setup: setup}
+func NewStdRunner(s sys.Manager, ss snippets.Service) *StdRunner {
+	return &StdRunner{snippets: ss, system: s}
 }
 
 func (r *StdRunner) Edit(s *models.Snippet) error {

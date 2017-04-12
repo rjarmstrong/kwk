@@ -10,7 +10,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
 	"github.com/urfave/cli"
-	"bitbucket.com/sharingmachine/kwkcli/setup"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"strings"
@@ -29,12 +28,12 @@ type KwkApp struct {
 	Api 	       rpc.Service
 }
 
-func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u account.Manager,
-	d dlg.Dialog, w tmpl.Writer, api rpc.Service, su setup.Provider) *KwkApp {
+func NewApp(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u account.Manager,
+	d dlg.Dialog, w tmpl.Writer, api rpc.Service) *KwkApp {
 
-	app := cli.NewApp()
+	ap := cli.NewApp()
 
-	app.Flags = []cli.Flag {
+	ap.Flags = []cli.Flag {
 		cli.BoolFlag{
 			Name: "covert, x",
 			Usage: "Open browser in covert mode.",
@@ -71,20 +70,19 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 		//},
 	}
 
-	app.Version = models.Client.String()
+	ap.Version = models.Client.String()
 	dash := NewDashBoard(w, a)
 	cli.HelpPrinter = dash.GetWriter()
 
-
 	accCli := NewAccountCli(u, t, w, d, dash)
-	app.Commands = append(app.Commands, Accounts(accCli)...)
+	ap.Commands = append(ap.Commands, Accounts(accCli)...)
 
 	sysCli := NewSystemCli(s, api, u, w, t)
-	app.Commands = append(app.Commands, System(sysCli)...)
+	ap.Commands = append(ap.Commands, System(sysCli)...)
 
 	snipCli := NewSnippetCli(a, r, s, d, w, t)
-	app.Commands = append(app.Commands, Snippets(snipCli)...)
-	app.CommandNotFound = func(c *cli.Context, distinctName string) {
+	ap.Commands = append(ap.Commands, Snippets(snipCli)...)
+	ap.CommandNotFound = func(c *cli.Context, distinctName string) {
 		i := c.Args().Get(1)
 		if strings.HasPrefix(distinctName, "@") {
 			fmt.Println("listing:", distinctName)
@@ -109,7 +107,7 @@ func New(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u 
 	}
 
 	return &KwkApp{
-		App: app,
+		App: ap,
 		System: s,
 		Settings: t,
 		Runner: r,

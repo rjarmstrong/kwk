@@ -62,12 +62,12 @@ func (cs *ConfigProvider) loadPrefs() {
 	prefs := &models.Preferences{PersistedPrefs: models.PersistedPrefs{}}
 	parse := func(p string) (*models.Preferences, error) {
 		ph := &models.PreferencesHolder{}
-		if err := yaml.Unmarshal([]byte(p), ph); err != nil {
+		err := yaml.Unmarshal([]byte(p), ph)
+		if err != nil {
 			return nil, err
-		} else {
-			prefs.PersistedPrefs = ph.Preferences
-			return prefs, nil
 		}
+		prefs.PersistedPrefs = ph.Preferences
+		return prefs, nil
 	}
 	log.Debug("Loaded prefs:%+v", c)
 	res, err := parse(c)
