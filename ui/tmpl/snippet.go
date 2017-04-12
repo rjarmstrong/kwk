@@ -13,14 +13,14 @@ import (
 func inspect(s *models.Snippet) string {
 	w := &bytes.Buffer{}
 	w.WriteString("\n")
-	w.WriteString(MARGIN)
+	w.WriteString(style.MARGIN)
 	fmtHeader(w,  s.Username, s.Pouch, &s.SnipName)
 	w.WriteString(strings.Repeat(" ", 4))
 	w.WriteString(snippetIcon(s))
 	w.WriteString("  ")
 	w.WriteString(FSnippetType(s))
 	fmt.Fprint(w,"\n")
-	fmt.Fprint(w, TWOLINES)
+	fmt.Fprint(w, style.TWOLINES)
 	fmt.Fprint(w, FCodeview(s, 100, 0, false))
 	fmt.Fprint(w,"\n\n")
 

@@ -64,7 +64,7 @@ func listHorizontal(l []interface{}, stats *models.UserStats) []byte {
 }
 
 func insertGridLine(b *bytes.Buffer) {
-	b.WriteString(fmt.Sprintf("\n%s\t%s\t%s\t%s\t%s\t%s\n", MARGIN, style.Pad_1_2, style.Pad_1_2, style.Pad_1_2, style.Pad_1_2, style.Pad_1_2))
+	b.WriteString(fmt.Sprintf("\n%s\t%s\t%s\t%s\t%s\t%s\n", style.MARGIN, style.Pad_1_2, style.Pad_1_2, style.Pad_1_2, style.Pad_1_2, style.Pad_1_2))
 }
 
 func pouchIcon(pch *models.Pouch, isLast bool) string {

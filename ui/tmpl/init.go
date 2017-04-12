@@ -27,21 +27,19 @@ const logo = `
 
 const(
 	KWK_HOME = "kwk.co"
-	MARGIN   = "  "
-	TWOLINES = "\n\n"
 )
 
 func init() {
 	// Aliases
 	add("dashboard", style.Fmt16(style.Cyan, logo)+"{{. | listRoot }}", template.FuncMap{"listRoot": listRoot })
 
-	add("snippet:updated", MARGIN+ "👍  Description updated:\n{{ .Description | blue }}\n\n", template.FuncMap{"blue": blue})
+	add("snippet:updated", style.MARGIN+ "👍  Description updated:\n{{ .Description | blue }}\n\n", template.FuncMap{"blue": blue})
 	add("api:not-found", "{{. | yellow }} Not found\n", template.FuncMap{"yellow": yellow})
-	add("snippet:cloned", MARGIN +"👍  Cloned as {{.String | blue}}\n\n", template.FuncMap{"blue": blue})
-	add("snippet:new", MARGIN+ "👍  {{. | blue }} created "+style.Icon_Pouch+"\n\n", template.FuncMap{"blue": blue})
-	add("snippet:newprivate", MARGIN+ "👍  {{.String | blue }} created "+style.Icon_PrivatePouch+"\n\n", template.FuncMap{"blue": blue})
+	add("snippet:cloned", style.MARGIN +"👍  Cloned as {{.String | blue}}\n\n", template.FuncMap{"blue": blue})
+	add("snippet:new", style.MARGIN+ "👍  {{. | blue }} created "+style.Icon_Pouch+"\n\n", template.FuncMap{"blue": blue})
+	add("snippet:newprivate", style.MARGIN+ "👍  {{.String | blue }} created "+style.Icon_PrivatePouch+"\n\n", template.FuncMap{"blue": blue})
 	add("snippet:cat", "{{.Snip}}\n", nil)
-	add("snippet:edited", MARGIN + "👍  Successfully updated {{ .String | blue }}\n\n", template.FuncMap{"blue": blue})
+	add("snippet:edited", style.MARGIN + "👍  Successfully updated {{ .String | blue }}\n\n", template.FuncMap{"blue": blue})
 
 	add("snippet:editing", "{{ \"Editing... \" | blue }}\nHit ENTER to upload changes. CTRL+C to cancel.\n", template.FuncMap{"blue": blue})
 
@@ -142,13 +140,13 @@ func multiChoice(w io.Writer, in interface{}) {
 	list := in.([]*models.Snippet)
 	fmt.Fprint(w, "\n")
 	if len(list) == 1 {
-		fmt.Fprintf(w, "%sDid you mean: %s? y/n\n\n", MARGIN, style.Fmt256(style.Color_PouchCyan, list[0].String()))
+		fmt.Fprintf(w, "%sDid you mean: %s? y/n\n\n", style.MARGIN, style.Fmt256(style.Color_PouchCyan, list[0].String()))
 		return
 	}
 	t := tabwriter.NewWriter(w, 5, 1, 3, ' ', tabwriter.TabIndent)
 	for i, v := range list {
 		if i%3 == 0 {
-			t.Write([]byte(MARGIN))
+			t.Write([]byte(style.MARGIN))
 		}
 		fmt256 := style.Fmt16(style.Cyan, i+1)
 		t.Write([]byte(fmt.Sprintf("%s %s", fmt256, v.SnipName.String())))
@@ -161,7 +159,7 @@ func multiChoice(w io.Writer, in interface{}) {
 	}
 	t.Write([]byte("\n\n"))
 	t.Flush()
-	fmt.Fprint(w, MARGIN + style.Fmt256(style.Color_PouchCyan, "Please select a snippet: "))
+	fmt.Fprint(w, style.MARGIN + style.Fmt256(style.Color_PouchCyan, "Please select a snippet: "))
 }
 
 type ColorFunc func(int interface{}) string

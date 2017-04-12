@@ -63,16 +63,16 @@ func listRoot(r *models.ListView) string {
 
 	fmtHeader(w, r.Username, "", nil)
 	fmt.Fprint(w, strings.Repeat(" ", 50), style.Fmt16(style.Subdued, "◉  "+models.Principal.Username + "    TLS12"))
-	fmt.Fprint(w, TWOLINES)
+	fmt.Fprint(w, style.TWOLINES)
 	w.Write(listHorizontal(all, &r.UserStats))
 
 	if len(r.Snippets) > 0 {
-		fmt.Fprintf(w, "\n%sLast:", MARGIN)
+		fmt.Fprintf(w, "\n%sLast:", style.MARGIN)
 		fmt.Fprint(w, listSnippets(r, true))
 	}
 
 	if models.ClientIsNew(r.LastUpgrade) {
-		w.WriteString(style.Fmt16(style.Subdued, fmt.Sprintf("\n\n%skwk auto-updated to %s %s", MARGIN, models.Client.Version, humanTime(r.LastUpgrade))))
+		w.WriteString(style.Fmt16(style.Subdued, fmt.Sprintf("\n\n%skwk auto-updated to %s %s", style.MARGIN, models.Client.Version, humanTime(r.LastUpgrade))))
 	} else {
 		w.WriteString("\n")
 	}
@@ -81,7 +81,7 @@ func listRoot(r *models.ListView) string {
 }
 
 //func printCommunity(w *bytes.Buffer) {
-//	fmt.Fprint(w, "\n", MARGIN, style.Fmt(style.Subdued, "Community"), "\n")
+//	fmt.Fprint(w, "\n", style.MARGIN, style.Fmt(style.Subdued, "Community"), "\n")
 //	com := []interface{}{}
 //	com = append(com, &models.Pouch{
 //		Name:       style.Fmt(style.Cyan, "/kwk/") + "unicode",
@@ -103,11 +103,11 @@ func listRoot(r *models.ListView) string {
 
 func printPouchHeadAndFoot(w *bytes.Buffer, list *models.ListView) {
 	fmtHeader(w, list.Username, list.Pouch.Name, nil)
-	fmt.Fprint(w, MARGIN, MARGIN, pouchIcon(list.Pouch, false))
+	fmt.Fprint(w, style.MARGIN, style.MARGIN, pouchIcon(list.Pouch, false))
 	fmt.Fprint(w, "  ")
 	fmt.Fprint(w, locked(list.Pouch.MakePrivate))
 	fmt.Fprint(w, " Pouch")
-	fmt.Fprint(w, MARGIN, MARGIN, len(list.Snippets), " snippets")
+	fmt.Fprint(w, style.MARGIN, style.MARGIN, len(list.Snippets), " snippets")
 	fmt.Fprint(w, "\n")
 }
 
@@ -197,10 +197,10 @@ func listSnippets(list *models.ListView, fullName bool) string {
 
 	if len(list.Snippets) == 0 {
 		fmt.Fprint(w, "\n")
-		fmt.Fprint(w, MARGIN)
+		fmt.Fprint(w, style.MARGIN)
 		fmt.Fprint(w, style.Fmt16(style.Subdued, "<empty pouch>"))
-		fmt.Fprint(w, TWOLINES)
-		fmt.Fprint(w, MARGIN)
+		fmt.Fprint(w, style.TWOLINES)
+		fmt.Fprint(w, style.MARGIN)
 		fmt.Fprint(w, style.Fmt16(style.Cyan, "Add new snippets to this pouch: "))
 		if list.Pouch != nil {
 			fmt.Fprintf(w, "`kwk new <snippet> %s/<name>.<ext>`", list.Pouch.Name)
@@ -267,7 +267,7 @@ func listSnippets(list *models.ListView, fullName bool) string {
 			snip = snip + "\n"
 		}
 		if len(v.Preview) >= 10 {
-			snip = snip + "\n\n" + MARGIN + style.Fmt256(style.Color_MonthGrey, style.FPreview(v.Preview, 120, 1))
+			snip = snip + "\n\n" + style.MARGIN + style.Fmt256(style.Color_MonthGrey, style.FPreview(v.Preview, 120, 1))
 		}
 
 		tbl.Append([]string{
@@ -280,13 +280,13 @@ func listSnippets(list *models.ListView, fullName bool) string {
 
 	//fmt.Fprint(w, style.Start)
 	//fmt.Fprintf(w, "%dm", style.Subdued)
-	//fmt.Fprint(w, MARGIN)
+	//fmt.Fprint(w, style.MARGIN)
 	//fmt.Fprintf(w,"Expand list: `kwk expand %s`", list.Pouch)
-	//fmt.Fprint(w, MARGIN)
+	//fmt.Fprint(w, style.MARGIN)
 	//fmt.Fprint(w, style.End)
 	////fmt.Fprint(w, style.Start)
 	//fmt.Fprintf(w, "%dm", style.Subdued)
-	//fmt.Fprint(w, MARGIN)
+	//fmt.Fprint(w, style.MARGIN)
 	//fmt.Fprintf(w, "%d of max 32 snippets in pouch", len(list.Snippets))
 	//fmt.Fprint(w, style.End)
 
@@ -328,7 +328,7 @@ func fmtRunCount(count int64) string {
 
 func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
 	fmt.Fprint(w, "\n")
-	fmt.Fprint(w, MARGIN)
+	fmt.Fprint(w, style.MARGIN)
 	fmt.Fprint(w, style.Start)
 	fmt.Fprint(w, "7m")
 	fmt.Fprint(w, " ❯ ")

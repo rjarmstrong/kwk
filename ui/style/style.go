@@ -97,6 +97,9 @@ const (
 	Color_DimStat = 238
 	Color_YesGreen = 119
 
+	MARGIN   = "  "
+	TWOLINES = "\n\n"
+
 	// 🔰 👝 🔒 🔸 ⚡ ✓ ⇨ ᗜ 🔑 ● 🌎 ◯ ⚡ ☰ 💫 📦 ▻ ▸ ► ▷ ◦ ▲ ⚙ ⿳ ▣ ⬤ ⬜ 👁 👀
 )
 
