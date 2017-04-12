@@ -163,7 +163,7 @@ func (r *StdRunner) execEdit(a models.Alias, editor string, arg ...string) error
 exec realArgs are args that were passed to the snippet, and not the derived args which are passed to the runner.
  */
 func (r *StdRunner) exec(a models.Alias, snipArgs []string, runner string, arg ...string) error {
-	ctx, stop := context.WithTimeout(context.Background(), time.Duration(models.Prefs().CommandTimeout)*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(models.Prefs().CommandTimeout)*time.Second)
 	c := exec.CommandContext(ctx, runner, arg...)
 	c.Stdin = os.Stdin
 	out, err := c.StdoutPipe()
@@ -206,23 +206,24 @@ func (r *StdRunner) exec(a models.Alias, snipArgs []string, runner string, arg .
 		log.Debug("INTERRUPTED: %s|Level:%d|Caller:%s|Message:%s", node.AliasString, node.Level, caller, res.String())
 	}()
 	err = c.Run()
-	node.Complete(c.ProcessState.Pid())
-	if err == nil {
-		r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, outBuff.String())
-		return nil
+	if c.ProcessState != nil {
+		node.Complete(c.ProcessState.Pid())
 	}
-	stop()
-	exErr, ok := err.(*exec.ExitError)
-	if ok {
-		log.Debug("Interupted:%+v", exErr)
-		r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, outBuff.String())
-		return nil
-
-	} else {
-		desc := fmt.Sprintf("Error running '%s' (runner: %s %s)\n\n%s", a.String(), runner, err.Error(), stderr.String())
+	if stderr.Len() > 0 {
+		desc := fmt.Sprintf("Error running '%s' (runner: '%s' %s)\n\n%s", a.String(), runner, err.Error(), stderr.String())
+		r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, stderr.String())
 		return models.ErrOneLine(models.Code_RunnerExitError, desc)
 	}
-	r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, stderr.String())
+	if err != nil {
+		exErr, ok := err.(*exec.ExitError)
+		if !ok {
+			// kwk error return and handle
+			return err
+		}
+		// Was an interrupt
+		log.Debug("Interupted:%+v", exErr)
+	}
+	r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, outBuff.String())
 	return nil
 }
 
