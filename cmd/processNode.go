@@ -1,46 +1,64 @@
 package cmd
 
 import (
-	"time"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"os"
 	"encoding/json"
 	"fmt"
 	"os/exec"
+	//"github.com/mitchellh/go-ps"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 )
 
-////go:generate
 
 type ProcessNode struct {
 	AliasString string `msg:"ali" json:"ali"`
 	Level       int `msg:"l" json:"lvl"`
 	Args        []string `msg:"args" json:"args"`
 	Caller      *ProcessNode `msg:"c" json:"c"`
-	NodeStart   int64 `msg:"nst" json:"nst"`
-	AppStart    int64 `msg:"ast" json:"ast"`
-	AppDuration int64 `msg:"ad" json:"ad"`
-	Pid         int `msg:"pid" json:"pid"`
+	Runner      string `msg:"rnr" json:"rnr"`
+	PPid        int `msg:"ppid" json:"ppid"` //Parent pid
+	PRunner    string `msg:"prnr" json:"prnr"` //Parent exe
+	Pid        int `msg:"pid" json:"pid"` //Can only be retrospectively set.
 }
 
+var nodes = []*ProcessNode{}
 
-func NewProcessNode(a models.Alias, args []string, caller *ProcessNode) *ProcessNode {
-	n := &ProcessNode{AliasString : a.String(), Args : args, Pid : os.Getpid() }
-	n.NodeStart = int64(time.Now().UnixNano())
+func NewProcessNode(a models.Alias, runner string, args []string, caller *ProcessNode) *ProcessNode {
+	//printTree(os.Getpid(), args)
+	exe, _ := os.Executable()
+	n := &ProcessNode{AliasString : a.String(), Runner: runner, Args : args, PPid: os.Getpid(), PRunner: exe}
 	if caller != nil {
 		n.Caller = caller
 		n.Level = caller.Level + 1
-		n.AppStart = caller.AppStart
-		n.AppDuration=time.Now().UnixNano()-caller.AppStart
 	} else {
-		n.AppStart = time.Now().UnixNano()
 		n.Caller = nil
 		n.Level = 1
 	}
+	nodes = append(nodes, n)
 	return n
 }
 
-func getCurrentNode(a models.Alias, args []string, c *exec.Cmd) (*ProcessNode, error) {
+func (node *ProcessNode) Complete(pid int) {
+	node.Pid = pid
+	log.Debug("NODE: %+v", node)
+}
+
+//func printTree(pid int, args []string) {
+//	p, err := ps.FindProcess(pid)
+//	if err != nil {
+//		fmt.Println(err)
+//		return
+//	}
+//	if p == nil || p.Pid() == 0 {
+//		fmt.Println("DONE")
+//		return
+//	}
+//	fmt.Println(p.Executable(), p.Pid(), args)
+//	printTree(p.PPid(), nil)
+//}
+
+func getCurrentNode(a models.Alias, runner string, args []string, c *exec.Cmd) (*ProcessNode, error) {
 	callerString, ok := os.LookupEnv(PROCESS_NODE)
 	var caller *ProcessNode
 	if ok && callerString != "" {
@@ -53,11 +71,9 @@ func getCurrentNode(a models.Alias, args []string, c *exec.Cmd) (*ProcessNode, e
 			caller = nil
 		}
 	}
-	node := NewProcessNode(a, args, caller)
+	node := NewProcessNode(a, runner, args, caller)
 	b, _ := json.Marshal(node)
 	nodeString := fmt.Sprintf("%s=%s", PROCESS_NODE, b)
 	c.Env = append(os.Environ(), nodeString)
-	log.Debug(nodeString)
-	log.Debug("Elapsed: %dms", node.AppDuration/1000000)
 	return node, nil
 }

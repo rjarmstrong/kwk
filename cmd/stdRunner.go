@@ -180,7 +180,7 @@ func (r *StdRunner) exec(a models.Alias, snipArgs []string, runner string, arg .
 	c.Stderr = &stderr
 
 	// KEEP TRACK OF PROCESS GRAPH
-	node, err := getCurrentNode(a, snipArgs, c)
+	node, err := getCurrentNode(a, runner, snipArgs, c)
 	if node.Level > models.MaxProcessLevel {
 		return models.ErrOneLine(models.Code_ProcessTooDeep,
 			"Maximum levels in an app is %d. Not executing:%s", models.MaxProcessLevel, node.AliasString)
@@ -206,24 +206,27 @@ func (r *StdRunner) exec(a models.Alias, snipArgs []string, runner string, arg .
 		}
 		log.Debug("INTERRUPTED: %s|Level:%d|Caller:%s|Message:%s", node.AliasString, node.Level, caller, res.String())
 	}()
-
 	err = c.Run()
-	if err != nil {
-		stop()
-		_, ok := err.(*exec.ExitError)
-		if ok {
-			//fmt.Println("Interupted", exErr.UserTime())
-		} else {
-			desc := fmt.Sprintf("Error running '%s' (runner: %s %s)\n\n%s", a.String(), runner, err.Error(), stderr.String())
-			return models.ErrOneLine(models.Code_RunnerExitError, desc)
-		}
-		r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, stderr.String())
-		// In this case the error is a snippet runtime error and is treated already above from app errors.
+	node.Complete(c.ProcessState.Pid())
+	if err == nil {
+		r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, outBuff.String())
 		return nil
 	}
-	r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, outBuff.String())
+	stop()
+	exErr, ok := err.(*exec.ExitError)
+	if ok {
+		log.Debug("Interupted:%+v", exErr)
+		r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, outBuff.String())
+		return nil
+
+	} else {
+		desc := fmt.Sprintf("Error running '%s' (runner: %s %s)\n\n%s", a.String(), runner, err.Error(), stderr.String())
+		return models.ErrOneLine(models.Code_RunnerExitError, desc)
+	}
+	r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, stderr.String())
 	return nil
 }
+
 
 func (r *StdRunner) getEnvSection(name string) (*yaml.MapSlice, error) {
 	rs, _ := getSubSection(models.Env(), name)
@@ -234,10 +237,10 @@ func (r *StdRunner) getEnvSection(name string) (*yaml.MapSlice, error) {
 }
 
 /*
- 	$FULL_NAME = full name of the snippet e.g. `hello.js`
- 	$NAME = name excluding extension e.g. `hello`
- 	$DIR = directory of the snippet on disk. Useful when editing a file in a directory structure or when compilation needs it.
- 	$CLASS_NAME = for java and scala these will be the class name in the snippet. Used when attempting to run the compiled file.
+	 $FULL_NAME = full name of the snippet e.g. `hello.js`
+	 $NAME = name excluding extension e.g. `hello`
+	 $DIR = directory of the snippet on disk. Useful when editing a file in a directory structure or when compilation needs it.
+	 $CLASS_NAME = for java and scala these will be the class name in the snippet. Used when attempting to run the compiled file.
  */
 func replaceVariables(cliArgs *[]string, filePath string, s *models.Snippet) {
 	for i := range *cliArgs {
