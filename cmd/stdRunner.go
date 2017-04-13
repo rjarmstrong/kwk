@@ -188,7 +188,7 @@ func (r *StdRunner) exec(a models.Alias, snipArgs []string, runner string, arg .
 		return err
 	}
 	// CHECK FOR COMMON VULNERABILITIES AND ABORT (COULD BE USED WHEN EDITING?)
-	err = models.ScanVulnerabilities(strings.Join(arg, " "))
+	err = models.ScanVulnerabilities(strings.Join(arg, " "), a.Ext)
 	if err != nil {
 		e := err.(*models.ClientErr)
 		r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, e.Msgs[0].Desc)

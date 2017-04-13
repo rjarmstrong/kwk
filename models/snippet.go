@@ -126,7 +126,7 @@ func Limit(in string, length int) string {
 }
 
 //TODO: Optimise this
-func ScanVulnerabilities(snip string) error {
+func ScanVulnerabilities(snip string, ext string) error {
 	if strings.Contains(snip, "rm -rf") || strings.Contains(snip, "rm ") {
 		return ErrOneLine(Code_SnippetVulnerable, "kwk constraint: Shell scripts cannot contain 'rm '.")
 	}
@@ -147,6 +147,14 @@ func ScanVulnerabilities(snip string) error {
 	}
 	if strings.Contains(snip, "nohup") {
 		return ErrOneLine(Code_SnippetVulnerable, "kwk constraint: 'nohup' command is not allowed.")
+	}
+	if (ext == "sh" || ext == "js") && strings.Contains(snip, "eval") {
+		m := "kwk constraint: 'eval' command is not allowed."
+		if ext == "sh" {
+			m += "  Tip: try using '($VAR)' instead of 'eval $VAR' to execute commands.\n"
+			m += "  See: /richard/cli/basheval.url\n"
+		}
+		return ErrOneLine(Code_SnippetVulnerable, m)
 	}
 	return nil
 }
