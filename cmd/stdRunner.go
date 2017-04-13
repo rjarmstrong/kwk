@@ -49,19 +49,38 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 		return err
 	}
 	replaceVariables(&cli, filePath, s)
-
 	log.Debug("EDITING:%v %v", s.Alias, cli)
-	err = r.execEdit(s.Alias, cli[0], cli[1:]...)
 	if err != nil {
 		return err
 	}
+	editor := cli[0]
+	cliEditors := map[string]bool{
+		"vi":  true,
+		"nano": true,
+	}
+	if cliEditors[editor] {
+		done := make(chan bool)
+		go func() {
+			log.Debug("EDIT asynchronously.")
+			err = r.execEdit(s.Alias, editor, cli[1:]...)
+			done<-true
+			if err != nil {
+				log.Error("Error editing with cli", err)
+			}
+		}()
+		<-done
+	} else {
+		err = r.execEdit( s.Alias, editor, cli[1:]...)
+		rdr := bufio.NewReader(os.Stdin)
+		rdr.ReadLine()
+	}
 
-	rdr := bufio.NewReader(os.Stdin)
-	rdr.ReadLine()
-
-	if text, err := r.file.Read(setup.SNIP_CACHE_PATH, s.String(), true, 0); err != nil {
+	text, err := r.file.Read(setup.SNIP_CACHE_PATH, s.String(), true, 0);
+	if err != nil {
 		return err
-	} else if _, err = r.snippets.Patch(s.Alias, s.Snip, text); err != nil {
+	}
+	_, err = r.snippets.Patch(s.Alias, s.Snip, text);
+	if err != nil {
 		return err
 	}
 	return nil
@@ -132,28 +151,22 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 
 const PROCESS_NODE = "PROCESS_NODE"
 
-func (r *StdRunner) execEdit(a models.Alias, editor string, arg ...string) error {
-	ctx, stop := context.WithTimeout(context.Background(), time.Duration(models.Prefs().CommandTimeout)*time.Second)
+func (r *StdRunner) execEdit( a models.Alias, editor string, arg ...string) error {
+	log.Debug("EXEC EDIT: %s %s %s", a.String(), editor, strings.Join(arg, " "))
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(models.Prefs().CommandTimeout)*time.Second)
 	c := exec.CommandContext(ctx, editor, arg...)
 	c.Stdin = os.Stdin
-	out, err := c.StdoutPipe()
+	var stderr bytes.Buffer
+	c.Stdout = os.Stdout
+	c.Stderr = &stderr
+	err := c.Run()
 	if err != nil {
 		return err
 	}
-	defer out.Close()
-	err = c.Run()
-	if err != nil {
-		stop()
-		_, ok := err.(*exec.ExitError)
-		if ok {
-			//fmt.Println("Interupted", exErr.UserTime())
-		} else {
-			desc := fmt.Sprintf("Error editing '%s' (editor: %s)\n\n%s", a.String(), editor, err.Error())
-			return models.ErrOneLine(models.Code_RunnerExitError, desc)
-		}
-		// In this case the error is a snippet runtime error and is treated already above from app errors.
-		return nil
-	}
+	//if stderr.Len() > 0 {
+	//	desc := fmt.Sprintf("Error editing '%s' (editor: %s)\n\n%s", a.String(), editor, stderr.String())
+	//	return nil, models.ErrOneLine(models.Code_RunnerExitError, desc)
+	//}
 	return nil
 }
 
@@ -224,7 +237,6 @@ func (r *StdRunner) exec(a models.Alias, snipArgs []string, runner string, arg .
 	r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, outBuff.String())
 	return nil
 }
-
 
 func (r *StdRunner) getEnvSection(name string) (*yaml.MapSlice, error) {
 	rs, _ := getSubSection(models.Env(), name)
