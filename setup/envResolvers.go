@@ -181,8 +181,6 @@ runners:
   xml: ["echo", "$SNIP"]
   json: ["echo", "$SNIP"]
   yml: ["echo", "$SNIP"]
-    md:
-    run: ["mdless", "$FULL_NAME"]
   default: ["echo", "$SNIP"]
 security: #https://gist.github.com/pmarreck/5388643
   encrypt: []
