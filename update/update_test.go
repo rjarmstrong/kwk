@@ -3,12 +3,12 @@ package update
 import (
 	gu "github.com/inconshreveable/go-update"
 	"bitbucket.com/sharingmachine/kwkcli/models"
+	. "github.com/smartystreets/goconvey/convey"
 	"io/ioutil"
 	"strings"
 	"testing"
 	"errors"
 	"io"
-	//"os"
 	"bitbucket.com/sharingmachine/kwkcli/persist"
 )
 
