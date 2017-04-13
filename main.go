@@ -3,7 +3,6 @@ package main
 import (
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/config"
-	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/setup"
@@ -18,6 +17,7 @@ import (
 	"strings"
 	"strconv"
 	"bitbucket.com/sharingmachine/kwkcli/file"
+	"bitbucket.com/sharingmachine/kwkcli/user"
 )
 
 var f file.IO
@@ -65,7 +65,7 @@ func runKwk() {
 	}
 	defer conn.Close()
 	h := rpc.NewHeaders(j)
-	a := account.NewStdManager(conn, j, h)
+	a := user.NewAccount(conn, j, h)
 	ss := snippets.New(conn, j, h)
 	conf := setup.NewConfigProvider(ss, f, a, w)
 	conf.Load()

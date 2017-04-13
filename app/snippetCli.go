@@ -238,7 +238,6 @@ func (sc *SnippetCli) InspectListOrRun(distinctName string, forceInspect bool, a
 	v, err := sc.s.GetRoot(a.Username, true)
 	if err != nil {
 		sc.HandleErr(err)
-		log.Error("Error getting root, but not critical to 'run'", err)
 		return
 	} else if a.Ext == "" && v.IsPouch(a.Name) {
 		p := v.GetPouch(a.Name)

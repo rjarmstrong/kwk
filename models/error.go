@@ -34,6 +34,8 @@ const (
 	Code_InvalidEmail    Code = 4050
 	Code_InvalidUsername Code = 4060
 	Code_InvalidPassword Code = 4170
+	Code_NotAuthenticated Code = 4180
+	Code_PermissionDenied Code = 4190
 
 	Code_MultiplePouches  Code = 4210
 	Code_IncompleteAlias  Code = 4220
@@ -59,11 +61,17 @@ const (
 // returned by the GRPC stubs need to be converted to local errors.
 func ParseGrpcErr(e error) error {
 	sts, _ := status.FromError(e)
-	m := &ClientErr{}
-	m.remoteCode = sts.Code()
-	if m.remoteCode == codes.NotFound {
+	if sts.Code() == codes.Unauthenticated {
+		return ErrOneLine(Code_NotAuthenticated, sts.Message())
+	}
+	if sts.Code() == codes.PermissionDenied {
+		return ErrOneLine(Code_PermissionDenied, sts.Message())
+	}
+	if sts.Code() == codes.NotFound {
 		return ErrOneLine(Code_NotFound, sts.Message())
 	}
+	m := &ClientErr{}
+	m.remoteCode = sts.Code()
 	if err := json.Unmarshal([]byte(sts.Message()), m); err != nil {
 		m.Title = sts.Message()
 		return m

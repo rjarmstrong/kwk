@@ -2,7 +2,6 @@ package app
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/config"
-	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
@@ -14,6 +13,7 @@ import (
 	"strings"
 	"fmt"
 	"bitbucket.com/sharingmachine/kwkcli/file"
+	"bitbucket.com/sharingmachine/kwkcli/user"
 )
 
 type KwkApp struct {
@@ -21,14 +21,14 @@ type KwkApp struct {
 	Snippets       snippets.Service
 	File           file.IO
 	Settings       config.Persister
-	AccountManage  account.Manager
+	Acc            user.Account
 	Runner         cmd.Runner
 	Dialogue       dlg.Dialog
 	TemplateWriter tmpl.Writer
 	Api            rpc.Service
 }
 
-func NewApp(a snippets.Service, f file.IO, t config.Persister, r cmd.Runner, u account.Manager,
+func NewApp(a snippets.Service, f file.IO, t config.Persister, r cmd.Runner, u user.Account,
 	d dlg.Dialog, w tmpl.Writer, api rpc.Service) *KwkApp {
 
 	ap := cli.NewApp()
@@ -77,7 +77,7 @@ func NewApp(a snippets.Service, f file.IO, t config.Persister, r cmd.Runner, u a
 	accCli := NewAccountCli(u, t, w, d, dash)
 	ap.Commands = append(ap.Commands, Accounts(accCli)...)
 
-	sysCli := NewSystemCli(f, api, u, w, t)
+	sysCli := NewSystemCli(f, api, w, t)
 	ap.Commands = append(ap.Commands, System(sysCli)...)
 
 	snipCli := NewSnippetCli(a, r, f, d, w, t)
@@ -111,7 +111,7 @@ func NewApp(a snippets.Service, f file.IO, t config.Persister, r cmd.Runner, u a
 		File:           f,
 		Settings:       t,
 		Runner:         r,
-		AccountManage:  u,
+		Acc:            u,
 		Dialogue:       d,
 		Snippets:       a,
 		TemplateWriter: w,

@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"io"
 	"google.golang.org/grpc/status"
+	"fmt"
 )
 
 /*
@@ -69,6 +70,14 @@ func (w *StdWriter) HandleErr(e error) {
 }
 
 func (w *StdWriter) handleClientError(e *models.ClientErr) {
+	if e.Contains(models.Code_NotAuthenticated) {
+		fmt.Println("dash here")
+		return
+	}
+	if e.Contains(models.Code_PermissionDenied) {
+		w.Render("api:not-found", e)
+		return
+	}
 	if e.Title != "" {
 		w.Render("validation:title", e.Title)
 	}

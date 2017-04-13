@@ -1,4 +1,4 @@
-package account
+package user
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
@@ -9,17 +9,17 @@ import (
 	"time"
 )
 
-type StdManager struct {
+type StdAccount struct {
 	client   usersRpc.UsersRpcClient
 	settings config.Persister
 	headers  *rpc.Headers
 }
 
-func NewStdManager(conn *grpc.ClientConn, s config.Persister, h *rpc.Headers) *StdManager {
-	return &StdManager{client: usersRpc.NewUsersRpcClient(conn), settings: s, headers: h}
+func NewAccount(conn *grpc.ClientConn, s config.Persister, h *rpc.Headers) *StdAccount {
+	return &StdAccount{client: usersRpc.NewUsersRpcClient(conn), settings: s, headers: h}
 }
 
-func (u *StdManager) SignIn(username string, password string) (*models.User, error) {
+func (u *StdAccount) SignIn(username string, password string) (*models.User, error) {
 	if res, err := u.client.SignIn(u.headers.Context(), &usersRpc.SignInRequest{Username: username, Password: password}); err != nil {
 		return nil, err
 	} else {
@@ -29,7 +29,7 @@ func (u *StdManager) SignIn(username string, password string) (*models.User, err
 	}
 }
 
-func (u *StdManager) SignUp(email string, username string, password string, inviteCode string) (*models.User, error) {
+func (u *StdAccount) SignUp(email string, username string, password string, inviteCode string) (*models.User, error) {
 	if res, err := u.client.SignUp(u.headers.Context(), &usersRpc.SignUpRequest{Username: username, Email: email, Password: password, InviteCode:inviteCode}); err != nil {
 		return nil, err
 	} else {
@@ -39,7 +39,7 @@ func (u *StdManager) SignUp(email string, username string, password string, invi
 	}
 }
 
-func (u *StdManager) Get() (*models.User, error) {
+func (u *StdAccount) Get() (*models.User, error) {
 	if models.Principal != nil && models.Principal.Id != "" {
 		return models.Principal, nil
 	}
@@ -51,7 +51,7 @@ func (u *StdManager) Get() (*models.User, error) {
 	}
 }
 
-func (u *StdManager) ResetPassword(email string) (bool, error){
+func (u *StdAccount) ResetPassword(email string) (bool, error){
 	req := &usersRpc.ResetRequest{Email:email}
 	_, err := u.client.ResetPassword(u.headers.Context(), req)
 	if err != nil {
@@ -60,7 +60,7 @@ func (u *StdManager) ResetPassword(email string) (bool, error){
 	return true, nil
 }
 
-func (u *StdManager) ChangePassword(p models.ChangePasswordParams) (bool, error) {
+func (u *StdAccount) ChangePassword(p models.ChangePasswordParams) (bool, error) {
 	req := &usersRpc.ChangeRequest{
 		Email:p.Email, //Required if no email
 		Username: p.Username, //Required if no email
@@ -75,7 +75,7 @@ func (u *StdManager) ChangePassword(p models.ChangePasswordParams) (bool, error)
 	return true, nil
 }
 
-func (u *StdManager) HasValidCredentials() bool {
+func (u *StdAccount) HasValidCredentials() bool {
 	if user, err := u.Get(); err != nil {
 		return false
 	} else if user != nil {
@@ -85,7 +85,7 @@ func (u *StdManager) HasValidCredentials() bool {
 	return false
 }
 
-func (u *StdManager) Signout() error {
+func (u *StdAccount) Signout() error {
 	// Implement service call which would be more informational/analytical in nature
 	// TODO: Delete local token
 	// Clear variables

@@ -12,7 +12,7 @@ import (
 func Test_App(t *testing.T) {
 	Convey("ACCOUNT COMMANDS", t, func() {
 		app := CreateAppStub()
-		u := app.AccountManage.(*account.ManagerMock)
+		u := app.Acc.(*user.ManagerMock)
 		t := app.Settings.(*config.PersisterMock)
 		d := app.Dialogue.(*dlg.DialogMock)
 

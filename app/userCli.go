@@ -3,33 +3,33 @@ package app
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/config"
-	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"os"
+	"bitbucket.com/sharingmachine/kwkcli/user"
 )
 
-type AccountCli struct {
-	service  account.Manager
+type UserCli struct {
+	acc  user.Account
 	settings config.Persister
 	tmpl.Writer
 	dlg.Dialog
-	dash *Dashboard
+	dash     *Dashboard
 }
 
-func NewAccountCli(u account.Manager, s config.Persister, w tmpl.Writer, d dlg.Dialog, dash *Dashboard) *AccountCli {
-	return &AccountCli{service: u, settings: s, Writer: w, Dialog: d, dash: dash}
+func NewAccountCli(u user.Account, s config.Persister, w tmpl.Writer, d dlg.Dialog, dash *Dashboard) *UserCli {
+	return &UserCli{acc: u, settings: s, Writer: w, Dialog: d, dash: dash}
 }
 
-func (c *AccountCli) Get() {
-	if u, err := c.service.Get(); err != nil {
+func (c *UserCli) Get() {
+	if u, err := c.acc.Get(); err != nil {
 		c.Render("api:not-authenticated", nil)
 	} else {
 		c.Render("account:profile", u)
 	}
 }
 
-func (c *AccountCli) SignUp() {
+func (c *UserCli) SignUp() {
 
 	res, _ := c.TemplateFormField("account:signup:email", nil, false)
 	email := res.Value.(string)
@@ -40,7 +40,7 @@ func (c *AccountCli) SignUp() {
 	res, _ = c.TemplateFormField("account:signup:invite-code", nil, false)
 	inviteCode := res.Value.(string)
 
-	if u, err := c.service.SignUp(email, username, password, inviteCode); err != nil {
+	if u, err := c.acc.SignUp(email, username, password, inviteCode); err != nil {
 		c.HandleErr(err)
 	} else {
 		if len(u.Token) > 50 {
@@ -50,7 +50,7 @@ func (c *AccountCli) SignUp() {
 	}
 }
 
-func (c *AccountCli) SignIn(username string, password string) {
+func (c *UserCli) SignIn(username string, password string) {
 	if username == "" {
 		res, _ := c.TemplateFormField("account:usernamefield", nil, false)
 		username = res.Value.(string)
@@ -60,7 +60,7 @@ func (c *AccountCli) SignIn(username string, password string) {
 		res, _ := c.TemplateFormField("account:passwordfield", nil, true)
 		password = res.Value.(string)
 	}
-	if u, err := c.service.SignIn(username, password); err != nil {
+	if u, err := c.acc.SignIn(username, password); err != nil {
 		c.HandleErr(err)
 	} else {
 		if len(u.Token) > 50 {
@@ -71,8 +71,8 @@ func (c *AccountCli) SignIn(username string, password string) {
 	}
 }
 
-func (c *AccountCli) SignOut() {
-	if err := c.service.Signout(); err != nil {
+func (c *UserCli) SignOut() {
+	if err := c.acc.Signout(); err != nil {
 		c.HandleErr(err)
 		return
 	}
@@ -83,7 +83,7 @@ func (c *AccountCli) SignOut() {
 	c.Render("account:signedout", nil)
 }
 
-func (c *AccountCli) ChangePassword() {
+func (c *UserCli) ChangePassword() {
 	p := models.ChangePasswordParams{}
 	res, _ := c.Dialog.FormField("Please provide an email or username:")
 	p.Email = res.Value.(string)
@@ -91,19 +91,19 @@ func (c *AccountCli) ChangePassword() {
 	p.ExistingPassword = res.Value.(string)
 	res, _ = c.Dialog.TemplateFormField("account:passwordfield", nil, true)
 	p.NewPassword = res.Value.(string)
-	_, err := c.service.ChangePassword(p)
+	_, err := c.acc.ChangePassword(p)
 	if err != nil {
 		c.HandleErr(err)
 	}
 	c.Render("account:password-changed", nil)
 }
 
-func (c *AccountCli) ResetPassword(email string) {
+func (c *UserCli) ResetPassword(email string) {
 	if email == "" {
 		res, _ := c.Dialog.TemplateFormField("account:signup:email", nil , false)
 		email = res.Value.(string)
 	}
-	_, err := c.service.ResetPassword(email)
+	_, err := c.acc.ResetPassword(email)
 	if err != nil {
 		c.HandleErr(err)
 	}

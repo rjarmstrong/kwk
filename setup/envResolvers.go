@@ -2,7 +2,6 @@ package setup
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
-	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"fmt"
 	"runtime"
@@ -16,19 +15,17 @@ import (
 type EnvResolvers struct {
 	snippets snippets.Service
 	file     file.IO
-	account  account.Manager
 	alias    models.Alias
 	runtime  string
 }
 
-func NewEnvResolvers(s snippets.Service, sys file.IO, a account.Manager) Resolvers {
+func NewEnvResolvers(s snippets.Service, sys file.IO) Resolvers {
 	r := strings.ToLower(fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH))
 	return &EnvResolvers{
 		runtime: 	r,
 		alias:    *models.NewSetupAlias("env", "yml", true),
 		snippets: s,
 		file:   sys,
-		account:  a,
 	}
 }
 

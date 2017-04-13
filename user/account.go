@@ -1,10 +1,10 @@
-package account
+package user
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 )
 
-type Manager interface {
+type Account interface {
 	SignIn(username string, password string) (*models.User, error)
 	SignUp(email string, username string, password string, inviteCode string) (*models.User, error)
 	Get() (*models.User, error)

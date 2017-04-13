@@ -22,7 +22,7 @@ func createApp(conn *grpc.ClientConn, writer *bytes.Buffer, r *bufio.Reader) *ap
 	s := system.New()
 	t := config.NewJsonSettings(s, "settings")
 	h := rpc.NewHeaders(t)
-	u := account.NewStdManager(conn, t, h)
+	u := user.NewStdManager(conn, t, h)
 	a := snippets.New(conn, t, h, su)
 	w := tmpl.NewWriter(writer)
 	d := dlg.New(w, r)
