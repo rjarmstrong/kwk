@@ -4,7 +4,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/setup"
-	"bitbucket.com/sharingmachine/kwkcli/config"
 	"gopkg.in/yaml.v2"
 	"strings"
 	"os/exec"
@@ -19,17 +18,16 @@ import (
 	"bufio"
 	"os/signal"
 	"syscall"
-	"bitbucket.com/sharingmachine/kwkcli/file"
+	"bitbucket.com/sharingmachine/kwkcli/persist"
 )
 
 type StdRunner struct {
 	snippets snippets.Service
-	system   file.IO
-	settings config.Persister
+	file     persist.IO
 }
 
-func NewStdRunner(s file.IO, ss snippets.Service) *StdRunner {
-	return &StdRunner{snippets: ss, system: s}
+func NewStdRunner(s persist.IO, ss snippets.Service) *StdRunner {
+	return &StdRunner{snippets: ss, file: s}
 }
 
 func (r *StdRunner) Edit(s *models.Snippet) error {
@@ -46,7 +44,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	}
 	_, cli := getSubSection(a, candidates[0])
 
-	filePath, err := r.system.Write(setup.SNIP_CACHE_PATH, s.String(), s.Snip, true)
+	filePath, err := r.file.Write(setup.SNIP_CACHE_PATH, s.String(), s.Snip, true)
 	if err != nil {
 		return err
 	}
@@ -61,7 +59,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	rdr := bufio.NewReader(os.Stdin)
 	rdr.ReadLine()
 
-	if text, err := r.system.Read(setup.SNIP_CACHE_PATH, s.String(), true, 0); err != nil {
+	if text, err := r.file.Read(setup.SNIP_CACHE_PATH, s.String(), true, 0); err != nil {
 		return err
 	} else if _, err = r.snippets.Patch(s.Alias, s.Snip, text); err != nil {
 		return err
@@ -86,7 +84,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 	}
 	comp, interp := getSubSection(rs, yamlKey)
 	if comp != nil {
-		if filePath, err := r.system.Write(setup.SNIP_CACHE_PATH, s.String(), s.Snip, true); err != nil {
+		if filePath, err := r.file.Write(setup.SNIP_CACHE_PATH, s.String(), s.Snip, true); err != nil {
 			return err
 		} else {
 			_, compile := getSubSection(&comp, "compile")

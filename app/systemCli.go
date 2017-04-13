@@ -4,20 +4,18 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/update"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
-	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/models"
-	"bitbucket.com/sharingmachine/kwkcli/file"
+	"bitbucket.com/sharingmachine/kwkcli/persist"
 )
 
 type SystemCli struct {
-	file    file.IO
 	tmpl.Writer
 	rpc     rpc.Service
 	updater *update.Runner
 }
 
-func NewSystemCli(s file.IO, r rpc.Service, w tmpl.Writer, p config.Persister) *SystemCli {
-	return &SystemCli{file: s, rpc: r, Writer: w, updater:update.NewRunner(p)}
+func NewSystemCli(s persist.IO, r rpc.Service, w tmpl.Writer, p persist.Persister) *SystemCli {
+	return &SystemCli{rpc: r, Writer: w, updater:update.NewRunner(p)}
 }
 
 func (c *SystemCli) Update() {

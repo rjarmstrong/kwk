@@ -1,4 +1,4 @@
-package config
+package persist
 
 
 type Persister interface {

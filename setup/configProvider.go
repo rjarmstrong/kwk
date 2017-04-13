@@ -7,8 +7,8 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"fmt"
-	"bitbucket.com/sharingmachine/kwkcli/file"
 	"bitbucket.com/sharingmachine/kwkcli/user"
+	"bitbucket.com/sharingmachine/kwkcli/persist"
 )
 
 type ConfigProvider struct {
@@ -18,7 +18,7 @@ type ConfigProvider struct {
 	w              tmpl.Writer
 }
 
-func NewConfigProvider(ss snippets.Service, f file.IO, u user.Account, w tmpl.Writer) Provider {
+func NewConfigProvider(ss snippets.Service, f persist.IO, u user.Account, w tmpl.Writer) Provider {
 	env := NewEnvResolvers(ss, f)
 	prefs := NewPrefsResolvers(ss, f)
 	return &ConfigProvider{envResolvers: env, prefsResolvers: prefs, u: u, w: w}

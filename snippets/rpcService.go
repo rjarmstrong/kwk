@@ -3,7 +3,6 @@ package snippets
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
-	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/rpc/src/snipsRpc"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"google.golang.org/grpc"
@@ -12,14 +11,13 @@ import (
 )
 
 type RpcService struct {
-	persister config.Persister
 	pc        snipsRpc.PouchesRpcClient
 	client    snipsRpc.SnipsRpcClient
 	h         *rpc.Headers
 }
 
-func New(conn *grpc.ClientConn, s config.Persister, h *rpc.Headers) Service {
-	return &RpcService{persister: s,
+func New(conn *grpc.ClientConn, h *rpc.Headers) Service {
+	return &RpcService{
 		client:               snipsRpc.NewSnipsRpcClient(conn),
 		pc:                   snipsRpc.NewPouchesRpcClient(conn),
 		h:              h,
@@ -269,10 +267,6 @@ func (rs *RpcService) DeletePouch(pouch string) (bool, error) {
 		return false, err
 	}
 	return true, nil
-}
-
-func MillisToTime(in int64) time.Time {
-	return time.Unix(in/1000, 0)
 }
 
 func (rs *RpcService) mapPouchList(in []*snipsRpc.Pouch) []*models.Pouch {

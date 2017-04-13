@@ -2,7 +2,6 @@ package rpc
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
-	"bitbucket.com/sharingmachine/kwkcli/config"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -77,12 +76,11 @@ func GetConn(serverAddress string, trustAllCerts bool) (*grpc.ClientConn, error)
 
 //
 
-func NewHeaders(t config.Persister) *Headers {
-	return &Headers{persister: t, version: models.Client.String() }
+func NewHeaders() *Headers {
+	return &Headers{version: models.Client.String() }
 }
 
 type Headers struct {
-	persister config.Persister
 	version string
 }
 

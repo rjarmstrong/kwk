@@ -1,7 +1,6 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
@@ -12,15 +11,15 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"strings"
 	"fmt"
-	"bitbucket.com/sharingmachine/kwkcli/file"
 	"bitbucket.com/sharingmachine/kwkcli/user"
+	"bitbucket.com/sharingmachine/kwkcli/persist"
 )
 
 type KwkApp struct {
 	App            *cli.App
 	Snippets       snippets.Service
-	File           file.IO
-	Settings       config.Persister
+	File           persist.IO
+	Settings       persist.Persister
 	Acc            user.Account
 	Runner         cmd.Runner
 	Dialogue       dlg.Dialog
@@ -28,7 +27,7 @@ type KwkApp struct {
 	Api            rpc.Service
 }
 
-func NewApp(a snippets.Service, f file.IO, t config.Persister, r cmd.Runner, u user.Account,
+func NewApp(a snippets.Service, f persist.IO, t persist.Persister, r cmd.Runner, u user.Account,
 	d dlg.Dialog, w tmpl.Writer, api rpc.Service) *KwkApp {
 
 	ap := cli.NewApp()

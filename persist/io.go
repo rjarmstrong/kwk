@@ -1,6 +1,5 @@
-package file
+package persist
 
-var KWK_TEST_MODE = false
 
 type IO interface {
 	Delete(subDirName string, suffixPath string) error

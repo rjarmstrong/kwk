@@ -2,7 +2,6 @@ package update
 
 import (
 	gu "github.com/inconshreveable/go-update"
-	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"io/ioutil"
 	"strings"
@@ -10,14 +9,14 @@ import (
 	"errors"
 	"io"
 	//"os"
-	"bitbucket.com/sharingmachine/kwkcli/file"
+	"bitbucket.com/sharingmachine/kwkcli/persist"
 )
 
 func Test_Update(t *testing.T) {
 	Convey("Runner test", t, func() {
 		am := &ApplierMock{}
 		rm := &RemoterMock{}
-		pm := &config.PersisterMock{}
+		pm := &persist.PersisterMock{}
 		models.SetPrefs(models.DefaultPrefs())
 		models.Client.Version = "v0.0.1"
 
@@ -48,7 +47,7 @@ func Test_Update(t *testing.T) {
 
 		Convey("Given there is NOT an update record and the remote version is newer should update.", func() {
 			rm.BI = ReleaseInfo{Version: "v0.0.2"}
-			pm.GetReturns = file.ErrFileNotFound
+			pm.GetReturns = persist.ErrFileNotFound
 			err := r.Run()
 			So(err, ShouldBeNil)
 			So(rm.LatestCalled, ShouldBeTrue)
@@ -57,7 +56,7 @@ func Test_Update(t *testing.T) {
 
 		Convey(`When updating Given the applier returns an error should rollback.`, func() {
 			rm.BI = ReleaseInfo{Version: "v0.0.2"}
-			pm.GetReturns = file.ErrFileNotFound
+			pm.GetReturns = persist.ErrFileNotFound
 			m := "Couldn't apply."
 			am.ApplyErr = errors.New(m)
 			err := r.Run()

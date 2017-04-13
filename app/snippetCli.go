@@ -2,7 +2,6 @@ package app
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
-	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
@@ -15,20 +14,19 @@ import (
 	"bytes"
 	"time"
 	"sort"
-	"bitbucket.com/sharingmachine/kwkcli/file"
+	"bitbucket.com/sharingmachine/kwkcli/persist"
 )
 
 type SnippetCli struct {
 	s        snippets.Service
 	runner   cmd.Runner
-	file     file.IO
-	settings config.Persister
+	settings persist.Persister
 	dlg.Dialog
 	tmpl.Writer
 }
 
-func NewSnippetCli(a snippets.Service, r cmd.Runner, f file.IO, d dlg.Dialog, w tmpl.Writer, t config.Persister) *SnippetCli {
-	return &SnippetCli{s: a, runner: r, file: f, Dialog: d, Writer: w, settings: t}
+func NewSnippetCli(a snippets.Service, r cmd.Runner, f persist.IO, d dlg.Dialog, w tmpl.Writer, t persist.Persister) *SnippetCli {
+	return &SnippetCli{s: a, runner: r, Dialog: d, Writer: w, settings: t}
 }
 
 func (sc *SnippetCli) Search(args ...string) {

@@ -1,14 +1,12 @@
 package rpc
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/rpc/src/sysRpc"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"google.golang.org/grpc"
 )
 
 type stdService struct {
-	Settings config.Persister
 	client   sysRpc.SysRpcClient
 	headers  *Headers
 }

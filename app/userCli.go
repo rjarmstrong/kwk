@@ -2,23 +2,23 @@ package app
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
-	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/ui/dlg"
 	"os"
 	"bitbucket.com/sharingmachine/kwkcli/user"
+	"bitbucket.com/sharingmachine/kwkcli/persist"
 )
 
 type UserCli struct {
 	acc  user.Account
-	settings config.Persister
+	conf persist.Persister
 	tmpl.Writer
 	dlg.Dialog
-	dash     *Dashboard
+	dash *Dashboard
 }
 
-func NewAccountCli(u user.Account, s config.Persister, w tmpl.Writer, d dlg.Dialog, dash *Dashboard) *UserCli {
-	return &UserCli{acc: u, settings: s, Writer: w, Dialog: d, dash: dash}
+func NewAccountCli(u user.Account, s persist.Persister, w tmpl.Writer, d dlg.Dialog, dash *Dashboard) *UserCli {
+	return &UserCli{acc: u, conf: s, Writer: w, Dialog: d, dash: dash}
 }
 
 func (c *UserCli) Get() {
@@ -44,7 +44,7 @@ func (c *UserCli) SignUp() {
 		c.HandleErr(err)
 	} else {
 		if len(u.Token) > 50 {
-			c.settings.Upsert(models.ProfileFullKey, u)
+			c.conf.Upsert(models.ProfileFullKey, u)
 			c.Render("account:signedup", u)
 		}
 	}
@@ -64,7 +64,7 @@ func (c *UserCli) SignIn(username string, password string) {
 		c.HandleErr(err)
 	} else {
 		if len(u.Token) > 50 {
-			c.settings.Upsert(models.ProfileFullKey, u)
+			c.conf.Upsert(models.ProfileFullKey, u)
 			c.Render("account:signedin", u)
 			c.dash.GetWriter()(os.Stdout,"", nil)
 		}
@@ -76,7 +76,7 @@ func (c *UserCli) SignOut() {
 		c.HandleErr(err)
 		return
 	}
-	if err := c.settings.Delete(models.ProfileFullKey); err != nil {
+	if err := c.conf.Delete(models.ProfileFullKey); err != nil {
 		c.Render("error", err)
 		return
 	}

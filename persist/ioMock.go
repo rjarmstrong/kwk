@@ -1,4 +1,4 @@
-package file
+package persist
 
 type IoMock struct {
 	VersionCalled             bool

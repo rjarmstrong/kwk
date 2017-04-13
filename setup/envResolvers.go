@@ -7,19 +7,19 @@ import (
 	"runtime"
 	"strings"
 	"bitbucket.com/sharingmachine/kwkcli/log"
-	"bitbucket.com/sharingmachine/kwkcli/file"
+	"bitbucket.com/sharingmachine/kwkcli/persist"
 )
 
 // TODO: check yml version is compatible with this build else force upgrade.
 
 type EnvResolvers struct {
 	snippets snippets.Service
-	file     file.IO
+	file     persist.IO
 	alias    models.Alias
 	runtime  string
 }
 
-func NewEnvResolvers(s snippets.Service, sys file.IO) Resolvers {
+func NewEnvResolvers(s snippets.Service, sys persist.IO) Resolvers {
 	r := strings.ToLower(fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH))
 	return &EnvResolvers{
 		runtime: 	r,

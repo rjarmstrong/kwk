@@ -1,7 +1,6 @@
 package update
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	gu "github.com/inconshreveable/go-update"
 	"bitbucket.com/sharingmachine/kwkcli/log"
@@ -10,6 +9,7 @@ import (
 	"time"
 	"os"
 	"io"
+	"bitbucket.com/sharingmachine/kwkcli/persist"
 )
 
 const RecordFile = "update-record.json"
@@ -29,10 +29,10 @@ type Runner struct {
 	Remoter
 	Applier
 	Rollbacker
-	config.Persister
+	persist.Persister
 }
 
-func NewRunner(p config.Persister) *Runner {
+func NewRunner(p persist.Persister) *Runner {
 	return &Runner{Remoter:&S3Remoter{}, Applier:gu.Apply, Rollbacker:gu.RollbackError, Persister:p, UpdatePeriod:time.Hour}
 }
 

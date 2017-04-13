@@ -3,19 +3,19 @@ package user
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
-	"bitbucket.com/sharingmachine/kwkcli/config"
 	"bitbucket.com/sharingmachine/rpc/src/usersRpc"
 	"google.golang.org/grpc"
 	"time"
+	"bitbucket.com/sharingmachine/kwkcli/persist"
 )
 
 type StdAccount struct {
 	client   usersRpc.UsersRpcClient
-	settings config.Persister
+	settings persist.Persister
 	headers  *rpc.Headers
 }
 
-func NewAccount(conn *grpc.ClientConn, s config.Persister, h *rpc.Headers) *StdAccount {
+func NewAccount(conn *grpc.ClientConn, s persist.Persister, h *rpc.Headers) *StdAccount {
 	return &StdAccount{client: usersRpc.NewUsersRpcClient(conn), settings: s, headers: h}
 }
 

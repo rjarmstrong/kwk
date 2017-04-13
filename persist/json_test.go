@@ -1,4 +1,4 @@
-package config
+package persist
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
@@ -11,8 +11,8 @@ import (
 func Test_JsonFile(t *testing.T) {
 	Convey("JsonFile test", t, func() {
 		Convey(`Should create, update, delete and get a setting`, func() {
-			sys := file.New()
-			s := NewJsonSettings(sys, "test_settings")
+			sys := persist.New()
+			s := NewJson(sys, "test_settings")
 			key := "user"
 			expected := models.User{
 				Email: "richard@kwk.co",

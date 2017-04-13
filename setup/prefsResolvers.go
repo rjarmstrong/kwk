@@ -3,17 +3,17 @@ package setup
 import (
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/models"
-	"bitbucket.com/sharingmachine/kwkcli/file"
 	"gopkg.in/yaml.v2"
+	"bitbucket.com/sharingmachine/kwkcli/persist"
 )
 
 type PrefsResolvers struct {
 	snippets snippets.Service
-	file     file.IO
+	file     persist.IO
 	a        models.Alias
 }
 
-func NewPrefsResolvers(s snippets.Service, f file.IO) Resolvers {
+func NewPrefsResolvers(s snippets.Service, f persist.IO) Resolvers {
 	return &PrefsResolvers{
 		a:        *models.NewSetupAlias("prefs", "yml", false),
 		snippets: s,
