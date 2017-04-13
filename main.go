@@ -12,22 +12,22 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/update"
-	"bitbucket.com/sharingmachine/kwkcli/sys"
 	//"runtime/pprof"
 	"bufio"
 	"os"
 	"strings"
 	"strconv"
+	"bitbucket.com/sharingmachine/kwkcli/file"
 )
 
-var s sys.Manager
+var f file.IO
 var j config.Persister
 
 func main() {
-	_, sys.KWK_TEST_MODE = os.LookupEnv("KWK_TEST_MODE")
+	_, file.KWK_TEST_MODE = os.LookupEnv("KWK_TEST_MODE")
 	args := strings.Join(os.Args[1:], "+")
-	s = sys.New()
-	j = config.NewJsonSettings(s, "settings")
+	f = file.New()
+	j = config.NewJsonSettings(f, "settings")
 
 	if args == "update+silent" {
 		update.NewRunner(j).Run()
@@ -51,14 +51,14 @@ func runKwk() {
 
 	host := os.Getenv("API_HOST")
 	if host == "" {
-		if sys.KWK_TEST_MODE {
+		if file.KWK_TEST_MODE {
 			host = "localhost:8000"
 		} else {
 			host = "api.kwk.co:443"
 		}
 	}
 	w := tmpl.NewWriter(os.Stdout)
-	conn, err := rpc.GetConn(host, sys.KWK_TEST_MODE)
+	conn, err := rpc.GetConn(host, file.KWK_TEST_MODE)
 	if err != nil {
 		w.HandleErr(models.ErrOneLine(models.Code_ApiDown, " The kwk api is down, please try again."))
 		return
@@ -67,13 +67,13 @@ func runKwk() {
 	h := rpc.NewHeaders(j)
 	a := account.NewStdManager(conn, j, h)
 	ss := snippets.New(conn, j, h)
-	conf := setup.NewConfigProvider(ss, s, a, w)
+	conf := setup.NewConfigProvider(ss, f, a, w)
 	conf.Load()
-	o := cmd.NewStdRunner(s, ss)
+	o := cmd.NewStdRunner(f, ss)
 	r := bufio.NewReader(os.Stdin)
 	d := dlg.New(w, r)
 	api := rpc.New(conn, h)
-	kwkApp := app.NewApp(ss, s, j, o, a, d, w, api)
+	kwkApp := app.NewApp(ss, f, j, o, a, d, w, api)
 	kwkApp.App.Run(os.Args)
 }
 

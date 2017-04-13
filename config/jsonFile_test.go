@@ -2,16 +2,16 @@ package config
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
-	"bitbucket.com/sharingmachine/kwkcli/sys"
 	. "github.com/smartystreets/goconvey/convey"
 	"os"
 	"testing"
+	"bitbucket.com/sharingmachine/kwkcli/file"
 )
 
 func Test_JsonFile(t *testing.T) {
 	Convey("JsonFile test", t, func() {
 		Convey(`Should create, update, delete and get a setting`, func() {
-			sys := sys.New()
+			sys := file.New()
 			s := NewJsonSettings(sys, "test_settings")
 			key := "user"
 			expected := models.User{

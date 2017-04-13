@@ -7,28 +7,28 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
-	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
 	"github.com/urfave/cli"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"strings"
 	"fmt"
+	"bitbucket.com/sharingmachine/kwkcli/file"
 )
 
 type KwkApp struct {
 	App            *cli.App
 	Snippets       snippets.Service
-	System         sys.Manager
+	File           file.IO
 	Settings       config.Persister
 	AccountManage  account.Manager
 	Runner         cmd.Runner
 	Dialogue       dlg.Dialog
 	TemplateWriter tmpl.Writer
-	Api 	       rpc.Service
+	Api            rpc.Service
 }
 
-func NewApp(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner, u account.Manager,
+func NewApp(a snippets.Service, f file.IO, t config.Persister, r cmd.Runner, u account.Manager,
 	d dlg.Dialog, w tmpl.Writer, api rpc.Service) *KwkApp {
 
 	ap := cli.NewApp()
@@ -77,10 +77,10 @@ func NewApp(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner,
 	accCli := NewAccountCli(u, t, w, d, dash)
 	ap.Commands = append(ap.Commands, Accounts(accCli)...)
 
-	sysCli := NewSystemCli(s, api, u, w, t)
+	sysCli := NewSystemCli(f, api, u, w, t)
 	ap.Commands = append(ap.Commands, System(sysCli)...)
 
-	snipCli := NewSnippetCli(a, r, s, d, w, t)
+	snipCli := NewSnippetCli(a, r, f, d, w, t)
 	ap.Commands = append(ap.Commands, Snippets(snipCli)...)
 	ap.CommandNotFound = func(c *cli.Context, distinctName string) {
 		i := c.Args().Get(1)
@@ -107,15 +107,15 @@ func NewApp(a snippets.Service, s sys.Manager, t config.Persister, r cmd.Runner,
 	}
 
 	return &KwkApp{
-		App: ap,
-		System: s,
-		Settings: t,
-		Runner: r,
-		AccountManage: u,
-		Dialogue: d,
-		Snippets: a,
+		App:            ap,
+		File:           f,
+		Settings:       t,
+		Runner:         r,
+		AccountManage:  u,
+		Dialogue:       d,
+		Snippets:       a,
 		TemplateWriter: w,
-		Api:api,
+		Api:            api,
 	}
 }
 

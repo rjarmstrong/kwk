@@ -4,30 +4,30 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
 	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/models"
-	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"fmt"
 	"runtime"
 	"strings"
 	"bitbucket.com/sharingmachine/kwkcli/log"
+	"bitbucket.com/sharingmachine/kwkcli/file"
 )
 
 // TODO: check yml version is compatible with this build else force upgrade.
 
 type EnvResolvers struct {
 	snippets snippets.Service
-	system   sys.Manager
+	file     file.IO
 	account  account.Manager
 	alias    models.Alias
-	runtime string
+	runtime  string
 }
 
-func NewEnvResolvers(s snippets.Service, sys sys.Manager, a account.Manager) Resolvers {
+func NewEnvResolvers(s snippets.Service, sys file.IO, a account.Manager) Resolvers {
 	r := strings.ToLower(fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH))
 	return &EnvResolvers{
 		runtime: 	r,
 		alias:    *models.NewSetupAlias("env", "yml", true),
 		snippets: s,
-		system:   sys,
+		file:   sys,
 		account:  a,
 	}
 }
@@ -37,7 +37,7 @@ func (e *EnvResolvers) Anon() (string, error) {
 }
 
 func (e *EnvResolvers) Local() (string, error) {
-	return e.system.ReadFromFile(SNIP_CACHE_PATH, e.alias.String(), true, 0)
+	return e.file.Read(SNIP_CACHE_PATH, e.alias.String(), true, 0)
 }
 
 func (e *EnvResolvers) Own() (string, error) {
@@ -45,7 +45,7 @@ func (e *EnvResolvers) Own() (string, error) {
 	if l, err := e.snippets.Get(e.alias); err != nil {
 		return "", err
 	} else {
-		if _, err := e.system.WriteToFile(SNIP_CACHE_PATH, e.alias.String(), l.Snippets[0].Snip, true); err != nil {
+		if _, err := e.file.Write(SNIP_CACHE_PATH, e.alias.String(), l.Snippets[0].Snip, true); err != nil {
 			return "", err
 		}
 		return l.Snippets[0].Snip, nil
@@ -61,7 +61,7 @@ func (e *EnvResolvers) Default() (string, error) {
 		} else {
 			return snip.Snippet.Snip, nil
 		}
-		if _, err := e.system.WriteToFile(SNIP_CACHE_PATH, e.alias.String(), env, true); err != nil {
+		if _, err := e.file.Write(SNIP_CACHE_PATH, e.alias.String(), env, true); err != nil {
 			return "", err
 		} else {
 			return env, nil

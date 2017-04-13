@@ -3,12 +3,12 @@ package setup
 import (
 	"bitbucket.com/sharingmachine/kwkcli/account"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
-	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"gopkg.in/yaml.v2"
 	"bitbucket.com/sharingmachine/kwkcli/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"fmt"
+	"bitbucket.com/sharingmachine/kwkcli/file"
 )
 
 type ConfigProvider struct {
@@ -18,9 +18,9 @@ type ConfigProvider struct {
 	w              tmpl.Writer
 }
 
-func NewConfigProvider(ss snippets.Service, s sys.Manager, u account.Manager, w tmpl.Writer) Provider {
-	env := NewEnvResolvers(ss, s, u)
-	prefs := NewPrefsResolvers(ss, s, u)
+func NewConfigProvider(ss snippets.Service, f file.IO, u account.Manager, w tmpl.Writer) Provider {
+	env := NewEnvResolvers(ss, f, u)
+	prefs := NewPrefsResolvers(ss, f, u)
 	return &ConfigProvider{envResolvers: env, prefsResolvers: prefs, u: u, w: w}
 }
 

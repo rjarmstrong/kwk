@@ -1,10 +1,8 @@
 package update
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
 	gu "github.com/inconshreveable/go-update"
 	"bitbucket.com/sharingmachine/kwkcli/config"
-	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"io/ioutil"
 	"strings"
@@ -12,6 +10,7 @@ import (
 	"errors"
 	"io"
 	//"os"
+	"bitbucket.com/sharingmachine/kwkcli/file"
 )
 
 func Test_Update(t *testing.T) {
@@ -49,7 +48,7 @@ func Test_Update(t *testing.T) {
 
 		Convey("Given there is NOT an update record and the remote version is newer should update.", func() {
 			rm.BI = ReleaseInfo{Version: "v0.0.2"}
-			pm.GetReturns = sys.ErrFileNotFound
+			pm.GetReturns = file.ErrFileNotFound
 			err := r.Run()
 			So(err, ShouldBeNil)
 			So(rm.LatestCalled, ShouldBeTrue)
@@ -58,7 +57,7 @@ func Test_Update(t *testing.T) {
 
 		Convey(`When updating Given the applier returns an error should rollback.`, func() {
 			rm.BI = ReleaseInfo{Version: "v0.0.2"}
-			pm.GetReturns = sys.ErrFileNotFound
+			pm.GetReturns = file.ErrFileNotFound
 			m := "Couldn't apply."
 			am.ApplyErr = errors.New(m)
 			err := r.Run()

@@ -1,4 +1,4 @@
-package sys
+package file
 
 type ManagerMock struct {
 	VersionCalled             bool
@@ -25,9 +25,9 @@ func (m *ManagerMock) CopyFile(src, dst string) error {
 func (m *ManagerMock) Delete(directoryName string, fullKey string) error {
 	return nil
 }
-func (m *ManagerMock) WriteToFile(subDirName string, fullName string, snippet string, incHoldingDir bool) (string, error) {
+func (m *ManagerMock) Write(subDirName string, fullName string, snippet string, incHoldingDir bool) (string, error) {
 	return "", nil
 }
-func (m *ManagerMock) ReadFromFile(subDirName string, fullName string, incHoldingDir bool, fresherThan int64) (string, error) {
+func (m *ManagerMock) Read(subDirName string, fullName string, incHoldingDir bool, fresherThan int64) (string, error) {
 	return "", nil
 }

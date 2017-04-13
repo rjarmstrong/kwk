@@ -1,4 +1,4 @@
-package sys
+package file
 
 import (
 	"github.com/kennygrant/sanitize"
@@ -14,21 +14,21 @@ import (
 var ErrFileNotFound = models.ErrOneLine(models.Code_NotFound, "File not found.")
 var ErrFileExpired = models.ErrOneLine(models.Code_NotFound, "File found but expired.")
 
-func New() Manager {
-	return &StdManager{}
+func New() IO {
+	return &StdIO{}
 }
 
-type StdManager struct {
+type StdIO struct {
 }
 
-func (s *StdManager) WriteToFile(subDirName string, suffixPath string, snippet string, incHoldingDir bool) (filePath string, err error) {
+func (s *StdIO) Write(subDirName string, suffixPath string, snippet string, incHoldingDir bool) (filePath string, err error) {
 	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
 	log.Debug("WRITE: %s", fp)
 	err = ioutil.WriteFile(fp, []byte(snippet), cache.StandardFilePermission)
 	return fp, err
 }
 
-func (s *StdManager) ReadFromFile(subDirName string, suffixPath string, incHoldingDir bool, after int64) (string, error) {
+func (s *StdIO) Read(subDirName string, suffixPath string, incHoldingDir bool, after int64) (string, error) {
 	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
 	log.Debug("READ: %s", fp)
 	if fi, err := os.Stat(fp); err != nil {
@@ -49,32 +49,17 @@ func (s *StdManager) ReadFromFile(subDirName string, suffixPath string, incHoldi
 	}
 }
 
-func (s *StdManager) FileExists(subDirName string, suffixPath string, incHoldingDir bool) (bool, error) {
-	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
-	return s.Exists(fp)
-}
-
-func (s *StdManager) Exists(fullPath string) (bool, error) {
-	if _, err := os.Stat(fullPath); err != nil {
-		if os.IsNotExist(err) {
-			return false, nil
-		} else {
-			return false, err
-		}
-	}
-	return true, nil
-}
-
-func (s *StdManager) Delete(directoryName string, fullKey string) error {
+func (s *StdIO) Delete(directoryName string, fileName string) error {
 	dirPath, err := s.getSubDir(directoryName)
 	if err != nil {
 		return err
 	}
-	fp := path.Join(dirPath, fullKey)
+	fp := path.Join(dirPath, fileName)
+	log.Debug("DELETING:%s", fp)
 	return os.RemoveAll(fp)
 }
 
-func (s *StdManager) upsertDirectory(dir string) error {
+func (s *StdIO) upsertDirectory(dir string) error {
 	if err := os.MkdirAll(dir, cache.StandardFilePermission); err != nil {
 		if os.IsExist(err) {
 			return nil
@@ -84,13 +69,14 @@ func (s *StdManager) upsertDirectory(dir string) error {
 	return nil
 }
 
-func (s *StdManager) getSubDir(directoryName string) (string, error) {
+func (s *StdIO) getSubDir(directoryName string) (string, error) {
 	dir := path.Join(cache.Path(), directoryName)
+	log.Debug("DIR: %s", dir)
 	err := s.upsertDirectory(dir)
-	return directoryName, err
+	return dir, err
 }
 
-func (s *StdManager) getHoldingDirectory(subDirName string, fullName string) string {
+func (s *StdIO) getHoldingDirectory(subDirName string, fullName string) string {
 	hd := strings.Replace(fullName, ".", "_", -1)
 	dirPath := path.Join(cache.Path(), subDirName, hd)
 	if e := s.upsertDirectory(dirPath); e != nil {
@@ -100,7 +86,7 @@ func (s *StdManager) getHoldingDirectory(subDirName string, fullName string) str
 	return hd
 }
 
-func (s *StdManager) getFilePath(subDirName string, suffixPath string, incHoldingDir bool) string {
+func (s *StdIO) getFilePath(subDirName string, suffixPath string, incHoldingDir bool) string {
 	sn := sanitize.Name(suffixPath)
 	if incHoldingDir {
 		hd := s.getHoldingDirectory(subDirName, sn)

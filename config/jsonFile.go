@@ -1,29 +1,29 @@
 package config
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/sys"
 	"encoding/json"
+	"bitbucket.com/sharingmachine/kwkcli/file"
 )
 
 // FileSettings is an abstraction over the file system which
 // marshals json to and from a specific location.
 type JsonFile struct {
 	DirectoryName string
-	System        sys.Manager
+	System        file.IO
 }
 
-func NewJsonSettings(s sys.Manager, subDirName string) Persister {
+func NewJsonSettings(s file.IO, subDirName string) Persister {
 	return &JsonFile{DirectoryName: subDirName, System: s}
 }
 
 func (s *JsonFile) Upsert(key string, value interface{}) error {
 	bytes, _ := json.Marshal(value)
-	_, err := s.System.WriteToFile(s.DirectoryName, key, string(bytes), false)
+	_, err := s.System.Write(s.DirectoryName, key, string(bytes), false)
 	return err
 }
 
 func (s *JsonFile) Get(key string, value interface{}, fresherThan int64) error {
-	if str, err := s.System.ReadFromFile(s.DirectoryName, key, false, fresherThan); err != nil {
+	if str, err := s.System.Read(s.DirectoryName, key, false, fresherThan); err != nil {
 		return err
 	} else {
 		return json.Unmarshal([]byte(str), value)
