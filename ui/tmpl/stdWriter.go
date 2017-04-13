@@ -45,6 +45,10 @@ func (w *StdWriter) HandleErr(e error) {
 		return
 	}
 	sts, ok := status.FromError(e)
+	if !ok {
+		log.Error("Unhandled err:", e)
+		return
+	}
 	switch sts.Code() {
 	case codes.InvalidArgument:
 		log.Error("Unhandled err, requires mapping to client err.:", e)
