@@ -13,6 +13,10 @@ type PersisterMock struct {
 	GetReturns               error
 }
 
+func (s *PersisterMock) DeleteAll() error {
+	panic("ni")
+}
+
 func (s *PersisterMock) Delete(fullKey string) error {
 	s.DeleteCalledWith = fullKey
 	return nil

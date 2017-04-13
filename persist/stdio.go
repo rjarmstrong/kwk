@@ -49,6 +49,10 @@ func (s *StdIO) Read(subDirName string, suffixPath string, incHoldingDir bool, a
 	}
 }
 
+func (s *StdIO) DeleteAll() error {
+	return os.RemoveAll(cache.Path())
+}
+
 func (s *StdIO) Delete(directoryName string, fileName string) error {
 	dirPath, err := s.getSubDir(directoryName)
 	if err != nil {

@@ -5,6 +5,9 @@ type IoMock struct {
 	CopyToClipboardCalledWith string
 }
 
+func (m *IoMock) DeleteAll() error {
+	panic("implement me")
+}
 
 func (*IoMock) FileExists(subDirName string, fullName string, incHoldingDir bool) (bool, error) {
 	panic("implement me")

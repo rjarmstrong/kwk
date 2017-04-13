@@ -32,3 +32,7 @@ func (s *Json) Get(key string, value interface{}, fresherThan int64) error {
 func (s *Json) Delete(key string) error {
 	return s.System.Delete(s.DirectoryName, key)
 }
+
+func (s *Json) DeleteAll() error {
+	return s.System.DeleteAll()
+}

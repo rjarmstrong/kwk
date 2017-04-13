@@ -30,7 +30,7 @@ func (u *StdAccount) SignIn(username string, password string) (*models.User, err
 }
 
 func (u *StdAccount) SignUp(email string, username string, password string, inviteCode string) (*models.User, error) {
-	if res, err := u.client.SignUp(u.headers.Context(), &usersRpc.SignUpRequest{Username: username, Email: email, Password: password, InviteCode:inviteCode}); err != nil {
+	if res, err := u.client.SignUp(u.headers.Context(), &usersRpc.SignUpRequest{Username: username, Email: email, Password: password, InviteCode: inviteCode}); err != nil {
 		return nil, err
 	} else {
 		model := &models.User{}
@@ -51,8 +51,8 @@ func (u *StdAccount) Get() (*models.User, error) {
 	}
 }
 
-func (u *StdAccount) ResetPassword(email string) (bool, error){
-	req := &usersRpc.ResetRequest{Email:email}
+func (u *StdAccount) ResetPassword(email string) (bool, error) {
+	req := &usersRpc.ResetRequest{Email: email}
 	_, err := u.client.ResetPassword(u.headers.Context(), req)
 	if err != nil {
 		return false, err
@@ -62,11 +62,11 @@ func (u *StdAccount) ResetPassword(email string) (bool, error){
 
 func (u *StdAccount) ChangePassword(p models.ChangePasswordParams) (bool, error) {
 	req := &usersRpc.ChangeRequest{
-		Email:p.Email, //Required if no email
-		Username: p.Username, //Required if no email
-		ExistingPassword:p.ExistingPassword, // Required if no ResetToken
-		NewPassword:p.NewPassword, // Required
-		ResetToken:p.ResetToken, // Required if no Existing password
+		Email:            p.Email,            //Required if no email
+		Username:         p.Username,         //Required if no email
+		ExistingPassword: p.ExistingPassword, // Required if no ResetToken
+		NewPassword:      p.NewPassword,      // Required
+		ResetToken:       p.ResetToken,       // Required if no Existing password
 	}
 	_, err := u.client.ChangePassword(u.headers.Context(), req)
 	if err != nil {
@@ -76,9 +76,11 @@ func (u *StdAccount) ChangePassword(p models.ChangePasswordParams) (bool, error)
 }
 
 func (u *StdAccount) HasValidCredentials() bool {
-	if user, err := u.Get(); err != nil {
+	usr, err := u.Get()
+	if err != nil {
 		return false
-	} else if user != nil {
+	}
+	if usr != nil {
 		// TODO: Check jwt expiry
 		return true
 	}
@@ -86,9 +88,11 @@ func (u *StdAccount) HasValidCredentials() bool {
 }
 
 func (u *StdAccount) Signout() error {
+	err := u.settings.DeleteAll()
+	if err != nil {
+		return err
+	}
 	// Implement service call which would be more informational/analytical in nature
-	// TODO: Delete local token
-	// Clear variables
 	return nil
 }
 

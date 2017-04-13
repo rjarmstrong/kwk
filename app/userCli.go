@@ -66,18 +66,15 @@ func (c *UserCli) SignIn(username string, password string) {
 		if len(u.Token) > 50 {
 			c.conf.Upsert(models.ProfileFullKey, u)
 			c.Render("account:signedin", u)
-			c.dash.GetWriter()(os.Stdout,"", nil)
+			c.dash.GetWriter()(os.Stdout, "", nil)
 		}
 	}
 }
 
 func (c *UserCli) SignOut() {
-	if err := c.acc.Signout(); err != nil {
+	err := c.acc.Signout()
+	if err != nil {
 		c.HandleErr(err)
-		return
-	}
-	if err := c.conf.Delete(models.ProfileFullKey); err != nil {
-		c.Render("error", err)
 		return
 	}
 	c.Render("account:signedout", nil)
@@ -100,7 +97,7 @@ func (c *UserCli) ChangePassword() {
 
 func (c *UserCli) ResetPassword(email string) {
 	if email == "" {
-		res, _ := c.Dialog.TemplateFormField("account:signup:email", nil , false)
+		res, _ := c.Dialog.TemplateFormField("account:signup:email", nil, false)
 		email = res.Value.(string)
 	}
 	_, err := c.acc.ResetPassword(email)
