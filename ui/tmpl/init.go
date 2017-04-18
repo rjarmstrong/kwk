@@ -62,7 +62,7 @@ func init() {
 	add("snippet:moved-root", "{{ .Quant | blue }} snippet(s) moved to root.\n", template.FuncMap{"blue": blue})
 	add("snippet:moved-pouch", "{{ .Quant | blue }} snippet(s) moved to pouch {{ .Pouch | blue }}\n", template.FuncMap{"blue": blue})
 	add("snippet:create-pouch", "{{ \"Would you like to create the snippet in a new pouch? [y/n] \" | yellow }} ?  ", template.FuncMap{"yellow": yellow})
-	add("snippet:inspect", "{{ . | inspect }}", template.FuncMap{"inspect":  inspect })
+	add("snippet:inspect", "{{ . | inspect }}", template.FuncMap{"inspect":  view })
 
 	add("pouch:not-deleted", "{{. | blue }} was NOT deleted.\n", template.FuncMap{"blue": blue})
 	add("pouch:deleted", "{{. | blue }} was deleted.\n", template.FuncMap{"blue": blue})

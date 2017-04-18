@@ -10,7 +10,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/style"
 )
 
-func inspect(s *models.Snippet) string {
+func view(s *models.Snippet) string {
 	w := &bytes.Buffer{}
 	w.WriteString("\n")
 	w.WriteString(style.MARGIN)
@@ -65,8 +65,8 @@ func inspect(s *models.Snippet) string {
 	tbl.Append([]string{
 		style.Fmt16(style.Subdued,"sha256:"), FVerified(s) })
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued,"Updated:"), humanTime(s.Created) })
-
+		style.Fmt16(style.Subdued,"Updated:"), fmt.Sprintf("%s - %s", humanTime(s.Created), fmt.Sprintf("v%d", s.Version )),
+	})
 	tbl.Render()
 
 
