@@ -5,7 +5,6 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 	"os"
 	"testing"
-	"bitbucket.com/sharingmachine/kwkcli/file"
 )
 
 func Test_JsonFile(t *testing.T) {

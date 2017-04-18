@@ -3,7 +3,6 @@ package app
 import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/snippets"
-	"bitbucket.com/sharingmachine/kwkcli/config"
 	. "github.com/smartystreets/goconvey/convey"
 	"bitbucket.com/sharingmachine/kwkcli/cmd"
 	"testing"
