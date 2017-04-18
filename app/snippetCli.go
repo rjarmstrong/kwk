@@ -557,7 +557,7 @@ func (sc *SnippetCli) List(username string, pouch string) {
 			*a,
 			models.UseStatusSuccess,
 			models.UseTypeView,
-			"",
+			nil,
 		)
 	}
 }

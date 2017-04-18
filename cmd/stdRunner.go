@@ -55,7 +55,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	}
 	editor := cli[0]
 	cliEditors := map[string]bool{
-		"vi":  true,
+		"vi":   true,
 		"nano": true,
 	}
 	if cliEditors[editor] {
@@ -63,14 +63,14 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 		go func() {
 			log.Debug("EDIT asynchronously.")
 			err = r.execEdit(s.Alias, editor, cli[1:]...)
-			done<-true
+			done <- true
 			if err != nil {
 				log.Error("Error editing with cli", err)
 			}
 		}()
 		<-done
 	} else {
-		err = r.execEdit( s.Alias, editor, cli[1:]...)
+		err = r.execEdit(s.Alias, editor, cli[1:]...)
 		rdr := bufio.NewReader(os.Stdin)
 		rdr.ReadLine()
 	}
@@ -151,7 +151,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 
 const PROCESS_NODE = "PROCESS_NODE"
 
-func (r *StdRunner) execEdit( a models.Alias, editor string, arg ...string) error {
+func (r *StdRunner) execEdit(a models.Alias, editor string, arg ...string) error {
 	log.Debug("EXEC EDIT: %s %s %s", a.String(), editor, strings.Join(arg, " "))
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(models.Prefs().CommandTimeout)*time.Second)
 	c := exec.CommandContext(ctx, editor, arg...)
@@ -202,7 +202,14 @@ func (r *StdRunner) exec(a models.Alias, snipArgs []string, runner string, arg .
 	err = models.ScanVulnerabilities(strings.Join(arg, " "), a.Ext)
 	if err != nil {
 		e := err.(*models.ClientErr)
-		r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, e.Msgs[0].Desc)
+		r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun,
+			&snippets.UseContext{
+				Preview:     e.Msgs[0].Desc,
+				CallerAlias: node.Caller.AliasString,
+				Level:       node.Level,
+				Runner:      node.Runner,
+			},
+		)
 		return err
 	}
 	// CAPTURE INTERRUPT SO WE CAN LOG PART OF THE EXECUTION IF IS ONGOING e.g. real-time analytics.
@@ -222,7 +229,14 @@ func (r *StdRunner) exec(a models.Alias, snipArgs []string, runner string, arg .
 	}
 	if stderr.Len() > 0 {
 		desc := fmt.Sprintf("Error running '%s' (runner: '%s' %s)\n\n%s", a.String(), runner, err.Error(), stderr.String())
-		r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun, stderr.String())
+		r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun,
+			&snippets.UseContext{
+				Preview:     stderr.String(),
+				CallerAlias: node.Caller.AliasString,
+				Level:       node.Level,
+				Runner:      node.Runner,
+			},
+		)
 		return models.ErrOneLine(models.Code_RunnerExitError, desc)
 	}
 	if err != nil {
@@ -234,7 +248,14 @@ func (r *StdRunner) exec(a models.Alias, snipArgs []string, runner string, arg .
 		// Was an interrupt
 		log.Debug("Interupted:%+v", exErr)
 	}
-	r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun, outBuff.String())
+	r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun,
+		&snippets.UseContext{
+			Preview:     outBuff.String(),
+			CallerAlias: node.Caller.AliasString,
+			Level:       node.Level,
+			Runner:      node.Runner,
+		},
+	)
 	return nil
 }
 

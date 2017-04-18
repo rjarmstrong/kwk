@@ -8,15 +8,15 @@
 	"Deps": [
 		{
 			"ImportPath": "bitbucket.com/sharingmachine/rpc/src/snipsRpc",
-			"Rev": "27ae4400701a45c8233b85073bfb597744489f17"
+			"Rev": "35ec4f7294be08f1045611d5f01f46a379b9ab3f"
 		},
 		{
 			"ImportPath": "bitbucket.com/sharingmachine/rpc/src/sysRpc",
-			"Rev": "27ae4400701a45c8233b85073bfb597744489f17"
+			"Rev": "35ec4f7294be08f1045611d5f01f46a379b9ab3f"
 		},
 		{
 			"ImportPath": "bitbucket.com/sharingmachine/rpc/src/usersRpc",
-			"Rev": "27ae4400701a45c8233b85073bfb597744489f17"
+			"Rev": "35ec4f7294be08f1045611d5f01f46a379b9ab3f"
 		},
 		{
 			"ImportPath": "github.com/chzyer/readline",

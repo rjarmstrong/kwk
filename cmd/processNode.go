@@ -13,7 +13,7 @@ import (
 
 type ProcessNode struct {
 	AliasString string `msg:"ali" json:"ali"`
-	Level       int `msg:"l" json:"lvl"`
+	Level       int64 `msg:"l" json:"lvl"`
 	Args        []string `msg:"args" json:"args"`
 	Caller      *ProcessNode `msg:"c" json:"c"`
 	Runner      string `msg:"rnr" json:"rnr"`
@@ -24,6 +24,8 @@ type ProcessNode struct {
 
 var nodes = []*ProcessNode{}
 
+var emptyCaller = &ProcessNode{AliasString:"-"}
+
 func NewProcessNode(a models.Alias, runner string, args []string, caller *ProcessNode) *ProcessNode {
 	//printTree(os.Getpid(), args)
 	exe, _ := os.Executable()
@@ -32,7 +34,7 @@ func NewProcessNode(a models.Alias, runner string, args []string, caller *Proces
 		n.Caller = caller
 		n.Level = caller.Level + 1
 	} else {
-		n.Caller = nil
+		n.Caller = emptyCaller
 		n.Level = 1
 	}
 	nodes = append(nodes, n)

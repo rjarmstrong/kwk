@@ -55,6 +55,12 @@ func view(s *models.Snippet) string {
 			style.FBox(strings.Join(s.Dependencies, ", "), 50, 5)})
 	}
 	tbl.Append([]string{
+		style.Fmt16(style.Subdued,"Used by:"),
+		style.FBox(strings.Join(s.Apps, ", "), 50, 5)})
+	tbl.Append([]string{
+		style.Fmt16(style.Subdued,"Supported OS:"),
+		style.FBox(strings.Join(s.SupportedOs, ", "), 50, 5)})
+	tbl.Append([]string{
 		style.Fmt16(style.Subdued,"Description:"), style.FBox(FEmpty(s.Description), 50, 3), "", ""})
 
 	tbl.Append([]string{

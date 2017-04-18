@@ -61,6 +61,10 @@ message LogUseRequest {
     UseStatus status = 3;
     string preview = 4;
     int64 time = 5;
+    int64 level = 6;
+    string runner = 7;
+    string callerAlias = 8;
+    string os = 9;
 }
 
 message LogUseResponse {
@@ -231,6 +235,7 @@ message UnTagResponse {
 
 message GetRequest {
     Alias alias = 1;
+    int64 version = 2;
 }
 
 message ListRequest {
@@ -329,6 +334,8 @@ message Snip {
     string preview = 20;
 
     repeated string dependencies = 22;
+    repeated string apps = 24;
+    repeated string supportedOs = 25;
     string attribution = 23;
 }
 

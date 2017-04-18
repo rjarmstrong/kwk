@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"net/url"
+	"strconv"
 )
 
 func NewAlias(username string, pouch string, name string, extension string) *Alias {
@@ -14,10 +16,20 @@ func NewAlias(username string, pouch string, name string, extension string) *Ali
 	}
 }
 
+func NewVAlias(username string, pouch string, name string, extension string, version int) *Alias {
+	return &Alias{
+		Username: username,
+		Pouch:    pouch,
+		SnipName: SnipName{Name: name, Ext: extension},
+		Version: int64(version),
+	}
+}
+
 type Alias struct {
 	Pouch    string
 	Username string
 	SnipName
+	Version int64
 }
 
 func (a *Alias) String() string {
@@ -95,6 +107,21 @@ func ParseAlias(distinctName string) (*Alias, error) {
 	if distinctName == "" {
 		return NewAlias("", ROOT_POUCH, "", ""), nil
 	}
+	query := strings.Split(distinctName, "?")
+	version := 0
+	if len(query) > 1 {
+		v, err := url.ParseQuery(query[1])
+		if err != nil {
+			return nil, err
+		}
+		if len(v["v"]) > 0 {
+			version, err = strconv.Atoi(v["v"][0])
+			if err != nil {
+				return nil, err
+			}
+		}
+		distinctName = query[0]
+	}
 	// When prefixed with a forward slash this refers to another users alias
 	var isOtherUserAlias bool
 	if distinctName[0] == '.' {
@@ -115,17 +142,17 @@ func ParseAlias(distinctName string) (*Alias, error) {
 			return NewAlias(distinctName, ROOT_POUCH, "", ""), nil
 		}
 		// If its just the name
-		return NewAlias("", ROOT_POUCH, sn.Name, sn.Ext), nil
+		return NewVAlias("", ROOT_POUCH, sn.Name, sn.Ext, version), nil
 	}
 	if len(t) == 2 {
 		if isOtherUserAlias {
-			return NewAlias(t[0], ROOT_POUCH, sn.Name, sn.Ext), nil
+			return NewVAlias(t[0], ROOT_POUCH, sn.Name, sn.Ext, version), nil
 		}
-		return NewAlias("", t[0], sn.Name, sn.Ext), nil
+		return NewVAlias("", t[0], sn.Name, sn.Ext, version), nil
 	}
 	if len(t) == 3 {
 		// If it has three parts then this will be an absolute alias
-		return NewAlias(t[0], t[1], sn.Name, sn.Ext), nil
+		return NewVAlias(t[0], t[1], sn.Name, sn.Ext, version), nil
 	}
 	return nil, ErrOneLine(Code_AliasMaxSegments, "Alias can only consist of max 3 segments.")
 }

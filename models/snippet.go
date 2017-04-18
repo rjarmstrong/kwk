@@ -44,6 +44,8 @@ type Snippet struct {
 	RunStatus     UseStatus
 	RunStatusTime int64
 	Dependencies []string
+	Apps []string
+	SupportedOs []string
 	Attribution string
 
 	CheckSum string

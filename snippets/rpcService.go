@@ -4,23 +4,24 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"bitbucket.com/sharingmachine/kwkcli/rpc"
 	"bitbucket.com/sharingmachine/rpc/src/snipsRpc"
-	"bitbucket.com/sharingmachine/kwkcli/log"
 	"google.golang.org/grpc"
 	"time"
 	"github.com/lunixbochs/vtclean"
+	"bitbucket.com/sharingmachine/kwkcli/log"
+	"runtime"
 )
 
 type RpcService struct {
-	pc        snipsRpc.PouchesRpcClient
-	client    snipsRpc.SnipsRpcClient
-	h         *rpc.Headers
+	pc     snipsRpc.PouchesRpcClient
+	client snipsRpc.SnipsRpcClient
+	h      *rpc.Headers
 }
 
 func New(conn *grpc.ClientConn, h *rpc.Headers) Service {
 	return &RpcService{
-		client:               snipsRpc.NewSnipsRpcClient(conn),
-		pc:                   snipsRpc.NewPouchesRpcClient(conn),
-		h:              h,
+		client: snipsRpc.NewSnipsRpcClient(conn),
+		pc:     snipsRpc.NewPouchesRpcClient(conn),
+		h:      h,
 	}
 }
 
@@ -38,7 +39,7 @@ func (rs *RpcService) AlphaSearch(term string) (*models.SearchTermResponse, erro
 			s := &models.Snippet{}
 			rs.mapSnip(v.Snippet, s, false)
 			sr := &models.SearchResult{
-				Snippet: s,
+				Snippet:    s,
 				Highlights: v.Highlights,
 			}
 			r.Results = append(r.Results, sr)
@@ -60,14 +61,14 @@ func (rs *RpcService) Update(a models.Alias, description string) (*models.Snippe
 // since unix time in milliseconds
 func (rs *RpcService) List(l *models.ListParams) (*models.ListView, error) {
 	if res, err := rs.client.List(rs.h.Context(), &snipsRpc.ListRequest{
-		Username: l.Username,
-		Pouch: l.Pouch,
-		Since: l.Since,
-		Size: l.Size,
-		Tags: l.Tags,
+		Username:      l.Username,
+		Pouch:         l.Pouch,
+		Since:         l.Since,
+		Size:          l.Size,
+		Tags:          l.Tags,
 		IgnorePouches: l.IgnorePouches,
-		Category: l.Category,
-		All: l.All,
+		Category:      l.Category,
+		All:           l.All,
 	}); err != nil {
 		return nil, err
 	} else {
@@ -78,7 +79,7 @@ func (rs *RpcService) List(l *models.ListParams) (*models.ListView, error) {
 }
 
 func (rs *RpcService) Get(k models.Alias) (*models.ListView, error) {
-	if res, err := rs.client.Get(rs.h.Context(), &snipsRpc.GetRequest{Alias: mapAlias(k)}); err != nil {
+	if res, err := rs.client.Get(rs.h.Context(), &snipsRpc.GetRequest{Alias: mapAlias(k), Version: k.Version}); err != nil {
 		return nil, err
 	} else {
 		list := &models.ListView{}
@@ -102,9 +103,9 @@ func (rs *RpcService) Delete(username string, pouch string, names []*models.Snip
 func (rs *RpcService) Move(username string, sourcePouch string, targetPouch string, names []*models.SnipName) (string, error) {
 	ns := []*snipsRpc.SnipName{}
 	for _, v := range names {
-	   ns = append(ns, &snipsRpc.SnipName{Name:v.Name, Extension:v.Ext})
+		ns = append(ns, &snipsRpc.SnipName{Name: v.Name, Extension: v.Ext})
 	}
-	mv := &snipsRpc.MoveRequest{Username: username, SourcePouch: sourcePouch, TargetPouch: targetPouch,SnipNames:ns}
+	mv := &snipsRpc.MoveRequest{Username: username, SourcePouch: sourcePouch, TargetPouch: targetPouch, SnipNames: ns}
 	r, err := rs.client.Move(rs.h.Context(), mv)
 	if err != nil {
 		return "", err
@@ -167,9 +168,28 @@ func (rs *RpcService) Clone(a models.Alias, new models.Alias) (*models.Snippet, 
 	}
 }
 
-func (rs *RpcService) LogUse(a models.Alias, s models.UseStatus, u models.UseType, preview string) {
-	_, err := rs.client.LogUse(rs.h.Context(), &snipsRpc.LogUseRequest{
-		Alias: mapAlias(a), Status: snipsRpc.UseStatus(s), Preview: LimitPreview(preview, 50), Type:snipsRpc.UseType(u), Time: time.Now().Unix() })
+type UseContext struct {
+	Preview     string
+	Runner      string
+	Level       int64
+	CallerAlias string
+}
+
+func (rs *RpcService) LogUse(a models.Alias, s models.UseStatus, u models.UseType, ctx *UseContext) {
+	req := &snipsRpc.LogUseRequest{
+		Alias: mapAlias(a), Status: snipsRpc.UseStatus(s),
+		Type:  snipsRpc.UseType(u),
+		Time:  time.Now().Unix(),
+	}
+
+	if ctx != nil {
+		req.Preview = LimitPreview(ctx.Preview, 50)
+		req.Runner = ctx.Runner
+		req.Level = ctx.Level
+		req.CallerAlias = ctx.CallerAlias
+		req.Os = runtime.GOOS
+	}
+	_, err := rs.client.LogUse(rs.h.Context(), req)
 	if err != nil {
 		log.Error("Error sending LogRun", err)
 	}
@@ -182,7 +202,6 @@ func LimitPreview(in string, length int) string {
 	in = vtclean.Clean(in, true)
 	return models.Limit(in, length-5) + "\033[0m"
 }
-
 
 func (rs *RpcService) Tag(a models.Alias, tags ...string) (*models.Snippet, error) {
 	if res, err := rs.client.Tag(rs.h.Context(), &snipsRpc.TagRequest{Alias: mapAlias(a), Tags: tags}); err != nil {
@@ -216,16 +235,16 @@ func (rs *RpcService) GetRoot(username string, all bool) (*models.ListView, erro
 	perL := rs.mapPouchList(r.Personal)
 	//record := &update.Record{}
 	root := &models.ListView{
-		IsRoot: true,
+		IsRoot:   true,
 		Snippets: l.Snippets,
-		Pouches: pl,
+		Pouches:  pl,
 		Personal: perL,
 		Username: r.Username,
 		UserStats: models.UserStats{
-		 LastPouch:r.Stats.LastPouch,
-		 RecentPouches:r.Stats.RecentPouches,
-		 MaxUsePerPouch:r.Stats.MaxUsePerPouch,
-		 MaxSnipsPerPouch:r.Stats.MaxSnipsPerPouch,
+			LastPouch:        r.Stats.LastPouch,
+			RecentPouches:    r.Stats.RecentPouches,
+			MaxUsePerPouch:   r.Stats.MaxUsePerPouch,
+			MaxSnipsPerPouch: r.Stats.MaxSnipsPerPouch,
 		},
 	}
 	//if e := rs.persister.Get(update.RecordFile, record, 0); e == nil {
@@ -243,7 +262,7 @@ func (rs *RpcService) CreatePouch(pouch string) (string, error) {
 }
 
 func (rs *RpcService) RenamePouch(pouch string, newPouch string) (string, error) {
-	req := &snipsRpc.RenamePouchRequest{ Name:pouch, NewName:newPouch}
+	req := &snipsRpc.RenamePouchRequest{Name: pouch, NewName: newPouch}
 	r, err := rs.pc.Rename(rs.h.Context(), req)
 	if err != nil {
 		return "", err
@@ -252,7 +271,7 @@ func (rs *RpcService) RenamePouch(pouch string, newPouch string) (string, error)
 }
 
 func (rs *RpcService) MakePrivate(pouch string, private bool) (bool, error) {
-	req := &snipsRpc.MakePrivateRequest{ MakePrivate:private, Name:pouch }
+	req := &snipsRpc.MakePrivateRequest{MakePrivate: private, Name: pouch }
 	_, err := rs.pc.MakePrivate(rs.h.Context(), req)
 	if err != nil {
 		return false, err
@@ -261,7 +280,7 @@ func (rs *RpcService) MakePrivate(pouch string, private bool) (bool, error) {
 }
 
 func (rs *RpcService) DeletePouch(pouch string) (bool, error) {
-	req := &snipsRpc.DeletePouchRequest{ Name:pouch }
+	req := &snipsRpc.DeletePouchRequest{Name: pouch }
 	_, err := rs.pc.Delete(rs.h.Context(), req)
 	if err != nil {
 		return false, err
@@ -310,6 +329,8 @@ func (rs *RpcService) mapSnip(rpc *snipsRpc.Snip, model *models.Snippet, cache b
 	model.CheckSum = rpc.SnipChecksum
 	model.Attribution = rpc.Attribution
 	model.Dependencies = rpc.Dependencies
+	model.Apps = rpc.Apps
+	model.SupportedOs = rpc.SupportedOs
 }
 
 func (rs *RpcService) mapSnippetList(rpc *snipsRpc.ListResponse, model *models.ListView, isList bool) {
@@ -345,17 +366,17 @@ func mapPouch(p *snipsRpc.Pouch) *models.Pouch {
 		PouchId:     p.PouchId,
 		SharedWith:  p.SharedWith,
 		LastUse:     p.LastUse,
-		Type: models.PouchType(p.Type),
+		Type:        models.PouchType(p.Type),
 		PouchStats: models.PouchStats{
-			Use: p.Stats.Use,
-			Runs:p.Stats.Runs,
-			Views:p.Stats.Views,
-			Clones:p.Stats.Clones,
-			Green:p.Stats.Green,
-			Red:p.Stats.Red,
-			Snips:p.Stats.Snips,
+			Use:    p.Stats.Use,
+			Runs:   p.Stats.Runs,
+			Views:  p.Stats.Views,
+			Clones: p.Stats.Clones,
+			Green:  p.Stats.Green,
+			Red:    p.Stats.Red,
+			Snips:  p.Stats.Snips,
 		},
-		UnOpened:p.UnOpened,
-		Username:p.Username,
+		UnOpened: p.UnOpened,
+		Username: p.Username,
 	}
 }
