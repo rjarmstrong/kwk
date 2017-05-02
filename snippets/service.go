@@ -1,21 +1,24 @@
 package snippets
 
-import "bitbucket.com/sharingmachine/kwkcli/models"
+import (
+	"bitbucket.com/sharingmachine/kwkcli/models"
+	t "bitbucket.com/sharingmachine/types"
+)
 
 type Service interface {
-	Create(snip string, a models.Alias, role models.SnipRole) (*models.CreateSnippetResponse, error)
-	Update(a models.Alias, description string) (*models.Snippet, error)
-	Rename(a models.Alias, new models.SnipName) (*models.Snippet, *models.SnipName, error)
-	Patch(a models.Alias, target string, patch string) (*models.Snippet, error)
-	Delete(username string, pouch string, names []*models.SnipName) error
-	Move(username string, sourcePouch string, targetPouch string, names []*models.SnipName) (string, error)
-	Clone(a models.Alias, new models.Alias) (*models.Snippet, error)
-	Tag(a models.Alias, tag ...string) (*models.Snippet, error)
-	UnTag(a models.Alias, tag ...string) (*models.Snippet, error)
-	Get(a models.Alias) (*models.ListView, error)
+	Create(snip string, a t.Alias, role t.SnipRole) (*models.CreateSnippetResponse, error)
+	Update(a t.Alias, description string) (*t.Snippet, error)
+	Rename(a t.Alias, new t.SnipName) (*t.Snippet, *t.SnipName, error)
+	Patch(a t.Alias, target string, patch string) (*t.Snippet, error)
+	Delete(username string, pouch string, names []*t.SnipName) error
+	Move(username string, sourcePouch string, targetPouch string, names []*t.SnipName) (string, error)
+	Clone(a t.Alias, new t.Alias) (*t.Snippet, error)
+	Tag(a t.Alias, tag ...string) (*t.Snippet, error)
+	UnTag(a t.Alias, tag ...string) (*t.Snippet, error)
+	Get(a t.Alias) (*models.ListView, error)
 	List(l *models.ListParams) (*models.ListView, error)
 	AlphaSearch(term string) (*models.SearchTermResponse, error)
-	LogUse(a models.Alias, s models.UseStatus, u models.UseType, ctx *UseContext)
+	LogUse(a t.Alias, s t.UseStatus, u t.UseType, ctx *UseContext)
 
 	GetRoot (username string, all bool) (*models.ListView, error)
 	CreatePouch (pouch string) (string, error)

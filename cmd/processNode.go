@@ -1,15 +1,16 @@
 package cmd
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/models"
 	"os"
 	"encoding/json"
 	"fmt"
 	"os/exec"
 	//"github.com/mitchellh/go-ps"
 	"bitbucket.com/sharingmachine/kwkcli/log"
+	"bitbucket.com/sharingmachine/types"
 )
 
+const PROCESS_NODE = "PROCESS_NODE"
 
 type ProcessNode struct {
 	AliasString string `msg:"ali" json:"ali"`
@@ -26,7 +27,7 @@ var nodes = []*ProcessNode{}
 
 var emptyCaller = &ProcessNode{AliasString:"-"}
 
-func NewProcessNode(a models.Alias, runner string, args []string, caller *ProcessNode) *ProcessNode {
+func NewProcessNode(a types.Alias, runner string, args []string, caller *ProcessNode) *ProcessNode {
 	//printTree(os.Getpid(), args)
 	exe, _ := os.Executable()
 	n := &ProcessNode{AliasString : a.String(), Runner: runner, Args : args, PPid: os.Getpid(), PRunner: exe}
@@ -60,7 +61,7 @@ func (node *ProcessNode) Complete(pid int) {
 //	printTree(p.PPid(), nil)
 //}
 
-func getCurrentNode(a models.Alias, runner string, args []string, c *exec.Cmd) (*ProcessNode, error) {
+func getCurrentNode(a types.Alias, runner string, args []string, c *exec.Cmd) (*ProcessNode, error) {
 	callerString, ok := os.LookupEnv(PROCESS_NODE)
 	var caller *ProcessNode
 	if ok && callerString != "" {

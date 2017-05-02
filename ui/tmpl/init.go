@@ -2,12 +2,12 @@ package tmpl
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/ui/style"
-	"bitbucket.com/sharingmachine/kwkcli/models"
 	"text/template"
 	"fmt"
 	"time"
 	"io"
 	"text/tabwriter"
+	"bitbucket.com/sharingmachine/types"
 )
 
 var Templates = map[string]*template.Template{}
@@ -137,7 +137,7 @@ func addColor(name string, text string, color ColorFunc) {
 }
 
 func multiChoice(w io.Writer, in interface{}) {
-	list := in.([]*models.Snippet)
+	list := in.([]*types.Snippet)
 	fmt.Fprint(w, "\n")
 	if len(list) == 1 {
 		fmt.Fprintf(w, "%sDid you mean: %s? y/n\n\n", style.MARGIN, style.Fmt256(style.Color_PouchCyan, list[0].String()))

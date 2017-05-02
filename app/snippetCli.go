@@ -15,6 +15,7 @@ import (
 	"time"
 	"sort"
 	"bitbucket.com/sharingmachine/kwkcli/persist"
+	"bitbucket.com/sharingmachine/types"
 )
 
 type SnippetCli struct {
@@ -40,7 +41,7 @@ func (sc *SnippetCli) Search(args ...string) {
 }
 
 func (sc *SnippetCli) ListCategory(category string, args ...string) {
-	username, pouch, err := models.ParsePouch(args[0])
+	username, pouch, err := types.ParsePouch(args[0])
 	if err != nil {
 		sc.HandleErr(err)
 		return
@@ -91,12 +92,12 @@ func (sc *SnippetCli) Suggest(term string) {
 	}
 }
 
-func (sc *SnippetCli) run(selected *models.Snippet, args []string) {
+func (sc *SnippetCli) run(selected *types.Snippet, args []string) {
 	sc.runner.Run(selected, args)
 }
 
 func (sc *SnippetCli) Run(distinctName string, args []string) {
-	a, err := models.ParseAlias(distinctName)
+	a, err := types.ParseAlias(distinctName)
 	if err != nil {
 		sc.Render("validation:one-line", err)
 	}
@@ -115,61 +116,89 @@ func (sc *SnippetCli) Run(distinctName string, args []string) {
 	}
 }
 
-func (sc *SnippetCli) Create(args []string) {
-	alias := &models.Alias{}
-	var snippet string
-	// TODO: 'http://www.fileformat.info/info/unicode/char/1f526/index.htm'
-	// When there is only one argument a path or url will incorrectly be guessed as being an alias
-	// suggest that if has more than 3 segments then we treat as the snippet instead.
-	if len(args) == 1 {
-		a, err := models.ParseAlias(args[0])
+func IsAlias(in string) bool {
+	if strings.ContainsAny(in, "\t\n\f\r ") {
+		return false
+	}
+	if strings.Contains(in, "/") {
+		return true
+	}
+	return false
+}
+
+func GuessArgs(a string, b string) (*types.Alias, string, error) {
+	fstIsAlias := IsAlias(a)
+	sndIsAlias := IsAlias(b)
+
+	log.Debug("ARG1:%v ARG2:%v", a, b)
+
+	if !fstIsAlias && !sndIsAlias {
+		return nil, "", models.ErrOneLine(models.Code_InvalidArgument,
+			"Please specify a pouch to create a snippet."+
+				"\n   e.g."+
+				"\n  `kwk new <pouch_name>/<snip_name>[.<ext>]  <snippet>`"+
+				"\n  `kwk new <snippet> <pouch_name>/<snip_name>[.<ext>]`"+
+				"\n  `<cmd> | kwk new <pouch_name>/<snip_name>[.<ext>]`",
+		)
+	}
+	if fstIsAlias && sndIsAlias {
+		return nil, "", models.ErrOneLine(models.Code_InvalidArgument,
+			"Ambiguous",
+		)
+	}
+	if fstIsAlias {
+		alias, err := types.ParseAlias(a)
 		if err != nil {
-			sc.HandleErr(err)
-			return
+			return nil, "", err
 		}
-		if a.Ext == "" {
+		return alias, b, nil
+
+	}
+	alias, err := types.ParseAlias(b)
+	if err != nil {
+		return nil, "", err
+	}
+	return alias, a, nil
+}
+
+func (sc *SnippetCli) Create(args []string) {
+	a1 := &types.Alias{}
+	var snippet string
+	if len(args) == 1 {
+		if IsAlias(args[0]) {
+			a, err := types.ParseAlias(args[0])
+			if err != nil {
+				sc.HandleErr(err)
+				return
+			}
+			a1 = a
+		} else {
 			log.Debug("Assuming first arg is the snippet.")
 			snippet = args[0]
-			a = &models.Alias{}
+			a1 = &types.Alias{}
 		}
-		alias = a
 	} else if len(args) > 1 {
-		log.Debug("Assuming first arg is the snippet and second is alias.")
-		a, err := models.ParseAlias(args[1])
+		a, s, err := GuessArgs(args[0], args[1])
 		if err != nil {
 			sc.HandleErr(err)
-			return
 		}
-		alias = a
-		snippet = args[0]
+		a1 = a
+		snippet = s
 	}
 	if snippet == "" {
 		snippet = stdInAsString()
 	}
-
-	if createAlias, err := sc.s.Create(snippet, *alias, models.SnipRoleStandard); err != nil {
+	if createAlias, err := sc.s.Create(snippet, *a1, types.RoleStandard); err != nil {
 		sc.HandleErr(err)
+		//TODO: If snippet is similar to an existing one prompt for it here.
 	} else {
-		sc.List("", models.ROOT_POUCH)
+		sc.List("", types.PouchRoot)
 		sc.Render("snippet:new", createAlias.Snippet.String())
-		// TODO: Add similarity prompt here
-		//} else {
-		//	matches := createAlias.TypeMatch.Matches
-		//	r := s.MultiChoice("snippet:chooseruntime", "Choose a type for this snippet:", matches)
-		//	winner := r.Value.(models.Match)
-		//	if winner.Score == -1 {
-		//		ca, _ := sc.s.Create("_", "_", models.RoleStandard)
-		//		matches = ca.TypeMatch.Matches
-		//		winner = s.MultiChoice("snippet:chooseruntime", "Choose a type for this snippet:", matches).Value.(models.Match)
-		//	}
-		//	fk := fullKey + "." + winner.Extension
-		//	s.New(uri, fk)
-		//}
 	}
 }
 
 func (sc *SnippetCli) Edit(distinctName string) {
-	innerEdit := func(s *models.Snippet) {
+	innerEdit := func(s *types.Snippet) {
 		sc.Render("snippet:editing", s)
 		if err := sc.runner.Edit(s); err != nil {
 			sc.HandleErr(err)
@@ -182,13 +211,13 @@ func (sc *SnippetCli) Edit(distinctName string) {
 	}
 	if list, _, err := sc.getSnippet(distinctName); err != nil {
 		if models.HasErrCode(err, models.Code_NotFound) {
-			a, err := models.ParseAlias(distinctName)
+			a, err := types.ParseAlias(distinctName)
 			if err != nil {
 				sc.HandleErr(err)
 			}
 			r := sc.Dialog.Modal("snippet:edit-prompt", a, false)
 			if r.Ok {
-				r, err := sc.s.Create("", *a, models.SnipRoleStandard)
+				r, err := sc.s.Create("", *a, types.RoleStandard)
 				if err != nil {
 					sc.HandleErr(err)
 					return
@@ -202,15 +231,15 @@ func (sc *SnippetCli) Edit(distinctName string) {
 		if snippet := sc.handleMultiResponse(distinctName, list); snippet != nil {
 			innerEdit(snippet)
 		} else {
-			sc.Render("snippet:notfound", &models.Snippet{})
+			sc.Render("snippet:notfound", &types.Snippet{})
 		}
 	}
 }
 
 func (sc *SnippetCli) Describe(distinctName string, description string) {
-	a, err := models.ParseAlias(distinctName)
+	a, err := types.ParseAlias(distinctName)
 	if description == "" {
-		sc.typeAhead(distinctName, func(s *models.Snippet, args []string) {
+		sc.typeAhead(distinctName, func(s *types.Snippet, args []string) {
 			cm := fmt.Sprintf("Enter new description for %s: ", s.SnipName.String())
 			res, err := sc.FormField(cm)
 			if err != nil {
@@ -232,14 +261,14 @@ func (sc *SnippetCli) Describe(distinctName string, description string) {
 }
 
 func (sc *SnippetCli) InspectListOrRun(distinctName string, forceInspect bool, args ...string) {
-	a, err := models.ParseAlias(distinctName)
+	a, err := types.ParseAlias(distinctName)
 	v, err := sc.s.GetRoot(a.Username, true)
 	if err != nil {
 		sc.HandleErr(err)
 		return
 	} else if a.Ext == "" && v.IsPouch(a.Name) {
 		p := v.GetPouch(a.Name)
-		if p.Type == models.PouchType_Virtual {
+		if p.Type == types.PouchTypeVirtual{
 			fmt.Println("List virtual.")
 		} else {
 			sc.List(a.Username, a.Name)
@@ -324,7 +353,7 @@ func (sc *SnippetCli) Move(args []string) {
 			sc.HandleErr(err)
 			return
 		}
-		sc.List("", models.ROOT_POUCH)
+		sc.List("", types.PouchRoot)
 		sc.Render("pouch:renamed", p)
 		return
 	} else if !root.IsPouch(last) && len(args) == 2 {
@@ -340,7 +369,7 @@ func (sc *SnippetCli) Move(args []string) {
 		})
 		return
 	}
-	as, source, err := models.ParseMany(args[0:len(args)-1])
+	as, source, err := types.ParseMany(args[0:len(args)-1])
 	if err != nil {
 		sc.HandleErr(err)
 		return
@@ -352,7 +381,7 @@ func (sc *SnippetCli) Move(args []string) {
 		return
 	}
 	if last == "" {
-		sc.List("", models.ROOT_POUCH)
+		sc.List("", types.PouchRoot)
 		sc.Render("snippet:moved-root", MoveResult{Quant: len(as)})
 	} else {
 		sc.List("", last)
@@ -369,7 +398,7 @@ type MoveResult struct {
 func (sc *SnippetCli) Cat(distinctName string) {
 	if list, a, err := sc.getSnippet(distinctName); err != nil {
 		if models.HasErrCode(err, models.Code_NotFound) {
-			sc.typeAhead(distinctName, func(s *models.Snippet, args []string) {
+			sc.typeAhead(distinctName, func(s *types.Snippet, args []string) {
 				sc.Render("snippet:cat", s)
 			})
 		} else {
@@ -388,7 +417,7 @@ func (sc *SnippetCli) Cat(distinctName string) {
 }
 
 func (sc *SnippetCli) Patch(distinctName string, target string, patch string) {
-	a, err := models.ParseAlias(distinctName)
+	a, err := types.ParseAlias(distinctName)
 	if err != nil {
 		sc.HandleErr(err)
 		return
@@ -401,12 +430,12 @@ func (sc *SnippetCli) Patch(distinctName string, target string, patch string) {
 }
 
 func (sc *SnippetCli) Clone(distinctName string, newFullName string) {
-	a, err := models.ParseAlias(distinctName)
+	a, err := types.ParseAlias(distinctName)
 	if err != nil {
 		sc.HandleErr(err)
 		return
 	}
-	newA, err := models.ParseAlias(newFullName)
+	newA, err := types.ParseAlias(newFullName)
 	if err != nil {
 		sc.HandleErr(err)
 		return
@@ -421,7 +450,7 @@ func (sc *SnippetCli) Clone(distinctName string, newFullName string) {
 }
 
 func (sc *SnippetCli) Tag(distinctName string, tags ...string) {
-	a, err := models.ParseAlias(distinctName)
+	a, err := types.ParseAlias(distinctName)
 	if err != nil {
 		sc.HandleErr(err)
 		return
@@ -434,7 +463,7 @@ func (sc *SnippetCli) Tag(distinctName string, tags ...string) {
 }
 
 func (sc *SnippetCli) UnTag(distinctName string, tags ...string) {
-	a, err := models.ParseAlias(distinctName)
+	a, err := types.ParseAlias(distinctName)
 	if err != nil {
 		sc.HandleErr(err)
 		return
@@ -496,7 +525,7 @@ func (sc *SnippetCli) GetEra(virtualPouch string) {
 	if list, err := sc.s.List(p); err != nil {
 		sc.HandleErr(err)
 	} else {
-		era := []*models.Snippet{}
+		era := []*types.Snippet{}
 		var since, latest int64
 		bod := Bod(time.Now()).Unix()
 		isoYear, isoWeek := time.Now().ISOWeek()
@@ -516,12 +545,12 @@ func (sc *SnippetCli) GetEra(virtualPouch string) {
 			latest = bom
 		}
 		for _, v := range list.Snippets {
-			if v.RunStatusTime > since && v.RunStatusTime < latest {
+			if v.RunStatusTime.Unix() > since && v.RunStatusTime.Unix() < latest {
 				era = append(era, v)
 			}
 		}
 		sort.Slice(era, func(i, j int) bool {
-			return era[i].RunStatusTime < era[j].RunStatusTime
+			return era[i].RunStatusTime.Unix() < era[j].RunStatusTime.Unix()
 		})
 		list.Snippets = era
 		sc.Render("snippet:list", list)
@@ -551,23 +580,23 @@ func (sc *SnippetCli) List(username string, pouch string) {
 	if list, err := sc.s.List(p); err != nil {
 		sc.HandleErr(err)
 	} else {
-		a := models.NewAlias(username, pouch, "", "")
+		a := types.NewAlias(username, pouch, "", "")
 		sc.Render("snippet:list", list)
 		sc.s.LogUse(
 			*a,
-			models.UseStatusSuccess,
-			models.UseTypeView,
+			types.UseStatusSuccess,
+			types.UseTypeView,
 			nil,
 		)
 	}
 }
 
-func (sc *SnippetCli) typeAhead(term string, onSelect func(s *models.Snippet, args []string)) {
+func (sc *SnippetCli) typeAhead(term string, onSelect func(s *types.Snippet, args []string)) {
 	if res, err := sc.s.AlphaSearch(term); err != nil {
 		sc.HandleErr(err)
 	} else {
 		res.Term = term
-		snips := []*models.Snippet{}
+		snips := []*types.Snippet{}
 		for _, v := range res.Results {
 			snips = append(snips, v.Snippet)
 		}
@@ -587,7 +616,7 @@ func stdInAsString() string {
 	return in.String()
 }
 
-func (sc *SnippetCli) handleMultiResponse(distinctName string, list *models.ListView) *models.Snippet {
+func (sc *SnippetCli) handleMultiResponse(distinctName string, list *models.ListView) *types.Snippet {
 	if list.Total == 1 {
 		return list.Snippets[0]
 	} else if list.Total > 1 {
@@ -597,8 +626,8 @@ func (sc *SnippetCli) handleMultiResponse(distinctName string, list *models.List
 	}
 }
 
-func (sc *SnippetCli) getSnippet(distinctName string) (*models.ListView, *models.Alias, error) {
-	a, err := models.ParseAlias(distinctName)
+func (sc *SnippetCli) getSnippet(distinctName string) (*models.ListView, *types.Alias, error) {
+	a, err := types.ParseAlias(distinctName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -609,12 +638,12 @@ func (sc *SnippetCli) getSnippet(distinctName string) (*models.ListView, *models
 	}
 }
 
-func (sc *SnippetCli) rename(distinctName string, newSnipName string) (*models.Snippet, *models.SnipName, error) {
-	a, err := models.ParseAlias(distinctName)
+func (sc *SnippetCli) rename(distinctName string, newSnipName string) (*types.Snippet, *types.SnipName, error) {
+	a, err := types.ParseAlias(distinctName)
 	if err != nil {
 		return nil, nil, err
 	}
-	sn, err := models.ParseSnipName(newSnipName)
+	sn, err := types.ParseSnipName(newSnipName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -622,7 +651,7 @@ func (sc *SnippetCli) rename(distinctName string, newSnipName string) (*models.S
 }
 
 func (sc *SnippetCli) deleteSnippet(args []string) {
-	as, pouch, err := models.ParseMany(args)
+	as, pouch, err := types.ParseMany(args)
 	if err != nil {
 		sc.HandleErr(err)
 		return
@@ -647,7 +676,7 @@ func (sc *SnippetCli) deletePouch(pouch string) {
 			sc.HandleErr(err)
 			return
 		}
-		sc.List("", models.ROOT_POUCH)
+		sc.List("", types.PouchRoot)
 		sc.Render("pouch:deleted", pouch)
 	} else {
 		sc.Render("pouch:not-deleted", pouch)

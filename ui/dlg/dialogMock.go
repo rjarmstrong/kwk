@@ -1,6 +1,8 @@
 package dlg
 
-import "bitbucket.com/sharingmachine/kwkcli/models"
+import (
+	"bitbucket.com/sharingmachine/types"
+)
 
 type DialogMock struct {
 	LastModalCalledWith   []interface{}
@@ -10,7 +12,7 @@ type DialogMock struct {
 	FieldResponse         *DialogResponse
 	FieldResponseMap map[string]interface{}
 	MultiChoiceCalledWith []interface{}
-	MultiChoiceResponse   *models.Snippet
+	MultiChoiceResponse   *types.Snippet
 }
 
 func (d *DialogMock) Modal(templateName string, data interface{}, autoYes bool) *DialogResponse {
@@ -31,7 +33,7 @@ func (d *DialogMock) FormField(label string) (*DialogResponse, error) {
   panic("not impl")
 }
 
-func (d *DialogMock) MultiChoice(templateName string, header interface{}, list []*models.Snippet) *models.Snippet {
+func (d *DialogMock) MultiChoice(templateName string, header interface{}, list []*types.Snippet) *types.Snippet {
 	d.MultiChoiceCalledWith = []interface{}{templateName, header, list}
 	return d.MultiChoiceResponse
 }

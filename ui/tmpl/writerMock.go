@@ -18,4 +18,3 @@ func (t *WriterMock) Render(templateName string, data interface{}) {
 func (t *WriterMock) Out(templateName string, data interface{}) {
 
 }
-

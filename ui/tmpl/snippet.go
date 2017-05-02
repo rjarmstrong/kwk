@@ -5,12 +5,12 @@ import (
 	"github.com/rjarmstrong/tablewriter"
 	"bytes"
 	"fmt"
-	"time"
 	"strings"
 	"bitbucket.com/sharingmachine/kwkcli/ui/style"
+	"bitbucket.com/sharingmachine/types"
 )
 
-func view(s *models.Snippet) string {
+func view(s *types.Snippet) string {
 	w := &bytes.Buffer{}
 	w.WriteString("\n")
 	w.WriteString(style.MARGIN)
@@ -37,18 +37,18 @@ func view(s *models.Snippet) string {
 	tbl.Append([]string{style.Fmt256(style.Color_PouchCyan, FSnippetType(s) + " Details:"), "", "", ""})
 
 	var lastRun string
-	if s.RunCount < 1 {
+	if s.Runs < 1 {
 		lastRun = "never"
 	} else {
-		lastRun = pad(20, style.Time(time.Unix(s.RunStatusTime, 0))).String()
+		lastRun = pad(20, style.Time(s.RunStatusTime)).String()
 	}
 	tbl.Append([]string{
 		style.Fmt16(style.Subdued,"Run Status:"), FStatus(s, true),
 		style.Fmt16(style.Subdued,"Last Run:"), lastRun,
 	})
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued,"Run Count: "), fmt.Sprintf("↻ %2d", s.RunCount),
-		style.Fmt16(style.Subdued,"View count:") , fmt.Sprintf("%s  %2d", style.Icon_View, s.ViewCount )})
+		style.Fmt16(style.Subdued,"Run Count: "), fmt.Sprintf("↻ %2d", s.Runs),
+		style.Fmt16(style.Subdued,"View count:") , fmt.Sprintf("%s  %2d", style.Icon_View, s.Views )})
 	if s.IsApp() {
 		tbl.Append([]string{
 			style.Fmt16(style.Subdued,"App Deps:"),
@@ -71,7 +71,7 @@ func view(s *models.Snippet) string {
 	tbl.Append([]string{
 		style.Fmt16(style.Subdued,"sha256:"), FVerified(s) })
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued,"Updated:"), fmt.Sprintf("%s - %s", humanTime(s.Created), fmt.Sprintf("v%d", s.Version )),
+		style.Fmt16(style.Subdued,"Updated:"), fmt.Sprintf("%s - %s", style.Time(s.Created), fmt.Sprintf("v%d", s.Version )),
 	})
 	tbl.Render()
 
@@ -89,7 +89,7 @@ func view(s *models.Snippet) string {
 
 	return w.String()
 }
-func FSnippetType(s *models.Snippet) string {
+func FSnippetType(s *types.Snippet) string {
 	if s.IsApp() {
 		return "App"
 	} else if s.Ext == "url" {
@@ -98,20 +98,20 @@ func FSnippetType(s *models.Snippet) string {
 		return "Snippet"
 	}
 }
-func FVerified(s *models.Snippet) string {
+func FVerified(s *types.Snippet) string {
 	var buff bytes.Buffer
 	if s.VerifyChecksum() {
 		buff.WriteString(style.Fmt256(style.Color_YesGreen,  style.Icon_Tick + " "))
-		buff.WriteString(pad(12, s.CheckSum).String())
+		buff.WriteString(pad(12, s.SnipChecksum).String())
 		buff.WriteString("...")
 	} else {
 		buff.WriteString(" " + style.Icon_Cross + "  Invalid Checksum: ")
-		buff.WriteString(FEmpty(s.CheckSum))
+		buff.WriteString(FEmpty(s.SnipChecksum))
 	}
 	return buff.String()
 }
 
-func FCodeview(s *models.Snippet, width int, lines int, odd bool) string {
+func FCodeview(s *types.Snippet, width int, lines int, odd bool) string {
 	if s.Snip == "" {
 		s.Snip = "<empty>"
 	}

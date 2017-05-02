@@ -5,7 +5,7 @@ import (
 	"github.com/siddontang/go/num"
 	"github.com/howeyc/gopass"
 	"bufio"
-	"bitbucket.com/sharingmachine/kwkcli/models"
+	"bitbucket.com/sharingmachine/types"
 )
 
 func New(w tmpl.Writer, reader *bufio.Reader) *StdDialog {
@@ -30,7 +30,7 @@ func (d *StdDialog) Modal(templateName string, data interface{}, autoYes bool) *
 	return r
 }
 
-func (d *StdDialog) MultiChoice(templateName string, header interface{}, list []*models.Snippet) *models.Snippet {
+func (d *StdDialog) MultiChoice(templateName string, header interface{}, list []*types.Snippet) *types.Snippet {
 	d.writer.Out(templateName, list)
 	input, _, _ := d.reader.ReadLine()
 	i, err := num.ParseInt(string(input))

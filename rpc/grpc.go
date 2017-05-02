@@ -13,6 +13,7 @@ import (
 	"runtime"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"time"
+	"bitbucket.com/sharingmachine/types"
 )
 
 // /etc/ssl/certs/COMODO_RSA_Certification_Authority.pem
@@ -92,7 +93,7 @@ func (i *Headers) Context() context.Context {
 		ctx := metadata.NewContext(
 			context.Background(),
 			metadata.Pairs(
-				models.TokenHeaderName, models.Principal.Token,
+				types.TokenHeaderName, models.Principal.Token,
 				"host", hostname,
 				"os", runtime.GOOS,
 				"agnt", "<not implemented>", //agent //ps -p $$ | tail -1 | awk '{print $NF}'

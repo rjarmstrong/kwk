@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/models"
+	"bitbucket.com/sharingmachine/types"
 )
 
 type Runner interface {
-	Run(s *models.Snippet, args []string) error
-	Edit(s *models.Snippet) error
+	Run(s *types.Snippet, args []string) error
+	Edit(s *types.Snippet) error
 }

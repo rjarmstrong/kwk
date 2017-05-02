@@ -19,6 +19,7 @@ import (
 	"os/signal"
 	"syscall"
 	"bitbucket.com/sharingmachine/kwkcli/persist"
+	"bitbucket.com/sharingmachine/types"
 )
 
 type StdRunner struct {
@@ -30,7 +31,7 @@ func NewStdRunner(s persist.IO, ss snippets.Service) *StdRunner {
 	return &StdRunner{snippets: ss, file: s}
 }
 
-func (r *StdRunner) Edit(s *models.Snippet) error {
+func (r *StdRunner) Edit(s *types.Snippet) error {
 	//TODO: if we pull out the env from getSection we can improve speed
 	a, err := r.getEnvSection("apps")
 	eRoot, err := r.getEnvSection("editors")
@@ -75,7 +76,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 		rdr.ReadLine()
 	}
 
-	text, err := r.file.Read(setup.SNIP_CACHE_PATH, s.String(), true, 0);
+	text, err := r.file.Read(setup.SNIP_CACHE_PATH, s.String(), true, 0)
 	if err != nil {
 		return err
 	}
@@ -86,7 +87,7 @@ func (r *StdRunner) Edit(s *models.Snippet) error {
 	return nil
 }
 
-func (r *StdRunner) Run(s *models.Snippet, args []string) error {
+func (r *StdRunner) Run(s *types.Snippet, args []string) error {
 	if !s.VerifyChecksum() {
 		return models.ErrOneLine(models.Code_SnippetNotVerified, "The checksum doesn't match the snippet.")
 	}
@@ -149,9 +150,7 @@ func (r *StdRunner) Run(s *models.Snippet, args []string) error {
 	return nil
 }
 
-const PROCESS_NODE = "PROCESS_NODE"
-
-func (r *StdRunner) execEdit(a models.Alias, editor string, arg ...string) error {
+func (r *StdRunner) execEdit(a types.Alias, editor string, arg ...string) error {
 	log.Debug("EXEC EDIT: %s %s %s", a.String(), editor, strings.Join(arg, " "))
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(models.Prefs().CommandTimeout)*time.Second)
 	c := exec.CommandContext(ctx, editor, arg...)
@@ -173,7 +172,7 @@ func (r *StdRunner) execEdit(a models.Alias, editor string, arg ...string) error
 /*
 exec realArgs are args that were passed to the snippet, and not the derived args which are passed to the runner.
  */
-func (r *StdRunner) exec(a models.Alias, snipArgs []string, runner string, arg ...string) error {
+func (r *StdRunner) exec(a types.Alias, snipArgs []string, runner string, arg ...string) error {
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(models.Prefs().CommandTimeout)*time.Second)
 	c := exec.CommandContext(ctx, runner, arg...)
 	c.Stdin = os.Stdin
@@ -202,7 +201,7 @@ func (r *StdRunner) exec(a models.Alias, snipArgs []string, runner string, arg .
 	err = models.ScanVulnerabilities(strings.Join(arg, " "), a.Ext)
 	if err != nil {
 		e := err.(*models.ClientErr)
-		r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun,
+		r.snippets.LogUse(a, types.UseStatusFail, types.UseTypeRun,
 			&snippets.UseContext{
 				Preview:     e.Msgs[0].Desc,
 				CallerAlias: node.Caller.AliasString,
@@ -229,7 +228,7 @@ func (r *StdRunner) exec(a models.Alias, snipArgs []string, runner string, arg .
 	}
 	if stderr.Len() > 0 {
 		desc := fmt.Sprintf("Error running '%s' (runner: '%s' %s)\n\n%s", a.String(), runner, err.Error(), stderr.String())
-		r.snippets.LogUse(a, models.UseStatusFail, models.UseTypeRun,
+		r.snippets.LogUse(a, types.UseStatusFail, types.UseTypeRun,
 			&snippets.UseContext{
 				Preview:     stderr.String(),
 				CallerAlias: node.Caller.AliasString,
@@ -248,7 +247,7 @@ func (r *StdRunner) exec(a models.Alias, snipArgs []string, runner string, arg .
 		// Was an interrupt
 		log.Debug("Interupted:%+v", exErr)
 	}
-	r.snippets.LogUse(a, models.UseStatusSuccess, models.UseTypeRun,
+	r.snippets.LogUse(a, types.UseStatusSuccess, types.UseTypeRun,
 		&snippets.UseContext{
 			Preview:     outBuff.String(),
 			CallerAlias: node.Caller.AliasString,
@@ -273,7 +272,7 @@ func (r *StdRunner) getEnvSection(name string) (*yaml.MapSlice, error) {
 	 $DIR = directory of the snippet on disk. Useful when editing a file in a directory structure or when compilation needs it.
 	 $CLASS_NAME = for java and scala these will be the class name in the snippet. Used when attempting to run the compiled file.
  */
-func replaceVariables(cliArgs *[]string, filePath string, s *models.Snippet) {
+func replaceVariables(cliArgs *[]string, filePath string, s *types.Snippet) {
 	for i := range *cliArgs {
 		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$FULL_NAME", filePath, -1)
 		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$DIR", strings.Replace(filePath, s.String(), "", -1), -1)

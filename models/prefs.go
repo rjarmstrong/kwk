@@ -2,10 +2,26 @@ package models
 
 import (
 	"gopkg.in/yaml.v2"
+	"os"
+	"fmt"
+	"strings"
+	"bitbucket.com/sharingmachine/types"
 )
 
 var prefs  *Preferences
 var env   *yaml.MapSlice
+
+func NewSetupAlias(name string, ext string, uniquePerHost bool) *types.Alias {
+	if uniquePerHost {
+		s, _ := os.Hostname()
+		//u, _ := user.Current()
+		name = fmt.Sprintf("%s-%s", name, strings.ToLower(s))
+	}
+	return &types.Alias{
+		Pouch:    types.PouchSettings,
+		SnipName: types.SnipName{Name: name, Ext: ext},
+	}
+}
 
 func Prefs() *Preferences {
 	//if prefs == nil {

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"bitbucket.com/sharingmachine/kwkcli/log"
 	"bitbucket.com/sharingmachine/kwkcli/persist"
+	"bitbucket.com/sharingmachine/types"
 )
 
 // TODO: check yml version is compatible with this build else force upgrade.
@@ -15,7 +16,7 @@ import (
 type EnvResolvers struct {
 	snippets snippets.Service
 	file     persist.IO
-	alias    models.Alias
+	alias    types.Alias
 	runtime  string
 }
 
@@ -53,7 +54,7 @@ func (e *EnvResolvers) Default() (string, error) {
 	if env, err := e.Fallback(); err != nil {
 		return "", err
 	} else {
-		if snip, err := e.snippets.Create(env, e.alias, models.SnipRoleEnvironment); err != nil {
+		if snip, err := e.snippets.Create(env, e.alias, types.RoleEnvironment); err != nil {
 			return "", err
 		} else {
 			return snip.Snippet.Snip, nil

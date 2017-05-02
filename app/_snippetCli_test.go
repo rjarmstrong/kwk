@@ -39,7 +39,7 @@ func Test_Snippet(t *testing.T) {
 			//		t.GetHydrates = &models.User{Username: "rjarmstrong"}
 			//		d.MultiChoiceResponse = &dlg.DialogResponse{Value: a.ReturnItemsForGet[0]}
 			//		app.App.Run([]string{"[app]", "hola", "arg1", "arg2"})
-			//		So(a.GetCalledWith, ShouldResemble, &models.Alias{Username: "rjarmstrong", FullKey: "hola"})
+			//		So(a.GetCalledWith, ShouldResemble, &types.SnipName{Username: "rjarmstrong", FullKey: "hola"})
 			//		So(d.MultiChoiceCalledWith, ShouldResemble, []interface{}{"dialog:choose", "Multiple matches. Choose a snippet to run:", a.ReturnItemsForGet})
 			//		a.ReturnItemsForGet = nil
 			//	})
@@ -54,7 +54,7 @@ func Test_Snippet(t *testing.T) {
 			//			Results:results,
 			//		}
 			//		app.App.Run([]string{"[app]", fullKey, "arg1", "arg2"})
-			//		So(a.GetCalledWith, ShouldResemble, &models.Alias{FullKey: "hola.sh"})
+			//		So(a.GetCalledWith, ShouldResemble, &types.SnipName{FullKey: "hola.sh"})
 			//		So(w.RenderCalledWith[0], ShouldResemble, "search:alphaSuggest")
 			//		So(w.RenderCalledWith[1].(*models.SearchTermResponse).Results[0], ShouldResemble, result)
 			//		a.ReturnItemsForGet = nil
@@ -93,7 +93,7 @@ func Test_Snippet(t *testing.T) {
 			//	})
 			//	Convey(`Should call get and respond with template`, func() {
 			//		app.App.Run([]string{"[app]", "inspect", "arrows.js"})
-			//		So(a.GetCalledWith, ShouldResemble, &models.Alias{FullKey: "arrows.js"})
+			//		So(a.GetCalledWith, ShouldResemble, &types.SnipName{FullKey: "arrows.js"})
 			//		So(w.RenderCalledWith, ShouldResemble, []interface{}{"snippet:inspect", &models.SnippetList{}})
 			//	})
 			//})
@@ -170,7 +170,7 @@ func Test_Snippet(t *testing.T) {
 			//			{FullName: "arrows.js"},
 			//		}
 			//		app.App.Run([]string{"[app]", "cat", "arrows.js"})
-			//		So(a.GetCalledWith, ShouldResemble, &models.Alias{FullKey: "arrows.js"})
+			//		So(a.GetCalledWith, ShouldResemble, &types.SnipName{FullKey: "arrows.js"})
 			//		So(w.RenderCalledWith[0].(string), ShouldResemble, "snippet:cat")
 			//		So(w.RenderCalledWith[1].(models.Snippet).FullName, ShouldResemble, "arrows.js")
 			//	})
@@ -201,7 +201,7 @@ func Test_Snippet(t *testing.T) {
 			//		app.App.Run([]string{"[app]", "clone", "unicode/arrows.js", "myarrows.js"})
 			//		So(a.CloneCalledWith, ShouldResemble, []interface{}{
 			//
-			//			&models.Alias{Username: "unicode", FullKey: "arrows.js"}, "myarrows.js"})
+			//			&types.SnipName{Username: "unicode", FullKey: "arrows.js"}, "myarrows.js"})
 			//
 			//		So(w.RenderCalledWith, ShouldResemble, []interface{}{"snippet:cloned", &models.Snippet{}})
 			//	})

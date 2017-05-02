@@ -5,12 +5,13 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"gopkg.in/yaml.v2"
 	"bitbucket.com/sharingmachine/kwkcli/persist"
+	"bitbucket.com/sharingmachine/types"
 )
 
 type PrefsResolvers struct {
 	snippets snippets.Service
 	file     persist.IO
-	a        models.Alias
+	a        types.Alias
 }
 
 func NewPrefsResolvers(s snippets.Service, f persist.IO) Resolvers {
@@ -44,7 +45,7 @@ func (p *PrefsResolvers) Default() (string, error) {
 	if prefs, err := p.Fallback(); err != nil {
 		return "", err
 	} else {
-		if _, err := p.snippets.Create(prefs, p.a, models.SnipRolePreferences); err != nil {
+		if _, err := p.snippets.Create(prefs, p.a, types.RolePreferences); err != nil {
 			return "", err
 		}
 		return prefs, nil

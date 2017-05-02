@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"time"
+	"bitbucket.com/sharingmachine/types"
+)
 
 /*
 ListView represents a listing view which could contain snippets, pouches or both.
@@ -9,22 +12,22 @@ is an empty string.
  */
 type ListView struct {
 	IsRoot bool
-	Pouch    *Pouch
+	Pouch    *types.Pouch
 
 	LastUpgrade int64
 	Expanded    bool
 
 	Username    string
-	Pouches     []*Pouch
-	Personal    []*Pouch
-	Snippets    []*Snippet
-	UserStats
+	Pouches     []*types.Pouch
+	Personal    []*types.Pouch
+	Snippets    []*types.Snippet
+	types.UserStats
 
 	Total    int64
 	Since    time.Time
 	Size     int64
 }
-func (rt *ListView) GetPouch(name string) *Pouch {
+func (rt *ListView) GetPouch(name string) *types.Pouch {
 	for _, v := range rt.Pouches {
 		if name == v.Name {
 			return v

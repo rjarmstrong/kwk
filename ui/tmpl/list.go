@@ -6,11 +6,11 @@ import (
 	"github.com/rjarmstrong/tablewriter"
 	"strings"
 	"bytes"
-	"time"
 	"fmt"
 	"io"
 	"golang.org/x/text/unicode/norm"
 	"sort"
+	"bitbucket.com/sharingmachine/types"
 )
 
 var mainMarkers = map[string]string{
@@ -22,25 +22,25 @@ type CodeLine struct {
 	Body   string
 }
 
-func StatusText(s *models.Snippet) string {
+func StatusText(s *types.Snippet) string {
 	if s.Ext == "url" {
 		return "bookmark"
 	}
-	if s.RunStatus == models.UseStatusSuccess {
+	if s.RunStatus == types.UseStatusSuccess {
 		return "success"
-	} else if s.RunStatus == models.UseStatusFail {
+	} else if s.RunStatus == types.UseStatusFail {
 		return "error"
 	}
 	return "static"
 }
 
-func FStatus(s *models.Snippet, includeText bool) string {
-	if s.RunStatus == models.UseStatusSuccess {
+func FStatus(s *types.Snippet, includeText bool) string {
+	if s.RunStatus == types.UseStatusSuccess {
 		if includeText {
 			return style.Fmt256(style.Color_YesGreen, style.Icon_Tick) + "  Success"
 		}
 		return style.Fmt256(style.Color_YesGreen, style.Icon_Tick)
-	} else if s.RunStatus == models.UseStatusFail {
+	} else if s.RunStatus == types.UseStatusFail {
 		if includeText {
 			return style.Fmt256(style.Color_BrightRed, style.Icon_Broke) +  "  Error"
 		}
@@ -155,8 +155,6 @@ func listNaked(list *models.ListView) interface{} {
 	tbl.SetColWidth(5)
 	tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
 	for _, v := range list.Snippets {
-		t := time.Unix(v.Created, 0)
-		lr := time.Unix(v.RunStatusTime, 0)
 		var private string
 		if v.Private {
 			private = "private"
@@ -170,11 +168,11 @@ func listNaked(list *models.ListView) interface{} {
 			v.Ext,
 			private,
 			StatusText(v),
-			fmt.Sprintf("%d", v.RunCount),
-			fmt.Sprintf("%d", v.ViewCount),
+			fmt.Sprintf("%d", v.Runs),
+			fmt.Sprintf("%d", v.Views),
 			fmt.Sprintf("%d", len(v.Dependencies)),
-			lr.Format(timeLayout),
-			t.Format(timeLayout),
+			v.RunStatusTime.Format(timeLayout),
+			v.Created.Format(timeLayout),
 		})
 	}
 	tbl.Render()
@@ -241,7 +239,7 @@ func listSnippets(list *models.ListView, fullName bool) string {
 			name.WriteString("\n\n")
 			name.WriteString(style.Fmt256(style.Color_MonthGrey, style.FBox(v.Description, 25, 3)))
 		}
-		if v.Role == models.SnipRoleEnvironment {
+		if v.Role == types.RoleEnvironment {
 			name.WriteString("\n\n")
 			name.WriteString(style.Fmt16(style.Subdued, "short-cut: kwk edit env"))
 		}
@@ -253,11 +251,11 @@ func listSnippets(list *models.ListView, fullName bool) string {
 			lines = models.Prefs().SlimRows
 		}
 		status := &bytes.Buffer{}
-		runCount := fmtRunCount(v.RunCount)
+		runCount := fmtRunCount(v.Runs)
 		status.WriteString(PadRight(runCount, " ", 21))
 		status.WriteString(" ")
-		if v.RunStatusTime > 0 {
-			h := PadLeft(style.Time(time.Unix(v.RunStatusTime, 0)), " ", 4)
+		if !v.RunStatusTime.IsZero() {
+			h := PadLeft(style.Time(v.RunStatusTime), " ", 4)
 			t := fmt.Sprintf("%s", style.Fmt256(239, h))
 			status.WriteString(t)
 		}
@@ -307,16 +305,16 @@ func PadLeft(str, pad string, length int) string {
 	return str
 }
 
-func snippetIcon(v *models.Snippet) string {
+func snippetIcon(v *types.Snippet) string {
 	icon := style.Icon_Snippet
 	if v.IsApp() {
 		icon = style.Icon_App
 	} else if v.Ext == "url" {
 		icon = style.Icon_Bookmark
 	}
-	if v.RunStatus == models.UseStatusSuccess {
+	if v.RunStatus == types.UseStatusSuccess {
 		return style.Fmt256(122, icon)
-	} else if v.RunStatus == models.UseStatusFail {
+	} else if v.RunStatus == types.UseStatusFail {
 		return style.Fmt256(196, icon)
 	}
 	return style.Fmt256(style.Color_MonthGrey, icon)
@@ -326,7 +324,7 @@ func fmtRunCount(count int64) string {
 	return fmt.Sprintf(style.Fmt256(247, "↻ %0d"), count)
 }
 
-func fmtHeader(w io.Writer, username string, pouch string, s *models.SnipName) {
+func fmtHeader(w io.Writer, username string, pouch string, s *types.SnipName) {
 	fmt.Fprint(w, "\n")
 	fmt.Fprint(w, style.MARGIN)
 	fmt.Fprint(w, style.Start)

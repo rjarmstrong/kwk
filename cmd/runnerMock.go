@@ -2,20 +2,20 @@ package cmd
 
 import
 (
-	"bitbucket.com/sharingmachine/kwkcli/models"
+	"bitbucket.com/sharingmachine/types"
 )
 
 type RunnerMock struct {
 	RunCalledWith  []interface{}
-	EditCalledWith *models.Snippet
+	EditCalledWith *types.Snippet
 }
 
-func (o *RunnerMock) Run(alias *models.Snippet, args []string) error {
+func (o *RunnerMock) Run(alias *types.Snippet, args []string) error {
 	o.RunCalledWith = []interface{}{alias, args}
 	return nil
 }
 
-func (o *RunnerMock) Edit(alias *models.Snippet) error {
+func (o *RunnerMock) Edit(alias *types.Snippet) error {
 	o.EditCalledWith = alias
 	return nil
 }

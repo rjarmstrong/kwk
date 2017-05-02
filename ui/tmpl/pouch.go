@@ -7,13 +7,14 @@ import (
 	"text/tabwriter"
 	"bitbucket.com/sharingmachine/kwkcli/models"
 	"time"
+	"bitbucket.com/sharingmachine/types"
 )
 
 const oneMin = int64(60)
 const oneHour = oneMin * 60
 const oneDay = oneHour * 24
 
-func listHorizontal(l []interface{}, stats *models.UserStats) []byte {
+func listHorizontal(l []interface{}, stats *types.UserStats) []byte {
 	var buff bytes.Buffer
 	w := tabwriter.NewWriter(&buff, 5, 1, 3, ' ', tabwriter.TabIndent)
 	var item bytes.Buffer
@@ -22,29 +23,29 @@ func listHorizontal(l []interface{}, stats *models.UserStats) []byte {
 		if i%5 == 0 {
 			item.WriteString("  ")
 		}
-		if sn, ok := v.(*models.Snippet); ok {
+		if sn, ok := v.(*types.Snippet); ok {
 			item.WriteString(snippetIcon(sn))
 			item.WriteString("  ")
 			item.WriteString(style.Fmt256(style.Color_BrighterWhite, sn.SnipName.String()))
 			//item.WriteString(FStatus(sn, false))
 		}
-		if pch, ok := v.(*models.Pouch); ok {
+		if pch, ok := v.(*types.Pouch); ok {
 			if models.Prefs().ListAll || !pch.MakePrivate {
 				if colWidths[i%5] < len(pch.Name) {
 					colWidths[i%5] = len(pch.Name)
 				}
-				isLast := stats.LastPouch == pch.PouchId
+				isLast := stats.LastPouch == pch.Id
 				item.WriteString(pouchIcon(pch, isLast))
 				if isLast {
 					item.WriteString(style.Fmt256(style.AnsiCode(style.Color_BrightestWhite), "  ❯ "+pch.Name))
 				} else {
 					item.WriteString("  ")
-					item.WriteString(style.Fmt256(decayColor(pch.LastUse, true), pch.Name))
+					item.WriteString(style.Fmt256(decayColor(pch.LastUse.Unix(), true), pch.Name))
 				}
-				if pch.Type == models.PouchType_Virtual {
+				if pch.Type == types.PouchTypeVirtual{
 					item.WriteString(style.Pad_1_1)
 				} else {
-					item.WriteString(style.Fmt256(style.Color_DimStat, fmt.Sprintf(" %d", pch.PouchStats.Snips)))
+					item.WriteString(style.Fmt256(style.Color_DimStat, fmt.Sprintf(" %d", pch.Snips)))
 				}
 			}
 		}
@@ -67,11 +68,11 @@ func insertGridLine(b *bytes.Buffer) {
 	b.WriteString(fmt.Sprintf("\n%s\t%s\t%s\t%s\t%s\t%s\n", style.MARGIN, style.Pad_1_2, style.Pad_1_2, style.Pad_1_2, style.Pad_1_2, style.Pad_1_2))
 }
 
-func pouchIcon(pch *models.Pouch, isLast bool) string {
+func pouchIcon(pch *types.Pouch, isLast bool) string {
 	if pch.MakePrivate {
-		return colorPouch(isLast, pch.LastUse, pch.Red, style.Icon_PrivatePouch)
+		return colorPouch(isLast, pch.LastUse.Unix(), pch.Red, style.Icon_PrivatePouch)
 	} else {
-		return colorPouch(isLast, pch.LastUse, pch.Red, style.Icon_Pouch)
+		return colorPouch(isLast, pch.LastUse.Unix(), pch.Red, style.Icon_Pouch)
 	}
 }
 

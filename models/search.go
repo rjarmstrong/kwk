@@ -1,7 +1,9 @@
 package models
 
+import "bitbucket.com/sharingmachine/types"
+
 type SearchResult struct {
-	*Snippet
+	*types.Snippet
 	Highlights  map[string]string
 }
 

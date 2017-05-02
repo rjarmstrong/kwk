@@ -5,13 +5,11 @@ import (
 	"runtime"
 	"os"
 	"fmt"
+	"bitbucket.com/sharingmachine/types"
 )
 
 const (
 	StandardFilePermission = 0700
-	OS_DARWIN = `darwin`
-	OS_LINUX = `linux`
-	OS_WINDOWS = `windows`
 )
 
 var cachePath string
@@ -23,9 +21,9 @@ func Path() string {
 	var p string
 	u, _ := user.Current()
 	p = fmt.Sprintf("%s/.kwk", u.HomeDir)
-	if runtime.GOOS == OS_WINDOWS {
+	if runtime.GOOS == types.OsWindows {
 		p = "%LocalAppData%\\kwk"
-	} else if runtime.GOOS == OS_DARWIN {
+	} else if runtime.GOOS == types.OsDarwin {
 		if u.Username == "root" {
 			p = "/var/root/.kwk"
 		}

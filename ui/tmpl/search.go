@@ -5,6 +5,7 @@ import (
 	"strings"
 	"fmt"
 	"io"
+	"bitbucket.com/sharingmachine/types"
 )
 
 	// SEARCH
@@ -26,7 +27,7 @@ func alphaSearchResult(w io.Writer, in interface{}) {
 	//fmt.Fprint(w, "\n\n")
 	// {{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{ . | result}}\n
 
-	view := &models.ListView{Snippets: []*models.Snippet{}}
+	view := &models.ListView{Snippets: []*types.Snippet{}}
 	for _, v := range res.Results {
 		view.Snippets = append(view.Snippets, v.Snippet)
 	}
