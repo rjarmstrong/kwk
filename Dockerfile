@@ -1,4 +1,4 @@
-FROM golang:1.8
+FROM golang:1.8.1
 
 RUN apt-get update; apt-get install tree -y; apt-get install zip -y
 
@@ -8,8 +8,8 @@ RUN curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.
     && unzip awscli-bundle.zip \
     && ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
 
-COPY . $GOPATH/src/bitbucket.com/sharingmachine/kwkcli/
-WORKDIR $GOPATH/src/bitbucket.com/sharingmachine/kwkcli/
+COPY . $GOPATH/src/bitbucket.com/sharingmachine/kwkcli/src/
+WORKDIR $GOPATH/src/bitbucket.com/sharingmachine/kwkcli/src/
 
 ARG BUILD_NUMBER
 
