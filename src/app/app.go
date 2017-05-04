@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"github.com/urfave/cli"
 	"strings"
+	"bitbucket.com/sharingmachine/kwkcli/src/ui"
 )
 
 var CLIInfo = types.AppInfo{}
@@ -83,6 +84,7 @@ func NewApp(a gokwk.Snippets, f persist.IO, t persist.Persister, r cmd.Runner, u
 		},
 	})
 
+	cli.ErrWriter = ui.ErrWriter{}
 	cli.HelpPrinter = dash.GetWriter()
 	accCli := NewAccountCli(u, t, w, d, dash)
 	ap.Commands = append(ap.Commands, userRoutes(accCli)...)

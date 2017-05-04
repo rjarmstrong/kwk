@@ -149,15 +149,14 @@ func GuessArgs(a string, b string) (*types.Alias, string, error) {
 	return alias, a, nil
 }
 
-func (sc *snippets) Create(args []string) {
+func (sc *snippets) Create(args []string) error {
 	a1 := &types.Alias{}
 	var snippet string
 	if len(args) == 1 {
 		if types.IsDefNotPouchedSnippetURI(args[0]) {
 			a, err := types.ParseAlias(args[0])
 			if err != nil {
-				sc.HandleErr(err)
-				return
+				return err
 			}
 			a1 = a
 		} else {
@@ -168,8 +167,7 @@ func (sc *snippets) Create(args []string) {
 	} else if len(args) > 1 {
 		a, s, err := GuessArgs(args[0], args[1])
 		if err != nil {
-			sc.HandleErr(err)
-			return
+			return err
 		}
 		a1 = a
 		snippet = s
@@ -179,12 +177,12 @@ func (sc *snippets) Create(args []string) {
 	}
 	createAlias, err := sc.s.Create(snippet, *a1, types.RoleStandard)
 	if err != nil {
-		sc.HandleErr(err)
-		return
+		return err
 		//TODO: If snippet is similar to an existing one prompt for it here.
 	}
 	sc.List("", types.PouchRoot)
 	sc.Render("snippet:new", createAlias.Snippet.String())
+	return nil
 }
 
 func (sc *snippets) Edit(distinctName string) {

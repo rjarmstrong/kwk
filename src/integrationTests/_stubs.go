@@ -6,7 +6,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/src/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/src/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/src/app"
-	"bitbucket.com/sharingmachine/kwkcli/src/rpc"
 	"bitbucket.com/sharingmachine/kwkcli/src/setup"
 	"google.golang.org/grpc"
 	"strings"

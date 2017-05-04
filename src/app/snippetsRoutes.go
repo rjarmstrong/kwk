@@ -11,7 +11,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Name:    "new",
 			Aliases: []string{"create", "save"},
 			Action: func(c *cli.Context) error {
-				s.Create(c.Args())
+				return s.Create(c.Args())
 				return nil
 			},
 		},
