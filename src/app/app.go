@@ -7,11 +7,11 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/src/persist"
 	"bitbucket.com/sharingmachine/kwkcli/src/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/src/ui/tmpl"
+	"bitbucket.com/sharingmachine/kwkcli/src/update"
 	"bitbucket.com/sharingmachine/types"
 	"fmt"
 	"github.com/urfave/cli"
 	"strings"
-	"bitbucket.com/sharingmachine/kwkcli/src/update"
 )
 
 var CLIInfo = types.AppInfo{}
@@ -72,16 +72,26 @@ func NewApp(a gokwk.Snippets, f persist.IO, t persist.Persister, r cmd.Runner, u
 
 	ap.Version = CLIInfo.String()
 	dash := NewDashBoard(w, a)
-	cli.HelpPrinter = dash.GetWriter()
+	help := cli.HelpPrinter
+	ap.Commands = append(ap.Commands, cli.Command{
+		Name:"help",
+		Aliases:[]string{"h"},
+		Action: func(c *cli.Context) error {
+			cli.HelpPrinter = help
+			cli.ShowAppHelp(c)
+			return nil
+		},
+	})
 
+	cli.HelpPrinter = dash.GetWriter()
 	accCli := NewAccountCli(u, t, w, d, dash)
-	ap.Commands = append(ap.Commands, Accounts(accCli)...)
+	ap.Commands = append(ap.Commands, userRoutes(accCli)...)
 
 	sysCli := NewSystemCli(w, up)
-	ap.Commands = append(ap.Commands, System(sysCli)...)
+	ap.Commands = append(ap.Commands, systemRoutes(sysCli)...)
 
-	snipCli := NewSnippetCli(a, r, f, d, w, t)
-	ap.Commands = append(ap.Commands, Snippets(snipCli)...)
+	snipCli := NewSnippet(a, r, f, d, w, t)
+	ap.Commands = append(ap.Commands, snippetsRoutes(snipCli)...)
 	ap.CommandNotFound = func(c *cli.Context, distinctName string) {
 		i := c.Args().Get(1)
 		if strings.HasPrefix(distinctName, "@") {

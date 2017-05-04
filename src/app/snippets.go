@@ -18,7 +18,7 @@ import (
 	"time"
 )
 
-type SnippetCli struct {
+type snippets struct {
 	s        gokwk.Snippets
 	runner   cmd.Runner
 	settings persist.Persister
@@ -26,11 +26,11 @@ type SnippetCli struct {
 	tmpl.Writer
 }
 
-func NewSnippetCli(a gokwk.Snippets, r cmd.Runner, f persist.IO, d dlg.Dialog, w tmpl.Writer, t persist.Persister) *SnippetCli {
-	return &SnippetCli{s: a, runner: r, Dialog: d, Writer: w, settings: t}
+func NewSnippet(a gokwk.Snippets, r cmd.Runner, f persist.IO, d dlg.Dialog, w tmpl.Writer, t persist.Persister) *snippets {
+	return &snippets{s: a, runner: r, Dialog: d, Writer: w, settings: t}
 }
 
-func (sc *SnippetCli) Search(args ...string) {
+func (sc *snippets) Search(args ...string) {
 	term := strings.Join(args, " ")
 	if res, err := sc.s.AlphaSearch(term); err != nil {
 		sc.HandleErr(err)
@@ -67,7 +67,7 @@ func (sc *SnippetCli) Search(args ...string) {
 //	}
 //}
 
-func (sc *SnippetCli) Share(distinctName string, destination string) {
+func (sc *snippets) Share(distinctName string, destination string) {
 	if list, _, err := sc.getSnippet(distinctName); err != nil {
 		sc.HandleErr(err)
 	} else {
@@ -82,7 +82,7 @@ func (sc *SnippetCli) Share(distinctName string, destination string) {
 	}
 }
 
-func (sc *SnippetCli) Suggest(term string) {
+func (sc *snippets) Suggest(term string) {
 	if res, err := sc.s.AlphaSearch(term); err != nil {
 		sc.HandleErr(err)
 	} else if res.Total > 0 {
@@ -92,11 +92,11 @@ func (sc *SnippetCli) Suggest(term string) {
 	}
 }
 
-func (sc *SnippetCli) run(selected *types.Snippet, args []string) {
+func (sc *snippets) run(selected *types.Snippet, args []string) {
 	sc.runner.Run(selected, args)
 }
 
-func (sc *SnippetCli) Run(distinctName string, args []string) {
+func (sc *snippets) Run(distinctName string, args []string) {
 	a, err := types.ParseAlias(distinctName)
 	if err != nil {
 		sc.Render("validation:one-line", err)
@@ -117,12 +117,12 @@ func (sc *SnippetCli) Run(distinctName string, args []string) {
 }
 
 func GuessArgs(a string, b string) (*types.Alias, string, error) {
-	fstIsAlias := types.IsAlias(a)
-	sndIsAlias := types.IsAlias(b)
+	aIsNotSUri := types.IsDefNotPouchedSnippetURI(a)
+	bIsNotSUri := types.IsDefNotPouchedSnippetURI(b)
 
-	models.Debug("ARG1:%v (alias=%t) ARG2:%v (alias=%t)", a, fstIsAlias, b, sndIsAlias)
+	models.Debug("ARG1:%v (snip=%t) ARG2:%v (snip=%t)", a, aIsNotSUri, b, bIsNotSUri)
 
-	if !fstIsAlias && !sndIsAlias {
+	if aIsNotSUri && bIsNotSUri {
 		return nil, "", errs.New(errs.CodeInvalidArgument,
 			"Please specify a pouch to create a snippet."+
 				"\n   e.g."+
@@ -131,12 +131,10 @@ func GuessArgs(a string, b string) (*types.Alias, string, error) {
 				"\n  `<cmd> | kwk new <pouch_name>/<snip_name>[.<ext>]`",
 		)
 	}
-	if fstIsAlias && sndIsAlias {
-		return nil, "", errs.New(errs.CodeInvalidArgument,
-			"Ambiguous",
-		)
+	if !aIsNotSUri && !bIsNotSUri {
+		return nil, "", errs.New(errs.CodeInvalidArgument, "It looks like both arguments could be either be a path or kwk URIs, please add an extension or fully quality the kwk URI. e.g. kwk.co/richard/dill/name.path")
 	}
-	if fstIsAlias {
+	if !aIsNotSUri {
 		alias, err := types.ParseAlias(a)
 		if err != nil {
 			return nil, "", err
@@ -151,11 +149,11 @@ func GuessArgs(a string, b string) (*types.Alias, string, error) {
 	return alias, a, nil
 }
 
-func (sc *SnippetCli) Create(args []string) {
+func (sc *snippets) Create(args []string) {
 	a1 := &types.Alias{}
 	var snippet string
 	if len(args) == 1 {
-		if types.IsAlias(args[0]) {
+		if types.IsDefNotPouchedSnippetURI(args[0]) {
 			a, err := types.ParseAlias(args[0])
 			if err != nil {
 				sc.HandleErr(err)
@@ -171,6 +169,7 @@ func (sc *SnippetCli) Create(args []string) {
 		a, s, err := GuessArgs(args[0], args[1])
 		if err != nil {
 			sc.HandleErr(err)
+			return
 		}
 		a1 = a
 		snippet = s
@@ -178,16 +177,17 @@ func (sc *SnippetCli) Create(args []string) {
 	if snippet == "" {
 		snippet = stdInAsString()
 	}
-	if createAlias, err := sc.s.Create(snippet, *a1, types.RoleStandard); err != nil {
+	createAlias, err := sc.s.Create(snippet, *a1, types.RoleStandard)
+	if err != nil {
 		sc.HandleErr(err)
+		return
 		//TODO: If snippet is similar to an existing one prompt for it here.
-	} else {
-		sc.List("", types.PouchRoot)
-		sc.Render("snippet:new", createAlias.Snippet.String())
 	}
+	sc.List("", types.PouchRoot)
+	sc.Render("snippet:new", createAlias.Snippet.String())
 }
 
-func (sc *SnippetCli) Edit(distinctName string) {
+func (sc *snippets) Edit(distinctName string) {
 	innerEdit := func(s *types.Snippet) {
 		sc.Render("snippet:editing", s)
 		if err := sc.runner.Edit(s); err != nil {
@@ -226,7 +226,7 @@ func (sc *SnippetCli) Edit(distinctName string) {
 	}
 }
 
-func (sc *SnippetCli) Describe(distinctName string, description string) {
+func (sc *snippets) Describe(distinctName string, description string) {
 	a, err := types.ParseAlias(distinctName)
 	if description == "" {
 		sc.typeAhead(distinctName, func(s *types.Snippet, args []string) {
@@ -250,8 +250,12 @@ func (sc *SnippetCli) Describe(distinctName string, description string) {
 	}
 }
 
-func (sc *SnippetCli) InspectListOrRun(distinctName string, forceInspect bool, args ...string) {
+func (sc *snippets) InspectListOrRun(distinctName string, forceInspect bool, args ...string) {
 	a, err := types.ParseAlias(distinctName)
+	if err != nil {
+		sc.HandleErr(err)
+		return
+	}
 	v, err := sc.s.GetRoot(a.Username, true)
 	if err != nil {
 		sc.HandleErr(err)
@@ -285,7 +289,7 @@ func (sc *SnippetCli) InspectListOrRun(distinctName string, forceInspect bool, a
 	}
 }
 
-func (sc *SnippetCli) Delete(args []string) {
+func (sc *snippets) Delete(args []string) {
 	r, err := sc.s.GetRoot("", true)
 	if err != nil {
 		sc.HandleErr(err)
@@ -297,7 +301,7 @@ func (sc *SnippetCli) Delete(args []string) {
 	sc.deleteSnippet(args)
 }
 
-func (sc *SnippetCli) Lock(pouch string) {
+func (sc *snippets) Lock(pouch string) {
 	_, err := sc.s.MakePrivate(pouch, true)
 	if err != nil {
 		sc.HandleErr(err)
@@ -306,7 +310,7 @@ func (sc *SnippetCli) Lock(pouch string) {
 	sc.Render("pouch:locked", pouch)
 }
 
-func (sc *SnippetCli) UnLock(pouch string) {
+func (sc *snippets) UnLock(pouch string) {
 	res := sc.Dialog.Modal("pouch:check-unlock", pouch, false)
 	if res.Ok {
 		_, err := sc.s.MakePrivate(pouch, false)
@@ -322,7 +326,7 @@ func (sc *SnippetCli) UnLock(pouch string) {
 
 // kwk mv regions.txt reference -- moves the reference pouch, if no reference pouch then move to reference.txt
 // kwk mv examples/regions.txt reference
-func (sc *SnippetCli) Move(args []string) {
+func (sc *snippets) Move(args []string) {
 	if len(args) < 2 {
 		sc.HandleErr(errs.TwoArgumentsReqForMove)
 		return
@@ -386,7 +390,7 @@ type MoveResult struct {
 	Quant int
 }
 
-func (sc *SnippetCli) Cat(distinctName string) {
+func (sc *snippets) Cat(distinctName string) {
 	a, err := types.ParseAlias(distinctName)
 	if err != nil {
 		sc.HandleErr(err)
@@ -420,7 +424,7 @@ func (sc *SnippetCli) Cat(distinctName string) {
 	sc.Render("snippet:ambiguouscat", list)
 }
 
-func (sc *SnippetCli) Patch(distinctName string, target string, patch string) {
+func (sc *snippets) Patch(distinctName string, target string, patch string) {
 	a, err := types.ParseAlias(distinctName)
 	if err != nil {
 		sc.HandleErr(err)
@@ -433,7 +437,7 @@ func (sc *SnippetCli) Patch(distinctName string, target string, patch string) {
 	}
 }
 
-func (sc *SnippetCli) Clone(distinctName string, newFullName string) {
+func (sc *snippets) Clone(distinctName string, newFullName string) {
 	a, err := types.ParseAlias(distinctName)
 	if err != nil {
 		sc.HandleErr(err)
@@ -453,7 +457,7 @@ func (sc *SnippetCli) Clone(distinctName string, newFullName string) {
 	}
 }
 
-func (sc *SnippetCli) Tag(distinctName string, tags ...string) {
+func (sc *snippets) Tag(distinctName string, tags ...string) {
 	a, err := types.ParseAlias(distinctName)
 	if err != nil {
 		sc.HandleErr(err)
@@ -466,7 +470,7 @@ func (sc *SnippetCli) Tag(distinctName string, tags ...string) {
 	}
 }
 
-func (sc *SnippetCli) UnTag(distinctName string, tags ...string) {
+func (sc *snippets) UnTag(distinctName string, tags ...string) {
 	a, err := types.ParseAlias(distinctName)
 	if err != nil {
 		sc.HandleErr(err)
@@ -479,7 +483,7 @@ func (sc *SnippetCli) UnTag(distinctName string, tags ...string) {
 	}
 }
 
-func (sc *SnippetCli) CreatePouch(name string) {
+func (sc *snippets) CreatePouch(name string) {
 	if _, err := sc.s.CreatePouch(name); err != nil {
 		sc.HandleErr(err)
 	} else {
@@ -487,7 +491,7 @@ func (sc *SnippetCli) CreatePouch(name string) {
 	}
 }
 
-func (sc *SnippetCli) Flatten(username string) {
+func (sc *snippets) Flatten(username string) {
 	p := &models.ListParams{Username: username, IgnorePouches: true, All: models.Prefs().ListAll}
 	if list, err := sc.s.List(p); err != nil {
 		sc.HandleErr(err)
@@ -525,7 +529,7 @@ func firstDayOfISOWeek(year int, week int, timezone *time.Location) time.Time {
 }
 
 // GetEra lists snippets by special filters: @today @week @month @old
-func (sc *SnippetCli) GetEra(virtualPouch string) {
+func (sc *snippets) GetEra(virtualPouch string) {
 	p := &models.ListParams{Username: "", IgnorePouches: true, All: models.Prefs().ListAll}
 	if list, err := sc.s.List(p); err != nil {
 		sc.HandleErr(err)
@@ -570,7 +574,7 @@ func (sc *SnippetCli) GetEra(virtualPouch string) {
 // Use snippet list:
 // kwk richard (this is a pouch in this case)
 // kwk /richard/examples
-func (sc *SnippetCli) List(username string, pouch string) {
+func (sc *snippets) List(username string, pouch string) {
 	if pouch == "" {
 		r, err := sc.s.GetRoot(username, models.Prefs().ListAll)
 		if err != nil {
@@ -596,7 +600,7 @@ func (sc *SnippetCli) List(username string, pouch string) {
 	}
 }
 
-func (sc *SnippetCli) typeAhead(term string, onSelect func(s *types.Snippet, args []string)) {
+func (sc *snippets) typeAhead(term string, onSelect func(s *types.Snippet, args []string)) {
 	if res, err := sc.s.AlphaSearch(term); err != nil {
 		sc.HandleErr(err)
 	} else {
@@ -621,7 +625,7 @@ func stdInAsString() string {
 	return in.String()
 }
 
-func (sc *SnippetCli) handleMultiResponse(distinctName string, list *models.ListView) *types.Snippet {
+func (sc *snippets) handleMultiResponse(distinctName string, list *models.ListView) *types.Snippet {
 	list.Version = CLIInfo.String()
 	if list.Total == 1 {
 		return list.Snippets[0]
@@ -632,7 +636,7 @@ func (sc *SnippetCli) handleMultiResponse(distinctName string, list *models.List
 	}
 }
 
-func (sc *SnippetCli) getSnippet(distinctName string) (*models.ListView, *types.Alias, error) {
+func (sc *snippets) getSnippet(distinctName string) (*models.ListView, *types.Alias, error) {
 	a, err := types.ParseAlias(distinctName)
 	if err != nil {
 		return nil, nil, err
@@ -644,7 +648,7 @@ func (sc *SnippetCli) getSnippet(distinctName string) (*models.ListView, *types.
 	return list, a, nil
 }
 
-func (sc *SnippetCli) rename(distinctName string, newSnipName string) (*types.Snippet, *types.SnipName, error) {
+func (sc *snippets) rename(distinctName string, newSnipName string) (*types.Snippet, *types.SnipName, error) {
 	a, err := types.ParseAlias(distinctName)
 	if err != nil {
 		return nil, nil, err
@@ -656,7 +660,7 @@ func (sc *SnippetCli) rename(distinctName string, newSnipName string) (*types.Sn
 	return sc.s.Rename(*a, *sn)
 }
 
-func (sc *SnippetCli) deleteSnippet(args []string) {
+func (sc *snippets) deleteSnippet(args []string) {
 	as, pouch, err := types.ParseMany(args)
 	if err != nil {
 		sc.HandleErr(err)
@@ -674,7 +678,7 @@ func (sc *SnippetCli) deleteSnippet(args []string) {
 	}
 }
 
-func (sc *SnippetCli) deletePouch(pouch string) {
+func (sc *snippets) deletePouch(pouch string) {
 	res := sc.Dialog.Modal("pouch:check-delete", pouch, false)
 	if res.Ok {
 		_, err := sc.s.DeletePouch(pouch)

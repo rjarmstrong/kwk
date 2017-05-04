@@ -17,7 +17,7 @@ import (
 
 const workFolder = "./update_work"
 
-type Remoter interface {
+type BinRepo interface {
 	// LatestInfo gets information about the latest build.
 	LatestInfo() (*ReleaseInfo, error)
 	// Latest gets the actual binary.
@@ -33,10 +33,10 @@ type ReleaseInfo struct {
 	Notes   string `json:"notes"`
 }
 
-type S3Remoter struct {
+type S3Repo struct {
 }
 
-func (r *S3Remoter) LatestInfo() (*ReleaseInfo, error) {
+func (r *S3Repo) LatestInfo() (*ReleaseInfo, error) {
 	i, err := http.Get("https://s3.amazonaws.com/kwk-cli/release-info.json")
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (r *S3Remoter) LatestInfo() (*ReleaseInfo, error) {
 	return ri, nil
 }
 
-func (r *S3Remoter) LatestBinary() (io.ReadCloser, error) {
+func (r *S3Repo) LatestBinary() (io.ReadCloser, error) {
 	fn := fmt.Sprintf("kwk-%s-%s", runtime.GOOS, runtime.GOARCH)
 	fnt := fmt.Sprintf("%s.tar.gz", fn)
 	url := fmt.Sprintf("https://s3.amazonaws.com/kwk-cli/latest/bin/%s", fnt)
@@ -88,7 +88,7 @@ func (r *S3Remoter) LatestBinary() (io.ReadCloser, error) {
 	return os.Open(target)
 }
 
-func (r *S3Remoter) CleanUp() {
+func (r *S3Repo) CleanUp() {
 	models.Debug("Removing work folder.")
 	err := os.RemoveAll(workFolder)
 	if err != nil {

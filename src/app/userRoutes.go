@@ -4,7 +4,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-func Accounts(a *UserCli) []cli.Command {
+func userRoutes(a *users) []cli.Command {
 	c := []cli.Command{
 		{
 			Name:    "profile",

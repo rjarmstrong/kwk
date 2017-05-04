@@ -2,7 +2,6 @@ package gokwk
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
-	"bitbucket.com/sharingmachine/kwkcli/src/rpc"
 	"bitbucket.com/sharingmachine/rpc/src/snipsRpc"
 	"bitbucket.com/sharingmachine/types"
 	"bytes"
@@ -16,14 +15,14 @@ import (
 type SnippetsGrpc struct {
 	pc     snipsRpc.PouchesRpcClient
 	client snipsRpc.SnipsRpcClient
-	h      *rpc.Headers
+	h      Headers
 }
 
-func New(conn *grpc.ClientConn, h *rpc.Headers) Snippets {
+func New(conn *grpc.ClientConn, client types.AppInfo) Snippets {
 	return &SnippetsGrpc{
 		client: snipsRpc.NewSnipsRpcClient(conn),
 		pc:     snipsRpc.NewPouchesRpcClient(conn),
-		h:      h,
+		h:      Headers{version:client.Version},
 	}
 }
 

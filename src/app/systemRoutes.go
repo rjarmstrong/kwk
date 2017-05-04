@@ -4,7 +4,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-func System(s *SystemCli) []cli.Command {
+func systemRoutes(s *system) []cli.Command {
 	c := []cli.Command{
 		{
 			Name: "update",

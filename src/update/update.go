@@ -27,7 +27,7 @@ func SilentCheckAndRun() {
 
 type Runner struct {
 	UpdatePeriod   time.Duration
-	Remoter
+	BinRepo
 	Applier
 	Rollbacker
 	persist.Persister
@@ -35,7 +35,7 @@ type Runner struct {
 }
 
 func NewRunner(p persist.Persister, version string) *Runner {
-	return &Runner{currentVersion: version, Remoter:&S3Remoter{}, Applier:gu.Apply, Rollbacker:gu.RollbackError, Persister:p, UpdatePeriod:time.Hour}
+	return &Runner{currentVersion: version, BinRepo: &S3Repo{}, Applier: gu.Apply, Rollbacker: gu.RollbackError, Persister: p, UpdatePeriod: time.Hour}
 }
 
 type Applier func(update io.Reader, opts gu.Options) error

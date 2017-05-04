@@ -3,7 +3,6 @@ package main
 import (
 	"bitbucket.com/sharingmachine/kwkcli/src/app"
 	"bitbucket.com/sharingmachine/kwkcli/src/cmd"
-	"bitbucket.com/sharingmachine/kwkcli/src/rpc"
 	"bitbucket.com/sharingmachine/kwkcli/src/setup"
 	"bitbucket.com/sharingmachine/kwkcli/src/ui/dlg"
 	"bitbucket.com/sharingmachine/kwkcli/src/ui/tmpl"
@@ -60,15 +59,14 @@ func runKwk(up *update.Runner) {
 		}
 	}
 	w := tmpl.NewWriter(os.Stdout)
-	conn, err := rpc.GetConn(host, KWK_TEST_MODE)
+	conn, err := gokwk.GetConn(host, KWK_TEST_MODE)
 	if err != nil {
 		w.HandleErr(errs.ApiDown)
 		return
 	}
 	defer conn.Close()
-	h := rpc.NewHeaders(app.CLIInfo.String())
-	u := gokwk.NewUsers(conn, j, h)
-	ss := gokwk.New(conn, h)
+	u := gokwk.NewUsers(conn, j, app.CLIInfo)
+	ss := gokwk.New(conn, app.CLIInfo)
 	conf := setup.NewConfigProvider(ss, f, u, w)
 	conf.Load()
 	o := cmd.NewStdRunner(f, ss)

@@ -1,4 +1,4 @@
-package rpc
+package gokwk
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
@@ -78,17 +78,12 @@ func GetConn(serverAddress string, trustAllCerts bool) (*grpc.ClientConn, error)
 	return conn, err
 }
 
-//
-
-func NewHeaders(version string) *Headers {
-	return &Headers{version: version }
-}
 
 type Headers struct {
 	version string
 }
 
-func (i *Headers) Context() context.Context {
+func (i Headers) Context() context.Context {
 	if models.Principal == nil {
 		return context.Background()
 	} else {

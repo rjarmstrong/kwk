@@ -5,7 +5,7 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
 )
 
-func Snippets(s *SnippetCli) []cli.Command {
+func snippetsRoutes(s *snippets) []cli.Command {
 	c := []cli.Command{
 		{
 			Name:    "new",

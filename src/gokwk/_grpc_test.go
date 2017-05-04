@@ -1,4 +1,4 @@
-package rpc
+package gokwk
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/src/models"

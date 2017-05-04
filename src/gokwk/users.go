@@ -2,21 +2,21 @@ package gokwk
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
-	"bitbucket.com/sharingmachine/kwkcli/src/rpc"
 	"bitbucket.com/sharingmachine/rpc/src/usersRpc"
 	"google.golang.org/grpc"
 	"time"
 	"bitbucket.com/sharingmachine/kwkcli/src/persist"
+	"bitbucket.com/sharingmachine/types"
 )
 
 type UsersGrpc struct {
 	client   usersRpc.UsersRpcClient
 	settings persist.Persister
-	headers  *rpc.Headers
+	headers  Headers
 }
 
-func NewUsers(conn *grpc.ClientConn, s persist.Persister, h *rpc.Headers) Users {
-	return &UsersGrpc{client: usersRpc.NewUsersRpcClient(conn), settings: s, headers: h}
+func NewUsers(conn *grpc.ClientConn, s persist.Persister, client types.AppInfo) Users {
+	return &UsersGrpc{client: usersRpc.NewUsersRpcClient(conn), settings: s, headers: Headers{version:client.Version}}
 }
 
 func (u *UsersGrpc) SignIn(username string, password string) (*models.User, error) {

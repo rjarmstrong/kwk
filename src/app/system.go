@@ -5,22 +5,22 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/src/update"
 )
 
-type SystemCli struct {
+type system struct {
 	tmpl.Writer
 	updater *update.Runner
 }
 
-func NewSystemCli(w tmpl.Writer, u *update.Runner) *SystemCli {
-	return &SystemCli{ Writer: w, updater:u}
+func NewSystemCli(w tmpl.Writer, u *update.Runner) *system {
+	return &system{ Writer: w, updater: u}
 }
 
-func (c *SystemCli) Update() {
+func (c *system) Update() {
 	err := c.updater.Run()
 	if err != nil {
 		c.HandleErr(err)
 	}
 }
 
-func (c *SystemCli) GetVersion() {
+func (c *system) GetVersion() {
 	c.Render("system:version", CLIInfo)
 }

@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-type UserCli struct {
+type users struct {
 	acc  gokwk.Users
 	conf persist.Persister
 	tmpl.Writer
@@ -17,11 +17,11 @@ type UserCli struct {
 	dash *Dashboard
 }
 
-func NewAccountCli(u gokwk.Users, s persist.Persister, w tmpl.Writer, d dlg.Dialog, dash *Dashboard) *UserCli {
-	return &UserCli{acc: u, conf: s, Writer: w, Dialog: d, dash: dash}
+func NewAccountCli(u gokwk.Users, s persist.Persister, w tmpl.Writer, d dlg.Dialog, dash *Dashboard) *users {
+	return &users{acc: u, conf: s, Writer: w, Dialog: d, dash: dash}
 }
 
-func (c *UserCli) Get() {
+func (c *users) Get() {
 	if u, err := c.acc.Get(); err != nil {
 		c.Render("api:not-authenticated", nil)
 	} else {
@@ -29,7 +29,7 @@ func (c *UserCli) Get() {
 	}
 }
 
-func (c *UserCli) SignUp() {
+func (c *users) SignUp() {
 
 	res, _ := c.TemplateFormField("account:signup:email", nil, false)
 	email := res.Value.(string)
@@ -50,7 +50,7 @@ func (c *UserCli) SignUp() {
 	}
 }
 
-func (c *UserCli) SignIn(username string, password string) {
+func (c *users) SignIn(username string, password string) {
 	if username == "" {
 		res, _ := c.TemplateFormField("account:usernamefield", nil, false)
 		username = res.Value.(string)
@@ -71,7 +71,7 @@ func (c *UserCli) SignIn(username string, password string) {
 	}
 }
 
-func (c *UserCli) SignOut() {
+func (c *users) SignOut() {
 	err := c.acc.Signout()
 	if err != nil {
 		c.HandleErr(err)
@@ -80,7 +80,7 @@ func (c *UserCli) SignOut() {
 	c.Render("account:signedout", nil)
 }
 
-func (c *UserCli) ChangePassword() {
+func (c *users) ChangePassword() {
 	p := models.ChangePasswordParams{}
 	res, _ := c.Dialog.FormField("Please provide an email or username:")
 	p.Email = res.Value.(string)
@@ -95,7 +95,7 @@ func (c *UserCli) ChangePassword() {
 	c.Render("account:password-changed", nil)
 }
 
-func (c *UserCli) ResetPassword(email string) {
+func (c *users) ResetPassword(email string) {
 	if email == "" {
 		res, _ := c.Dialog.TemplateFormField("account:signup:email", nil, false)
 		email = res.Value.(string)
