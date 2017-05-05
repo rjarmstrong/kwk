@@ -1,26 +1,24 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/ui/tmpl"
+	"bitbucket.com/sharingmachine/kwkcli/src/app/out"
 	"bitbucket.com/sharingmachine/kwkcli/src/update"
+	"bitbucket.com/sharingmachine/types/vwrite"
 )
 
 type system struct {
-	tmpl.Writer
+	vwrite.Writer
 	updater *update.Runner
 }
 
-func NewSystemCli(w tmpl.Writer, u *update.Runner) *system {
-	return &system{ Writer: w, updater: u}
+func NewSystemCli(w vwrite.Writer, u *update.Runner) *system {
+	return &system{Writer: w, updater: u}
 }
 
-func (c *system) Update() {
-	err := c.updater.Run()
-	if err != nil {
-		c.HandleErr(err)
-	}
+func (c *system) Update() error {
+	return c.updater.Run()
 }
 
-func (c *system) GetVersion() {
-	c.Render("system:version", CLIInfo)
+func (c *system) GetVersion() error {
+	return c.EWrite(out.Version(CLIInfo))
 }

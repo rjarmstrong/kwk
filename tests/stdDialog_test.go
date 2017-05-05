@@ -1,11 +1,11 @@
-package dlg
+package tests
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
 	_ "bitbucket.com/sharingmachine/kwkcli/src/ui/tmpl"
-	"testing"
-	_ "bytes"
 	_ "bufio"
+	_ "bytes"
+	. "github.com/smartystreets/goconvey/convey"
+	"testing"
 )
 
 func Test_StdDialog(t *testing.T) {

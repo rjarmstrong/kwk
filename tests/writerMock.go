@@ -1,8 +1,8 @@
-package tmpl
+package tests
 
 type WriterMock struct {
-	RenderCalledWith []interface{}
-	RenderCallCount int
+	RenderCalledWith    []interface{}
+	RenderCallCount     int
 	RenderErrCalledWith error
 }
 

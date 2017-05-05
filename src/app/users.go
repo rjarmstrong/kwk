@@ -1,108 +1,115 @@
 package app
 
 import (
+	"bitbucket.com/sharingmachine/kwkcli/src/app/out"
 	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
 	"bitbucket.com/sharingmachine/kwkcli/src/persist"
-	"bitbucket.com/sharingmachine/kwkcli/src/ui/dlg"
-	"bitbucket.com/sharingmachine/kwkcli/src/ui/tmpl"
+	"bitbucket.com/sharingmachine/types/vwrite"
 	"os"
 )
 
 type users struct {
 	acc  gokwk.Users
 	conf persist.Persister
-	tmpl.Writer
-	dlg.Dialog
+	vwrite.Writer
+	Dialog
 	dash *Dashboard
 }
 
-func NewAccountCli(u gokwk.Users, s persist.Persister, w tmpl.Writer, d dlg.Dialog, dash *Dashboard) *users {
+func NewAccountCli(u gokwk.Users, s persist.Persister, w vwrite.Writer, d Dialog, dash *Dashboard) *users {
 	return &users{acc: u, conf: s, Writer: w, Dialog: d, dash: dash}
 }
 
-func (c *users) Get() {
-	if u, err := c.acc.Get(); err != nil {
-		c.Render("api:not-authenticated", nil)
-	} else {
-		c.Render("account:profile", u)
+func (c *users) Get() error {
+	u, err := c.acc.Get()
+	if err != nil {
+		return err
 	}
+	return c.EWrite(out.UserProfile(u))
 }
 
-func (c *users) SignUp() {
-
-	res, _ := c.TemplateFormField("account:signup:email", nil, false)
+func (c *users) SignUp() error {
+	res, _ := c.FormField(out.UserEmailField, false)
 	email := res.Value.(string)
-	res, _ = c.TemplateFormField("account:signup:username", nil, false)
+	res, _ = c.FormField(out.UserUsernameField, false)
 	username := res.Value.(string)
-	res, _ = c.TemplateFormField("account:signup:password", nil, true)
+	res, _ = c.FormField(out.UserPasswordField, true)
 	password := res.Value.(string)
-	res, _ = c.TemplateFormField("account:signup:invite-code", nil, false)
+	res, _ = c.FormField(out.UserInviteTokenField, false)
 	inviteCode := res.Value.(string)
 
-	if u, err := c.acc.SignUp(email, username, password, inviteCode); err != nil {
-		c.HandleErr(err)
-	} else {
-		if len(u.Token) > 50 {
-			c.conf.Upsert(models.ProfileFullKey, u)
-			c.Render("account:signedup", u)
-		}
+	u, err := c.acc.SignUp(email, username, password, inviteCode)
+	if err != nil {
+		return err
 	}
+	if len(u.Token) > 50 {
+		err := c.conf.Upsert(models.ProfileFullKey, u)
+		if err != nil {
+			return err
+		}
+		c.EWrite(out.UserSignedUp(u.Username))
+	}
+	return nil
 }
 
-func (c *users) SignIn(username string, password string) {
+func (c *users) SignIn(username string, password string) error {
 	if username == "" {
-		res, _ := c.TemplateFormField("account:usernamefield", nil, false)
+		res, _ := c.FormField(out.UserUsernameField, false)
 		username = res.Value.(string)
 
 	}
 	if password == "" {
-		res, _ := c.TemplateFormField("account:passwordfield", nil, true)
+		res, _ := c.FormField(out.UserPasswordField, true)
 		password = res.Value.(string)
 	}
-	if u, err := c.acc.SignIn(username, password); err != nil {
-		c.HandleErr(err)
-	} else {
-		if len(u.Token) > 50 {
-			c.conf.Upsert(models.ProfileFullKey, u)
-			c.Render("account:signedin", u)
-			c.dash.GetWriter()(os.Stdout, "", nil)
-		}
+	u, err := c.acc.SignIn(username, password)
+	if err != nil {
+		return err
 	}
+	if len(u.Token) > 50 {
+		err := c.conf.Upsert(models.ProfileFullKey, u)
+		if err != nil {
+			return err
+		}
+		c.Write(out.UserSignedIn(u.Username))
+		c.dash.GetWriter()(os.Stdout, "", nil)
+	}
+	return nil
 }
 
-func (c *users) SignOut() {
+func (c *users) SignOut() error {
 	err := c.acc.Signout()
 	if err != nil {
-		c.HandleErr(err)
-		return
+		return err
 	}
-	c.Render("account:signedout", nil)
+	return c.EWrite(out.UserSignedOut)
 }
 
-func (c *users) ChangePassword() {
+func (c *users) ChangePassword() error {
 	p := models.ChangePasswordParams{}
-	res, _ := c.Dialog.FormField("Please provide an email or username:")
-	p.Email = res.Value.(string)
-	res, _ = c.Dialog.TemplateFormField("account:passwordfield", nil, true)
+	res, _ := c.Dialog.FormField(out.FreeText("Please provide an email or username: "), false)
+	p.Username = res.Value.(string)
+
+	res, _ = c.FormField(out.FreeText("Current password: "), true)
 	p.ExistingPassword = res.Value.(string)
-	res, _ = c.Dialog.TemplateFormField("account:passwordfield", nil, true)
+	res, _ = c.FormField(out.FreeText("New password: "), true)
 	p.NewPassword = res.Value.(string)
 	_, err := c.acc.ChangePassword(p)
 	if err != nil {
-		c.HandleErr(err)
+		return err
 	}
-	c.Render("account:password-changed", nil)
+	return c.EWrite(out.UserPasswordChanged)
 }
 
-func (c *users) ResetPassword(email string) {
+func (c *users) ResetPassword(email string) error {
 	if email == "" {
-		res, _ := c.Dialog.TemplateFormField("account:signup:email", nil, false)
+		res, _ := c.FormField(out.FreeText("Enter your email to reset your password:  "), false)
 		email = res.Value.(string)
 	}
 	_, err := c.acc.ResetPassword(email)
 	if err != nil {
-		c.HandleErr(err)
+		return err
 	}
-	c.Render("account:reset-sent", email)
+	return c.EWrite(out.UserPasswordResetSent(email))
 }

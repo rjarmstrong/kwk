@@ -1,14 +1,15 @@
 package app
 
 import (
+	"bitbucket.com/sharingmachine/kwkcli/src/app/out"
 	"bitbucket.com/sharingmachine/kwkcli/src/cmd"
 	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
 	"bitbucket.com/sharingmachine/kwkcli/src/persist"
-	"bitbucket.com/sharingmachine/kwkcli/src/ui/dlg"
-	"bitbucket.com/sharingmachine/kwkcli/src/ui/tmpl"
+	"bitbucket.com/sharingmachine/kwkcli/src/style"
 	"bitbucket.com/sharingmachine/types"
 	"bitbucket.com/sharingmachine/types/errs"
+	"bitbucket.com/sharingmachine/types/vwrite"
 	"bufio"
 	"bytes"
 	"fmt"
@@ -22,22 +23,22 @@ type snippets struct {
 	s        gokwk.Snippets
 	runner   cmd.Runner
 	settings persist.Persister
-	dlg.Dialog
-	tmpl.Writer
+	Dialog
+	vwrite.Writer
 }
 
-func NewSnippet(a gokwk.Snippets, r cmd.Runner, f persist.IO, d dlg.Dialog, w tmpl.Writer, t persist.Persister) *snippets {
+func NewSnippet(a gokwk.Snippets, r cmd.Runner, d Dialog, w vwrite.Writer, t persist.Persister) *snippets {
 	return &snippets{s: a, runner: r, Dialog: d, Writer: w, settings: t}
 }
 
-func (sc *snippets) Search(args ...string) {
+func (sc *snippets) Search(args ...string) error {
 	term := strings.Join(args, " ")
-	if res, err := sc.s.AlphaSearch(term); err != nil {
-		sc.HandleErr(err)
-	} else {
-		res.Term = term
-		sc.Out("search:alpha", res)
+	res, err := sc.s.AlphaSearch(term)
+	if err != nil {
+		return err
 	}
+	res.Term = term
+	return sc.EWrite(out.AlphaSearchResult(res))
 }
 
 //func (sc *SnippetCli) ListCategory(category string, args ...string) {
@@ -67,53 +68,51 @@ func (sc *snippets) Search(args ...string) {
 //	}
 //}
 
-func (sc *snippets) Share(distinctName string, destination string) {
-	if list, _, err := sc.getSnippet(distinctName); err != nil {
-		sc.HandleErr(err)
-	} else {
-		if alias := sc.handleMultiResponse(distinctName, list); alias != nil {
-			snip := "https://mail.google.com/mail/?ui=2&view=cm&fs=1&tf=1&su=&body=http%3A%2F%2Faus.kwk.co%2F" + alias.String()
-			gmail := gokwk.NewSnippet(snip)
-			gmail.Ext = "url"
-			sc.runner.Run(gmail, []string{})
-		} else {
-			sc.Render("snippet:notfound", map[string]interface{}{"fullKey": distinctName})
-		}
+//func (sc *snippets) Share(distinctName string, destination string) error {
+//	list, _, err := sc.getSnippet(distinctName)
+//	if err != nil {
+//		return err
+//	}
+//	alias := sc.handleMultiResponse(distinctName, list)
+//	if alias != nil {
+//		snip := "https://mail.google.com/mail/?ui=2&view=cm&fs=1&tf=1&su=&body=http%3A%2F%2Faus.kwk.co%2F" + alias.String()
+//		gmail := gokwk.NewSnippet(snip)
+//		gmail.Ext = "url"
+//		sc.runner.Run(gmail, []string{})
+//	}
+//	return sc.EWrite(out.) sc.Render("snippet:notfound", map[string]interface{}{"fullKey": distinctName})
+//}
+
+func (sc *snippets) Suggest(term string) error {
+	res, err := sc.s.AlphaSearch(term)
+	if err != nil {
+		return err
 	}
-}
-
-func (sc *snippets) Suggest(term string) {
-	if res, err := sc.s.AlphaSearch(term); err != nil {
-		sc.HandleErr(err)
-	} else if res.Total > 0 {
-		//sc.Render("search:alphaSuggest", res)
-		sc.Render("search:typeahead", res)
-		return
+	if res.Total > 0 {
+		return sc.EWrite(out.AlphaTypeAhead(res))
 	}
+	return nil
 }
 
-func (sc *snippets) run(selected *types.Snippet, args []string) {
-	sc.runner.Run(selected, args)
+func (sc *snippets) run(selected *types.Snippet, args []string) error {
+	return sc.runner.Run(selected, args)
 }
 
-func (sc *snippets) Run(distinctName string, args []string) {
+func (sc *snippets) Run(distinctName string, args []string) error {
 	a, err := types.ParseAlias(distinctName)
 	if err != nil {
-		sc.Render("validation:one-line", err)
+		return err
 	}
-
-	if list, err := sc.s.Get(*a); err != nil {
+	list, err := sc.s.Get(*a)
+	if err != nil {
 		sc.typeAhead(distinctName, sc.run)
-	} else {
-		if alias := sc.handleMultiResponse(distinctName, list); alias != nil {
-			//TODO: If username is not the current user or 'kwk' then prompt before executing.
-			if err = sc.runner.Run(alias, args); err != nil {
-				sc.HandleErr(err)
-			}
-		} else {
-			sc.typeAhead(distinctName, sc.run)
-		}
 	}
+	alias := sc.handleMultiResponse(distinctName, list)
+	if alias != nil {
+		//TODO: If username is not the current user or 'kwk' then prompt before executing.
+		return sc.runner.Run(alias, args)
+	}
+	return sc.typeAhead(distinctName, sc.run)
 }
 
 func GuessArgs(a string, b string) (*types.Alias, string, error) {
@@ -175,89 +174,83 @@ func (sc *snippets) Create(args []string) error {
 	if snippet == "" {
 		snippet = stdInAsString()
 	}
-	createAlias, err := sc.s.Create(snippet, *a1, types.RoleStandard)
+	res, err := sc.s.Create(snippet, *a1, types.RoleStandard)
 	if err != nil {
 		return err
 		//TODO: If snippet is similar to an existing one prompt for it here.
 	}
 	sc.List("", types.PouchRoot)
-	sc.Render("snippet:new", createAlias.Snippet.String())
-	return nil
+	return sc.EWrite(out.SnippetCreated(res.Snippet))
 }
 
-func (sc *snippets) Edit(distinctName string) {
-	innerEdit := func(s *types.Snippet) {
-		sc.Render("snippet:editing", s)
-		if err := sc.runner.Edit(s); err != nil {
-			sc.HandleErr(err)
-		} else {
-			sc.Render("snippet:edited", &s)
+func (sc *snippets) Edit(distinctName string) error {
+	innerEdit := func(s *types.Snippet) error {
+		sc.Write(out.SnippetEditing(s))
+		err := sc.runner.Edit(s)
+		if err != nil {
+			return err
 		}
+		return sc.EWrite(out.SnippetEdited(s))
 	}
 	if distinctName == "env" {
 		distinctName = models.NewSetupAlias(distinctName, "yml", true).String()
 	}
-	if list, _, err := sc.getSnippet(distinctName); err != nil {
+	list, _, err := sc.getSnippet(distinctName)
+	if err != nil {
 		if errs.HasCode(err, errs.CodeNotFound) {
 			a, err := types.ParseAlias(distinctName)
 			if err != nil {
-				sc.HandleErr(err)
+				return err
 			}
-			r := sc.Dialog.Modal("snippet:edit-prompt", a, false)
+			r := sc.Dialog.Modal(out.SnippetEditNewPrompt(a.String()), false)
 			if r.Ok {
 				r, err := sc.s.Create("", *a, types.RoleStandard)
 				if err != nil {
-					sc.HandleErr(err)
-					return
+					return err
 				}
-				innerEdit(r.Snippet)
+				return innerEdit(r.Snippet)
 			}
-			return
 		}
-		sc.HandleErr(err)
-	} else {
-		if snippet := sc.handleMultiResponse(distinctName, list); snippet != nil {
-			innerEdit(snippet)
-		} else {
-			sc.Render("snippet:notfound", &types.Snippet{})
-		}
+		return err
 	}
+	snippet := sc.handleMultiResponse(distinctName, list)
+	if snippet != nil {
+		return innerEdit(snippet)
+	}
+	return errs.NotFound
 }
 
-func (sc *snippets) Describe(distinctName string, description string) {
+func (sc *snippets) Describe(distinctName string, description string) error {
 	a, err := types.ParseAlias(distinctName)
 	if description == "" {
-		sc.typeAhead(distinctName, func(s *types.Snippet, args []string) {
-			cm := fmt.Sprintf("Enter new description for %s: ", s.SnipName.String())
-			res, err := sc.FormField(cm)
+		return sc.typeAhead(distinctName, func(s *types.Snippet, args []string) error {
+			res, err := sc.FormField(
+				out.FreeText(fmt.Sprintf("Enter new description for %s: ", s.SnipName.String())), false)
 			if err != nil {
-				sc.HandleErr(err)
+				return err
 			}
 			models.Debug("Form result: %+v", res.Value)
-			sc.Describe(s.SnipName.String(), res.Value.(string))
+			return sc.Describe(s.SnipName.String(), res.Value.(string))
 		})
-		return
 	}
 	if err != nil {
-		sc.Render("validation:one-line", err)
+		return err
 	}
-	if alias, err := sc.s.Update(*a, description); err != nil {
-		sc.HandleErr(err)
-	} else {
-		sc.Render("snippet:updated", alias)
+	alias, err := sc.s.Update(*a, description)
+	if err != nil {
+		return err
 	}
+	return sc.EWrite(out.SnippetDescriptionUpdated(alias.String(), description))
 }
 
-func (sc *snippets) InspectListOrRun(distinctName string, forceInspect bool, args ...string) {
+func (sc *snippets) InspectListOrRun(distinctName string, forceInspect bool, args ...string) error {
 	a, err := types.ParseAlias(distinctName)
 	if err != nil {
-		sc.HandleErr(err)
-		return
+		return err
 	}
 	v, err := sc.s.GetRoot(a.Username, true)
 	if err != nil {
-		sc.HandleErr(err)
-		return
+		return err
 	}
 	if a.Ext == "" && v.IsPouch(a.Name) {
 		p := v.GetPouch(a.Name)
@@ -266,121 +259,94 @@ func (sc *snippets) InspectListOrRun(distinctName string, forceInspect bool, arg
 		} else {
 			sc.List(a.Username, a.Name)
 		}
-		return
+		return nil
 	}
 	if err != nil {
-		sc.Render("validation:one-line", err)
+		return err
 	}
 
 	// GET SNIPPET
-	if list, err := sc.s.Get(*a); err != nil {
-		sc.typeAhead(distinctName, sc.run)
-	} else {
-		s := sc.handleMultiResponse(distinctName, list)
-		if forceInspect || models.Prefs().RequireRunKeyword {
-			sc.Render("snippet:inspect", s)
-		} else {
-			if err = sc.runner.Run(s, args); err != nil {
-				sc.HandleErr(err)
-			}
-		}
+	list, err := sc.s.Get(*a)
+	if err != nil {
+		return sc.typeAhead(distinctName, sc.run)
 	}
+	s := sc.handleMultiResponse(distinctName, list)
+	if forceInspect || models.Prefs().RequireRunKeyword {
+		sc.Write(out.SnippetView(s))
+	}
+	return sc.runner.Run(s, args)
 }
 
-func (sc *snippets) Delete(args []string) {
+func (sc *snippets) Delete(args []string) error {
 	r, err := sc.s.GetRoot("", true)
 	if err != nil {
-		sc.HandleErr(err)
+		return err
 	}
 	if r.IsPouch(args[0]) {
-		sc.deletePouch(args[0])
-		return
+		return sc.deletePouch(args[0])
 	}
-	sc.deleteSnippet(args)
+	return sc.deleteSnippet(args)
 }
 
-func (sc *snippets) Lock(pouch string) {
+func (sc *snippets) Lock(pouch string) error {
 	_, err := sc.s.MakePrivate(pouch, true)
 	if err != nil {
-		sc.HandleErr(err)
-		return
+		return err
 	}
-	sc.Render("pouch:locked", pouch)
+	return sc.EWrite(out.PouchLocked(pouch))
 }
 
-func (sc *snippets) UnLock(pouch string) {
-	res := sc.Dialog.Modal("pouch:check-unlock", pouch, false)
+func (sc *snippets) UnLock(pouch string) error {
+	res := sc.Dialog.Modal(out.PouchCheckUnLock(pouch), false)
 	if res.Ok {
 		_, err := sc.s.MakePrivate(pouch, false)
 		if err != nil {
-			sc.HandleErr(err)
-			return
+			return err
 		}
-		sc.Render("pouch:unlocked", pouch)
-	} else {
-		sc.Render("pouch:not-unlocked", pouch)
+		return sc.EWrite(out.PouchUnLocked(pouch))
 	}
+	return sc.EWrite(out.PouchNotUnLocked(pouch))
 }
 
 // kwk mv regions.txt reference -- moves the reference pouch, if no reference pouch then move to reference.txt
 // kwk mv examples/regions.txt reference
-func (sc *snippets) Move(args []string) {
+func (sc *snippets) Move(args []string) error {
 	if len(args) < 2 {
-		sc.HandleErr(errs.TwoArgumentsReqForMove)
-		return
+		return errs.TwoArgumentsReqForMove
 	}
 	root, err := sc.s.GetRoot("", true)
 	if err != nil {
-		sc.HandleErr(err)
-		return
+		return err
 	}
 	last := args[len(args)-1]
-	// . (current folder is an alias for root directory)
-	if last == "." {
-		last = ""
-	}
 	if root.IsPouch(args[0]) {
-		// rename pouch
 		p, err := sc.s.RenamePouch(args[0], last)
 		if err != nil {
-			sc.HandleErr(err)
-			return
+			return err
 		}
 		sc.List("", types.PouchRoot)
-		sc.Render("pouch:renamed", p)
-		return
+		return sc.EWrite(out.PouchRenamed(args[0], p))
 	} else if !root.IsPouch(last) && len(args) == 2 {
 		// rename single snippet
 		snip, original, err := sc.rename(args[0], args[1])
 		if err != nil {
-			sc.HandleErr(err)
+			return err
 		}
 		sc.List("", snip.Pouch)
-		sc.Render("snippet:renamed", &map[string]string{
-			"originalName": original.String(),
-			"newName":      snip.SnipName.String(),
-		})
-		return
+		return sc.EWrite(out.SnippetRenamed(original.String(), snip.String()))
+		return nil
 	}
 	as, source, err := types.ParseMany(args[0 : len(args)-1])
 	if err != nil {
-		sc.HandleErr(err)
-		return
+		return err
 	}
 	// move snippets into a pouch
 	p, err := sc.s.Move("", source, last, as)
 	if err != nil {
-		sc.HandleErr(err)
-		return
+		return err
 	}
-	if last == "" {
-		sc.List("", types.PouchRoot)
-		sc.Render("snippet:moved-root", MoveResult{Quant: len(as)})
-	} else {
-		sc.List("", last)
-		sc.Render("snippet:moved-pouch", MoveResult{Pouch: p, Quant: len(as)})
-	}
-
+	sc.List("", last)
+	return sc.EWrite(out.SnippetsMoved(as, p))
 }
 
 type MoveResult struct {
@@ -388,230 +354,187 @@ type MoveResult struct {
 	Quant int
 }
 
-func (sc *snippets) Cat(distinctName string) {
+func (sc *snippets) Cat(distinctName string) error {
 	a, err := types.ParseAlias(distinctName)
 	if err != nil {
-		sc.HandleErr(err)
-		return
+		return err
 	}
 	if !a.IsSnippet() {
-		sc.HandleErr(errs.SnippetNameRequired)
-		return
+		return errs.SnippetNameRequired
 	}
 	list, err := sc.s.Get(*a)
 	if err != nil {
 		if errs.HasCode(err, errs.CodeNotFound) {
-			sc.typeAhead(distinctName, func(s *types.Snippet, args []string) {
-				sc.Render("snippet:cat", s)
+			return sc.typeAhead(distinctName, func(s *types.Snippet, args []string) error {
+				return sc.EWrite(out.SnippetCat(s))
+				return nil
 			})
-			return
 		}
-		sc.HandleErr(err)
-		return
+		return nil
 	}
-
 	if len(list.Snippets) == 0 {
-		sc.Render("snippet:notfound", a)
-		return
+		return errs.NotFound
 	}
 	if len(list.Snippets) == 1 {
 		// TODO: use echo instead so that we can do variable substitution
-		sc.Render("snippet:cat", list.Snippets[0])
-		return
+		return sc.EWrite(out.SnippetCat(list.Snippets[0]))
 	}
-	sc.Render("snippet:ambiguouscat", list)
+	return sc.EWrite(out.SnippetAmbiguousCat(list.Snippets))
 }
 
-func (sc *snippets) Patch(distinctName string, target string, patch string) {
+func (sc *snippets) Patch(distinctName string, target string, patch string) error {
 	a, err := types.ParseAlias(distinctName)
 	if err != nil {
-		sc.HandleErr(err)
-		return
+		return err
 	}
-	if alias, err := sc.s.Patch(*a, target, patch); err != nil {
-		sc.HandleErr(err)
-	} else {
-		sc.Render("snippet:patched", alias)
+	alias, err := sc.s.Patch(*a, target, patch)
+	if err != nil {
+		return err
 	}
+	return sc.EWrite(out.SnippetPatched(alias.String()))
 }
 
-func (sc *snippets) Clone(distinctName string, newFullName string) {
+func (sc *snippets) Clone(distinctName string, newFullName string) error {
 	a, err := types.ParseAlias(distinctName)
 	if err != nil {
-		sc.HandleErr(err)
-		return
+		return err
 	}
 	newA, err := types.ParseAlias(newFullName)
 	if err != nil {
-		sc.HandleErr(err)
-		return
+		return err
 	}
-
-	if alias, err := sc.s.Clone(*a, *newA); err != nil {
-		sc.HandleErr(err)
-	} else {
-		sc.List("", newA.Pouch)
-		sc.Render("snippet:cloned", alias)
+	alias, err := sc.s.Clone(*a, *newA)
+	if err != nil {
+		return err
 	}
+	err = sc.List("", newA.Pouch)
+	if err != nil {
+		return err
+	}
+	return sc.EWrite(out.SnippetClonedAs(alias.String()))
 }
 
-func (sc *snippets) Tag(distinctName string, tags ...string) {
+func (sc *snippets) Tag(distinctName string, tags ...string) error {
 	a, err := types.ParseAlias(distinctName)
 	if err != nil {
-		sc.HandleErr(err)
-		return
+		return err
 	}
-	if alias, err := sc.s.Tag(*a, tags...); err != nil {
-		sc.HandleErr(err)
-	} else {
-		sc.Render("snippet:tag", alias)
+	alias, err := sc.s.Tag(*a, tags...)
+	if err != nil {
+		return err
 	}
+	return sc.EWrite(out.Tagged(alias.String(), tags))
 }
 
-func (sc *snippets) UnTag(distinctName string, tags ...string) {
+func (sc *snippets) UnTag(distinctName string, tags ...string) error {
 	a, err := types.ParseAlias(distinctName)
 	if err != nil {
-		sc.HandleErr(err)
-		return
+		return err
 	}
-	if alias, err := sc.s.UnTag(*a, tags...); err != nil {
-		sc.HandleErr(err)
-	} else {
-		sc.Render("snippet:untag", alias)
+	alias, err := sc.s.UnTag(*a, tags...)
+	if err != nil {
+		return err
 	}
+	return sc.EWrite(out.UnTag(alias.String(), tags))
 }
 
-func (sc *snippets) CreatePouch(name string) {
-	if _, err := sc.s.CreatePouch(name); err != nil {
-		sc.HandleErr(err)
-	} else {
-		sc.Render("pouch:created", name)
+func (sc *snippets) CreatePouch(name string) error {
+	_, err := sc.s.CreatePouch(name)
+	if err != nil {
+		return err
 	}
+	return sc.EWrite(out.PouchCreated(name))
 }
 
-func (sc *snippets) Flatten(username string) {
+func (sc *snippets) Flatten(username string) error {
 	p := &models.ListParams{Username: username, IgnorePouches: true, All: models.Prefs().ListAll}
-	if list, err := sc.s.List(p); err != nil {
-		sc.HandleErr(err)
-	} else {
-		sc.Render("snippet:list", list)
+	list, err := sc.s.List(p)
+	if err != nil {
+		return err
 	}
-}
-
-func Bom(t time.Time) time.Time {
-	year, month, _ := t.Date()
-	return time.Date(year, month, 1, 0, 0, 0, 0, t.Location())
-}
-
-func Bod(t time.Time) time.Time {
-	year, month, day := t.Date()
-	return time.Date(year, month, day, 0, 0, 0, 0, t.Location())
-}
-
-func firstDayOfISOWeek(year int, week int, timezone *time.Location) time.Time {
-	date := time.Date(year, 0, 0, 0, 0, 0, 0, timezone)
-	isoYear, isoWeek := date.ISOWeek()
-	for date.Weekday() != time.Monday { // iterate back to Monday
-		date = date.AddDate(0, 0, -1)
-		isoYear, isoWeek = date.ISOWeek()
-	}
-	for isoYear < year { // iterate forward to the first day of the first week
-		date = date.AddDate(0, 0, 1)
-		isoYear, isoWeek = date.ISOWeek()
-	}
-	for isoWeek < week { // iterate forward to the first day of the given week
-		date = date.AddDate(0, 0, 1)
-		isoYear, isoWeek = date.ISOWeek()
-	}
-	return date
+	return sc.EWrite(out.SnippetList(list))
 }
 
 // GetEra lists snippets by special filters: @today @week @month @old
-func (sc *snippets) GetEra(virtualPouch string) {
+func (sc *snippets) GetEra(virtualPouch string) error {
 	p := &models.ListParams{Username: "", IgnorePouches: true, All: models.Prefs().ListAll}
-	if list, err := sc.s.List(p); err != nil {
-		sc.HandleErr(err)
-	} else {
-		era := []*types.Snippet{}
-		var since, latest int64
-		bod := Bod(time.Now()).Unix()
-		isoYear, isoWeek := time.Now().ISOWeek()
-		fod := firstDayOfISOWeek(isoYear, isoWeek, time.Local).Unix()
-		bom := Bom(time.Now()).Unix()
-		if virtualPouch == "@today" {
-			since = bod
-			latest = time.Now().Unix()
-		} else if virtualPouch == "@week" {
-			since = fod
-			latest = bod
-		} else if virtualPouch == "@month" {
-			since = bom
-			latest = fod
-		} else if virtualPouch == "@old" {
-			since = 0
-			latest = bom
-		}
-		for _, v := range list.Snippets {
-			if v.RunStatusTime.Unix() > since && v.RunStatusTime.Unix() < latest {
-				era = append(era, v)
-			}
-		}
-		sort.Slice(era, func(i, j int) bool {
-			return era[i].RunStatusTime.Unix() < era[j].RunStatusTime.Unix()
-		})
-		list.Snippets = era
-		sc.Render("snippet:list", list)
+	list, err := sc.s.List(p)
+	if err != nil {
+		return err
 	}
+	era := []*types.Snippet{}
+	var since, latest int64
+	sod := style.StartOfDay(time.Now()).Unix()
+	isoYear, isoWeek := time.Now().ISOWeek()
+	fdw := style.FirstDayOfISOWeek(isoYear, isoWeek, time.Local).Unix()
+	som := style.StartOfMonth(time.Now()).Unix()
+	if virtualPouch == "@today" {
+		since = sod
+		latest = time.Now().Unix()
+	} else if virtualPouch == "@week" {
+		since = fdw
+		latest = sod
+	} else if virtualPouch == "@month" {
+		since = som
+		latest = fdw
+	} else if virtualPouch == "@old" {
+		since = 0
+		latest = som
+	}
+	for _, v := range list.Snippets {
+		if v.RunStatusTime.Unix() > since && v.RunStatusTime.Unix() < latest {
+			era = append(era, v)
+		}
+	}
+	sort.Slice(era, func(i, j int) bool {
+		return era[i].RunStatusTime.Unix() < era[j].RunStatusTime.Unix()
+	})
+	list.Snippets = era
+	return sc.EWrite(out.SnippetList(list))
 }
 
-// List
-// Use root list:
-// kwk /richard
-// kwk
-//
-// Use snippet list:
-// kwk richard (this is a pouch in this case)
-// kwk /richard/examples
-func (sc *snippets) List(username string, pouch string) {
+func (sc *snippets) List(username string, pouch string) error {
 	if pouch == "" {
 		r, err := sc.s.GetRoot(username, models.Prefs().ListAll)
 		if err != nil {
-			sc.HandleErr(err)
-			return
+			return err
 		}
-		sc.Render("pouch:list-root", r)
-		return
+		return sc.EWrite(out.PrintRoot(r))
 	}
 	var size int64
 	p := &models.ListParams{Username: username, Pouch: pouch, Size: size, All: models.Prefs().ListAll}
-	if list, err := sc.s.List(p); err != nil {
-		sc.HandleErr(err)
-	} else {
-		a := types.NewAlias(username, pouch, "", "")
-		sc.Render("snippet:list", list)
-		sc.s.LogUse(
-			*a,
-			types.UseStatusSuccess,
-			types.UseTypeView,
-			nil,
-		)
+	list, err := sc.s.List(p)
+	if err != nil {
+		return err
 	}
+	a := types.NewAlias(username, pouch, "", "")
+	sc.s.LogUse(
+		*a,
+		types.UseStatusSuccess,
+		types.UseTypeView,
+		nil,
+	)
+	return sc.EWrite(out.SnippetList(list))
 }
 
-func (sc *snippets) typeAhead(term string, onSelect func(s *types.Snippet, args []string)) {
-	if res, err := sc.s.AlphaSearch(term); err != nil {
-		sc.HandleErr(err)
-	} else {
-		res.Term = term
-		snips := []*types.Snippet{}
-		for _, v := range res.Results {
-			snips = append(snips, v.Snippet)
-		}
-		res := sc.Dialog.MultiChoice("dialog:choose", "Please choose one:", snips)
-		if res != nil {
-			onSelect(res, nil)
-		}
+func (sc *snippets) typeAhead(term string, onSelect func(s *types.Snippet, args []string) error) error {
+	res, err := sc.s.AlphaSearch(term)
+	if err != nil {
+		return err
 	}
+	res.Term = term
+	snips := []*types.Snippet{}
+	for _, v := range res.Results {
+		snips = append(snips, v.Snippet)
+	}
+	res2, err := sc.Dialog.MultiChoice(out.FreeText("Please choose a snippet:  "), snips)
+	if err != nil {
+		return err
+	}
+	if res2 != nil {
+		return onSelect(res2, nil)
+	}
+	return nil
 }
 
 func stdInAsString() string {
@@ -628,10 +551,10 @@ func (sc *snippets) handleMultiResponse(distinctName string, list *models.ListVi
 	if list.Total == 1 {
 		return list.Snippets[0]
 	} else if list.Total > 1 {
-		return sc.MultiChoice("dialog:choose", "Multiple matches. Choose a snippet to run:", list.Snippets)
-	} else {
-		return nil
+		s, _ := sc.MultiChoice(out.FreeText("Multiple matches. Choose a snippet to run:  "), list.Snippets)
+		return s
 	}
+	return nil
 }
 
 func (sc *snippets) getSnippet(distinctName string) (*models.ListView, *types.Alias, error) {
@@ -658,35 +581,32 @@ func (sc *snippets) rename(distinctName string, newSnipName string) (*types.Snip
 	return sc.s.Rename(*a, *sn)
 }
 
-func (sc *snippets) deleteSnippet(args []string) {
+func (sc *snippets) deleteSnippet(args []string) error {
 	as, pouch, err := types.ParseMany(args)
 	if err != nil {
-		sc.HandleErr(err)
-		return
+		return err
 	}
-	if r := sc.Modal("snippet:check-delete", as, models.Prefs().AutoYes); r.Ok {
-		if err := sc.s.Delete("", pouch, as); err != nil {
-			sc.HandleErr(err)
-			return
+	r := sc.Modal(out.SnippetCheckDelete(as), models.Prefs().AutoYes)
+	if r.Ok {
+		err := sc.s.Delete("", pouch, as)
+		if err != nil {
+			return err
 		}
 		sc.List("", pouch)
-		sc.Render("snippet:deleted", pouch)
-	} else {
-		sc.Render("snippet:not-deleted", pouch)
+		return sc.EWrite(out.SnippetsDeleted(as))
 	}
+	return sc.EWrite(out.SnippetsNotDeleted(as))
 }
 
-func (sc *snippets) deletePouch(pouch string) {
-	res := sc.Dialog.Modal("pouch:check-delete", pouch, false)
+func (sc *snippets) deletePouch(pouch string) error {
+	res := sc.Dialog.Modal(out.PouchCheckDelete(pouch), false)
 	if res.Ok {
 		_, err := sc.s.DeletePouch(pouch)
 		if err != nil {
-			sc.HandleErr(err)
-			return
+			return err
 		}
 		sc.List("", types.PouchRoot)
-		sc.Render("pouch:deleted", pouch)
-	} else {
-		sc.Render("pouch:not-deleted", pouch)
+		return sc.EWrite(out.PouchDeleted(pouch))
 	}
+	return sc.EWrite(out.PouchNotDeleted(pouch))
 }

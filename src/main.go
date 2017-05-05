@@ -4,17 +4,17 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/src/app"
 	"bitbucket.com/sharingmachine/kwkcli/src/cmd"
 	"bitbucket.com/sharingmachine/kwkcli/src/setup"
-	"bitbucket.com/sharingmachine/kwkcli/src/ui/dlg"
-	"bitbucket.com/sharingmachine/kwkcli/src/ui/tmpl"
 	"bitbucket.com/sharingmachine/kwkcli/src/update"
 	//"runtime/pprof"
+	"bitbucket.com/sharingmachine/kwkcli/src/app/out"
+	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
 	"bitbucket.com/sharingmachine/kwkcli/src/persist"
 	"bitbucket.com/sharingmachine/types/errs"
+	"bitbucket.com/sharingmachine/types/vwrite"
 	"bufio"
 	"os"
 	"strconv"
 	"strings"
-	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
 )
 
 var (
@@ -58,22 +58,23 @@ func runKwk(up *update.Runner) {
 			host = "api.kwk.co:443"
 		}
 	}
-	w := tmpl.NewWriter(os.Stdout)
+	eh := out.NewErrHandler(os.Stdout)
+	w := vwrite.New(os.Stdout)
 	conn, err := gokwk.GetConn(host, KWK_TEST_MODE)
 	if err != nil {
-		w.HandleErr(errs.ApiDown)
+		eh.Handle(errs.ApiDown)
 		return
 	}
 	defer conn.Close()
 	u := gokwk.NewUsers(conn, j, app.CLIInfo)
 	ss := gokwk.New(conn, app.CLIInfo)
-	conf := setup.NewConfigProvider(ss, f, u, w)
+	conf := setup.NewConfigProvider(ss, f, u, eh)
 	conf.Load()
 	o := cmd.NewStdRunner(f, ss)
 	r := bufio.NewReader(os.Stdin)
-	d := dlg.New(w, r)
-	kwkApp := app.NewApp(ss, f, j, o, u, d, w, up)
-	kwkApp.App.Run(os.Args)
+	d := app.NewDialog(w, r)
+	kwkApp := app.NewApp(ss, f, j, o, u, d, w, up, eh)
+	eh.Handle(kwkApp.App.Run(os.Args))
 }
 
 //func profile() *os.File {

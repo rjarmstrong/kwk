@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/urfave/cli"
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
+	"github.com/urfave/cli"
 )
 
 func snippetsRoutes(s *snippets) []cli.Command {
@@ -12,23 +12,21 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Aliases: []string{"create", "save"},
 			Action: func(c *cli.Context) error {
 				return s.Create(c.Args())
-				return nil
 			},
 		},
 		{
-			Name:    "ls",
+			Name: "ls",
 			Action: func(c *cli.Context) error {
-				models.Prefs().HorizontalLists = true;
-				s.List("", c.Args().First())
-				return nil
+				models.Prefs().HorizontalLists = true
+				return s.List("", c.Args().First())
 			},
 		},
 		{
 			Name:    "enchilada",
 			Aliases: []string{""},
-			Flags: []cli.Flag {
+			Flags: []cli.Flag{
 				cli.BoolFlag{
-					Name: "all, a",
+					Name:  "all, a",
 					Usage: "List all snippets.",
 				},
 			},
@@ -37,16 +35,15 @@ func snippetsRoutes(s *snippets) []cli.Command {
 				if all {
 					models.Prefs().ListAll = true
 				}
-				s.Flatten(c.Args().First())
-				return nil
+				return s.Flatten(c.Args().First())
 			},
 		},
 		{
 			Name:    "expand",
 			Aliases: []string{"x"},
-			Flags: []cli.Flag {
+			Flags: []cli.Flag{
 				cli.BoolFlag{
-					Name: "all, a",
+					Name:  "all, a",
 					Usage: "List all snippets.",
 				},
 			},
@@ -57,30 +54,26 @@ func snippetsRoutes(s *snippets) []cli.Command {
 				}
 				models.Prefs().AlwaysExpandRows = true
 				// TODO: This is not quite right as it means we can't expand other users lists
-				s.List("", c.Args().First())
-				return nil
+				return s.List("", c.Args().First())
 			},
 		},
 		{
 			Name:    "mkdir",
 			Aliases: []string{""},
 			Action: func(c *cli.Context) error {
-				s.CreatePouch(c.Args().First())
-				return nil
+				return s.CreatePouch(c.Args().First())
 			},
 		},
 		{
-			Name:    "lock",
+			Name: "lock",
 			Action: func(c *cli.Context) error {
-				s.Lock(c.Args().First())
-				return nil
+				return s.Lock(c.Args().First())
 			},
 		},
 		{
-			Name:    "unlock",
+			Name: "unlock",
 			Action: func(c *cli.Context) error {
-				s.UnLock(c.Args().First())
-				return nil
+				return s.UnLock(c.Args().First())
 			},
 		},
 		{
@@ -88,20 +81,18 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Aliases: []string{"f"},
 			Action: func(c *cli.Context) error {
 				args := []string(c.Args())
-				s.Search(args...)
-				return nil
+				return s.Search(args...)
 			},
 		},
 
-
 		/*
-		The following are actions on existing snippets (and in some cases pouches):
-		 */
+			The following are actions on existing snippets (and in some cases pouches):
+		*/
 		{
-			Name:    "describe",
+			Name: "describe",
 			Action: func(c *cli.Context) error {
-				s.Describe(c.Args().Get(0), c.Args().Get(1))
-				return nil
+				return s.Describe(c.Args().Get(0), c.Args().Get(1))
+
 			},
 		},
 		{
@@ -112,64 +103,64 @@ func snippetsRoutes(s *snippets) []cli.Command {
 				if covert {
 					models.Prefs().Covert = true
 				}
-				s.Run(c.Args().First(), []string(c.Args())[1:])
-				return nil
+				return s.Run(c.Args().First(), []string(c.Args())[1:])
+
 			},
 		},
 		{
 			Name:    "view",
 			Aliases: []string{"get"},
 			Action: func(c *cli.Context) error {
-				s.InspectListOrRun(c.Args().First(), true)
-				return nil
+				return s.InspectListOrRun(c.Args().First(), true)
+
 			},
 		},
 		{
 			Name:    "raw",
 			Aliases: []string{"cat"},
 			Action: func(c *cli.Context) error {
-				s.Cat(c.Args().First())
-				return nil
+				return s.Cat(c.Args().First())
+
 			},
 		},
 		{
 			Name:    "rename",
 			Aliases: []string{"mv", "move"},
 			Action: func(c *cli.Context) error {
-				s.Move(c.Args())
-				return nil
+				return s.Move(c.Args())
+
 			},
 		},
 		{
 			Name:    "clone",
 			Aliases: []string{"cp", "copy"},
 			Action: func(c *cli.Context) error {
-				s.Clone(c.Args().First(), c.Args().Get(1))
-				return nil
+				return s.Clone(c.Args().First(), c.Args().Get(1))
+
 			},
 		},
 		{
 			Name:    "edit",
 			Aliases: []string{"e"},
 			Action: func(c *cli.Context) error {
-				s.Edit(c.Args().First())
-				return nil
+				return s.Edit(c.Args().First())
+
 			},
 		},
 		{
 			Name:    "patch",
 			Aliases: []string{"replace"},
 			Action: func(c *cli.Context) error {
-				s.Patch(c.Args().First(), c.Args().Get(1), c.Args().Get(2))
-				return nil
+				return s.Patch(c.Args().First(), c.Args().Get(1), c.Args().Get(2))
+
 			},
 		},
 		{
 			Name:    "delete",
 			Aliases: []string{"rm"},
-			Flags: []cli.Flag {
+			Flags: []cli.Flag{
 				cli.BoolFlag{
-					Name: "yes, y",
+					Name:  "yes, y",
 					Usage: "Automatically accept yes is modal dialogs.",
 				},
 			},
@@ -178,8 +169,8 @@ func snippetsRoutes(s *snippets) []cli.Command {
 				if autoYes {
 					models.Prefs().AutoYes = true
 				}
-				s.Delete(c.Args())
-				return nil
+				return s.Delete(c.Args())
+
 			},
 		},
 		{
@@ -187,8 +178,8 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Aliases: []string{"t"},
 			Action: func(c *cli.Context) error {
 				args := []string(c.Args())
-				s.Tag(args[0], args[1:]...)
-				return nil
+				return s.Tag(args[0], args[1:]...)
+
 			},
 		},
 		{
@@ -196,18 +187,18 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Aliases: []string{"ut"},
 			Action: func(c *cli.Context) error {
 				args := []string(c.Args())
-				s.UnTag(args[0], args[1:]...)
-				return nil
+				return s.UnTag(args[0], args[1:]...)
+
 			},
 		},
-		{
-			Name:    "share",
-			Aliases: []string{"send"},
-			Action: func(c *cli.Context) error {
-				s.Share(c.Args().First(), c.Args().Get(2))
-				return nil
-			},
-		},
+		//{
+		//	Name:    "share",
+		//	Aliases: []string{"send"},
+		//	Action: func(c *cli.Context) error {
+		//		return s.Share(c.Args().First(), c.Args().Get(2))
+		//
+		//	},
+		//},
 	}
 	return c
 }

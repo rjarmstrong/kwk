@@ -4,7 +4,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
 	"bitbucket.com/sharingmachine/kwkcli/src/persist"
-	"bitbucket.com/sharingmachine/kwkcli/src/ui/tmpl"
 	"bitbucket.com/sharingmachine/types/errs"
 	"fmt"
 	"gopkg.in/yaml.v2"
@@ -14,13 +13,13 @@ type ConfigProvider struct {
 	u              gokwk.Users
 	envResolvers   Resolvers
 	prefsResolvers Resolvers
-	w              tmpl.Writer
+	errs.Handler
 }
 
-func NewConfigProvider(ss gokwk.Snippets, f persist.IO, u gokwk.Users, w tmpl.Writer) Provider {
+func NewConfigProvider(ss gokwk.Snippets, f persist.IO, u gokwk.Users, eh errs.Handler) Provider {
 	env := NewEnvResolvers(ss, f)
 	prefs := NewPrefsResolvers(ss, f)
-	return &ConfigProvider{envResolvers: env, prefsResolvers: prefs, u: u, w: w}
+	return &ConfigProvider{envResolvers: env, prefsResolvers: prefs, u: u, Handler: eh}
 }
 
 func (cs *ConfigProvider) Load() {
@@ -41,7 +40,7 @@ func (cs *ConfigProvider) loadEnv() *yaml.MapSlice {
 	env := &yaml.MapSlice{}
 	err = yaml.Unmarshal([]byte(envString), env)
 	if err != nil {
-		cs.w.HandleErr(errs.New(errs.CodeInvalidConfigSection,
+		cs.Handle(errs.New(errs.CodeInvalidConfigSection,
 			fmt.Sprintf("Invalid kwk *env.yml detected. `kwk edit env` to fix. %s", err)))
 		envString, _ = cs.envResolvers.Fallback()
 		yaml.Unmarshal([]byte(envString), env)
@@ -56,7 +55,7 @@ func (cs *ConfigProvider) loadPrefs() {
 	}
 	c, err := cs.GetConfig(cs.prefsResolvers)
 	if err != nil {
-		cs.w.HandleErr(err)
+		cs.Handle(err)
 		return
 	}
 	prefs := &models.Preferences{PersistedPrefs: models.PersistedPrefs{}}
@@ -72,8 +71,7 @@ func (cs *ConfigProvider) loadPrefs() {
 	models.Debug("Loaded prefs:%+v", c)
 	res, err := parse(c)
 	if err != nil {
-		// TODO: USE TEMPLATE WRITER
-		cs.w.HandleErr(errs.New(errs.CodeInvalidConfigSection,
+		cs.Handle(errs.New(errs.CodeInvalidConfigSection,
 			fmt.Sprintf("Invalid kwk *prefs.yml detected. `kwk edit prefs` to fix. %s", err)))
 		// The fallback is expected not to fail parsing
 		fb, _ := cs.prefsResolvers.Fallback()

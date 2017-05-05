@@ -1,8 +1,4 @@
-package dlg
-
-import (
-	"bitbucket.com/sharingmachine/types"
-)
+package tests
 
 type DialogMock struct {
 	LastModalCalledWith   []interface{}
@@ -10,7 +6,7 @@ type DialogMock struct {
 	ReturnItem            *DialogResponse
 	FieldCallHistory      []interface{}
 	FieldResponse         *DialogResponse
-	FieldResponseMap map[string]interface{}
+	FieldResponseMap      map[string]interface{}
 	MultiChoiceCalledWith []interface{}
 	MultiChoiceResponse   *types.Snippet
 }
@@ -24,13 +20,13 @@ func (d *DialogMock) Modal(templateName string, data interface{}, autoYes bool) 
 func (d *DialogMock) TemplateFormField(templateName string, data interface{}, mask bool) (*DialogResponse, error) {
 	d.FieldCallHistory = append(d.FieldCallHistory, []interface{}{templateName, data})
 	if d.FieldResponseMap[templateName] != nil {
-		return &DialogResponse{Value:d.FieldResponseMap[templateName], Ok:true}, nil
+		return &DialogResponse{Value: d.FieldResponseMap[templateName], Ok: true}, nil
 	}
 	return d.FieldResponse, nil
 }
 
 func (d *DialogMock) FormField(label string) (*DialogResponse, error) {
-  panic("not impl")
+	panic("not impl")
 }
 
 func (d *DialogMock) MultiChoice(templateName string, header interface{}, list []*types.Snippet) *types.Snippet {

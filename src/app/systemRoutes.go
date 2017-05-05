@@ -9,16 +9,14 @@ func systemRoutes(s *system) []cli.Command {
 		{
 			Name: "update",
 			Action: func(c *cli.Context) error {
-				s.Update()
-				return nil
+				return s.Update()
 			},
 		},
 		{
 			Name:    "version",
 			Aliases: []string{"v"},
 			Action: func(c *cli.Context) error {
-				s.GetVersion()
-				return nil
+				return s.GetVersion()
 			},
 		},
 	}

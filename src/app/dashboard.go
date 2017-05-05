@@ -1,45 +1,37 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/models"
-	"bitbucket.com/sharingmachine/kwkcli/src/ui/tmpl"
-	"fmt"
-	"io"
+	"bitbucket.com/sharingmachine/kwkcli/src/app/out"
 	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
+	"bitbucket.com/sharingmachine/kwkcli/src/models"
+	"bitbucket.com/sharingmachine/types/errs"
+	"bitbucket.com/sharingmachine/types/vwrite"
+	"io"
 )
 
 type Dashboard struct {
 	s gokwk.Snippets
-	tmpl.Writer
+	vwrite.Writer
+	errs.Handler
 }
 
-func NewDashBoard(w tmpl.Writer, s gokwk.Snippets) *Dashboard {
-	return &Dashboard{Writer: w, s: s}
+func NewDashBoard(w vwrite.Writer, eh errs.Handler, s gokwk.Snippets) *Dashboard {
+	return &Dashboard{Writer: w, s: s, Handler: eh}
 }
 
 func (d *Dashboard) GetWriter() func(w io.Writer, templ string, data interface{}) {
 	return d.writer
 }
 
-func renderSignoutDash() {
-	fmt.Print("<Signed out dash>\n\nkwk signin | kwk signup\n")
-}
-
-func (d *Dashboard) writer(out io.Writer, templ string, data interface{}) {
+func (d *Dashboard) writer(w io.Writer, templ string, data interface{}) {
 	if len(models.Principal.Token) == 0 {
-		renderSignoutDash()
+		d.Write(out.SignedOut())
 		return
 	}
 	r, err := d.s.GetRoot("", true)
-	// TODO: Review as this is confusing?
-	//ce, ok := err.(*models.ClientErr)
-	//if ok && ce.Contains(models.Code_SnippetVulnerable) {
-	//	renderSignoutDash()
-	//	return
-	//}
 	if err != nil {
-		d.HandleErr(err)
+		d.Handle(err)
 		return
 	}
-	d.Render("dashboard", r)
+	d.Write(out.Dashboard(r))
 }

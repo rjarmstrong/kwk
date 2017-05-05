@@ -10,46 +10,40 @@ func userRoutes(a *users) []cli.Command {
 			Name:    "profile",
 			Aliases: []string{"me", "whoami"},
 			Action: func(c *cli.Context) error {
-				a.Get()
-				return nil
+				return a.Get()
 			},
 		},
 		{
 			Name:    "signin",
 			Aliases: []string{"login", "switch", "cd"},
 			Action: func(c *cli.Context) error {
-				a.SignIn(c.Args().Get(0), c.Args().Get(1))
-				return nil
+				return a.SignIn(c.Args().Get(0), c.Args().Get(1))
 			},
 		},
 		{
 			Name:    "signup",
 			Aliases: []string{"register"},
 			Action: func(c *cli.Context) error {
-				a.SignUp()
-				return nil
+				return a.SignUp()
 			},
 		},
 		{
 			Name:    "signout",
 			Aliases: []string{"logout"},
 			Action: func(c *cli.Context) error {
-				a.SignOut()
-				return nil
+				return a.SignOut()
 			},
 		},
 		{
 			Name: "reset-password",
 			Action: func(c *cli.Context) error {
-				a.ResetPassword(c.Args().First())
-				return nil
+				return a.ResetPassword(c.Args().First())
 			},
 		},
 		{
 			Name: "change-password",
 			Action: func(c *cli.Context) error {
-				a.ChangePassword()
-				return nil
+				return a.ChangePassword()
 			},
 		},
 	}

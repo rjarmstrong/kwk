@@ -1,28 +1,28 @@
-package tmpl
+package out
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
-	"github.com/rjarmstrong/tablewriter"
+	"bitbucket.com/sharingmachine/kwkcli/src/style"
+	"bitbucket.com/sharingmachine/types"
 	"bytes"
 	"fmt"
+	"github.com/rjarmstrong/tablewriter"
+	"io"
 	"strings"
-	"bitbucket.com/sharingmachine/kwkcli/src/ui/style"
-	"bitbucket.com/sharingmachine/types"
 )
 
-func view(s *types.Snippet) string {
-	w := &bytes.Buffer{}
-	w.WriteString("\n")
-	w.WriteString(style.MARGIN)
-	fmtHeader(w,  s.Username, s.Pouch, &s.SnipName)
-	w.WriteString(strings.Repeat(" ", 4))
-	w.WriteString(snippetIcon(s))
-	w.WriteString("  ")
-	w.WriteString(FSnippetType(s))
-	fmt.Fprint(w,"\n")
+func printSnippetView(w io.Writer, s *types.Snippet) {
+	fmt.Fprintln(w, "")
+	fmt.Fprint(w, style.Margin)
+	fmtHeader(w, s.Username, s.Pouch, &s.SnipName)
+	fmt.Fprint(w, strings.Repeat(" ", 4))
+	fmt.Fprint(w, snippetIcon(s))
+	fmt.Fprint(w, "  ")
+	fmt.Fprint(w, FSnippetType(s))
+	fmt.Fprint(w, "\n")
 	fmt.Fprint(w, style.TWOLINES)
 	fmt.Fprint(w, FCodeview(s, 100, 0, false))
-	fmt.Fprint(w,"\n\n")
+	fmt.Fprint(w, "\n\n")
 
 	tbl := tablewriter.NewWriter(w)
 	tbl.SetAutoWrapText(false)
@@ -34,7 +34,7 @@ func view(s *types.Snippet) string {
 	tbl.SetAutoFormatHeaders(false)
 	tbl.SetHeaderLine(false)
 	tbl.SetColWidth(20)
-	tbl.Append([]string{style.Fmt256(style.Color_PouchCyan, FSnippetType(s) + " Details:"), "", "", ""})
+	tbl.Append([]string{style.Fmt256(style.ColorPouchCyan, FSnippetType(s)+" Details:"), "", "", ""})
 
 	var lastRun string
 	if s.Runs < 1 {
@@ -43,39 +43,37 @@ func view(s *types.Snippet) string {
 		lastRun = pad(20, style.Time(s.RunStatusTime)).String()
 	}
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued,"Run Status:"), FStatus(s, true),
-		style.Fmt16(style.Subdued,"Last Run:"), lastRun,
+		style.Fmt16(style.Subdued, "Run Status:"), FStatus(s, true),
+		style.Fmt16(style.Subdued, "Last Run:"), lastRun,
 	})
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued,"Run Count: "), fmt.Sprintf("↻ %2d", s.Runs),
-		style.Fmt16(style.Subdued,"View count:") , fmt.Sprintf("%s  %2d", style.Icon_View, s.Views )})
+		style.Fmt16(style.Subdued, "Run Count: "), fmt.Sprintf("↻ %2d", s.Runs),
+		style.Fmt16(style.Subdued, "View count:"), fmt.Sprintf("%s  %2d", style.IconView, s.Views)})
 	if s.IsApp() {
 		tbl.Append([]string{
-			style.Fmt16(style.Subdued,"App Deps:"),
+			style.Fmt16(style.Subdued, "App Deps:"),
 			style.FBox(strings.Join(s.Dependencies, ", "), 50, 5)})
 	}
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued,"Used by:"),
+		style.Fmt16(style.Subdued, "Used by:"),
 		style.FBox(strings.Join(s.Apps, ", "), 50, 5)})
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued,"Supported OS:"),
+		style.Fmt16(style.Subdued, "Supported OS:"),
 		style.FBox(strings.Join(s.SupportedOs, ", "), 50, 5)})
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued,"Description:"), style.FBox(FEmpty(s.Description), 50, 3), "", ""})
+		style.Fmt16(style.Subdued, "Description:"), style.FBox(FEmpty(s.Description), 50, 3), "", ""})
 
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued,"Preview:"), style.FPreview(s.Preview, 50, 1), "", ""})
+		style.Fmt16(style.Subdued, "Preview:"), style.FPreview(s.Preview, 50, 1), "", ""})
 
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued,"Tags:"), FTags(s.Tags), "", ""})
+		style.Fmt16(style.Subdued, "Tags:"), FTags(s.Tags), "", ""})
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued,"sha256:"), FVerified(s) })
+		style.Fmt16(style.Subdued, "sha256:"), FVerified(s)})
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued,"Updated:"), fmt.Sprintf("%s - %s", style.Time(s.Created), fmt.Sprintf("v%d", s.Version )),
+		style.Fmt16(style.Subdued, "Updated:"), fmt.Sprintf("%s - %s", style.Time(s.Created), fmt.Sprintf("v%d", s.Version)),
 	})
 	tbl.Render()
-
-
 
 	//fmt.Fprint(w, style.Start)
 	//fmt.Fprintf(w, "%dm", style.Subdued)
@@ -85,10 +83,9 @@ func view(s *types.Snippet) string {
 	//fmt.Fprint(w,"Run snippet: `kwk run <name>`")
 	//fmt.Fprint(w, MARGIN)
 	//fmt.Fprint(w, style.End)
-	fmt.Fprint(w,"\n")
-
-	return w.String()
+	fmt.Fprint(w, "\n")
 }
+
 func FSnippetType(s *types.Snippet) string {
 	if s.IsApp() {
 		return "App"
@@ -101,11 +98,11 @@ func FSnippetType(s *types.Snippet) string {
 func FVerified(s *types.Snippet) string {
 	var buff bytes.Buffer
 	if s.VerifyChecksum() {
-		buff.WriteString(style.Fmt256(style.Color_YesGreen,  style.Icon_Tick + " "))
+		buff.WriteString(style.Fmt256(style.ColorYesGreen, style.IconTick+" "))
 		buff.WriteString(pad(12, s.SnipChecksum).String())
 		buff.WriteString("...")
 	} else {
-		buff.WriteString(" " + style.Icon_Cross + "  Invalid Checksum: ")
+		buff.WriteString(" " + style.IconCross + "  Invalid Checksum: ")
 		buff.WriteString(FEmpty(s.SnipChecksum))
 	}
 	return buff.String()
@@ -188,7 +185,7 @@ func FCodeview(s *types.Snippet, width int, lines int, odd bool) string {
 		}
 		buff.WriteString(m)
 		buff.WriteString(b)
-		if i < len(codeview) - 1 {
+		if i < len(codeview)-1 {
 			buff.WriteString("\n")
 		}
 	}

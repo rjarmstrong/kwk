@@ -1,4 +1,4 @@
-package gokwk
+package tests
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
