@@ -1,13 +1,14 @@
 package style
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/models"
-	"bitbucket.com/sharingmachine/types"
 	"bytes"
-	"fmt"
-	"github.com/lunixbochs/vtclean"
 	"strings"
+	"fmt"
+	"bitbucket.com/sharingmachine/kwkcli/src/models"
+	"github.com/lunixbochs/vtclean"
+	"bitbucket.com/sharingmachine/types"
 )
+
 
 // FStart starts an ansi escape sequence, should be terminated with style.End
 func FStart(c types.AnsiCode, in interface{}) string {
@@ -75,18 +76,18 @@ func Squeeze(text string) string {
 	return " " + text
 }
 
+
 // fmtColor 'in' is the item to be formatted, ansiPattern is the short pattern which
 // denotes the type of formatting. e.g. 256 colors is: 38;5;
 // If the preference 'printansi' is set to false this method will have no effect.
 func fmtColor(c types.AnsiCode, in interface{}, ansiPattern string) string {
-	if models.Prefs() != nil && !models.Prefs().PrintAnsi {
-		return fmt.Sprintf("%v", in)
-	}
 	a := strings.Split(fmt.Sprintf("%v", in), "\n")
 	for i, v := range a {
 		ansi := fmt.Sprintf("%s%s%dm%s%s", Start, ansiPattern, c, v, End)
-		a[i] = fmt.Sprintf("%q", ansi)
-		continue
+		if models.Prefs() != nil && models.Prefs().PrintAnsi {
+			a[i] = fmt.Sprintf("%q", ansi)
+			continue
+		}
 		a[i] = ansi
 	}
 	return strings.Join(a, "\n")
