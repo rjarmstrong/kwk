@@ -9,8 +9,7 @@ type Provider interface {
 	Load()
 }
 
-
-type Resolvers interface{
+type Resolvers interface {
 	Anon() (string, error)
 	Local() (string, error)
 	Own() (string, error)
@@ -21,7 +20,5 @@ type Resolvers interface{
 type ProviderMock struct {
 }
 
-
 func (ProviderMock) Load() {
 }
-

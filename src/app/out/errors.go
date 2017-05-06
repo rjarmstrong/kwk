@@ -24,6 +24,9 @@ func (e *handlerWrapper) Handle(err error) {
 
 func errHandler(e error) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
+		if e == nil {
+			return
+		}
 		models.LogErr(e)
 		ce, ok := e.(*errs.Error)
 		if ok {

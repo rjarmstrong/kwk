@@ -20,7 +20,7 @@ func printSnippetView(w io.Writer, s *types.Snippet) {
 	fmt.Fprint(w, "  ")
 	fmt.Fprint(w, FSnippetType(s))
 	fmt.Fprint(w, "\n")
-	fmt.Fprint(w, style.TWOLINES)
+	fmt.Fprint(w, style.TwoLines)
 	fmt.Fprint(w, FCodeview(s, 100, 0, false))
 	fmt.Fprint(w, "\n\n")
 
@@ -34,7 +34,7 @@ func printSnippetView(w io.Writer, s *types.Snippet) {
 	tbl.SetAutoFormatHeaders(false)
 	tbl.SetHeaderLine(false)
 	tbl.SetColWidth(20)
-	tbl.Append([]string{style.Fmt256(style.ColorPouchCyan, FSnippetType(s)+" Details:"), "", "", ""})
+	tbl.Append([]string{style.Fmt256(colors.RecentPouch, FSnippetType(s)+" Details:"), "", "", ""})
 
 	var lastRun string
 	if s.Runs < 1 {
@@ -43,7 +43,7 @@ func printSnippetView(w io.Writer, s *types.Snippet) {
 		lastRun = pad(20, style.Time(s.RunStatusTime)).String()
 	}
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued, "Run Status:"), FStatus(s, true),
+		style.Fmt16(colors.Subdued, "Run Status:"), FStatus(s, true),
 		style.Fmt16(style.Subdued, "Last Run:"), lastRun,
 	})
 	tbl.Append([]string{

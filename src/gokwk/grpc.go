@@ -2,21 +2,21 @@ package gokwk
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
-	"golang.org/x/net/context"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/credentials"
+	"bitbucket.com/sharingmachine/types"
+	"bitbucket.com/sharingmachine/types/errs"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/grpclog"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 	"os"
 	"runtime"
 	"time"
-	"bitbucket.com/sharingmachine/types"
-	"bitbucket.com/sharingmachine/types/errs"
-	"encoding/json"
-	"google.golang.org/grpc/status"
-	"google.golang.org/grpc/codes"
 )
 
 // /etc/ssl/certs/COMODO_RSA_Certification_Authority.pem
@@ -61,12 +61,12 @@ func GetConn(serverAddress string, trustAllCerts bool) (*grpc.ClientConn, error)
 	pool := x509.NewCertPool()
 	pool.AppendCertsFromPEM([]byte(cert))
 	creds := credentials.NewTLS(&tls.Config{
-		RootCAs:                    pool,
-		InsecureSkipVerify:         trustAllCerts,
-		ClientSessionCache:         tls.NewLRUClientSessionCache(-1),
-		PreferServerCipherSuites:   true,
-		DynamicRecordSizingDisabled:false,
-		SessionTicketsDisabled:     false,
+		RootCAs:                     pool,
+		InsecureSkipVerify:          trustAllCerts,
+		ClientSessionCache:          tls.NewLRUClientSessionCache(-1),
+		PreferServerCipherSuites:    true,
+		DynamicRecordSizingDisabled: false,
+		SessionTicketsDisabled:      false,
 	})
 	opts = append(opts, grpc.WithTransportCredentials(creds))
 	opts = append(opts, grpc.WithUnaryInterceptor(interceptor))
@@ -77,7 +77,6 @@ func GetConn(serverAddress string, trustAllCerts bool) (*grpc.ClientConn, error)
 	conn, err := grpc.Dial(serverAddress, opts...)
 	return conn, err
 }
-
 
 type Headers struct {
 	version string
@@ -104,8 +103,8 @@ func (i Headers) Context() context.Context {
 }
 
 var noAuthMethods = map[string]bool{
-	"/usersRpc.UsersRpc/SignIn" : true,
-	"/usersRpc.UsersRpc/SignUp" : true,
+	"/usersRpc.UsersRpc/SignIn": true,
+	"/usersRpc.UsersRpc/SignUp": true,
 }
 
 func interceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
@@ -142,7 +141,7 @@ func translateGrpcErr(e error) error {
 	case codes.PermissionDenied:
 		return errs.PermissionDenied
 	case codes.Unimplemented:
-		return  errs.NotImplemented
+		return errs.NotImplemented
 	case codes.Internal:
 		return errs.Internal
 	case codes.Unavailable:

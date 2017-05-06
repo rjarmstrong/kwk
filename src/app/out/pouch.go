@@ -6,6 +6,7 @@ import (
 	"bitbucket.com/sharingmachine/types"
 	"bytes"
 	"fmt"
+	"strings"
 	"text/tabwriter"
 	"time"
 )
@@ -19,6 +20,7 @@ func listHorizontal(l []interface{}, stats *types.UserStats) []byte {
 	w := tabwriter.NewWriter(&buff, 5, 1, 3, ' ', tabwriter.TabIndent)
 	var item bytes.Buffer
 	colWidths := map[int]int{}
+	pad11 := strings.Repeat(style.Fmt256(100, " "), 1)
 	for i, v := range l {
 		if i%5 == 0 {
 			item.WriteString("  ")
@@ -37,13 +39,13 @@ func listHorizontal(l []interface{}, stats *types.UserStats) []byte {
 				isLast := stats.LastPouch == pch.Id
 				item.WriteString(pouchIcon(pch, isLast))
 				if isLast {
-					item.WriteString(style.Fmt256(style.AnsiCode(style.ColorBrightestWhite), "  ❯ "+pch.Name))
+					item.WriteString(style.Fmt256(style.ColorBrightestWhite, "  ❯ "+pch.Name))
 				} else {
 					item.WriteString("  ")
 					item.WriteString(style.Fmt256(decayColor(pch.LastUse.Unix(), true), pch.Name))
 				}
 				if pch.Type == types.PouchTypeVirtual {
-					item.WriteString(style.Pad11)
+					item.WriteString(pad11)
 				} else {
 					item.WriteString(style.Fmt256(style.ColorDimStat, fmt.Sprintf(" %d", pch.Snips)))
 				}
@@ -65,7 +67,8 @@ func listHorizontal(l []interface{}, stats *types.UserStats) []byte {
 }
 
 func insertGridLine(b *bytes.Buffer) {
-	b.WriteString(fmt.Sprintf("\n%s\t%s\t%s\t%s\t%s\t%s\n", style.Margin, style.Pad12, style.Pad12, style.Pad12, style.Pad12, style.Pad12))
+	pad := strings.Repeat(style.Fmt256(100, " "), 2)
+	b.WriteString(fmt.Sprintf("\n%s\t%s\t%s\t%s\t%s\t%s\n", style.Margin, pad, pad, pad, pad, pad))
 }
 
 func pouchIcon(pch *types.Pouch, isLast bool) string {
@@ -77,38 +80,38 @@ func pouchIcon(pch *types.Pouch, isLast bool) string {
 }
 
 func colorPouch(lastPouch bool, lastUsed int64, reddy int64, icon string) string {
-	var color style.AnsiCode
+	var col types.AnsiCode
 	if lastPouch && reddy > 0 {
-		color = style.ColorBrightRed
+		col = style.ColorBrightRed
 	} else if lastPouch {
-		color = style.ColorPouchCyan
+		col = colors.RecentPouch
 	} else if reddy > 0 {
-		color = style.ColorDimRed
+		col = style.ColorDimRed
 	} else {
-		color = decayColor(lastUsed, false)
+		col = decayColor(lastUsed, false)
 	}
-	return style.Fmt256(color, icon)
+	return style.Fmt256(col, icon)
 }
 
 func newerThan(unix int64, seconds int64) bool {
 	return time.Now().Unix()-unix < 5*seconds
 }
 
-func decayColor(unix int64, whiteToday bool) style.AnsiCode {
+func decayColor(unix int64, whiteToday bool) types.AnsiCode {
 	local := time.Now()
 	pouchT := time.Unix(unix, 0)
 	today := local.YearDay() == pouchT.YearDay() && local.Year() == pouchT.Year()
 	if today {
 		if whiteToday {
-			return style.AnsiCode(style.ColorBrightWhite)
+			return types.AnsiCode(style.ColorBrightWhite)
 		}
-		return style.AnsiCode(style.ColorPouchCyan)
+		return colors.RecentPouch
 	}
 	if newerThan(unix, 7*oneDay) {
-		return style.AnsiCode(style.ColorWeekGrey)
+		return types.AnsiCode(style.ColorWeekGrey)
 	}
 	if newerThan(unix, 28*oneDay) {
-		return style.AnsiCode(style.ColorMonthGrey)
+		return types.AnsiCode(style.ColorMonthGrey)
 	}
-	return style.AnsiCode(style.ColorOldGrey)
+	return types.AnsiCode(style.ColorOldGrey)
 }

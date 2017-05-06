@@ -17,7 +17,7 @@ type users struct {
 	dash *Dashboard
 }
 
-func NewAccountCli(u gokwk.Users, s persist.Persister, w vwrite.Writer, d Dialog, dash *Dashboard) *users {
+func NewAccount(u gokwk.Users, s persist.Persister, w vwrite.Writer, d Dialog, dash *Dashboard) *users {
 	return &users{acc: u, conf: s, Writer: w, Dialog: d, dash: dash}
 }
 

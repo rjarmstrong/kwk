@@ -4,7 +4,6 @@ import (
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
 	"bitbucket.com/sharingmachine/kwkcli/src/style"
 	"bitbucket.com/sharingmachine/types"
-	"bitbucket.com/sharingmachine/types/constants"
 	"bytes"
 	"fmt"
 	"github.com/rjarmstrong/tablewriter"
@@ -64,7 +63,7 @@ func printRoot(w io.Writer, r *models.ListView) {
 
 	fmtHeader(w, r.Username, "", nil)
 	fmt.Fprint(w, strings.Repeat(" ", 50), style.Fmt16(style.Subdued, "◉  "+models.Principal.Username+"    TLS12"))
-	fmt.Fprint(w, style.TWOLINES)
+	fmt.Fprint(w, style.TwoLines)
 	w.Write(listHorizontal(all, &r.UserStats))
 
 	if len(r.Snippets) > 0 {
@@ -201,7 +200,7 @@ func printSnippets(w io.Writer, list *models.ListView, fullName bool) {
 		fmt.Fprint(w, "\n")
 		fmt.Fprint(w, style.Margin)
 		fmt.Fprint(w, style.Fmt16(style.Subdued, "<empty pouch>"))
-		fmt.Fprint(w, style.TWOLINES)
+		fmt.Fprint(w, style.TwoLines)
 		fmt.Fprint(w, style.Margin)
 		fmt.Fprint(w, style.Fmt16(style.Cyan, "Add new snippets to this pouch: "))
 		if list.Pouch != nil {
@@ -332,7 +331,7 @@ func fmtHeader(w io.Writer, username string, pouch string, s *types.SnipName) {
 	fmt.Fprint(w, style.Start)
 	fmt.Fprint(w, "7m")
 	fmt.Fprint(w, " ❯ ")
-	fmt.Fprint(w, constants.KwkHost)
+	fmt.Fprint(w, types.KwkHost)
 	fmt.Fprint(w, "/")
 	if pouch == "" && s == nil {
 		fmt.Fprint(w, style.Start)

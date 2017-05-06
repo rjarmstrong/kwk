@@ -1,11 +1,13 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/cmd"
+	"bitbucket.com/sharingmachine/kwkcli/src/app/out"
+	"bitbucket.com/sharingmachine/kwkcli/src/exekwk/cmd"
+	"bitbucket.com/sharingmachine/kwkcli/src/exekwk/setup"
+	"bitbucket.com/sharingmachine/kwkcli/src/exekwk/update"
 	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
 	"bitbucket.com/sharingmachine/kwkcli/src/persist"
-	"bitbucket.com/sharingmachine/kwkcli/src/update"
 	"bitbucket.com/sharingmachine/types"
 	"bitbucket.com/sharingmachine/types/errs"
 	"bitbucket.com/sharingmachine/types/vwrite"
@@ -22,7 +24,7 @@ type KwkApp struct {
 	Snippets gokwk.Snippets
 	File     persist.IO
 	Settings persist.Persister
-	Updater  *update.Runner
+	Updater  *update.Updater
 	Runner   cmd.Runner
 	Dialogue Dialog
 	vwrite.Writer
@@ -30,7 +32,9 @@ type KwkApp struct {
 }
 
 func NewApp(a gokwk.Snippets, f persist.IO, t persist.Persister, r cmd.Runner, u gokwk.Users,
-	d Dialog, w vwrite.Writer, up *update.Runner, eh errs.Handler) *KwkApp {
+	d Dialog, w vwrite.Writer, up update.Updater, eh errs.Handler) *KwkApp {
+	out.SetColors(out.ColorsDefault())
+	setup.NewConfig(a, f, u, eh)
 	ap := cli.NewApp()
 	ap = setupFlags(ap)
 	ap.Version = CLIInfo.String()
@@ -46,9 +50,9 @@ func NewApp(a gokwk.Snippets, f persist.IO, t persist.Persister, r cmd.Runner, u
 		},
 	})
 	cli.HelpPrinter = dash.GetWriter()
-	accCli := NewAccountCli(u, t, w, d, dash)
+	accCli := NewAccount(u, t, w, d, dash)
 	ap.Commands = append(ap.Commands, userRoutes(accCli)...)
-	sysCli := NewSystemCli(w, up)
+	sysCli := NewSystem(w, up)
 	ap.Commands = append(ap.Commands, systemRoutes(sysCli)...)
 	snipCli := NewSnippet(a, r, d, w, t)
 	ap.Commands = append(ap.Commands, snippetsRoutes(snipCli)...)
@@ -66,12 +70,12 @@ func NewApp(a gokwk.Snippets, f persist.IO, t persist.Persister, r cmd.Runner, u
 	}
 }
 
-func getDefaultCommand(snipCli *snippets) func(c *cli.Context, distinctName string) {
-	return func(c *cli.Context, distinctName string) {
+func getDefaultCommand(snipCli *snippets) func(*cli.Context, string) {
+	return func(c *cli.Context, firstArg string) {
 		i := c.Args().Get(1)
-		if strings.HasPrefix(distinctName, "@") {
-			fmt.Println("listing:", distinctName)
-			snipCli.GetEra(distinctName)
+		if strings.HasPrefix(firstArg, "@") {
+			fmt.Println("listing:", firstArg)
+			snipCli.GetEra(firstArg)
 			return
 		}
 		switch i {

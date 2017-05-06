@@ -1,16 +1,16 @@
 package update
 
 import (
-	gu "github.com/inconshreveable/go-update"
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
+	"bitbucket.com/sharingmachine/kwkcli/src/persist"
+	"bitbucket.com/sharingmachine/types/errs"
+	"errors"
+	gu "github.com/inconshreveable/go-update"
 	. "github.com/smartystreets/goconvey/convey"
+	"io"
 	"io/ioutil"
 	"strings"
 	"testing"
-	"errors"
-	"io"
-	"bitbucket.com/sharingmachine/kwkcli/src/persist"
-	"bitbucket.com/sharingmachine/types/errs"
 )
 
 func Test_Update(t *testing.T) {
@@ -20,11 +20,11 @@ func Test_Update(t *testing.T) {
 		pm := &persist.PersisterMock{}
 		models.SetPrefs(models.DefaultPrefs())
 
-		r := Runner{
-			Applier:    am.Apply,
-			Rollbacker: am.RollbackError,
-			BinRepo:    rm,
-			Persister:  pm,
+		r := Updater{
+			Applier:        am.Apply,
+			Rollbacker:     am.RollbackError,
+			BinRepo:        rm,
+			Persister:      pm,
 			currentVersion: "v0.0.1",
 		}
 
@@ -66,7 +66,7 @@ func Test_Update(t *testing.T) {
 		})
 
 		// //TODO: Run on ad-hoc basis
-		 Convey(`Test remoter info and bin downloader`, func() {
+		Convey(`Test remoter info and bin downloader`, func() {
 			//r := S3Remoter{}
 			//ri, err := r.LatestInfo()
 			//So(err, ShouldBeNil)
@@ -85,9 +85,9 @@ func Test_Update(t *testing.T) {
 }
 
 type ApplierMock struct {
-	ApplyCalledWith []interface{}
+	ApplyCalledWith    []interface{}
 	RollbackCalledWith error
-	ApplyErr        error
+	ApplyErr           error
 }
 
 func (am *ApplierMock) Apply(update io.Reader, opts gu.Options) error {

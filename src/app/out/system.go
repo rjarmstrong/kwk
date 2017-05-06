@@ -11,7 +11,7 @@ import (
 
 func Version(i types.AppInfo) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprint(w, style.Fmt256(style.ColorPouchCyan, "kwk version: "))
+		fmt.Fprint(w, style.Fmt256(colors.RecentPouch, "kwk version: "))
 		fmt.Fprintf(w, "%s", i.Version)
 	})
 }

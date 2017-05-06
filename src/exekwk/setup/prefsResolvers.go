@@ -1,11 +1,11 @@
 package setup
 
 import (
+	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
-	"gopkg.in/yaml.v2"
 	"bitbucket.com/sharingmachine/kwkcli/src/persist"
 	"bitbucket.com/sharingmachine/types"
-	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
+	"gopkg.in/yaml.v2"
 )
 
 type PrefsResolvers struct {
@@ -18,7 +18,7 @@ func NewPrefsResolvers(s gokwk.Snippets, f persist.IO) Resolvers {
 	return &PrefsResolvers{
 		a:        *models.NewSetupAlias("prefs", "yml", false),
 		snippets: s,
-		file:   f,
+		file:     f,
 	}
 }
 
@@ -53,7 +53,7 @@ func (p *PrefsResolvers) Default() (string, error) {
 }
 
 func (p *PrefsResolvers) Fallback() (string, error) {
-	ph := &models.PreferencesHolder{KwkPrefs: "v1", Preferences: models.DefaultPrefs().PersistedPrefs }
+	ph := &models.PreferencesHolder{KwkPrefs: "v1", Preferences: models.DefaultPrefs().PersistedPrefs}
 	if b, err := yaml.Marshal(ph); err != nil {
 		return "", err
 	} else {

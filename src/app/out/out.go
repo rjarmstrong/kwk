@@ -18,7 +18,7 @@ func FreeText(text string) vwrite.Handler {
 
 func Dashboard(lv *models.ListView) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		PrintRoot(lv)
+		PrintRoot(lv).Write(w)
 	})
 }
 

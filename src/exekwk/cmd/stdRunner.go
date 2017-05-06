@@ -1,12 +1,11 @@
 package cmd
 
 import (
+	"bitbucket.com/sharingmachine/kwkcli/src/exekwk/setup"
 	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
 	"bitbucket.com/sharingmachine/kwkcli/src/persist"
-	"bitbucket.com/sharingmachine/kwkcli/src/setup"
 	"bitbucket.com/sharingmachine/types"
-	"bitbucket.com/sharingmachine/types/constants"
 	"bitbucket.com/sharingmachine/types/errs"
 	"bufio"
 	"bytes"
@@ -192,8 +191,8 @@ func (r *StdRunner) exec(a types.Alias, snipArgs []string, runner string, arg ..
 
 	// KEEP TRACK OF PROCESS GRAPH
 	node, err := getCurrentNode(a, runner, snipArgs, c)
-	if node.Level > constants.MaxProcessLevel {
-		return errs.New(errs.CodeErrTooDeep, "Maximum levels in an app is %d. Not executing:%s", constants.MaxProcessLevel, node.AliasString)
+	if node.Level > types.MaxProcessLevel {
+		return errs.New(errs.CodeErrTooDeep, "Maximum levels in an app is %d. Not executing:%s", types.MaxProcessLevel, node.AliasString)
 	}
 	if err != nil {
 		return err

@@ -1,14 +1,14 @@
 package setup
 
 import (
+	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
-	"fmt"
-	"runtime"
-	"strings"
 	"bitbucket.com/sharingmachine/kwkcli/src/persist"
 	"bitbucket.com/sharingmachine/types"
 	"bitbucket.com/sharingmachine/types/errs"
-	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
+	"fmt"
+	"runtime"
+	"strings"
 )
 
 // TODO: check yml version is compatible with this build else force upgrade.
@@ -23,10 +23,10 @@ type EnvResolvers struct {
 func NewEnvResolvers(s gokwk.Snippets, sys persist.IO) Resolvers {
 	r := strings.ToLower(fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH))
 	return &EnvResolvers{
-		runtime: 	r,
+		runtime:  r,
 		alias:    *models.NewSetupAlias("env", "yml", true),
 		snippets: s,
-		file:   sys,
+		file:     sys,
 	}
 }
 

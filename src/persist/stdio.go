@@ -2,13 +2,13 @@ package persist
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/src/cache"
+	"bitbucket.com/sharingmachine/kwkcli/src/models"
+	"bitbucket.com/sharingmachine/types/errs"
 	"github.com/kennygrant/sanitize"
 	"io/ioutil"
 	"os"
 	"path"
 	"strings"
-	"bitbucket.com/sharingmachine/types/errs"
-	"bitbucket.com/sharingmachine/kwkcli/src/models"
 )
 
 func New() IO {

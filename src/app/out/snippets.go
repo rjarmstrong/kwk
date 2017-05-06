@@ -29,7 +29,7 @@ func SnippetCreated(s *types.Snippet) vwrite.Handler {
 
 func SnippetCat(s *types.Snippet) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprint(w, s.Snip)
+		fmt.Fprintln(w, s.Snip)
 	})
 }
 

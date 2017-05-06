@@ -1,15 +1,15 @@
 package update
 
 import (
-	gu "github.com/inconshreveable/go-update"
-	"os/exec"
-	"bytes"
-	"time"
-	"os"
-	"io"
-	"bitbucket.com/sharingmachine/types/errs"
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
 	"bitbucket.com/sharingmachine/kwkcli/src/persist"
+	"bitbucket.com/sharingmachine/types/errs"
+	"bytes"
+	gu "github.com/inconshreveable/go-update"
+	"io"
+	"os"
+	"os/exec"
+	"time"
 )
 
 const RecordFile = "update-record.json"
@@ -22,11 +22,15 @@ func SilentCheckAndRun() {
 		models.Debug("If you are running nacl or OpenBSD they are not supported.")
 		models.LogErr(err)
 	}
-	exe(false, cmd,"update", "silent")
+	exe(false, cmd, "update", "silent")
+}
+
+type Updater interface {
+	Run() error
 }
 
 type Runner struct {
-	UpdatePeriod   time.Duration
+	UpdatePeriod time.Duration
 	BinRepo
 	Applier
 	Rollbacker
@@ -34,13 +38,13 @@ type Runner struct {
 	currentVersion string
 }
 
-func NewRunner(p persist.Persister, version string) *Runner {
+func NewRunner(p persist.Persister, version string) Updater {
 	return &Runner{currentVersion: version, BinRepo: &S3Repo{}, Applier: gu.Apply, Rollbacker: gu.RollbackError, Persister: p, UpdatePeriod: time.Hour}
 }
 
 type Applier func(update io.Reader, opts gu.Options) error
 
-type Rollbacker func (err error) error
+type Rollbacker func(err error) error
 
 type Record struct {
 	LastUpdate int64
@@ -90,7 +94,7 @@ func (r *Runner) Run() error {
 }
 
 func (r *Runner) recordUpdate() error {
-	ur := &Record{LastUpdate:time.Now().Unix()}
+	ur := &Record{LastUpdate: time.Now().Unix()}
 	models.Debug("Updating update record.")
 	return r.Persister.Upsert(RecordFile, ur)
 }

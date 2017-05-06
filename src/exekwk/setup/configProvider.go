@@ -16,10 +16,12 @@ type ConfigProvider struct {
 	errs.Handler
 }
 
-func NewConfigProvider(ss gokwk.Snippets, f persist.IO, u gokwk.Users, eh errs.Handler) Provider {
+func NewConfig(ss gokwk.Snippets, f persist.IO, u gokwk.Users, eh errs.Handler) Provider {
 	env := NewEnvResolvers(ss, f)
 	prefs := NewPrefsResolvers(ss, f)
-	return &ConfigProvider{envResolvers: env, prefsResolvers: prefs, u: u, Handler: eh}
+	c := &ConfigProvider{envResolvers: env, prefsResolvers: prefs, u: u, Handler: eh}
+	c.Load()
+	return c
 }
 
 func (cs *ConfigProvider) Load() {

@@ -2,11 +2,10 @@ package main
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/src/app"
-	"bitbucket.com/sharingmachine/kwkcli/src/cmd"
-	"bitbucket.com/sharingmachine/kwkcli/src/setup"
-	"bitbucket.com/sharingmachine/kwkcli/src/update"
 	//"runtime/pprof"
 	"bitbucket.com/sharingmachine/kwkcli/src/app/out"
+	"bitbucket.com/sharingmachine/kwkcli/src/exekwk/cmd"
+	"bitbucket.com/sharingmachine/kwkcli/src/exekwk/update"
 	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
 	"bitbucket.com/sharingmachine/kwkcli/src/persist"
 	"bitbucket.com/sharingmachine/types/errs"
@@ -44,7 +43,7 @@ var version string = "v-.-.-"
 var build string = "0"
 var releaseTime string
 
-func runKwk(up *update.Runner) {
+func runKwk(up update.Updater) {
 	app.CLIInfo.Version = version
 	app.CLIInfo.Build = build
 	app.CLIInfo.Time, _ = strconv.ParseInt(releaseTime, 10, 64)
@@ -68,8 +67,6 @@ func runKwk(up *update.Runner) {
 	defer conn.Close()
 	u := gokwk.NewUsers(conn, j, app.CLIInfo)
 	ss := gokwk.New(conn, app.CLIInfo)
-	conf := setup.NewConfigProvider(ss, f, u, eh)
-	conf.Load()
 	o := cmd.NewStdRunner(f, ss)
 	r := bufio.NewReader(os.Stdin)
 	d := app.NewDialog(w, r)

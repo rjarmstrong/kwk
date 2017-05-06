@@ -2,12 +2,12 @@ package app
 
 import (
 	"bitbucket.com/sharingmachine/kwkcli/src/app/out"
-	"bitbucket.com/sharingmachine/kwkcli/src/cmd"
+	"bitbucket.com/sharingmachine/kwkcli/src/exekwk/cmd"
 	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
 	"bitbucket.com/sharingmachine/kwkcli/src/persist"
-	"bitbucket.com/sharingmachine/kwkcli/src/style"
 	"bitbucket.com/sharingmachine/types"
+	"bitbucket.com/sharingmachine/types/age"
 	"bitbucket.com/sharingmachine/types/errs"
 	"bitbucket.com/sharingmachine/types/vwrite"
 	"bufio"
@@ -464,10 +464,10 @@ func (sc *snippets) GetEra(virtualPouch string) error {
 	}
 	era := []*types.Snippet{}
 	var since, latest int64
-	sod := style.StartOfDay(time.Now()).Unix()
+	sod := age.StartOfDay(time.Now()).Unix()
 	isoYear, isoWeek := time.Now().ISOWeek()
-	fdw := style.FirstDayOfISOWeek(isoYear, isoWeek, time.Local).Unix()
-	som := style.StartOfMonth(time.Now()).Unix()
+	fdw := age.FirstDayOfISOWeek(isoYear, isoWeek, time.Local).Unix()
+	som := age.StartOfMonth(time.Now()).Unix()
 	if virtualPouch == "@today" {
 		since = sod
 		latest = time.Now().Unix()
