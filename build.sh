@@ -12,8 +12,6 @@ ARCH=amd64
 
 # TESTING
 #go test ./app
-go test ./ui/dlg
-go test ./update/
 
 # PREP OUTPUT
 releasePath=/builds/${KWK_VERSION}
@@ -58,7 +56,7 @@ function compile(){
 
 sed -i -- "s/RELEASE_VERSION/${KWK_VERSION}/" ./main.go
 compile linux
-compile darwin
+#compile darwin
 # compile windows
 
 # CREATE NPM
@@ -79,11 +77,6 @@ sha1sum ${npmTar} > ${npmTar}.sha1
 
 # CLEAN-UP
 rm -fr ${tmp}
-
-# TODO: WARNING REMOVE THIS WHEN OPEN SOURCING
-export AWS_ACCESS_KEY_ID=AKIAJRJBQNMZWLG653WA
-export AWS_SECRET_ACCESS_KEY=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
-export DEFAULT_REGION="us-east-1"
 
 aws s3 cp /builds/${KWK_VERSION} s3://kwk-cli/${KWK_VERSION} --recursive --acl public-read
 aws s3 cp s3://kwk-cli/${KWK_VERSION} s3://kwk-cli/latest --recursive --acl public-read
