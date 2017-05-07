@@ -44,7 +44,9 @@ function compile(){
 
   # COMPILE
   binary=${tmp}/bin/${file}
-  env GOOS=${os} GOARCH=${ARCH} CGO_ENABLED=0 go build -ldflags "-s -w -X main.version=${KWK_VERSION} -X main.build=${BUILD_NUMBER} -X main.releaseTime=${RELEASE_TIME}" -x -o ${binary} ./src/
+  cd ./src/
+  env GOOS=${os} GOARCH=${ARCH} CGO_ENABLED=0 go build -ldflags "-s -w -X main.version=${KWK_VERSION} -X main.build=${BUILD_NUMBER} -X main.releaseTime=${RELEASE_TIME}" -x -o ${binary}
+  cd ..
 
   # ZIP
   zipped=/${binPath}/${file}.tar.gz
@@ -56,7 +58,7 @@ function compile(){
 
 sed -i -- "s/RELEASE_VERSION/${KWK_VERSION}/" ./src/main.go
 compile linux
-#compile darwin
+compile darwin
 # compile windows
 
 # CREATE NPM
