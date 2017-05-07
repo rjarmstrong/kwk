@@ -44,17 +44,17 @@ function compile(){
 
   # COMPILE
   binary=${tmp}/bin/${file}
-  env GOOS=${os} GOARCH=${ARCH} CGO_ENABLED=0 go build -ldflags "-s -w -X main.version=${KWK_VERSION} -X main.build=${BUILD_NUMBER} -X main.releaseTime=${RELEASE_TIME}" -x -o ${binary}
+  env GOOS=${os} GOARCH=${ARCH} CGO_ENABLED=0 go build -ldflags "-s -w -X main.version=${KWK_VERSION} -X main.build=${BUILD_NUMBER} -X main.releaseTime=${RELEASE_TIME}" -x -o ${binary} ./src/
 
   # ZIP
-  zipped=${binPath}/${file}.tar.gz
+  zipped=/${binPath}/${file}.tar.gz
   tar cvzf ${zipped} -C ${tmp}/bin ${file}
 
   # CHECKSUM
   sha1sum ${zipped} > ${zipped}.sha1
 }
 
-sed -i -- "s/RELEASE_VERSION/${KWK_VERSION}/" ./main.go
+sed -i -- "s/RELEASE_VERSION/${KWK_VERSION}/" ./src/main.go
 compile linux
 #compile darwin
 # compile windows
