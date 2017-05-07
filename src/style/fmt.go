@@ -1,14 +1,13 @@
 package style
 
 import (
-	"bytes"
-	"strings"
-	"fmt"
 	"bitbucket.com/sharingmachine/kwkcli/src/models"
-	"github.com/lunixbochs/vtclean"
 	"bitbucket.com/sharingmachine/types"
+	"bytes"
+	"fmt"
+	"github.com/lunixbochs/vtclean"
+	"strings"
 )
-
 
 // FStart starts an ansi escape sequence, should be terminated with style.End
 func FStart(c types.AnsiCode, in interface{}) string {
@@ -75,7 +74,6 @@ func Squeeze(text string) string {
 	}
 	return " " + text
 }
-
 
 // fmtColor 'in' is the item to be formatted, ansiPattern is the short pattern which
 // denotes the type of formatting. e.g. 256 colors is: 38;5;
