@@ -1,3 +1,8 @@
 language: sh
 
+sudo: required
+
 script: ./ci.sh
+
+services:
+  - docker
