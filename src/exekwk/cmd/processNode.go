@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/exec"
 	//"github.com/mitchellh/go-ps"
-	"bitbucket.com/sharingmachine/kwkcli/src/models"
+	"github.com/kwk-super-snippets/cli/src/models"
 	"bitbucket.com/sharingmachine/types"
 )
 

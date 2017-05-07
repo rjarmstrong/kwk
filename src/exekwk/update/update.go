@@ -1,8 +1,8 @@
 package update
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/models"
-	"bitbucket.com/sharingmachine/kwkcli/src/persist"
+	"github.com/kwk-super-snippets/cli/src/models"
+	"github.com/kwk-super-snippets/cli/src/persist"
 	"bitbucket.com/sharingmachine/types/errs"
 	"bytes"
 	gu "github.com/inconshreveable/go-update"

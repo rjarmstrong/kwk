@@ -1,8 +1,8 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/models"
-	"bitbucket.com/sharingmachine/kwkcli/src/ui/dlg"
+	"github.com/kwk-super-snippets/cli/src/models"
+	"github.com/kwk-super-snippets/cli/src/ui/dlg"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 )

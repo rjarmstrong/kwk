@@ -1,8 +1,8 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/app/out"
-	"bitbucket.com/sharingmachine/kwkcli/src/exekwk/update"
+	"github.com/kwk-super-snippets/cli/src/app/out"
+	"github.com/kwk-super-snippets/cli/src/exekwk/update"
 	"bitbucket.com/sharingmachine/types/vwrite"
 )
 

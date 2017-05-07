@@ -1,7 +1,7 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/app/out"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 	"bitbucket.com/sharingmachine/types"
 	"bitbucket.com/sharingmachine/types/vwrite"
 	"bufio"

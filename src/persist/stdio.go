@@ -1,8 +1,8 @@
 package persist
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/cache"
-	"bitbucket.com/sharingmachine/kwkcli/src/models"
+	"github.com/kwk-super-snippets/cli/src/cache"
+	"github.com/kwk-super-snippets/cli/src/models"
 	"bitbucket.com/sharingmachine/types/errs"
 	"github.com/kennygrant/sanitize"
 	"io/ioutil"

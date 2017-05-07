@@ -1,7 +1,7 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/models"
+	"github.com/kwk-super-snippets/cli/src/models"
 	"github.com/urfave/cli"
 )
 

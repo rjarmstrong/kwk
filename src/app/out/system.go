@@ -1,7 +1,7 @@
 package out
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/style"
+	"github.com/kwk-super-snippets/cli/src/style"
 	"bitbucket.com/sharingmachine/types"
 	"bitbucket.com/sharingmachine/types/vwrite"
 	"fmt"

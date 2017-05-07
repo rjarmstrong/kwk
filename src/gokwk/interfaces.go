@@ -1,7 +1,7 @@
 package gokwk
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/models"
+	"github.com/kwk-super-snippets/cli/src/models"
 	t "bitbucket.com/sharingmachine/types"
 )
 

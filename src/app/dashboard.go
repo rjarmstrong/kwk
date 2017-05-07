@@ -1,9 +1,9 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/app/out"
-	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
-	"bitbucket.com/sharingmachine/kwkcli/src/models"
+	"github.com/kwk-super-snippets/cli/src/app/out"
+	"github.com/kwk-super-snippets/cli/src/gokwk"
+	"github.com/kwk-super-snippets/cli/src/models"
 	"bitbucket.com/sharingmachine/types/errs"
 	"bitbucket.com/sharingmachine/types/vwrite"
 	"io"

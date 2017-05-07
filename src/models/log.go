@@ -1,7 +1,7 @@
 package models
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/cache"
+	"github.com/kwk-super-snippets/cli/src/cache"
 	"fmt"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"log"

@@ -1,7 +1,7 @@
 package tests
 
 import (
-	_ "bitbucket.com/sharingmachine/kwkcli/src/ui/tmpl"
+	_ "github.com/kwk-super-snippets/cli/src/ui/tmpl"
 	_ "bufio"
 	_ "bytes"
 	. "github.com/smartystreets/goconvey/convey"

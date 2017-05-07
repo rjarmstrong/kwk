@@ -1,11 +1,11 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/app/out"
-	"bitbucket.com/sharingmachine/kwkcli/src/exekwk/cmd"
-	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
-	"bitbucket.com/sharingmachine/kwkcli/src/models"
-	"bitbucket.com/sharingmachine/kwkcli/src/persist"
+	"github.com/kwk-super-snippets/cli/src/app/out"
+	"github.com/kwk-super-snippets/cli/src/exekwk/cmd"
+	"github.com/kwk-super-snippets/cli/src/gokwk"
+	"github.com/kwk-super-snippets/cli/src/models"
+	"github.com/kwk-super-snippets/cli/src/persist"
 	"bitbucket.com/sharingmachine/types"
 	"bitbucket.com/sharingmachine/types/age"
 	"bitbucket.com/sharingmachine/types/errs"

@@ -1,8 +1,8 @@
 package out
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/models"
-	"bitbucket.com/sharingmachine/kwkcli/src/style"
+	"github.com/kwk-super-snippets/cli/src/models"
+	"github.com/kwk-super-snippets/cli/src/style"
 	"bitbucket.com/sharingmachine/types/errs"
 	"bitbucket.com/sharingmachine/types/vwrite"
 	"fmt"

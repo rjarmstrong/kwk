@@ -1,9 +1,9 @@
 package setup
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/gokwk"
-	"bitbucket.com/sharingmachine/kwkcli/src/models"
-	"bitbucket.com/sharingmachine/kwkcli/src/persist"
+	"github.com/kwk-super-snippets/cli/src/gokwk"
+	"github.com/kwk-super-snippets/cli/src/models"
+	"github.com/kwk-super-snippets/cli/src/persist"
 	"bitbucket.com/sharingmachine/types"
 	"bitbucket.com/sharingmachine/types/errs"
 	"fmt"
@@ -115,8 +115,8 @@ runners:
     compile: ["scalac", "-d", "$DIR", "$FULL_NAME"]
     run: ["scala", "$NAME"]
   cs: #c sharp (dotnet core) Under development
-    compile: ["dotnet", "restore", "/Volumes/development/go/src/bitbucket.com/sharingmachine/kwkcli/src/dotnet/project.json"]
-    run: ["dotnet", "run", "--project", "/Volumes/development/go/src/bitbucket.com/sharingmachine/kwkcli/src/dotnet/project.json", "$FULL_NAME",]
+    compile: ["dotnet", "restore", "/Volumes/development/go/src/github.com/kwk-super-snippets/cli/src/dotnet/project.json"]
+    run: ["dotnet", "run", "--project", "/Volumes/development/go/src/github.com/kwk-super-snippets/cli/src/dotnet/project.json", "$FULL_NAME",]
   go: #golang
     run: ["go", "run", "$FULL_NAME"]
   rs: #rust

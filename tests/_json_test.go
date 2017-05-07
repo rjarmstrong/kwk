@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/models"
+	"github.com/kwk-super-snippets/cli/src/models"
 	. "github.com/smartystreets/goconvey/convey"
 	"os"
 	"testing"

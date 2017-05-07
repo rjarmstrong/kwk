@@ -1,11 +1,11 @@
 package gokwk
 
 import (
-	"bitbucket.com/sharingmachine/kwkcli/src/models"
+	"github.com/kwk-super-snippets/cli/src/models"
 	"bitbucket.com/sharingmachine/rpc/src/usersRpc"
 	"google.golang.org/grpc"
 	"time"
-	"bitbucket.com/sharingmachine/kwkcli/src/persist"
+	"github.com/kwk-super-snippets/cli/src/persist"
 	"bitbucket.com/sharingmachine/types"
 )
 

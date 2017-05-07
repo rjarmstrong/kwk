@@ -1,5 +1,5 @@
 {
-	"ImportPath": "bitbucket.com/sharingmachine/kwkcli/src",
+	"ImportPath": "github.com/kwk-super-snippets/cli/src",
 	"GoVersion": "go1.8",
 	"GodepVersion": "v79",
 	"Packages": [

@@ -2,8 +2,8 @@ package update
 
 import (
 	"archive/tar"
-	"bitbucket.com/sharingmachine/kwkcli/src/cache"
-	"bitbucket.com/sharingmachine/kwkcli/src/models"
+	"github.com/kwk-super-snippets/cli/src/cache"
+	"github.com/kwk-super-snippets/cli/src/models"
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
