@@ -2,7 +2,7 @@ package out
 
 import (
 	"github.com/kwk-super-snippets/cli/src/style"
-	"bitbucket.com/sharingmachine/types"
+	"github.com/kwk-super-snippets/types"
 )
 
 func SetColors(c Colors) {

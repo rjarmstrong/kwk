@@ -1,12 +1,12 @@
 package gokwk
 
 import (
-	"github.com/kwk-super-snippets/cli/src/models"
 	"bitbucket.com/sharingmachine/rpc/src/usersRpc"
+	"github.com/kwk-super-snippets/cli/src/models"
+	"github.com/kwk-super-snippets/cli/src/persist"
+	"github.com/kwk-super-snippets/types"
 	"google.golang.org/grpc"
 	"time"
-	"github.com/kwk-super-snippets/cli/src/persist"
-	"bitbucket.com/sharingmachine/types"
 )
 
 type UsersGrpc struct {
@@ -16,7 +16,7 @@ type UsersGrpc struct {
 }
 
 func NewUsers(conn *grpc.ClientConn, s persist.Persister, client types.AppInfo) Users {
-	return &UsersGrpc{client: usersRpc.NewUsersRpcClient(conn), settings: s, headers: Headers{version:client.Version}}
+	return &UsersGrpc{client: usersRpc.NewUsersRpcClient(conn), settings: s, headers: Headers{version: client.Version}}
 }
 
 func (u *UsersGrpc) SignIn(username string, password string) (*models.User, error) {

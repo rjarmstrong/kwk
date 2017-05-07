@@ -1,10 +1,10 @@
 package persist
 
 import (
+	"github.com/kennygrant/sanitize"
 	"github.com/kwk-super-snippets/cli/src/cache"
 	"github.com/kwk-super-snippets/cli/src/models"
-	"bitbucket.com/sharingmachine/types/errs"
-	"github.com/kennygrant/sanitize"
+	"github.com/kwk-super-snippets/types/errs"
 	"io/ioutil"
 	"os"
 	"path"

@@ -1,10 +1,10 @@
 package style
 
 import (
-	"github.com/kwk-super-snippets/cli/src/models"
-	"bitbucket.com/sharingmachine/types"
 	"bytes"
 	"fmt"
+	"github.com/kwk-super-snippets/cli/src/models"
+	"github.com/kwk-super-snippets/types"
 	"github.com/lunixbochs/vtclean"
 	"strings"
 )

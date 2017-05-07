@@ -1,11 +1,11 @@
 package update
 
 import (
-	"github.com/kwk-super-snippets/cli/src/models"
-	"github.com/kwk-super-snippets/cli/src/persist"
-	"bitbucket.com/sharingmachine/types/errs"
 	"errors"
 	gu "github.com/inconshreveable/go-update"
+	"github.com/kwk-super-snippets/cli/src/models"
+	"github.com/kwk-super-snippets/cli/src/persist"
+	"github.com/kwk-super-snippets/types/errs"
 	. "github.com/smartystreets/goconvey/convey"
 	"io"
 	"io/ioutil"

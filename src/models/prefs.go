@@ -1,8 +1,8 @@
 package models
 
 import (
-	"bitbucket.com/sharingmachine/types"
 	"fmt"
+	"github.com/kwk-super-snippets/types"
 	"gopkg.in/yaml.v2"
 	"os"
 	"strings"

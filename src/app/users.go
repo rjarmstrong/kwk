@@ -5,7 +5,7 @@ import (
 	"github.com/kwk-super-snippets/cli/src/gokwk"
 	"github.com/kwk-super-snippets/cli/src/models"
 	"github.com/kwk-super-snippets/cli/src/persist"
-	"bitbucket.com/sharingmachine/types/vwrite"
+	"github.com/kwk-super-snippets/types/vwrite"
 	"os"
 )
 

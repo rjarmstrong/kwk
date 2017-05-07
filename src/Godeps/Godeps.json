@@ -15,26 +15,6 @@
 			"Rev": "35ec4f7294be08f1045611d5f01f46a379b9ab3f"
 		},
 		{
-			"ImportPath": "bitbucket.com/sharingmachine/types",
-			"Rev": "2cfc6ea6a2a69b83e85d4e69a03771bfa6442e20"
-		},
-		{
-			"ImportPath": "bitbucket.com/sharingmachine/types/age",
-			"Rev": "2cfc6ea6a2a69b83e85d4e69a03771bfa6442e20"
-		},
-		{
-			"ImportPath": "bitbucket.com/sharingmachine/types/errs",
-			"Rev": "2cfc6ea6a2a69b83e85d4e69a03771bfa6442e20"
-		},
-		{
-			"ImportPath": "bitbucket.com/sharingmachine/types/valid",
-			"Rev": "2cfc6ea6a2a69b83e85d4e69a03771bfa6442e20"
-		},
-		{
-			"ImportPath": "bitbucket.com/sharingmachine/types/vwrite",
-			"Rev": "2cfc6ea6a2a69b83e85d4e69a03771bfa6442e20"
-		},
-		{
 			"ImportPath": "github.com/bmizerany/assert",
 			"Comment": "release.r60-7-gb7ed37b",
 			"Rev": "b7ed37b82869576c289d7d97fb2bbd8b64a0cb28"
@@ -117,6 +97,26 @@
 		{
 			"ImportPath": "github.com/kr/text",
 			"Rev": "7cafcd837844e784b526369c9bce262804aebc60"
+		},
+		{
+			"ImportPath": "github.com/kwk-super-snippets/types",
+			"Rev": "0d32fda8c22e3d497566e01afdba3d8caad2b4f2"
+		},
+		{
+			"ImportPath": "github.com/kwk-super-snippets/types/age",
+			"Rev": "0d32fda8c22e3d497566e01afdba3d8caad2b4f2"
+		},
+		{
+			"ImportPath": "github.com/kwk-super-snippets/types/errs",
+			"Rev": "0d32fda8c22e3d497566e01afdba3d8caad2b4f2"
+		},
+		{
+			"ImportPath": "github.com/kwk-super-snippets/types/valid",
+			"Rev": "0d32fda8c22e3d497566e01afdba3d8caad2b4f2"
+		},
+		{
+			"ImportPath": "github.com/kwk-super-snippets/types/vwrite",
+			"Rev": "0d32fda8c22e3d497566e01afdba3d8caad2b4f2"
 		},
 		{
 			"ImportPath": "github.com/lunixbochs/vtclean",

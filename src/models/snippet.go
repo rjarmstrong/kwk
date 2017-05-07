@@ -1,7 +1,7 @@
 package models
 
 import (
-	"bitbucket.com/sharingmachine/types"
+	"github.com/kwk-super-snippets/types"
 )
 
 const (
@@ -9,7 +9,7 @@ const (
 )
 
 type CreateSnippetResponse struct {
-	Snippet   *types.Snippet
+	Snippet *types.Snippet
 }
 
 type ListParams struct {

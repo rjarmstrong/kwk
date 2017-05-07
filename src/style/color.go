@@ -1,7 +1,7 @@
 package style
 
 import (
-	"bitbucket.com/sharingmachine/types"
+	"github.com/kwk-super-snippets/types"
 )
 
 const (

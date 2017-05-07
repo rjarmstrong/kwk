@@ -1,9 +1,9 @@
 package out
 
 import (
-	"github.com/kwk-super-snippets/cli/src/models"
-	"bitbucket.com/sharingmachine/types/vwrite"
 	"fmt"
+	"github.com/kwk-super-snippets/cli/src/models"
+	"github.com/kwk-super-snippets/types/vwrite"
 	"io"
 )
 

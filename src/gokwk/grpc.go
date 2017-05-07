@@ -1,12 +1,12 @@
 package gokwk
 
 import (
-	"github.com/kwk-super-snippets/cli/src/models"
-	"bitbucket.com/sharingmachine/types"
-	"bitbucket.com/sharingmachine/types/errs"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"github.com/kwk-super-snippets/cli/src/models"
+	"github.com/kwk-super-snippets/types"
+	"github.com/kwk-super-snippets/types/errs"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

@@ -3,7 +3,7 @@ package app
 import (
 	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/cli/src/exekwk/update"
-	"bitbucket.com/sharingmachine/types/vwrite"
+	"github.com/kwk-super-snippets/types/vwrite"
 )
 
 type system struct {

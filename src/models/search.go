@@ -1,10 +1,10 @@
 package models
 
-import "bitbucket.com/sharingmachine/types"
+import "github.com/kwk-super-snippets/types"
 
 type SearchResult struct {
 	*types.Snippet
-	Highlights  map[string]string
+	Highlights map[string]string
 }
 
 type SearchTermResponse struct {

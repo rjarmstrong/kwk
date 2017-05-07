@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/cli/src/exekwk/cmd"
 	"github.com/kwk-super-snippets/cli/src/exekwk/setup"
@@ -8,10 +9,9 @@ import (
 	"github.com/kwk-super-snippets/cli/src/gokwk"
 	"github.com/kwk-super-snippets/cli/src/models"
 	"github.com/kwk-super-snippets/cli/src/persist"
-	"bitbucket.com/sharingmachine/types"
-	"bitbucket.com/sharingmachine/types/errs"
-	"bitbucket.com/sharingmachine/types/vwrite"
-	"fmt"
+	"github.com/kwk-super-snippets/types"
+	"github.com/kwk-super-snippets/types/errs"
+	"github.com/kwk-super-snippets/types/vwrite"
 	"github.com/urfave/cli"
 	"strings"
 )

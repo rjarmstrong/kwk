@@ -1,11 +1,11 @@
 package setup
 
 import (
+	"fmt"
 	"github.com/kwk-super-snippets/cli/src/gokwk"
 	"github.com/kwk-super-snippets/cli/src/models"
 	"github.com/kwk-super-snippets/cli/src/persist"
-	"bitbucket.com/sharingmachine/types/errs"
-	"fmt"
+	"github.com/kwk-super-snippets/types/errs"
 	"gopkg.in/yaml.v2"
 )
 

@@ -1,33 +1,34 @@
 package models
 
 import (
+	"github.com/kwk-super-snippets/types"
 	"time"
-	"bitbucket.com/sharingmachine/types"
 )
 
 /*
 ListView represents a listing view which could contain snippets, pouches or both.
 Note 'Pouch' is only the root pouch when 'IsRoot' is true and not simply when it
 is an empty string.
- */
+*/
 type ListView struct {
 	IsRoot bool
-	Pouch    *types.Pouch
+	Pouch  *types.Pouch
 
 	LastUpgrade int64
-	Version string
+	Version     string
 	Expanded    bool
 
-	Username    string
-	Pouches     []*types.Pouch
-	Personal    []*types.Pouch
-	Snippets    []*types.Snippet
+	Username string
+	Pouches  []*types.Pouch
+	Personal []*types.Pouch
+	Snippets []*types.Snippet
 	types.UserStats
 
-	Total    int64
-	Since    time.Time
-	Size     int64
+	Total int64
+	Since time.Time
+	Size  int64
 }
+
 func (rt *ListView) GetPouch(name string) *types.Pouch {
 	for _, v := range rt.Pouches {
 		if name == v.Name {

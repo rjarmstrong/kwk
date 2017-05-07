@@ -2,7 +2,7 @@ package gokwk
 
 import (
 	"github.com/kwk-super-snippets/cli/src/models"
-	t "bitbucket.com/sharingmachine/types"
+	t "github.com/kwk-super-snippets/types"
 )
 
 type Snippets interface {
@@ -20,11 +20,11 @@ type Snippets interface {
 	AlphaSearch(term string) (*models.SearchTermResponse, error)
 	LogUse(a t.Alias, s t.UseStatus, u t.UseType, ctx *UseContext)
 
-	GetRoot (username string, all bool) (*models.ListView, error)
-	CreatePouch (pouch string) (string, error)
-	RenamePouch (pouch string, newPouch string) (string, error)
-	MakePrivate (pouch string, private bool) (bool, error)
-	DeletePouch (pouch string) (bool, error)
+	GetRoot(username string, all bool) (*models.ListView, error)
+	CreatePouch(pouch string) (string, error)
+	RenamePouch(pouch string, newPouch string) (string, error)
+	MakePrivate(pouch string, private bool) (bool, error)
+	DeletePouch(pouch string) (bool, error)
 }
 
 type Users interface {

@@ -1,10 +1,10 @@
 package gokwk
 
 import (
-	"github.com/kwk-super-snippets/cli/src/models"
 	"bitbucket.com/sharingmachine/rpc/src/snipsRpc"
-	"bitbucket.com/sharingmachine/types"
 	"bytes"
+	"github.com/kwk-super-snippets/cli/src/models"
+	"github.com/kwk-super-snippets/types"
 	"github.com/lunixbochs/vtclean"
 	"google.golang.org/grpc"
 	"runtime"
@@ -22,7 +22,7 @@ func New(conn *grpc.ClientConn, client types.AppInfo) Snippets {
 	return &SnippetsGrpc{
 		client: snipsRpc.NewSnipsRpcClient(conn),
 		pc:     snipsRpc.NewPouchesRpcClient(conn),
-		h:      Headers{version:client.Version},
+		h:      Headers{version: client.Version},
 	}
 }
 

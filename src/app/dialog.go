@@ -1,11 +1,11 @@
 package app
 
 import (
-	"github.com/kwk-super-snippets/cli/src/app/out"
-	"bitbucket.com/sharingmachine/types"
-	"bitbucket.com/sharingmachine/types/vwrite"
 	"bufio"
 	"github.com/howeyc/gopass"
+	"github.com/kwk-super-snippets/cli/src/app/out"
+	"github.com/kwk-super-snippets/types"
+	"github.com/kwk-super-snippets/types/vwrite"
 	"github.com/siddontang/go/num"
 )
 

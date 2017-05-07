@@ -1,11 +1,11 @@
 package out
 
 import (
+	"fmt"
 	"github.com/kwk-super-snippets/cli/src/models"
 	"github.com/kwk-super-snippets/cli/src/style"
-	"bitbucket.com/sharingmachine/types"
-	"bitbucket.com/sharingmachine/types/vwrite"
-	"fmt"
+	"github.com/kwk-super-snippets/types"
+	"github.com/kwk-super-snippets/types/vwrite"
 	"io"
 	"text/tabwriter"
 )

@@ -1,11 +1,11 @@
 package cache
 
 import (
+	"fmt"
+	"github.com/kwk-super-snippets/types"
+	"os"
 	"os/user"
 	"runtime"
-	"os"
-	"fmt"
-	"bitbucket.com/sharingmachine/types"
 )
 
 const (

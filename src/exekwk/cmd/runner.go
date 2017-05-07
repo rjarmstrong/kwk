@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"bitbucket.com/sharingmachine/types"
+	"github.com/kwk-super-snippets/types"
 )
 
 type Runner interface {

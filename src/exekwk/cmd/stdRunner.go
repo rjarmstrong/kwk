@@ -1,17 +1,17 @@
 package cmd
 
 import (
-	"github.com/kwk-super-snippets/cli/src/exekwk/setup"
-	"github.com/kwk-super-snippets/cli/src/gokwk"
-	"github.com/kwk-super-snippets/cli/src/models"
-	"github.com/kwk-super-snippets/cli/src/persist"
-	"bitbucket.com/sharingmachine/types"
-	"bitbucket.com/sharingmachine/types/errs"
 	"bufio"
 	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"github.com/kwk-super-snippets/cli/src/exekwk/setup"
+	"github.com/kwk-super-snippets/cli/src/gokwk"
+	"github.com/kwk-super-snippets/cli/src/models"
+	"github.com/kwk-super-snippets/cli/src/persist"
+	"github.com/kwk-super-snippets/types"
+	"github.com/kwk-super-snippets/types/errs"
 	"gopkg.in/yaml.v2"
 	"io"
 	"os"

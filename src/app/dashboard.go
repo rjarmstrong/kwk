@@ -4,8 +4,8 @@ import (
 	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/cli/src/gokwk"
 	"github.com/kwk-super-snippets/cli/src/models"
-	"bitbucket.com/sharingmachine/types/errs"
-	"bitbucket.com/sharingmachine/types/vwrite"
+	"github.com/kwk-super-snippets/types/errs"
+	"github.com/kwk-super-snippets/types/vwrite"
 	"io"
 )
 

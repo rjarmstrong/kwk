@@ -1,11 +1,11 @@
 package app
 
 import (
+	"bytes"
 	"github.com/kwk-super-snippets/cli/src/gokwk"
 	"github.com/kwk-super-snippets/cli/src/models"
-	"bitbucket.com/sharingmachine/types"
-	"bitbucket.com/sharingmachine/types/vwrite"
-	"bytes"
+	"github.com/kwk-super-snippets/types"
+	"github.com/kwk-super-snippets/types/vwrite"
 	"reflect"
 	"runtime/debug"
 	"testing"

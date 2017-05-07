@@ -1,9 +1,9 @@
 package app
 
 import (
-	"bitbucket.com/sharingmachine/types"
 	"bytes"
 	"github.com/bmizerany/assert"
+	"github.com/kwk-super-snippets/types"
 	"os"
 	"testing"
 )
