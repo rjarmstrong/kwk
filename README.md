@@ -1,4 +1,4 @@
-# kwk - the snippet manager for developers
+# kwk - cli
 
 kwk was built because I felt that there was no snippet manager which really solved my needs. I felt snippets should not be limited to code since, as a developer , there are so many little pieces of information that I needed to store. Also I felt it was very annoying to have to open a browser and find a link, I wanted to get the snippet quickly. 
 
