@@ -2,20 +2,20 @@ package app
 
 import (
 	"github.com/kwk-super-snippets/cli/src/app/out"
-	"github.com/kwk-super-snippets/cli/src/gokwk"
-	"github.com/kwk-super-snippets/cli/src/models"
+	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
 	"github.com/kwk-super-snippets/types/vwrite"
 	"io"
 )
 
 type Dashboard struct {
-	s gokwk.Snippets
+	s types.SnippetsClient
 	vwrite.Writer
 	errs.Handler
+	headers Headers
 }
 
-func NewDashBoard(w vwrite.Writer, eh errs.Handler, s gokwk.Snippets) *Dashboard {
+func NewDashBoard(w vwrite.Writer, eh errs.Handler, s types.SnippetsClient) *Dashboard {
 	return &Dashboard{Writer: w, s: s, Handler: eh}
 }
 
@@ -24,11 +24,11 @@ func (d *Dashboard) GetWriter() func(w io.Writer, templ string, data interface{}
 }
 
 func (d *Dashboard) writer(w io.Writer, templ string, data interface{}) {
-	if len(models.Principal.Token) == 0 {
+	if principal == nil {
 		d.Write(out.SignedOut())
 		return
 	}
-	r, err := d.s.GetRoot("", true)
+	r, err := d.s.GetRoot(d.headers.Context(), &types.RootRequest{})
 	if err != nil {
 		d.Handle(err)
 		return

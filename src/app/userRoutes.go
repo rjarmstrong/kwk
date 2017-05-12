@@ -10,7 +10,7 @@ func userRoutes(a *users) []cli.Command {
 			Name:    "profile",
 			Aliases: []string{"me", "whoami"},
 			Action: func(c *cli.Context) error {
-				return a.Get()
+				return a.Profile()
 			},
 		},
 		{

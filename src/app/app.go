@@ -3,12 +3,6 @@ package app
 import (
 	"fmt"
 	"github.com/kwk-super-snippets/cli/src/app/out"
-	"github.com/kwk-super-snippets/cli/src/exekwk/cmd"
-	"github.com/kwk-super-snippets/cli/src/exekwk/setup"
-	"github.com/kwk-super-snippets/cli/src/exekwk/update"
-	"github.com/kwk-super-snippets/cli/src/gokwk"
-	"github.com/kwk-super-snippets/cli/src/models"
-	"github.com/kwk-super-snippets/cli/src/persist"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
 	"github.com/kwk-super-snippets/types/vwrite"
@@ -16,28 +10,33 @@ import (
 	"strings"
 )
 
-var CLIInfo = types.AppInfo{}
+var (
+	cliInfo   = types.AppInfo{}
+	principal *UserWithToken
+)
+
+const profileFileName = "profile.json"
 
 type KwkApp struct {
 	App      *cli.App
-	Acc      gokwk.Users
-	Snippets gokwk.Snippets
-	File     persist.IO
-	Settings persist.Persister
-	Updater  *update.Updater
-	Runner   cmd.Runner
+	Users    types.UsersClient
+	Snippets types.SnippetsClient
+	File     IO
+	Settings Persister
+	Updater  *Updater
+	Runner   Runner
 	Dialogue Dialog
 	vwrite.Writer
 	errs.Handler
 }
 
-func NewApp(a gokwk.Snippets, f persist.IO, t persist.Persister, r cmd.Runner, u gokwk.Users,
-	d Dialog, w vwrite.Writer, up update.Updater, eh errs.Handler) *KwkApp {
+func NewApp(a types.SnippetsClient, f IO, t Persister, r Runner, u types.UsersClient,
+	d Dialog, w vwrite.Writer, up Updater, eh errs.Handler) *KwkApp {
 	out.SetColors(out.ColorsDefault())
-	setup.NewConfig(a, f, u, eh)
+	NewConfig(a, f, u, eh)
 	ap := cli.NewApp()
 	ap = setupFlags(ap)
-	ap.Version = CLIInfo.String()
+	ap.Version = cliInfo.String()
 	dash := NewDashBoard(w, eh, a)
 	help := cli.HelpPrinter
 	ap.Commands = append(ap.Commands, cli.Command{
@@ -62,7 +61,7 @@ func NewApp(a gokwk.Snippets, f persist.IO, t persist.Persister, r cmd.Runner, u
 		File:     f,
 		Settings: t,
 		Runner:   r,
-		Acc:      u,
+		Users:    u,
 		Dialogue: d,
 		Snippets: a,
 		Writer:   w,
@@ -101,23 +100,23 @@ func setupFlags(ap *cli.App) *cli.App {
 		cli.BoolFlag{
 			Name:        "covert, x",
 			Usage:       "Open browser in covert mode.",
-			Destination: &models.Prefs().Covert,
+			Destination: &Prefs().Covert,
 		},
 		cli.BoolFlag{
 			Name:        "debug, d",
 			Usage:       "Debug.",
-			Destination: &models.DebugEnabled,
+			Destination: &DebugEnabled,
 			EnvVar:      "DEBUG",
 		},
 		cli.BoolFlag{
 			Name:        "naked, n",
 			Usage:       "list without styles",
-			Destination: &models.Prefs().Naked,
+			Destination: &Prefs().Naked,
 		},
 		cli.BoolFlag{
 			Name:        "ansi",
 			Usage:       "Prints ansi escape sequences for debugging purposes",
-			Destination: &models.Prefs().PrintAnsi,
+			Destination: &Prefs().PrintAnsi,
 		},
 
 		//cli.BoolFlag{
@@ -141,3 +140,20 @@ func (a *KwkApp) Run(args ...string) {
 	params = append(params, args...)
 	a.Handle(a.App.Run(params))
 }
+
+//func GetPrincipal() (*types.User, error) {
+//	if principal != nil && principal.Id != "" {
+//		return principal, nil
+//	}
+//	principal = &types.User{}
+//	if err := u.settings.Get(profileFileName, principal, 0); err != nil {
+//		return nil, err
+//	} else {
+//		return principal, nil
+//	}
+//	u, err := c.client.
+//	if err != nil {
+//		return err
+//	}
+//	return c.EWrite(out.UserProfile(u))
+//}

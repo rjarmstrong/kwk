@@ -23,7 +23,7 @@ func Test_App(t *testing.T) {
 			})
 			Convey(`Should get profile and respond with template`, func() {
 				app.App.Run([]string{"[app]", "profile"})
-				So(t.GetCalledWith, ShouldResemble, []interface{}{models.ProfileFullKey, &models.User{}})
+				So(t.GetCalledWith, ShouldResemble, []interface{}{profileFileName, &models.User{}})
 			})
 		})
 
@@ -49,7 +49,7 @@ func Test_App(t *testing.T) {
 					Token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dnZWRJbkFzIjoiYWRtaW4iLCJpYXQiOjE0MjI3Nzk2Mzh9.gzSraSYS8EXBxLN_oWnFSRgCzcmJmMjLiuyu5CSpyHI",
 				}
 				app.App.Run([]string{"[app]", "signin"})
-				So(t.UpsertCalledWith, ShouldResemble, []interface{}{models.ProfileFullKey, u.SignInResponse})
+				So(t.UpsertCalledWith, ShouldResemble, []interface{}{profileFileName, u.SignInResponse})
 			})
 		})
 
@@ -84,7 +84,7 @@ func Test_App(t *testing.T) {
 			Convey(`Should call api signout`, func() {
 				app.App.Run([]string{"[app]", "signout"})
 				So(u.SignoutCalled, ShouldBeTrue)
-				So(t.DeleteCalledWith, ShouldResemble, models.ProfileFullKey)
+				So(t.DeleteCalledWith, ShouldResemble, profileFileName)
 			})
 		})
 	})

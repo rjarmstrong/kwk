@@ -4,11 +4,8 @@ import (
 	"github.com/kwk-super-snippets/cli/src/app"
 	//"runtime/pprof"
 	"bufio"
+	"github.com/inconshreveable/go-update"
 	"github.com/kwk-super-snippets/cli/src/app/out"
-	"github.com/kwk-super-snippets/cli/src/exekwk/cmd"
-	"github.com/kwk-super-snippets/cli/src/exekwk/update"
-	"github.com/kwk-super-snippets/cli/src/gokwk"
-	"github.com/kwk-super-snippets/cli/src/persist"
 	"github.com/kwk-super-snippets/types/errs"
 	"github.com/kwk-super-snippets/types/vwrite"
 	"os"
@@ -18,17 +15,17 @@ import (
 
 var (
 	KWK_TEST_MODE = false
-	f             persist.IO
-	j             persist.Persister
+	f             IO
+	j             Persister
 )
 
 func main() {
 	_, KWK_TEST_MODE = os.LookupEnv("KWK_TEST_MODE")
 	args := strings.Join(os.Args[1:], "+")
-	f = persist.New()
-	j = persist.NewJson(f, "settings")
+	f = New()
+	j = NewJson(f, "settings")
 
-	up := update.NewRunner(j, app.CLIInfo.String())
+	up := update.NewRunner(j, app.cliInfo.String())
 	if args == "update+silent" {
 		up.Run()
 	} else if args == "update" {
@@ -44,9 +41,9 @@ var build string = "0"
 var releaseTime string
 
 func runKwk(up update.Updater) {
-	app.CLIInfo.Version = version
-	app.CLIInfo.Build = build
-	app.CLIInfo.Time, _ = strconv.ParseInt(releaseTime, 10, 64)
+	app.cliInfo.Version = version
+	app.cliInfo.Build = build
+	app.cliInfo.Time, _ = strconv.ParseInt(releaseTime, 10, 64)
 	//profile().Close()
 
 	host := os.Getenv("API_HOST")
@@ -65,8 +62,8 @@ func runKwk(up update.Updater) {
 		return
 	}
 	defer conn.Close()
-	u := gokwk.NewUsers(conn, j, app.CLIInfo)
-	ss := gokwk.New(conn, app.CLIInfo)
+	u := gokwk.NewUsers(conn, j, app.cliInfo)
+	ss := gokwk.New(conn, app.cliInfo)
 	o := cmd.NewStdRunner(f, ss)
 	r := bufio.NewReader(os.Stdin)
 	d := app.NewDialog(w, r)

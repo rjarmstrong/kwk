@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/kwk-super-snippets/cli/src/models"
 	"github.com/urfave/cli"
 )
 
@@ -17,7 +16,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 		{
 			Name: "ls",
 			Action: func(c *cli.Context) error {
-				models.Prefs().HorizontalLists = true
+				Prefs().HorizontalLists = true
 				return s.List("", c.Args().First())
 			},
 		},
@@ -33,7 +32,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Action: func(c *cli.Context) error {
 				all := c.Bool("all")
 				if all {
-					models.Prefs().ListAll = true
+					Prefs().ListAll = true
 				}
 				return s.Flatten(c.Args().First())
 			},
@@ -50,9 +49,9 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Action: func(c *cli.Context) error {
 				all := c.Bool("all")
 				if all {
-					models.Prefs().ListAll = true
+					Prefs().ListAll = true
 				}
-				models.Prefs().AlwaysExpandRows = true
+				Prefs().AlwaysExpandRows = true
 				// TODO: This is not quite right as it means we can't expand other users lists
 				return s.List("", c.Args().First())
 			},
@@ -101,7 +100,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Action: func(c *cli.Context) error {
 				covert := c.Bool("covert")
 				if covert {
-					models.Prefs().Covert = true
+					Prefs().Covert = true
 				}
 				return s.Run(c.Args().First(), []string(c.Args())[1:])
 
@@ -167,7 +166,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Action: func(c *cli.Context) error {
 				autoYes := c.Bool("yes")
 				if autoYes {
-					models.Prefs().AutoYes = true
+					Prefs().AutoYes = true
 				}
 				return s.Delete(c.Args())
 

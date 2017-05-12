@@ -2,7 +2,7 @@ package out
 
 import (
 	"fmt"
-	"github.com/kwk-super-snippets/cli/src/models"
+	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/vwrite"
 	"io"
 )
@@ -35,7 +35,7 @@ var UserPasswordChanged = vwrite.HandlerFunc(func(w io.Writer) {
 	fmt.Fprintln(w, "Your password has been changed for next login.")
 })
 
-func UserProfile(u *models.User) vwrite.Handler {
+func UserProfile(u *types.User) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
 		fmt.Fprintf(w, "You are: %s\n", u.Username)
 	})

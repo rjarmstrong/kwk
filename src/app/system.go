@@ -2,16 +2,15 @@ package app
 
 import (
 	"github.com/kwk-super-snippets/cli/src/app/out"
-	"github.com/kwk-super-snippets/cli/src/exekwk/update"
 	"github.com/kwk-super-snippets/types/vwrite"
 )
 
 type system struct {
 	vwrite.Writer
-	updater update.Updater
+	updater Updater
 }
 
-func NewSystem(w vwrite.Writer, u update.Updater) *system {
+func NewSystem(w vwrite.Writer, u Updater) *system {
 	return &system{Writer: w, updater: u}
 }
 
@@ -20,5 +19,5 @@ func (c *system) Update() error {
 }
 
 func (c *system) GetVersion() error {
-	return c.EWrite(out.Version(CLIInfo))
+	return c.EWrite(out.Version(cliInfo))
 }

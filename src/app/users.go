@@ -2,31 +2,28 @@ package app
 
 import (
 	"github.com/kwk-super-snippets/cli/src/app/out"
-	"github.com/kwk-super-snippets/cli/src/gokwk"
-	"github.com/kwk-super-snippets/cli/src/models"
-	"github.com/kwk-super-snippets/cli/src/persist"
+	"github.com/kwk-super-snippets/types"
+	"github.com/kwk-super-snippets/types/errs"
 	"github.com/kwk-super-snippets/types/vwrite"
 	"os"
 )
 
 type users struct {
-	acc  gokwk.Users
-	conf persist.Persister
+	headers   Headers
+	client    types.UsersClient
+	persister Persister
 	vwrite.Writer
 	Dialog
 	dash *Dashboard
 }
 
-func NewAccount(u gokwk.Users, s persist.Persister, w vwrite.Writer, d Dialog, dash *Dashboard) *users {
-	return &users{acc: u, conf: s, Writer: w, Dialog: d, dash: dash}
+type UserWithToken struct {
+	AccessToken string `json:"access_token"`
+	User        types.User
 }
 
-func (c *users) Get() error {
-	u, err := c.acc.Get()
-	if err != nil {
-		return err
-	}
-	return c.EWrite(out.UserProfile(u))
+func NewAccount(u types.UsersClient, s Persister, w vwrite.Writer, d Dialog, dash *Dashboard) *users {
+	return &users{client: u, persister: s, Writer: w, Dialog: d, dash: dash}
 }
 
 func (c *users) SignUp() error {
@@ -39,16 +36,17 @@ func (c *users) SignUp() error {
 	res, _ = c.FormField(out.UserInviteTokenField, false)
 	inviteCode := res.Value.(string)
 
-	u, err := c.acc.SignUp(email, username, password, inviteCode)
+	req := &types.SignUpRequest{Email: email, Username: username, Password: password, InviteCode: inviteCode}
+	u, err := c.client.SignUp(c.headers.Context(), req)
 	if err != nil {
 		return err
 	}
-	if len(u.Token) > 50 {
-		err := c.conf.Upsert(models.ProfileFullKey, u)
+	if len(u.AccessToken) > 50 {
+		err := c.persister.Upsert(profileFileName, UserWithToken{AccessToken: u.AccessToken, User: *u.User})
 		if err != nil {
 			return err
 		}
-		c.EWrite(out.UserSignedUp(u.Username))
+		c.EWrite(out.UserSignedUp(u.User.Username))
 	}
 	return nil
 }
@@ -63,23 +61,23 @@ func (c *users) SignIn(username string, password string) error {
 		res, _ := c.FormField(out.UserPasswordField, true)
 		password = res.Value.(string)
 	}
-	u, err := c.acc.SignIn(username, password)
+	u, err := c.client.SignIn(c.headers.Context(), &types.SignInRequest{Username: username, Password: password})
 	if err != nil {
 		return err
 	}
-	if len(u.Token) > 50 {
-		err := c.conf.Upsert(models.ProfileFullKey, u)
+	if len(u.AccessToken) > 50 {
+		err := c.persister.Upsert(profileFileName, UserWithToken{AccessToken: u.AccessToken, User: *u.User})
 		if err != nil {
 			return err
 		}
-		c.Write(out.UserSignedIn(u.Username))
+		c.Write(out.UserSignedIn(u.User.Username))
 		c.dash.GetWriter()(os.Stdout, "", nil)
 	}
 	return nil
 }
 
 func (c *users) SignOut() error {
-	err := c.acc.Signout()
+	err := c.persister.DeleteAll()
 	if err != nil {
 		return err
 	}
@@ -87,7 +85,7 @@ func (c *users) SignOut() error {
 }
 
 func (c *users) ChangePassword() error {
-	p := models.ChangePasswordParams{}
+	p := &types.ChangeRequest{}
 	res, _ := c.Dialog.FormField(out.FreeText("Please provide an email or username: "), false)
 	p.Username = res.Value.(string)
 
@@ -95,7 +93,7 @@ func (c *users) ChangePassword() error {
 	p.ExistingPassword = res.Value.(string)
 	res, _ = c.FormField(out.FreeText("New password: "), true)
 	p.NewPassword = res.Value.(string)
-	_, err := c.acc.ChangePassword(p)
+	_, err := c.client.ChangePassword(c.headers.Context(), p)
 	if err != nil {
 		return err
 	}
@@ -107,9 +105,17 @@ func (c *users) ResetPassword(email string) error {
 		res, _ := c.FormField(out.FreeText("Enter your email to reset your password:  "), false)
 		email = res.Value.(string)
 	}
-	_, err := c.acc.ResetPassword(email)
+	req := &types.ResetRequest{Email: email}
+	_, err := c.client.ResetPassword(c.headers.Context(), req)
 	if err != nil {
 		return err
 	}
 	return c.EWrite(out.UserPasswordResetSent(email))
+}
+
+func (c *users) Profile() error {
+	if principal == nil {
+		return errs.NotAuthenticated
+	}
+	return c.EWrite(out.UserProfile(&principal.User))
 }
