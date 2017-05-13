@@ -2,7 +2,6 @@ package out
 
 import (
 	"fmt"
-	"github.com/kwk-super-snippets/cli/src/models"
 	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/vwrite"
@@ -50,7 +49,7 @@ func multiChoice(w io.Writer, in interface{}) {
 			t.Write([]byte(style.Margin))
 		}
 		fmt256 := style.Fmt16(style.Cyan, i+1)
-		t.Write([]byte(fmt.Sprintf("%s %s", fmt256, v.SnipName.String())))
+		t.Write([]byte(fmt.Sprintf("%s %s", fmt256, v.Alias.FileName())))
 		x := i + 1
 		if x%3 == 0 {
 			t.Write([]byte("\n"))

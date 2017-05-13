@@ -2,7 +2,6 @@ package out
 
 import (
 	"fmt"
-	"github.com/kwk-super-snippets/cli/src/models"
 	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/kwk-super-snippets/types/errs"
 	"github.com/kwk-super-snippets/types/vwrite"
@@ -27,7 +26,7 @@ func errHandler(e error) vwrite.Handler {
 		if e == nil {
 			return
 		}
-		models.LogErr(e)
+		LogErr(e)
 		ce, ok := e.(*errs.Error)
 		if ok {
 			switch ce.Code {
@@ -95,7 +94,7 @@ func internalError(err error) vwrite.Handler {
 			fmt.Fprintln(w, ce.Message)
 			return
 		}
-		models.LogErr(err)
+		LogErr(err)
 		fmt.Fprintln(w, "%s  We have a code RED error. \n- To report type: kwk upload-errors \n"+
 			"- You can also try to upgrade: npm update kwkcli -g\n", style.Fire)
 		os.Exit(1)

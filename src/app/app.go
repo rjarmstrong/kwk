@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	cliInfo   = types.AppInfo{}
+	CLIInfo   = types.AppInfo{}
 	principal *UserWithToken
 )
 
@@ -36,7 +36,7 @@ func NewApp(a types.SnippetsClient, f IO, t Persister, r Runner, u types.UsersCl
 	NewConfig(a, f, u, eh)
 	ap := cli.NewApp()
 	ap = setupFlags(ap)
-	ap.Version = cliInfo.String()
+	ap.Version = CLIInfo.String()
 	dash := NewDashBoard(w, eh, a)
 	help := cli.HelpPrinter
 	ap.Commands = append(ap.Commands, cli.Command{
@@ -49,11 +49,11 @@ func NewApp(a types.SnippetsClient, f IO, t Persister, r Runner, u types.UsersCl
 		},
 	})
 	cli.HelpPrinter = dash.GetWriter()
-	accCli := NewAccount(u, t, w, d, dash)
+	accCli := NewUsers(u, t, w, d, dash)
 	ap.Commands = append(ap.Commands, userRoutes(accCli)...)
 	sysCli := NewSystem(w, up)
 	ap.Commands = append(ap.Commands, systemRoutes(sysCli)...)
-	snipCli := NewSnippet(a, r, d, w, t)
+	snipCli := NewSnippets(a, r, d, w, t)
 	ap.Commands = append(ap.Commands, snippetsRoutes(snipCli)...)
 	ap.CommandNotFound = getDefaultCommand(snipCli)
 	return &KwkApp{
@@ -105,7 +105,7 @@ func setupFlags(ap *cli.App) *cli.App {
 		cli.BoolFlag{
 			Name:        "debug, d",
 			Usage:       "Debug.",
-			Destination: &DebugEnabled,
+			Destination: &out.DebugEnabled,
 			EnvVar:      "DEBUG",
 		},
 		cli.BoolFlag{

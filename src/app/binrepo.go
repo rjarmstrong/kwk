@@ -11,6 +11,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 )
 
 const workFolder = "./update_work"
@@ -43,7 +44,7 @@ func (r *S3Repo) LatestInfo() (*ReleaseInfo, error) {
 	info, err := ioutil.ReadAll(i.Body)
 	json.Unmarshal(info, ri)
 	if err != nil {
-		Debug("Failed unmarshalling release info.", err)
+		out.Debug("Failed unmarshalling release info.", err)
 		return nil, err
 	}
 	i.Body.Close()
@@ -54,13 +55,13 @@ func (r *S3Repo) LatestBinary() (io.ReadCloser, error) {
 	fn := fmt.Sprintf("kwk-%s-%s", runtime.GOOS, runtime.GOARCH)
 	fnt := fmt.Sprintf("%s.tar.gz", fn)
 	url := fmt.Sprintf("https://s3.amazonaws.com/kwk-cli/latest/bin/%s", fnt)
-	err := os.MkdirAll(workFolder, StandardFilePermission)
+	err := os.MkdirAll(workFolder, out.StandardFilePermission)
 	if err != nil {
 		return nil, err
 	}
 	fnt = path.Join(workFolder, fnt)
 
-	Debug("Getting latest from: %s", url)
+	out.Debug("Getting latest from: %s", url)
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -87,10 +88,10 @@ func (r *S3Repo) LatestBinary() (io.ReadCloser, error) {
 }
 
 func (r *S3Repo) CleanUp() {
-	Debug("Removing work folder.")
+	out.Debug("Removing work folder.")
 	err := os.RemoveAll(workFolder)
 	if err != nil {
-		LogErrM("Error cleaning up:", err)
+		out.LogErrM("Error cleaning up:", err)
 	}
 }
 

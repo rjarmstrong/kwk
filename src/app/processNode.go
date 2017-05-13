@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	//"github.com/mitchellh/go-ps"
 	"github.com/kwk-super-snippets/types"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 )
 
 const PROCESS_NODE = "PROCESS_NODE"
@@ -43,7 +44,7 @@ func NewProcessNode(a types.Alias, runner string, args []string, caller *Process
 
 func (node *ProcessNode) Complete(pid int) {
 	node.Pid = pid
-	Debug("NODE: %+v", node)
+	out.Debug("NODE: %+v", node)
 }
 
 //func printTree(pid int, args []string) {

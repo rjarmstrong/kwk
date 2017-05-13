@@ -16,6 +16,7 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 )
 
 type Runner interface {
@@ -26,7 +27,6 @@ type Runner interface {
 type runner struct {
 	snippets types.SnippetsClient
 	file     IO
-	headers  Headers
 }
 
 func NewRunner(s IO, ss types.SnippetsClient) Runner {
@@ -52,7 +52,7 @@ func (r *runner) Edit(s *types.Snippet) error {
 		return err
 	}
 	replaceVariables(&cli, filePath, s)
-	Debug("EDITING:%v %v", s.Alias, cli)
+	out.Debug("EDITING:%v %v", s.Alias, cli)
 	if err != nil {
 		return err
 	}
@@ -64,12 +64,12 @@ func (r *runner) Edit(s *types.Snippet) error {
 	if cliEditors[editor] {
 		done := make(chan bool)
 		go func() {
-			Debug("EDIT asynchronously.")
+			out.Debug("EDIT asynchronously.")
 			err = r.execEdit(s.Alias, editor, cli[1:]...)
 			done <- true
 			if err != nil {
-				Debug("Error editing:")
-				LogErr(err)
+				out.Debug("Error editing:")
+				out.LogErr(err)
 			}
 		}()
 		<-done
@@ -83,7 +83,7 @@ func (r *runner) Edit(s *types.Snippet) error {
 	if err != nil {
 		return err
 	}
-	_, err = r.snippets.Patch(r.headers.Context(), &types.PatchRequest{Alias: s.Alias, Target: s.Content, Patch: text})
+	_, err = r.snippets.Patch(GetCtx(), &types.PatchRequest{Alias: s.Alias, Target: s.Content, Patch: text})
 	if err != nil {
 		return err
 	}
@@ -203,7 +203,7 @@ func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...s
 	err = scanVulnerabilities(strings.Join(arg, " "), a.Ext)
 	if err != nil {
 		e := err.(*errs.Error)
-		r.snippets.LogUse(r.headers.Context(), &types.UseContext{
+		r.snippets.LogUse(GetCtx(), &types.UseContext{
 			Alias:       a,
 			Type:        types.UseType_Run,
 			Status:      types.UseStatus_Fail,
@@ -232,7 +232,7 @@ func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...s
 	}
 	if stderr.Len() > 0 {
 		desc := fmt.Sprintf("Error running '%s' (runner: '%s' %s)\n\n%s", a.String(), runner, err.Error(), stderr.String())
-		r.snippets.LogUse(r.headers.Context(), &types.UseContext{
+		r.snippets.LogUse(GetCtx(), &types.UseContext{
 			Alias:       a,
 			Status:      types.UseStatus_Fail,
 			Type:        types.UseType_Run,
@@ -253,7 +253,7 @@ func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...s
 		// Was an interrupt
 		Debug("Interupted:%+v", exErr)
 	}
-	r.snippets.LogUse(r.headers.Context(), &types.UseContext{
+	r.snippets.LogUse(GetCtx(), &types.UseContext{
 		Alias:       a,
 		Status:      types.UseStatus_Success,
 		Type:        types.UseType_Run,

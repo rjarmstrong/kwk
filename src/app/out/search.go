@@ -2,7 +2,6 @@ package out
 
 import (
 	"fmt"
-	"github.com/kwk-super-snippets/cli/src/models"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/vwrite"
 	"io"
@@ -32,7 +31,7 @@ func highlightsToLines(highlights map[string]string) []SearchResultLine {
 	return allLines
 }
 
-func AlphaTypeAhead(res *models.SearchTermResponse) vwrite.Handler {
+func AlphaTypeAhead(res *types.TypeAheadResponse) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
 		view := &models.ListView{Snippets: []*types.Snippet{}}
 		for _, v := range res.Results {
@@ -42,7 +41,7 @@ func AlphaTypeAhead(res *models.SearchTermResponse) vwrite.Handler {
 	})
 }
 
-func AlphaSearchResult(res *models.SearchTermResponse) vwrite.Handler {
+func AlphaSearchResult(res *types.SearchTermResponse) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
 		fmt.Fprintf(w, "\n\033[7m  \"%s\" found in %d results in %d ms  \033[0m", res.Term, res.Total, res.Took)
 		//fmt.Fprint(w, "\n\n")

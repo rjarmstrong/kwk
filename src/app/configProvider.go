@@ -5,6 +5,7 @@ import (
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
 	"gopkg.in/yaml.v2"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 )
 
 type ConfigProvider struct {
@@ -33,8 +34,8 @@ func (cs *ConfigProvider) loadEnv() *yaml.MapSlice {
 	}
 	envString, err := cs.GetConfig(cs.envResolvers)
 	if err != nil {
-		Debug("Failed to load env settings.")
-		LogErr(err)
+		out.Debug("Failed to load env settings.")
+		out.LogErr(err)
 		envString, _ = cs.envResolvers.Fallback()
 	}
 	env := &yaml.MapSlice{}
@@ -68,7 +69,7 @@ func (cs *ConfigProvider) loadPrefs() {
 		prefs.PersistedPrefs = ph.Preferences
 		return prefs, nil
 	}
-	Debug("Loaded prefs:%+v", c)
+	out.Debug("Loaded prefs:%+v", c)
 	res, err := parse(c)
 	if err != nil {
 		cs.Handle(errs.New(errs.CodeInvalidConfigSection,
@@ -77,7 +78,7 @@ func (cs *ConfigProvider) loadPrefs() {
 		fb, _ := cs.prefsResolvers.Fallback()
 		res, _ = parse(fb)
 	}
-	Debug("SETTING PREFS: %+v", res)
+	out.Debug("SETTING PREFS: %+v", res)
 	SetPrefs(res)
 }
 

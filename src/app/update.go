@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"time"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 )
 
 const RecordFile = "update-record.json"
@@ -15,10 +16,10 @@ const RecordFile = "update-record.json"
 // SilentCheckAndRun spawns a new process to check for updates and run.
 func SilentCheckAndRun() {
 	cmd, err := os.Executable()
-	Debug("Initiating silent update check for: %s", cmd)
+	out.Debug("Initiating silent update check for: %s", cmd)
 	if err != nil {
-		Debug("If you are running nacl or OpenBSD they are not supported.")
-		LogErr(err)
+		out.Debug("If you are running nacl or OpenBSD they are not supported.")
+		out.LogErr(err)
 	}
 	exe(false, cmd, "update", "silent")
 }
@@ -51,34 +52,34 @@ type Record struct {
 func (r *UpdateRunner) Run() error {
 	due, err := r.isUpdateDue()
 	if !due {
-		Debug("Update not due.")
+		out.Debug("Update not due.")
 		return nil
 	}
 	if err != nil {
-		Debug("%+v", err)
+		out.Debug("%+v", err)
 		return err
 	}
 
 	li, err := r.LatestInfo()
 	if err != nil {
-		LogErrM("Couldn't get remote release info.", err)
+		out.LogErrM("Couldn't get remote release info.", err)
 		return err
 	}
 	if li.Version == r.currentVersion {
-		Debug("Local is same as latest version: %s", li.Version)
+		out.Debug("Local is same as latest version: %s", li.Version)
 		r.recordUpdate()
 		return nil
 	}
 	latest, err := r.LatestBinary()
 	if err != nil {
-		LogErrM("Couldn't get latest from remote.", err)
+		out.LogErrM("Couldn't get latest from remote.", err)
 		return err
 	}
 	defer latest.Close() //TODO: Currently NOOP, should be real closer
-	Debug("Applying update.")
+	out.Debug("Applying update.")
 	err = r.Applier(latest, gu.Options{})
 	if err != nil {
-		LogErrM("Couldn't apply update.", err)
+		out.LogErrM("Couldn't apply update.", err)
 		err = r.Rollbacker(err)
 		r.CleanUp()
 		r.recordUpdate()
@@ -86,27 +87,27 @@ func (r *UpdateRunner) Run() error {
 	} else {
 		r.CleanUp()
 		r.recordUpdate()
-		Debug("Updated to version: %s+%s", li.Version, li.Build)
+		out.Debug("Updated to version: %s+%s", li.Version, li.Build)
 		return nil
 	}
 }
 
 func (r *UpdateRunner) recordUpdate() error {
 	ur := &Record{LastUpdate: time.Now().Unix()}
-	Debug("Updating update record.")
+	out.Debug("Updating update record.")
 	return r.Persister.Upsert(RecordFile, ur)
 }
 
 func (r *UpdateRunner) isUpdateDue() (bool, error) {
 	if !Prefs().RegulateUpdates {
-		Debug("Updates not regulated.")
+		out.Debug("Updates not regulated.")
 		return true, nil
 	}
 	ur := &Record{}
 	hiatus := time.Now().Unix() - int64(r.UpdatePeriod/time.Second)
-	Debug("Checking update is newer than: %d (Unix time seconds)", hiatus)
+	out.Debug("Checking update is newer than: %d (Unix time seconds)", hiatus)
 	if err := r.Persister.Get(RecordFile, ur, hiatus); err != nil {
-		LogErrM("Couldn't get local update record.", err)
+		out.LogErrM("Couldn't get local update record.", err)
 		err2, ok := err.(*errs.Error)
 		if !ok {
 			return false, err
@@ -125,7 +126,7 @@ func exe(wait bool, name string, arg ...string) {
 	c.Stdin = os.Stdin
 	out, err := c.StdoutPipe()
 	if err != nil {
-		LogErrM("If you are running nacl or OpenBSD they are not supported.", err)
+		out.LogErrM("If you are running nacl or OpenBSD they are not supported.", err)
 	}
 	var stderr bytes.Buffer
 	c.Stdout = os.Stdout
@@ -137,7 +138,7 @@ func exe(wait bool, name string, arg ...string) {
 	}
 
 	if err != nil {
-		LogErrM("Couldn't execute command.", err)
+		out.LogErrM("Couldn't execute command.", err)
 	}
 	out.Close()
 }

@@ -3,18 +3,18 @@ package out
 import (
 	"bytes"
 	"fmt"
-	"github.com/kwk-super-snippets/cli/src/models"
 	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/kwk-super-snippets/types"
 	"github.com/rjarmstrong/tablewriter"
 	"io"
 	"strings"
+	"time"
 )
 
 func printSnippetView(w io.Writer, s *types.Snippet) {
 	fmt.Fprintln(w, "")
 	fmt.Fprint(w, style.Margin)
-	fmtHeader(w, s.Username, s.Pouch, &s.SnipName)
+	fmtHeader(w, s.Username(), s.Pouch(), s.Alias.FileName())
 	fmt.Fprint(w, strings.Repeat(" ", 4))
 	fmt.Fprint(w, snippetIcon(s))
 	fmt.Fprint(w, "  ")
@@ -37,37 +37,50 @@ func printSnippetView(w io.Writer, s *types.Snippet) {
 	tbl.Append([]string{style.Fmt256(colors.RecentPouch, FSnippetType(s)+" Details:"), "", "", ""})
 
 	var lastRun string
-	if s.Runs < 1 {
+	if s.Stats.Runs < 1 {
 		lastRun = "never"
 	} else {
-		lastRun = pad(20, style.Time(s.RunStatusTime)).String()
+		lastRun = pad(20, style.Time(time.Unix(s.RunStatusTime, 0))).String()
 	}
 	tbl.Append([]string{
 		style.Fmt16(colors.Subdued, "Run Status:"), FStatus(s, true),
 		style.Fmt16(style.Subdued, "Last Run:"), lastRun,
 	})
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued, "Run Count: "), fmt.Sprintf("↻ %2d", s.Runs),
-		style.Fmt16(style.Subdued, "View count:"), fmt.Sprintf("%s  %2d", style.IconView, s.Views)})
+		style.Fmt16(style.Subdued, "Run Count: "), fmt.Sprintf("↻ %2d", s.Stats.Runs),
+		style.Fmt16(style.Subdued, "View count:"), fmt.Sprintf("%s  %2d", style.IconView, s.Stats.Views)})
 	if s.IsApp() {
+		var uris []string
+		for _, v := range s.Dependencies.Aliases {
+			uris = append(uris, v.URI())
+		}
 		tbl.Append([]string{
 			style.Fmt16(style.Subdued, "App Deps:"),
-			style.FBox(strings.Join(s.Dependencies, ", "), 50, 5)})
+			style.FBox(strings.Join(uris, ", "), 50, 5)})
+	}
+	var apps []string
+	for _, v := range s.Apps.Aliases {
+		apps = append(apps, v.URI())
 	}
 	tbl.Append([]string{
 		style.Fmt16(style.Subdued, "Used by:"),
-		style.FBox(strings.Join(s.Apps, ", "), 50, 5)})
+		style.FBox(strings.Join(apps, ", "), 50, 5)})
 	tbl.Append([]string{
 		style.Fmt16(style.Subdued, "Supported OS:"),
-		style.FBox(strings.Join(s.SupportedOs, ", "), 50, 5)})
+		style.FBox(strings.Join(s.SupportedOn.Oss, ", "), 50, 5)})
 	tbl.Append([]string{
 		style.Fmt16(style.Subdued, "Description:"), style.FBox(FEmpty(s.Description), 50, 3), "", ""})
 
 	tbl.Append([]string{
 		style.Fmt16(style.Subdued, "Preview:"), style.FPreview(s.Preview, 50, 1), "", ""})
 
+
+	var tags []string
+	for _, v := range s.Tags.Names {
+		tags = append(tags, v)
+	}
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued, "Tags:"), FTags(s.Tags), "", ""})
+		style.Fmt16(style.Subdued, "Tags:"), FTags(tags), "", ""})
 	tbl.Append([]string{
 		style.Fmt16(style.Subdued, "sha256:"), FVerified(s)})
 	tbl.Append([]string{
@@ -89,7 +102,7 @@ func printSnippetView(w io.Writer, s *types.Snippet) {
 func FSnippetType(s *types.Snippet) string {
 	if s.IsApp() {
 		return "App"
-	} else if s.Ext == "url" {
+	} else if s.Ext() == "url" {
 		return "Bookmark"
 	} else {
 		return "Snippet"
@@ -99,20 +112,20 @@ func FVerified(s *types.Snippet) string {
 	var buff bytes.Buffer
 	if s.VerifyChecksum() {
 		buff.WriteString(style.Fmt256(style.ColorYesGreen, style.IconTick+" "))
-		buff.WriteString(pad(12, s.SnipChecksum).String())
+		buff.WriteString(pad(12, s.Checksum).String())
 		buff.WriteString("...")
 	} else {
 		buff.WriteString(" " + style.IconCross + "  Invalid Checksum: ")
-		buff.WriteString(FEmpty(s.SnipChecksum))
+		buff.WriteString(FEmpty(s.Checksum))
 	}
 	return buff.String()
 }
 
-func FCodeview(s *types.Snippet, width int, lines int, odd bool) string {
-	if s.Snip == "" {
-		s.Snip = "<empty>"
+func FCodeview(s *types.Snippet, width int, lines int, odd bool, expandRows bool) string {
+	if s.Content == "" {
+		s.Content = "<empty>"
 	}
-	chunks := strings.Split(s.Snip, "\n")
+	chunks := strings.Split(s.Content, "\n")
 	//if s.Ext == "url" {
 	//	return uri(s.Snip)
 	//}
@@ -128,7 +141,7 @@ func FCodeview(s *types.Snippet, width int, lines int, odd bool) string {
 	lastLine := code[len(chunks)-1]
 
 	// Add to  starting from most important line
-	marker := mainMarkers[s.Ext]
+	marker := mainMarkers[s.Ext()]
 	if marker != "" {
 		var clipped []CodeLine
 		var startPreview int
@@ -163,7 +176,7 @@ func FCodeview(s *types.Snippet, width int, lines int, odd bool) string {
 	}
 
 	// Add page tear and last line
-	if models.Prefs().AlwaysExpandRows && crop && lines < len(code) {
+	if expandRows && crop && lines < len(code) {
 		codeview = append(codeview, CodeLine{
 			style.FStart(style.Subdued, "----"),
 			style.FStart(style.Subdued, strings.Repeat("-", width)+"|"),

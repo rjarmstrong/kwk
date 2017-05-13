@@ -16,6 +16,7 @@ import (
 	"os"
 	"runtime"
 	"time"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 )
 
 // /etc/ssl/certs/COMODO_RSA_Certification_Authority.pem
@@ -71,17 +72,13 @@ func GetConn(serverAddress string, trustAllCerts bool) (*grpc.ClientConn, error)
 	opts = append(opts, grpc.WithUnaryInterceptor(interceptor))
 	opts = append(opts, grpc.WithTimeout(time.Second*10))
 	opts = append(opts, grpc.WithBlock())
-	grpclog.SetLogger(DebugLogger)
+	grpclog.SetLogger(out.DebugLogger)
 
 	conn, err := grpc.Dial(serverAddress, opts...)
 	return conn, err
 }
 
-type Headers struct {
-	version string
-}
-
-func (i Headers) Context() context.Context {
+func GetCtx() context.Context {
 	if principal == nil {
 		return context.Background()
 	} else {
@@ -94,7 +91,7 @@ func (i Headers) Context() context.Context {
 				"host", hostname,
 				"os", runtime.GOOS,
 				"agnt", "<not implemented>", //agent //ps -p $$ | tail -1 | awk '{print $NF}'
-				"v", i.version,
+				"v", CLIInfo.String(),
 			),
 		)
 		return ctx
@@ -107,9 +104,9 @@ var noAuthMethods = map[string]bool{
 }
 
 func interceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-	Debug("GRPC: %s %+v", method, req)
+	out.Debug("GRPC: %s %+v", method, req)
 	if principal.AccessToken == "" && !noAuthMethods[method] {
-		Debug("AUTH: No token in request.")
+		out.Debug("AUTH: No token in request.")
 		return errs.NotAuthenticated
 	}
 	return translateGrpcErr(invoker(ctx, method, req, reply, cc, opts...))
@@ -122,7 +119,7 @@ func translateGrpcErr(e error) error {
 		return nil
 	}
 	se, _ := status.FromError(e)
-	Debug("API ERROR:%v", se.Message())
+	out.Debug("API ERROR:%v", se.Message())
 	switch se.Code() {
 	case codes.InvalidArgument:
 		te := &errs.Error{}

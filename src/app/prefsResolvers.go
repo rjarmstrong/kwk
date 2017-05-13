@@ -9,7 +9,6 @@ type PrefsResolvers struct {
 	snippets types.SnippetsClient
 	file     IO
 	a        *types.Alias
-	headers  Headers
 }
 
 func NewPrefsResolvers(s types.SnippetsClient, f IO) Resolvers {
@@ -29,7 +28,7 @@ func (p *PrefsResolvers) Local() (string, error) {
 }
 
 func (p *PrefsResolvers) Own() (string, error) {
-	l, err := p.snippets.Get(p.headers.Context(), &types.GetRequest{Alias: p.a})
+	l, err := p.snippets.Get(GetCtx(), &types.GetRequest{Alias: p.a})
 	if err != nil {
 		return "", err
 	}
@@ -45,7 +44,7 @@ func (p *PrefsResolvers) Default() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	_, err = p.snippets.Create(p.headers.Context(), &types.CreateRequest{Content: prefs, Alias: p.a,
+	_, err = p.snippets.Create(GetCtx(), &types.CreateRequest{Content: prefs, Alias: p.a,
 		Role: types.Role_Preferences})
 	if err != nil {
 		return "", err

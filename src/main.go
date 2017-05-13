@@ -11,27 +11,28 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"github.com/kwk-super-snippets/types"
 )
 
 var (
 	KWK_TEST_MODE = false
-	f             IO
-	j             Persister
+	f             app.IO
+	j             app.Persister
 )
 
 func main() {
 	_, KWK_TEST_MODE = os.LookupEnv("KWK_TEST_MODE")
 	args := strings.Join(os.Args[1:], "+")
-	f = New()
-	j = NewJson(f, "settings")
+	f = app.NewIO()
+	j = app.NewJson(f, "settings")
 
-	up := update.NewRunner(j, app.cliInfo.String())
+	up := app.NewUpdateRunner(j, app.CLIInfo.String())
 	if args == "update+silent" {
 		up.Run()
 	} else if args == "update" {
 		runKwk(up)
 	} else {
-		update.SilentCheckAndRun()
+		app.SilentCheckAndRun()
 		runKwk(up)
 	}
 }
@@ -40,11 +41,10 @@ var version string = "v-.-.-"
 var build string = "0"
 var releaseTime string
 
-func runKwk(up update.Updater) {
-	app.cliInfo.Version = version
-	app.cliInfo.Build = build
-	app.cliInfo.Time, _ = strconv.ParseInt(releaseTime, 10, 64)
-	//profile().Close()
+func runKwk(up app.Updater) {
+	app.CLIInfo.Version = version
+	app.CLIInfo.Build = build
+	app.CLIInfo.Time, _ = strconv.ParseInt(releaseTime, 10, 64)
 
 	host := os.Getenv("API_HOST")
 	if host == "" {
@@ -56,18 +56,18 @@ func runKwk(up update.Updater) {
 	}
 	eh := out.NewErrHandler(os.Stdout)
 	w := vwrite.New(os.Stdout)
-	conn, err := gokwk.GetConn(host, KWK_TEST_MODE)
+	conn, err := app.GetConn(host, KWK_TEST_MODE)
 	if err != nil {
 		eh.Handle(errs.ApiDown)
 		return
 	}
 	defer conn.Close()
-	u := gokwk.NewUsers(conn, j, app.cliInfo)
-	ss := gokwk.New(conn, app.cliInfo)
-	o := cmd.NewStdRunner(f, ss)
 	r := bufio.NewReader(os.Stdin)
 	d := app.NewDialog(w, r)
-	kwkApp := app.NewApp(ss, f, j, o, u, d, w, up, eh)
+	sc := types.NewSnippetsClient(conn)
+	uc := types.NewUsersClient(conn)
+	o := app.NewRunner(f, sc)
+	kwkApp := app.NewApp(sc, f, j, o, uc, d, w, up, eh)
 	eh.Handle(kwkApp.App.Run(os.Args))
 }
 

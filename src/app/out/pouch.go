@@ -3,7 +3,6 @@ package out
 import (
 	"bytes"
 	"fmt"
-	"github.com/kwk-super-snippets/cli/src/models"
 	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/kwk-super-snippets/types"
 	"strings"
@@ -15,7 +14,7 @@ const oneMin = int64(60)
 const oneHour = oneMin * 60
 const oneDay = oneHour * 24
 
-func listHorizontal(l []interface{}, stats *types.UserStats) []byte {
+func listHorizontal(l []interface{}, listAll bool, stats *types.UserStats) []byte {
 	var buff bytes.Buffer
 	w := tabwriter.NewWriter(&buff, 5, 1, 3, ' ', tabwriter.TabIndent)
 	var item bytes.Buffer
@@ -28,11 +27,11 @@ func listHorizontal(l []interface{}, stats *types.UserStats) []byte {
 		if sn, ok := v.(*types.Snippet); ok {
 			item.WriteString(snippetIcon(sn))
 			item.WriteString("  ")
-			item.WriteString(style.Fmt256(style.ColorBrighterWhite, sn.SnipName.String()))
+			item.WriteString(style.Fmt256(style.ColorBrighterWhite, sn.Alias.FileName()))
 			//item.WriteString(FStatus(sn, false))
 		}
 		if pch, ok := v.(*types.Pouch); ok {
-			if models.Prefs().ListAll || !pch.MakePrivate {
+			if listAll || !pch.MakePrivate {
 				if colWidths[i%5] < len(pch.Name) {
 					colWidths[i%5] = len(pch.Name)
 				}
@@ -42,12 +41,12 @@ func listHorizontal(l []interface{}, stats *types.UserStats) []byte {
 					item.WriteString(style.Fmt256(style.ColorBrightestWhite, "  ❯ "+pch.Name))
 				} else {
 					item.WriteString("  ")
-					item.WriteString(style.Fmt256(decayColor(pch.LastUse.Unix(), true), pch.Name))
+					item.WriteString(style.Fmt256(decayColor(pch.LastUse, true), pch.Name))
 				}
-				if pch.Type == types.PouchTypeVirtual {
+				if pch.Type == types.PouchType_Virtual {
 					item.WriteString(pad11)
 				} else {
-					item.WriteString(style.Fmt256(style.ColorDimStat, fmt.Sprintf(" %d", pch.Snips)))
+					item.WriteString(style.Fmt256(style.ColorDimStat, fmt.Sprintf(" %d", pch.Stats.Snips)))
 				}
 			}
 		}
@@ -73,9 +72,9 @@ func insertGridLine(b *bytes.Buffer) {
 
 func pouchIcon(pch *types.Pouch, isLast bool) string {
 	if pch.MakePrivate {
-		return colorPouch(isLast, pch.LastUse.Unix(), pch.Red, style.IconPrivatePouch)
+		return colorPouch(isLast, pch.LastUse, pch.Stats.Red, style.IconPrivatePouch)
 	} else {
-		return colorPouch(isLast, pch.LastUse.Unix(), pch.Red, style.IconPouch)
+		return colorPouch(isLast, pch.LastUse, pch.Stats.Red, style.IconPouch)
 	}
 }
 

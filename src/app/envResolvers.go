@@ -6,6 +6,7 @@ import (
 	"github.com/kwk-super-snippets/types/errs"
 	"runtime"
 	"strings"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 )
 
 // TODO: check yml version is compatible with this build else force upgrade.
@@ -15,7 +16,6 @@ type EnvResolvers struct {
 	file     IO
 	alias    *types.Alias
 	runtime  string
-	headers  Headers
 }
 
 func NewEnvResolvers(s types.SnippetsClient, sys IO) Resolvers {
@@ -37,8 +37,8 @@ func (e *EnvResolvers) Local() (string, error) {
 }
 
 func (e *EnvResolvers) Own() (string, error) {
-	Debug("GETTING ENV: %s", e.alias.URI())
-	res, err := e.snippets.Get(e.headers.Context(), &types.GetRequest{Alias: e.alias})
+	out.Debug("GETTING ENV: %s", e.alias.URI())
+	res, err := e.snippets.Get(GetCtx(), &types.GetRequest{Alias: e.alias})
 	if err != nil {
 		return "", err
 	}
@@ -55,7 +55,7 @@ func (e *EnvResolvers) Default() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	_, err = e.snippets.Create(e.headers.Context(), &types.CreateRequest{Content: env, Alias: e.alias, Role: types.Role_Environment})
+	_, err = e.snippets.Create(GetCtx(), &types.CreateRequest{Content: env, Alias: e.alias, Role: types.Role_Environment})
 	if err != nil {
 		return "", err
 	}

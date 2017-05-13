@@ -2,7 +2,6 @@ package out
 
 import (
 	"fmt"
-	"github.com/kwk-super-snippets/cli/src/models"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/vwrite"
 	"io"
@@ -29,7 +28,7 @@ func SnippetCreated(s *types.Snippet) vwrite.Handler {
 
 func SnippetCat(s *types.Snippet) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprintln(w, s.Snip)
+		fmt.Fprintln(w, s.Content)
 	})
 }
 

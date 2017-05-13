@@ -2,8 +2,6 @@ package app
 
 import (
 	"bytes"
-	"github.com/kwk-super-snippets/cli/src/gokwk"
-	"github.com/kwk-super-snippets/cli/src/models"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/vwrite"
 	"reflect"

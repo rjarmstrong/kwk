@@ -1,4 +1,4 @@
-package app
+package out
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 
 var DebugEnabled bool
 var fileOut = &lumberjack.Logger{
-	Filename:   path.Join(kwkPath(), "kwk.log"),
+	Filename:   path.Join(KwkPath(), "kwk.log"),
 	MaxSize:    3, // megabytes
 	MaxBackups: 2,
 	MaxAge:     5, //days})

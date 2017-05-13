@@ -9,7 +9,6 @@ import (
 )
 
 type users struct {
-	headers   Headers
 	client    types.UsersClient
 	persister Persister
 	vwrite.Writer
@@ -22,7 +21,7 @@ type UserWithToken struct {
 	User        types.User
 }
 
-func NewAccount(u types.UsersClient, s Persister, w vwrite.Writer, d Dialog, dash *Dashboard) *users {
+func NewUsers(u types.UsersClient, s Persister, w vwrite.Writer, d Dialog, dash *Dashboard) *users {
 	return &users{client: u, persister: s, Writer: w, Dialog: d, dash: dash}
 }
 
@@ -37,7 +36,7 @@ func (c *users) SignUp() error {
 	inviteCode := res.Value.(string)
 
 	req := &types.SignUpRequest{Email: email, Username: username, Password: password, InviteCode: inviteCode}
-	u, err := c.client.SignUp(c.headers.Context(), req)
+	u, err := c.client.SignUp(GetCtx(), req)
 	if err != nil {
 		return err
 	}
@@ -61,7 +60,7 @@ func (c *users) SignIn(username string, password string) error {
 		res, _ := c.FormField(out.UserPasswordField, true)
 		password = res.Value.(string)
 	}
-	u, err := c.client.SignIn(c.headers.Context(), &types.SignInRequest{Username: username, Password: password})
+	u, err := c.client.SignIn(GetCtx(), &types.SignInRequest{Username: username, Password: password})
 	if err != nil {
 		return err
 	}
@@ -93,7 +92,7 @@ func (c *users) ChangePassword() error {
 	p.ExistingPassword = res.Value.(string)
 	res, _ = c.FormField(out.FreeText("New password: "), true)
 	p.NewPassword = res.Value.(string)
-	_, err := c.client.ChangePassword(c.headers.Context(), p)
+	_, err := c.client.ChangePassword(GetCtx(), p)
 	if err != nil {
 		return err
 	}
@@ -106,7 +105,7 @@ func (c *users) ResetPassword(email string) error {
 		email = res.Value.(string)
 	}
 	req := &types.ResetRequest{Email: email}
-	_, err := c.client.ResetPassword(c.headers.Context(), req)
+	_, err := c.client.ResetPassword(GetCtx(), req)
 	if err != nil {
 		return err
 	}

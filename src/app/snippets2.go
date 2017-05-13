@@ -14,11 +14,10 @@ import (
 
 type SnippetsGrpc struct {
 	pc     snipsRpc.PouchesRpcClient
-	client snipsRpc.SnipsRpcClient
-	h      Headers
+	client types.SnipsRpcClient
 }
 
-func New(conn *grpc.ClientConn, client types.AppInfo) types.SnippetsClient {
+func NewSnippets2(conn *grpc.ClientConn, client types.AppInfo) types.SnippetsClient {
 
 		client: snipsRpc.NewSnipsRpcClient(conn),
 		pc:     snipsRpc.NewPouchesRpcClient(conn),

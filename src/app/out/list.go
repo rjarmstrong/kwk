@@ -3,7 +3,6 @@ package out
 import (
 	"bytes"
 	"fmt"
-	"github.com/kwk-super-snippets/cli/src/models"
 	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/kwk-super-snippets/types"
 	"github.com/rjarmstrong/tablewriter"
@@ -24,24 +23,24 @@ type CodeLine struct {
 }
 
 func StatusText(s *types.Snippet) string {
-	if s.Ext == "url" {
+	if s.Ext() == "url" {
 		return "bookmark"
 	}
-	if s.RunStatus == types.UseStatusSuccess {
+	if s.RunStatus == types.UseStatus_Success {
 		return "success"
-	} else if s.RunStatus == types.UseStatusFail {
+	} else if s.RunStatus == types.UseStatus_Fail {
 		return "error"
 	}
 	return "static"
 }
 
 func FStatus(s *types.Snippet, includeText bool) string {
-	if s.RunStatus == types.UseStatusSuccess {
+	if s.RunStatus == types.UseStatus_Success {
 		if includeText {
 			return style.Fmt256(style.ColorYesGreen, style.IconTick) + "  Success"
 		}
 		return style.Fmt256(style.ColorYesGreen, style.IconTick)
-	} else if s.RunStatus == types.UseStatusFail {
+	} else if s.RunStatus == types.UseStatus_Fail {
 		if includeText {
 			return style.Fmt256(style.ColorBrightRed, style.IconBroke) + "  Error"
 		}
@@ -310,12 +309,12 @@ func snippetIcon(s *types.Snippet) string {
 	icon := style.IconSnippet
 	if s.IsApp() {
 		icon = style.IconApp
-	} else if s.Ext == "url" {
+	} else if s.Ext() == "url" {
 		icon = style.IconBookmark
 	}
-	if s.RunStatus == types.UseStatusSuccess {
+	if s.RunStatus == types.UseStatus_Success {
 		return style.Fmt256(122, icon)
-	} else if s.RunStatus == types.UseStatusFail {
+	} else if s.RunStatus == types.UseStatus_Fail {
 		return style.Fmt256(196, icon)
 	}
 	return style.Fmt256(style.ColorMonthGrey, icon)
@@ -325,7 +324,7 @@ func fmtRunCount(count int64) string {
 	return fmt.Sprintf(style.Fmt256(247, "↻ %0d"), count)
 }
 
-func fmtHeader(w io.Writer, username string, pouch string, s *types.SnipName) {
+func fmtHeader(w io.Writer, username string, pouch string, fileName string) {
 	fmt.Fprint(w, "\n")
 	fmt.Fprint(w, style.Margin)
 	fmt.Fprint(w, style.Start)
@@ -333,7 +332,7 @@ func fmtHeader(w io.Writer, username string, pouch string, s *types.SnipName) {
 	fmt.Fprint(w, " ❯ ")
 	fmt.Fprint(w, types.KwkHost)
 	fmt.Fprint(w, "/")
-	if pouch == "" && s == nil {
+	if pouch == "" && fileName == nil {
 		fmt.Fprint(w, style.Start)
 		fmt.Fprint(w, "1m")
 		fmt.Fprint(w, username)
@@ -357,7 +356,7 @@ func fmtHeader(w io.Writer, username string, pouch string, s *types.SnipName) {
 	}
 	fmt.Fprint(w, style.Start)
 	fmt.Fprint(w, "1m")
-	fmt.Fprint(w, s.String())
+	fmt.Fprint(w, fileName)
 	fmt.Fprint(w, " ")
 	fmt.Fprint(w, style.End)
 }

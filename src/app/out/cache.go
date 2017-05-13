@@ -1,4 +1,4 @@
-package app
+package out
 
 import (
 	"fmt"
@@ -14,7 +14,8 @@ const (
 
 var cachePath string
 
-func kwkPath() string {
+// TODO: CHANGE TO STATIC PATH RESOLUTION
+func KwkPath() string {
 	if cachePath != "" {
 		return cachePath
 	}

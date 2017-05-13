@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 )
 
 type IO interface {
@@ -26,14 +27,14 @@ type StdIO struct {
 
 func (s *StdIO) Write(subDirName string, suffixPath string, snippet string, incHoldingDir bool) (filePath string, err error) {
 	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
-	Debug("WRITE: %s", fp)
-	err = ioutil.WriteFile(fp, []byte(snippet), StandardFilePermission)
+	out.Debug("WRITE: %s", fp)
+	err = ioutil.WriteFile(fp, []byte(snippet), out.StandardFilePermission)
 	return fp, err
 }
 
 func (s *StdIO) Read(subDirName string, suffixPath string, incHoldingDir bool, after int64) (string, error) {
 	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
-	Debug("READ: %s", fp)
+	out.Debug("READ: %s", fp)
 	if fi, err := os.Stat(fp); err != nil {
 		if os.IsNotExist(err) {
 			return "", errs.FileNotFound
@@ -52,7 +53,7 @@ func (s *StdIO) Read(subDirName string, suffixPath string, incHoldingDir bool, a
 }
 
 func (s *StdIO) DeleteAll() error {
-	return os.RemoveAll(kwkPath())
+	return os.RemoveAll(out.KwkPath())
 }
 
 func (s *StdIO) Delete(directoryName string, fileName string) error {
@@ -61,12 +62,12 @@ func (s *StdIO) Delete(directoryName string, fileName string) error {
 		return err
 	}
 	fp := path.Join(dirPath, fileName)
-	Debug("DELETING:%s", fp)
+	out.Debug("DELETING:%s", fp)
 	return os.RemoveAll(fp)
 }
 
 func (s *StdIO) upsertDirectory(dir string) error {
-	if err := os.MkdirAll(dir, StandardFilePermission); err != nil {
+	if err := os.MkdirAll(dir, out.StandardFilePermission); err != nil {
 		if os.IsExist(err) {
 			return nil
 		}
@@ -76,18 +77,18 @@ func (s *StdIO) upsertDirectory(dir string) error {
 }
 
 func (s *StdIO) getSubDir(directoryName string) (string, error) {
-	dir := path.Join(kwkPath(), directoryName)
-	Debug("DIR: %s", dir)
+	dir := path.Join(out.KwkPath(), directoryName)
+	out.Debug("DIR: %s", dir)
 	err := s.upsertDirectory(dir)
 	return dir, err
 }
 
 func (s *StdIO) getHoldingDirectory(subDirName string, fullName string) string {
 	hd := strings.Replace(fullName, ".", "_", -1)
-	dirPath := path.Join(kwkPath(), subDirName, hd)
+	dirPath := path.Join(out.KwkPath(), subDirName, hd)
 	if e := s.upsertDirectory(dirPath); e != nil {
-		Debug("Could not create directory:")
-		LogErr(e)
+		out.Debug("Could not create directory:")
+		out.LogErr(e)
 		return ""
 	}
 	return hd
@@ -97,11 +98,11 @@ func (s *StdIO) getFilePath(subDirName string, suffixPath string, incHoldingDir 
 	sn := sanitize.Name(suffixPath)
 	if incHoldingDir {
 		hd := s.getHoldingDirectory(subDirName, sn)
-		return path.Join(kwkPath(), subDirName, hd, sn)
+		return path.Join(out.KwkPath(), subDirName, hd, sn)
 	} else {
-		if err := s.upsertDirectory(path.Join(kwkPath(), subDirName)); err != nil {
+		if err := s.upsertDirectory(path.Join(out.KwkPath(), subDirName)); err != nil {
 			panic(err)
 		}
-		return path.Join(kwkPath(), subDirName, sn)
+		return path.Join(out.KwkPath(), subDirName, sn)
 	}
 }

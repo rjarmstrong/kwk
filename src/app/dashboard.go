@@ -12,7 +12,6 @@ type Dashboard struct {
 	s types.SnippetsClient
 	vwrite.Writer
 	errs.Handler
-	headers Headers
 }
 
 func NewDashBoard(w vwrite.Writer, eh errs.Handler, s types.SnippetsClient) *Dashboard {
@@ -28,7 +27,7 @@ func (d *Dashboard) writer(w io.Writer, templ string, data interface{}) {
 		d.Write(out.SignedOut())
 		return
 	}
-	r, err := d.s.GetRoot(d.headers.Context(), &types.RootRequest{})
+	r, err := d.s.GetRoot(GetCtx(), &types.RootRequest{})
 	if err != nil {
 		d.Handle(err)
 		return
