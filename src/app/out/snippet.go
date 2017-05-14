@@ -21,7 +21,7 @@ func printSnippetView(w io.Writer, s *types.Snippet) {
 	fmt.Fprint(w, FSnippetType(s))
 	fmt.Fprint(w, "\n")
 	fmt.Fprint(w, style.TwoLines)
-	fmt.Fprint(w, FCodeview(s, 100, 0, false))
+	fmt.Fprint(w, FCodeview(s, 100, 0, false, prefs.AlwaysExpandRows))
 	fmt.Fprint(w, "\n\n")
 
 	tbl := tablewriter.NewWriter(w)
@@ -72,8 +72,7 @@ func printSnippetView(w io.Writer, s *types.Snippet) {
 		style.Fmt16(style.Subdued, "Description:"), style.FBox(FEmpty(s.Description), 50, 3), "", ""})
 
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued, "Preview:"), style.FPreview(s.Preview, 50, 1), "", ""})
-
+		style.Fmt16(style.Subdued, "Preview:"), Fpreview(s.Preview, 50, 1), "", ""})
 
 	var tags []string
 	for _, v := range s.Tags.Names {
@@ -84,7 +83,7 @@ func printSnippetView(w io.Writer, s *types.Snippet) {
 	tbl.Append([]string{
 		style.Fmt16(style.Subdued, "sha256:"), FVerified(s)})
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued, "Updated:"), fmt.Sprintf("%s - %s", style.Time(s.Created), fmt.Sprintf("v%d", s.Version)),
+		style.Fmt16(style.Subdued, "Updated:"), fmt.Sprintf("%s - %s", style.Time(time.Unix(s.Created, 0)), fmt.Sprintf("v%d", s.Version)),
 	})
 	tbl.Render()
 
@@ -121,7 +120,7 @@ func FVerified(s *types.Snippet) string {
 	return buff.String()
 }
 
-func FCodeview(s *types.Snippet, width int, lines int, odd bool, expandRows bool) string {
+func FCodeview(s *types.Snippet, width int, lines int, odd bool, alwaysExpandRows bool) string {
 	if s.Content == "" {
 		s.Content = "<empty>"
 	}
@@ -176,7 +175,7 @@ func FCodeview(s *types.Snippet, width int, lines int, odd bool, expandRows bool
 	}
 
 	// Add page tear and last line
-	if expandRows && crop && lines < len(code) {
+	if alwaysExpandRows && crop && lines < len(code) {
 		codeview = append(codeview, CodeLine{
 			style.FStart(style.Subdued, "----"),
 			style.FStart(style.Subdued, strings.Repeat("-", width)+"|"),

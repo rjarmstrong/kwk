@@ -14,7 +14,7 @@ const oneMin = int64(60)
 const oneHour = oneMin * 60
 const oneDay = oneHour * 24
 
-func listHorizontal(l []interface{}, listAll bool, stats *types.UserStats) []byte {
+func horizontalPouches(l []*types.Pouch, stats *types.UserStats) []byte {
 	var buff bytes.Buffer
 	w := tabwriter.NewWriter(&buff, 5, 1, 3, ' ', tabwriter.TabIndent)
 	var item bytes.Buffer
@@ -24,32 +24,51 @@ func listHorizontal(l []interface{}, listAll bool, stats *types.UserStats) []byt
 		if i%5 == 0 {
 			item.WriteString("  ")
 		}
-		if sn, ok := v.(*types.Snippet); ok {
-			item.WriteString(snippetIcon(sn))
-			item.WriteString("  ")
-			item.WriteString(style.Fmt256(style.ColorBrighterWhite, sn.Alias.FileName()))
-			//item.WriteString(FStatus(sn, false))
-		}
-		if pch, ok := v.(*types.Pouch); ok {
-			if listAll || !pch.MakePrivate {
-				if colWidths[i%5] < len(pch.Name) {
-					colWidths[i%5] = len(pch.Name)
-				}
-				isLast := stats.LastPouch == pch.Id
-				item.WriteString(pouchIcon(pch, isLast))
-				if isLast {
-					item.WriteString(style.Fmt256(style.ColorBrightestWhite, "  ❯ "+pch.Name))
-				} else {
-					item.WriteString("  ")
-					item.WriteString(style.Fmt256(decayColor(pch.LastUse, true), pch.Name))
-				}
-				if pch.Type == types.PouchType_Virtual {
-					item.WriteString(pad11)
-				} else {
-					item.WriteString(style.Fmt256(style.ColorDimStat, fmt.Sprintf(" %d", pch.Stats.Snips)))
-				}
+		if prefs.ListAll || !v.MakePrivate {
+			if colWidths[i%5] < len(v.Name) {
+				colWidths[i%5] = len(v.Name)
+			}
+			isLast := stats.LastPouch == v.Id
+			item.WriteString(pouchIcon(v, isLast))
+			if isLast {
+				item.WriteString(style.Fmt256(style.ColorBrightestWhite, "  ❯ "+v.Name))
+			} else {
+				item.WriteString("  ")
+				item.WriteString(style.Fmt256(decayColor(v.LastUse, true), v.Name))
+			}
+			if v.Type == types.PouchType_Virtual {
+				item.WriteString(pad11)
+			} else {
+				item.WriteString(style.Fmt256(style.ColorDimStat, fmt.Sprintf(" %d", v.Stats.Snips)))
 			}
 		}
+		x := i + 1
+		if x%20 == 0 {
+			insertGridLine(&item)
+		} else if x%5 == 0 {
+			item.WriteString("\n")
+		} else {
+			item.WriteString("\t")
+		}
+		fmt.Fprint(w, fmt.Sprintf("%s", item.String()))
+		item.Reset()
+	}
+	w.Flush()
+	return buff.Bytes()
+}
+
+func horizontalSnippets(l []*types.Snippet) []byte {
+	var buff bytes.Buffer
+	w := tabwriter.NewWriter(&buff, 5, 1, 3, ' ', tabwriter.TabIndent)
+	var item bytes.Buffer
+	for i, v := range l {
+		if i%5 == 0 {
+			item.WriteString("  ")
+		}
+		item.WriteString(snippetIcon(v))
+		item.WriteString("  ")
+		item.WriteString(style.Fmt256(style.ColorBrighterWhite, v.Alias.FileName()))
+		//item.WriteString(FStatus(sn, false))
 		x := i + 1
 		if x%20 == 0 {
 			insertGridLine(&item)
@@ -89,6 +108,7 @@ func colorPouch(lastPouch bool, lastUsed int64, reddy int64, icon string) string
 	} else {
 		col = decayColor(lastUsed, false)
 	}
+	// TODO: NEVER REACHED
 	return style.Fmt256(col, icon)
 }
 

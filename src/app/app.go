@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 	"github.com/kwk-super-snippets/cli/src/app/out"
+	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
 	"github.com/kwk-super-snippets/types/vwrite"
@@ -116,7 +117,7 @@ func setupFlags(ap *cli.App) *cli.App {
 		cli.BoolFlag{
 			Name:        "ansi",
 			Usage:       "Prints ansi escape sequences for debugging purposes",
-			Destination: &Prefs().PrintAnsi,
+			Destination: &style.PrintAnsi,
 		},
 
 		//cli.BoolFlag{

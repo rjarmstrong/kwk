@@ -3,11 +3,11 @@ package style
 import (
 	"bytes"
 	"fmt"
-	"github.com/kwk-super-snippets/cli/src/models"
 	"github.com/kwk-super-snippets/types"
-	"github.com/lunixbochs/vtclean"
 	"strings"
 )
+
+var PrintAnsi bool //Prints ansi escape sequences for debugging purposes.
 
 // FStart starts an ansi escape sequence, should be terminated with style.End
 func FStart(c types.AnsiCode, in interface{}) string {
@@ -26,14 +26,6 @@ func Fmt256(c types.AnsiCode, in interface{}) string {
 func FmtFgBg(in string, fg types.AnsiCode, bg types.AnsiCode) string {
 	r := fmt.Sprintf("%s38;5;%dm%s48;5;%dm%s%s", Start, fg, Start, bg, in, End)
 	return r
-}
-
-func FPreview(in string, wrapAt int, lines int) string {
-	if models.Prefs().DisablePreview {
-		return ""
-	}
-	in = vtclean.Clean(in, false)
-	return FBox(in, wrapAt, lines) + End
 }
 
 /*
@@ -82,7 +74,7 @@ func fmtColor(c types.AnsiCode, in interface{}, ansiPattern string) string {
 	a := strings.Split(fmt.Sprintf("%v", in), "\n")
 	for i, v := range a {
 		ansi := fmt.Sprintf("%s%s%dm%s%s", Start, ansiPattern, c, v, End)
-		if models.Prefs() != nil && models.Prefs().PrintAnsi {
+		if PrintAnsi {
 			a[i] = fmt.Sprintf("%q", ansi)
 			continue
 		}

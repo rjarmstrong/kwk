@@ -2,12 +2,12 @@ package app
 
 import (
 	"github.com/kennygrant/sanitize"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/types/errs"
 	"io/ioutil"
 	"os"
 	"path"
 	"strings"
-	"github.com/kwk-super-snippets/cli/src/app/out"
 )
 
 type IO interface {

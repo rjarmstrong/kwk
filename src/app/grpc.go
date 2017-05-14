@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
 	"golang.org/x/net/context"
@@ -16,7 +17,6 @@ import (
 	"os"
 	"runtime"
 	"time"
-	"github.com/kwk-super-snippets/cli/src/app/out"
 )
 
 // /etc/ssl/certs/COMODO_RSA_Certification_Authority.pem

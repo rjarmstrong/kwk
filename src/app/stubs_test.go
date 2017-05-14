@@ -102,7 +102,6 @@ type SnippetsMock struct {
 	CloneCalledWith       []interface{}
 	TagCalledWith         map[string][]string
 	UnTagCalledWith       map[string][]string
-	ListCalledWith        *models.ListParams
 	CreatePouchCalledWith string
 	DeletePouchCalledWith string
 	GetRootCalledWith     []interface{}

@@ -4,14 +4,13 @@ import (
 	"github.com/kwk-super-snippets/cli/src/app"
 	//"runtime/pprof"
 	"bufio"
-	"github.com/inconshreveable/go-update"
 	"github.com/kwk-super-snippets/cli/src/app/out"
+	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
 	"github.com/kwk-super-snippets/types/vwrite"
 	"os"
 	"strconv"
 	"strings"
-	"github.com/kwk-super-snippets/types"
 )
 
 var (

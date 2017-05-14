@@ -49,8 +49,8 @@ func FStatus(s *types.Snippet, includeText bool) string {
 	return style.Fmt16(style.Subdued, "? ")
 }
 
-func printRoot(w io.Writer, r *models.ListView) {
-	var all []interface{}
+func printRoot(w io.Writer, cli *types.AppInfo, r *types.RootResponse, p *types.User) {
+	var all []*types.Pouch
 	for _, v := range r.Pouches {
 		if v.Name != "" {
 			all = append(all, v)
@@ -60,18 +60,18 @@ func printRoot(w io.Writer, r *models.ListView) {
 		all = append(all, v)
 	}
 
-	fmtHeader(w, r.Username, "", nil)
-	fmt.Fprint(w, strings.Repeat(" ", 50), style.Fmt16(style.Subdued, "◉  "+models.Principal.Username+"    TLS12"))
+	fmtHeader(w, r.Username, "", "")
+	fmt.Fprint(w, strings.Repeat(" ", 50), style.Fmt16(style.Subdued, "◉  "+p.Username+"    TLS12"))
 	fmt.Fprint(w, style.TwoLines)
-	w.Write(listHorizontal(all, &r.UserStats))
+	w.Write(horizontalPouches(all, r.Stats))
 
 	if len(r.Snippets) > 0 {
 		fmt.Fprintf(w, "\n%sLast:", style.Margin)
-		printSnippets(w, r, true)
+		printSnippets(w, "", r.Snippets, true)
 	}
 
-	if clientIsNew(r.LastUpgrade) {
-		fmt.Fprint(w, style.Fmt16(style.Subdued, fmt.Sprintf("\n\n%skwk auto-updated to %s %s", style.Margin, r.Version, style.Time(time.Unix(r.LastUpgrade, 0)))))
+	if clientIsNew(cli.Time) {
+		fmt.Fprint(w, style.Fmt16(style.Subdued, fmt.Sprintf("\n\n%skwk auto-updated to %s %s", style.Margin, cli.Version, style.Time(time.Unix(cli.Time, 0)))))
 	} else {
 		fmt.Fprintln(w, "")
 	}
@@ -106,13 +106,13 @@ func clientIsNew(t int64) bool {
 //	w.WriteString("\n")
 //}
 
-func printPouchHeadAndFoot(w io.Writer, list *models.ListView) {
-	fmtHeader(w, list.Username, list.Pouch.Name, nil)
-	fmt.Fprint(w, style.Margin, style.Margin, pouchIcon(list.Pouch, false))
+func printPouchHeadAndFoot(w io.Writer, pouch *types.Pouch, list []*types.Snippet) {
+	fmtHeader(w, pouch.Username, pouch.Name, "")
+	fmt.Fprint(w, style.Margin, style.Margin, pouchIcon(pouch, false))
 	fmt.Fprint(w, "  ")
-	fmt.Fprint(w, locked(list.Pouch.MakePrivate))
+	fmt.Fprint(w, locked(pouch.MakePrivate))
 	fmt.Fprint(w, " Pouch")
-	fmt.Fprint(w, style.Margin, style.Margin, len(list.Snippets), " snippets")
+	fmt.Fprint(w, style.Margin, style.Margin, len(list), " snippets")
 	fmt.Fprint(w, "\n")
 }
 
@@ -123,19 +123,19 @@ func locked(locked bool) string {
 	return "Public"
 }
 
-func printPouchSnippets(w io.Writer, list *models.ListView) {
-	if models.Prefs().Naked {
+func printPouchSnippets(w io.Writer, list *types.ListResponse) {
+	if prefs.Naked {
 		fmt.Fprint(w, listNaked(list))
 	} else {
 		//sort.Slice(list.Snippets, func(i, j int) bool {
 		//	return list.Snippets[i].Created <= list.Snippets[j].Created
 		//})
 		if list.Pouch != nil {
-			printPouchHeadAndFoot(w, list)
+			printPouchHeadAndFoot(w, list.Pouch, list.Items)
 		}
-		printSnippets(w, list, false)
-		if list.Pouch != nil && len(list.Snippets) > 10 && !models.Prefs().HorizontalLists {
-			printPouchHeadAndFoot(w, list)
+		printSnippets(w, list.Pouch.Name, list.Items, false)
+		if list.Pouch != nil && len(list.Items) > 10 && !prefs.ListHorizontal {
+			printPouchHeadAndFoot(w, list.Pouch, list.Items)
 		}
 		fmt.Fprint(w, "\n")
 	}
@@ -143,7 +143,7 @@ func printPouchSnippets(w io.Writer, list *models.ListView) {
 
 const timeLayout = "2 Jan 15:04 06"
 
-func listNaked(list *models.ListView) interface{} {
+func listNaked(list *types.ListResponse) interface{} {
 	w := &bytes.Buffer{}
 	tbl := tablewriter.NewWriter(w)
 	tbl.SetHeader([]string{"Name", "Username", "Pouch", "Ext", "Private", "Status", "Runs", "Views", "Deps", "LastActive", "Updated"})
@@ -157,7 +157,7 @@ func listNaked(list *models.ListView) interface{} {
 	tbl.SetHeaderLine(false)
 	tbl.SetColWidth(5)
 	tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
-	for _, v := range list.Snippets {
+	for _, v := range list.Items {
 		var private string
 		if v.Private {
 			private = "private"
@@ -165,45 +165,41 @@ func listNaked(list *models.ListView) interface{} {
 			private = "public"
 		}
 		tbl.Append([]string{
-			v.Name,
-			v.Username,
-			v.Pouch,
-			v.Ext,
+			v.Name(),
+			v.Username(),
+			v.Pouch(),
+			v.Ext(),
 			private,
 			StatusText(v),
-			fmt.Sprintf("%d", v.Runs),
-			fmt.Sprintf("%d", v.Views),
-			fmt.Sprintf("%d", len(v.Dependencies)),
-			v.RunStatusTime.Format(timeLayout),
-			v.Created.Format(timeLayout),
+			fmt.Sprintf("%d", v.Stats.Runs),
+			fmt.Sprintf("%d", v.Stats.Views),
+			fmt.Sprintf("%d", len(v.Dependencies.Aliases)),
+			time.Unix(v.RunStatusTime, 0).Format(timeLayout),
+			time.Unix(v.Created, 0).Format(timeLayout),
 		})
 	}
 	tbl.Render()
 	return w.String()
 }
 
-func printSnippets(w io.Writer, list *models.ListView, fullName bool) {
-	if models.Prefs() != nil && models.Prefs().HorizontalLists {
-		sort.Slice(list.Snippets, func(i, j int) bool {
-			return list.Snippets[i].Name < list.Snippets[j].Name
+// printSnippets is the standard way snippets are viewed in as a list.
+func printSnippets(w io.Writer, pouchName string, list []*types.Snippet, showFullName bool) {
+	if prefs.ListHorizontal {
+		sort.Slice(list, func(i, j int) bool {
+			return list[i].Name() < list[j].Name()
 		})
-		l := []interface{}{}
-		for _, v := range list.Snippets {
-			l = append(l, v)
-		}
-		fmt.Fprint(w, "\n\n"+string(listHorizontal(l, nil))+"\n\n")
+		fmt.Fprint(w, "\n\n"+string(horizontalSnippets(list))+"\n\n")
 		return
 	}
-
-	if len(list.Snippets) == 0 {
+	if len(list) == 0 {
 		fmt.Fprint(w, "\n")
 		fmt.Fprint(w, style.Margin)
 		fmt.Fprint(w, style.Fmt16(style.Subdued, "<empty pouch>"))
 		fmt.Fprint(w, style.TwoLines)
 		fmt.Fprint(w, style.Margin)
 		fmt.Fprint(w, style.Fmt16(style.Cyan, "Add new snippets to this pouch: "))
-		if list.Pouch != nil {
-			fmt.Fprintf(w, "`kwk new <snippet> %s/<name>.<ext>`", list.Pouch.Name)
+		if pouchName != "" {
+			fmt.Fprintf(w, "`kwk new <snippet> %s/<name>.<ext>`", pouchName)
 		}
 		fmt.Fprint(w, "\n")
 		return
@@ -216,7 +212,7 @@ func printSnippets(w io.Writer, list *models.ListView, fullName bool) {
 	tbl.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
 	tbl.SetCenterSeparator("")
 	tbl.SetColumnSeparator(" ")
-	if models.Prefs().RowLines {
+	if prefs.RowLines {
 		tbl.SetRowLine(true)
 	}
 
@@ -226,14 +222,14 @@ func printSnippets(w io.Writer, list *models.ListView, fullName bool) {
 
 	tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
 
-	for i, v := range list.Snippets {
+	for i, v := range list {
 		// col1
 		name := &bytes.Buffer{}
 		name.WriteString(snippetIcon(v))
 		name.WriteString("  ")
-		sn := v.SnipName.String()
-		if fullName {
-			sn = v.String()
+		sn := v.Alias.FileName()
+		if showFullName {
+			sn = v.Alias.URI()
 		}
 		nt := style.Fmt256(style.ColorBrighterWhite, sn)
 		name.WriteString(nt)
@@ -241,33 +237,33 @@ func printSnippets(w io.Writer, list *models.ListView, fullName bool) {
 			name.WriteString("\n\n")
 			name.WriteString(style.Fmt256(style.ColorMonthGrey, style.FBox(v.Description, 25, 3)))
 		}
-		if v.Role == types.RoleEnvironment {
+		if v.Role == types.Role_Environment {
 			name.WriteString("\n\n")
 			name.WriteString(style.Fmt16(style.Subdued, "short-cut: kwk edit env"))
 		}
 		// col2
 		var lines int
-		if models.Prefs().AlwaysExpandRows {
-			lines = models.Prefs().ExpandedRows
+		if prefs.AlwaysExpandRows {
+			lines = prefs.ExpandedRows
 		} else {
-			lines = models.Prefs().SlimRows
+			lines = prefs.SlimRows
 		}
 		status := &bytes.Buffer{}
-		runCount := fmtRunCount(v.Runs)
+		runCount := fmtRunCount(v.Stats.Runs)
 		status.WriteString(PadRight(runCount, " ", 21))
 		status.WriteString(" ")
-		if !v.RunStatusTime.IsZero() {
-			h := PadLeft(style.Time(v.RunStatusTime), " ", 4)
+		if v.RunStatusTime > 0 {
+			h := PadLeft(style.Time(time.Unix(v.RunStatusTime, 0)), " ", 4)
 			t := fmt.Sprintf("%s", style.Fmt256(239, h))
 			status.WriteString(t)
 		}
 		//col3
-		snip := FCodeview(v, 60, lines, (i+1)%2 == 0)
-		if models.Prefs().RowSpaces {
+		snip := FCodeview(v, 60, lines, (i+1)%2 == 0, prefs.AlwaysExpandRows)
+		if prefs.RowSpaces {
 			snip = snip + "\n"
 		}
 		if len(v.Preview) >= 10 {
-			snip = snip + "\n\n" + style.Margin + style.Fmt256(style.ColorMonthGrey, style.FPreview(v.Preview, 120, 1))
+			snip = snip + "\n\n" + style.Margin + style.Fmt256(style.ColorMonthGrey, Fpreview(v.Preview, 120, 1))
 		}
 
 		tbl.Append([]string{
@@ -332,7 +328,7 @@ func fmtHeader(w io.Writer, username string, pouch string, fileName string) {
 	fmt.Fprint(w, " ❯ ")
 	fmt.Fprint(w, types.KwkHost)
 	fmt.Fprint(w, "/")
-	if pouch == "" && fileName == nil {
+	if pouch == "" && fileName == "" {
 		fmt.Fprint(w, style.Start)
 		fmt.Fprint(w, "1m")
 		fmt.Fprint(w, username)
@@ -342,7 +338,7 @@ func fmtHeader(w io.Writer, username string, pouch string, fileName string) {
 	}
 	fmt.Fprint(w, username)
 	fmt.Fprint(w, "/")
-	if s == nil {
+	if fileName == "" {
 		fmt.Fprint(w, style.Start)
 		fmt.Fprint(w, "1m")
 		fmt.Fprint(w, pouch)

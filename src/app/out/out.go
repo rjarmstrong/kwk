@@ -5,6 +5,7 @@ import (
 	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/vwrite"
+	"github.com/lunixbochs/vtclean"
 	"io"
 	"text/tabwriter"
 )
@@ -15,9 +16,9 @@ func FreeText(text string) vwrite.Handler {
 	})
 }
 
-func Dashboard(lv *models.ListView) vwrite.Handler {
+func Dashboard(cli *types.AppInfo, rr *types.RootResponse, u *types.User) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		PrintRoot(lv).Write(w)
+		PrintRoot(cli, rr, u).Write(w)
 	})
 }
 
@@ -60,4 +61,12 @@ func multiChoice(w io.Writer, in interface{}) {
 	t.Write([]byte("\n\n"))
 	t.Flush()
 	fmt.Fprint(w, style.Margin+style.Fmt256(style.ColorPouchCyan, "Please select a snippet: "))
+}
+
+func Fpreview(in string, wrapAt int, lines int) string {
+	if prefs.DisablePreview {
+		return ""
+	}
+	in = vtclean.Clean(in, false)
+	return style.FBox(in, wrapAt, lines) + style.End
 }

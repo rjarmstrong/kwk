@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/types"
 	"gopkg.in/yaml.v2"
 	"os"
@@ -46,10 +47,9 @@ func SetEnv(e *yaml.MapSlice) {
 
 func DefaultPrefs() *Preferences {
 	p := &Preferences{
-		Global:    false,
-		AutoYes:   false,
-		Force:     false,
-		PrintAnsi: false,
+		Global:  false,
+		AutoYes: false,
+		Force:   false,
 	}
 	p.Covert = false
 	p.DisableRun = false
@@ -65,7 +65,7 @@ func DefaultPrefs() *Preferences {
 	p.CommandTimeout = 60
 	p.RowSpaces = true
 	p.RowLines = false
-	p.HorizontalLists = false
+	p.ListHorizontal = false
 	return p
 }
 
@@ -79,32 +79,22 @@ type Preferences struct {
 	PersistedPrefs
 	Global bool // TODO: Implement in search api SEARCH
 	//Quiet   bool // Only display fullNames (for multi deletes etc)
-	AutoYes         bool //TODO: Security
-	Force           bool // TODO: Security Will squash warning messages e.g. when running third party snippets.
-	Encrypt         bool // TODO: Security
-	Decrypt         bool // TODO: Security
-	LastPouch       string
-	Naked           bool
-	PrintAnsi       bool //Prints ansi escape sequences for debugging purposes.
-	HorizontalLists bool
+	AutoYes   bool //TODO: Security
+	Force     bool // TODO: Security Will squash warning messages e.g. when running third party snippets.
+	Encrypt   bool // TODO: Security
+	Decrypt   bool // TODO: Security
+	LastPouch string
 }
 
 // PersistedPrefs are preferences which can be persistent.
 type PersistedPrefs struct {
-	Covert            bool // Always opens browser in covert mode, when set to true flag should have no effect. TODO: Update env/darwin.yml
-	ListAll           bool //List all pouches including private. TODO: implement on api in search SEARCH.
-	DisableRun        bool //Completely disabled running scripts even if using -f TODO: Security
-	RequireRunKeyword bool //If false then `kwk <snipname>` will execute the snippet without the `run|r` parameter. In this case `view|v` command will be required to view the details of a snippet`
-	DisablePreview    bool
+	Covert            bool  // Always opens browser in covert mode, when set to true flag should have no effect. TODO: Update env/darwin.yml
+	DisableRun        bool  //Completely disabled running scripts even if using -f TODO: Security
+	RequireRunKeyword bool  //If false then `kwk <snipname>` will execute the snippet without the `run|r` parameter. In this case `view|v` command will be required to view the details of a snippet`
 	WipeTrail         bool  //deletes the history each time a command is run TODO: Security
 	SessionTimeout    int64 // 0 = no timeout, TODO: Implement on api SECURITY
 	AutoEncrypt       bool  //Encrypts all snippets when created. TODO: SECURITY
 	RegulateUpdates   bool  //Updates based on the recommended schedule. If false get updates as soon as available.
 	CommandTimeout    int64
-
-	SlimRows         int
-	ExpandedRows     int
-	AlwaysExpandRows bool
-	RowSpaces        bool
-	RowLines         bool
+	out.Prefs
 }

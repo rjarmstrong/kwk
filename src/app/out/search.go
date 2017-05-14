@@ -33,26 +33,22 @@ func highlightsToLines(highlights map[string]string) []SearchResultLine {
 
 func AlphaTypeAhead(res *types.TypeAheadResponse) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		view := &models.ListView{Snippets: []*types.Snippet{}}
-		for _, v := range res.Results {
-			view.Snippets = append(view.Snippets, v.Snippet)
-		}
-		printSnippets(w, view, true)
+		//printSnippets(w, view, true)
 	})
 }
 
-func AlphaSearchResult(res *types.SearchTermResponse) vwrite.Handler {
+func AlphaSearchResult(res *types.AlphaResponse) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
 		fmt.Fprintf(w, "\n\033[7m  \"%s\" found in %d results in %d ms  \033[0m", res.Term, res.Total, res.Took)
 		//fmt.Fprint(w, "\n\n")
 		// {{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{ . | result}}\n
 
-		view := &models.ListView{Snippets: []*types.Snippet{}}
-		for _, v := range res.Results {
-			view.Snippets = append(view.Snippets, v.Snippet)
-		}
-
-		printSnippets(w, view, true)
+		//view := &models.ListView{Snippets: []*types.Snippet{}}
+		//for _, v := range res.Results {
+		//	view.Snippets = append(view.Snippets, v.Snippet)
+		//}
+		//
+		//printSnippets(w, view, true)
 
 		//for _, v := range res.Results {
 		//	fmt.Fprintf(w, "%s%s\n", MARGIN, v.String())

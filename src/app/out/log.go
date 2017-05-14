@@ -27,6 +27,7 @@ func Debug(in ...interface{}) {
 	DebugLogger.Output(2, fmt.Sprintf("%v", in))
 }
 
+// LogErrM allows to log an error and specify a custom message.
 func LogErrM(message string, err error) error {
 	Debug(message)
 	LogErr(err)

@@ -32,5 +32,5 @@ func (d *Dashboard) writer(w io.Writer, templ string, data interface{}) {
 		d.Handle(err)
 		return
 	}
-	d.Write(out.Dashboard(r))
+	d.Write(out.Dashboard(&CLIInfo, r, &principal.User))
 }

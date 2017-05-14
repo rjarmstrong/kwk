@@ -6,17 +6,19 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
+	"github.com/lunixbochs/vtclean"
 	"gopkg.in/yaml.v2"
 	"io"
 	"os"
 	"os/exec"
 	"os/signal"
+	"runtime"
 	"strings"
 	"syscall"
 	"time"
-	"github.com/kwk-super-snippets/cli/src/app/out"
 )
 
 type Runner interface {
@@ -33,6 +35,14 @@ func NewRunner(s IO, ss types.SnippetsClient) Runner {
 	return &runner{snippets: ss, file: s}
 }
 
+/*
+ Limits a preview adding an ascii escape at the end and fixing the length.
+*/
+func LimitPreview(in string, length int) string {
+	in = vtclean.Clean(in, true)
+	return types.Limit(in, length-5) + "\033[0m"
+}
+
 func (r *runner) Edit(s *types.Snippet) error {
 	//TODO: if we pull out the env from getSection we can improve speed
 	a, err := r.getEnvSection("apps")
@@ -43,7 +53,7 @@ func (r *runner) Edit(s *types.Snippet) error {
 	}
 	_, candidates := getSubSection(eRoot, s.Ext())
 	if len(candidates) != 1 {
-		return errs.New(-1, "No editors have been specified for  %s. And default editor is not specified.", s.Ext())
+		return errs.New(0, "No editors have been specified for  %s. And default editor is not specified.", s.Ext())
 	}
 	_, cli := getSubSection(a, candidates[0])
 
@@ -113,7 +123,7 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 			_, compile := getSubSection(&comp, "compile")
 			if compile != nil {
 				replaceVariables(&compile, filePath, s)
-				Debug("COMPILE: %s", compile)
+				out.Debug("COMPILE: %s", compile)
 				err := r.exec(s.Alias, args, compile[0], compile[1:]...)
 				if err != nil {
 					return err
@@ -122,7 +132,7 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 			_, run := getSubSection(&comp, "run")
 			replaceVariables(&run, filePath, s)
 
-			Debug("RUN: %s", run)
+			out.Debug("RUN: %s", run)
 			run = append(run, args...)
 			err := r.exec(s.Alias, args, run[0], run[1:]...)
 			if err != nil {
@@ -154,7 +164,7 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 }
 
 func (r *runner) execEdit(a *types.Alias, editor string, arg ...string) error {
-	Debug("EXEC EDIT: %s %s %s", a.String(), editor, strings.Join(arg, " "))
+	out.Debug("EXEC EDIT: %s %s %s", a.String(), editor, strings.Join(arg, " "))
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(Prefs().CommandTimeout)*time.Second)
 	c := exec.CommandContext(ctx, editor, arg...)
 	c.Stdin = os.Stdin
@@ -179,11 +189,11 @@ func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...s
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(Prefs().CommandTimeout)*time.Second)
 	c := exec.CommandContext(ctx, runner, arg...)
 	c.Stdin = os.Stdin
-	out, err := c.StdoutPipe()
+	stdout, err := c.StdoutPipe()
 	if err != nil {
 		return err
 	}
-	defer out.Close()
+	defer stdout.Close()
 
 	var stderr bytes.Buffer
 	outBuff := &bytes.Buffer{}
@@ -203,16 +213,7 @@ func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...s
 	err = scanVulnerabilities(strings.Join(arg, " "), a.Ext)
 	if err != nil {
 		e := err.(*errs.Error)
-		r.snippets.LogUse(GetCtx(), &types.UseContext{
-			Alias:       a,
-			Type:        types.UseType_Run,
-			Status:      types.UseStatus_Fail,
-			Preview:     e.Message,
-			CallerAlias: node.Caller.AliasString,
-			Level:       node.Level,
-			Runner:      node.Runner,
-		},
-		)
+		r.logUse(a, e.Message, node, types.UseStatus_Fail)
 		return err
 	}
 	// CAPTURE INTERRUPT SO WE CAN LOG PART OF THE EXECUTION IF IS ONGOING e.g. real-time analytics.
@@ -224,7 +225,7 @@ func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...s
 		if node.Caller != nil {
 			caller = node.Caller.AliasString
 		}
-		Debug("INTERRUPTED: %s|Level:%d|Caller:%s|Message:%s", node.AliasString, node.Level, caller, res.String())
+		out.Debug("INTERRUPTED: %s|Level:%d|Caller:%s|Message:%s", node.AliasString, node.Level, caller, res.String())
 	}()
 	err = c.Run()
 	if c.ProcessState != nil {
@@ -232,16 +233,7 @@ func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...s
 	}
 	if stderr.Len() > 0 {
 		desc := fmt.Sprintf("Error running '%s' (runner: '%s' %s)\n\n%s", a.String(), runner, err.Error(), stderr.String())
-		r.snippets.LogUse(GetCtx(), &types.UseContext{
-			Alias:       a,
-			Status:      types.UseStatus_Fail,
-			Type:        types.UseType_Run,
-			Preview:     stderr.String(),
-			CallerAlias: node.Caller.AliasString,
-			Level:       node.Level,
-			Runner:      node.Runner,
-		},
-		)
+		r.logUse(a, stderr.String(), node, types.UseStatus_Fail)
 		return errs.New(errs.CodeRunnerExit, desc)
 	}
 	if err != nil {
@@ -251,19 +243,23 @@ func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...s
 			return err
 		}
 		// Was an interrupt
-		Debug("Interupted:%+v", exErr)
+		out.Debug("Interupted:%+v", exErr)
 	}
+	r.logUse(a, outBuff.String(), node, types.UseStatus_Success)
+	return nil
+}
+
+func (r *runner) logUse(a *types.Alias, output string, node *ProcessNode, s types.UseStatus) {
 	r.snippets.LogUse(GetCtx(), &types.UseContext{
 		Alias:       a,
-		Status:      types.UseStatus_Success,
 		Type:        types.UseType_Run,
-		Preview:     outBuff.String(),
+		Status:      s,
+		Preview:     LimitPreview(output, types.PreviewMaxRuneLength),
 		CallerAlias: node.Caller.AliasString,
 		Level:       node.Level,
 		Runner:      node.Runner,
-	},
-	)
-	return nil
+		Os:          runtime.GOOS,
+	})
 }
 
 func (r *runner) getEnvSection(name string) (*yaml.MapSlice, error) {

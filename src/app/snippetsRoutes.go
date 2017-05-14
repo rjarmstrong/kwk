@@ -16,7 +16,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 		{
 			Name: "ls",
 			Action: func(c *cli.Context) error {
-				Prefs().HorizontalLists = true
+				Prefs().ListHorizontal = true
 				return s.List("", c.Args().First())
 			},
 		},

@@ -2,10 +2,10 @@ package app
 
 import (
 	"fmt"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
 	"gopkg.in/yaml.v2"
-	"github.com/kwk-super-snippets/cli/src/app/out"
 )
 
 type ConfigProvider struct {

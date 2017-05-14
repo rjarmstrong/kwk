@@ -56,15 +56,15 @@ func SnippetEditNewPrompt(uri string) vwrite.Handler {
 	}))
 }
 
-func SnippetList(list *models.ListView) vwrite.Handler {
+func SnippetList(list *types.ListResponse) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
 		printPouchSnippets(w, list)
 	})
 }
 
-func PrintRoot(list *models.ListView) vwrite.Handler {
+func PrintRoot(cli *types.AppInfo, rr *types.RootResponse, u *types.User) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		printRoot(w, list)
+		printRoot(w, cli, rr, u)
 	})
 }
 

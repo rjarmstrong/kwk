@@ -2,11 +2,11 @@ package app
 
 import (
 	"fmt"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
 	"runtime"
 	"strings"
-	"github.com/kwk-super-snippets/cli/src/app/out"
 )
 
 // TODO: check yml version is compatible with this build else force upgrade.

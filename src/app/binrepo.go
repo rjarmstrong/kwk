@@ -5,13 +5,13 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
 	"runtime"
-	"github.com/kwk-super-snippets/cli/src/app/out"
 )
 
 const workFolder = "./update_work"

@@ -3,12 +3,12 @@ package app
 import (
 	"bytes"
 	gu "github.com/inconshreveable/go-update"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/types/errs"
 	"io"
 	"os"
 	"os/exec"
 	"time"
-	"github.com/kwk-super-snippets/cli/src/app/out"
 )
 
 const RecordFile = "update-record.json"
@@ -124,7 +124,7 @@ func (r *UpdateRunner) isUpdateDue() (bool, error) {
 func exe(wait bool, name string, arg ...string) {
 	c := exec.Command(name, arg...)
 	c.Stdin = os.Stdin
-	out, err := c.StdoutPipe()
+	stdOut, err := c.StdoutPipe()
 	if err != nil {
 		out.LogErrM("If you are running nacl or OpenBSD they are not supported.", err)
 	}
@@ -140,5 +140,5 @@ func exe(wait bool, name string, arg ...string) {
 	if err != nil {
 		out.LogErrM("Couldn't execute command.", err)
 	}
-	out.Close()
+	stdOut.Close()
 }
