@@ -10,7 +10,7 @@ import (
 
 type users struct {
 	client    types.UsersClient
-	persister Persister
+	persister DocStore
 	vwrite.Writer
 	Dialog
 	dash *Dashboard
@@ -21,7 +21,7 @@ type UserWithToken struct {
 	User        types.User
 }
 
-func NewUsers(u types.UsersClient, s Persister, w vwrite.Writer, d Dialog, dash *Dashboard) *users {
+func NewUsers(u types.UsersClient, s DocStore, w vwrite.Writer, d Dialog, dash *Dashboard) *users {
 	return &users{client: u, persister: s, Writer: w, Dialog: d, dash: dash}
 }
 

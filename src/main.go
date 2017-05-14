@@ -16,7 +16,7 @@ import (
 var (
 	KWK_TEST_MODE = false
 	f             app.IO
-	j             app.Persister
+	j             app.DocStore
 )
 
 func main() {

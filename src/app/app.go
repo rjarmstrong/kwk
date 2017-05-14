@@ -23,7 +23,7 @@ type KwkApp struct {
 	Users    types.UsersClient
 	Snippets types.SnippetsClient
 	File     IO
-	Settings Persister
+	Settings DocStore
 	Updater  *Updater
 	Runner   Runner
 	Dialogue Dialog
@@ -31,7 +31,7 @@ type KwkApp struct {
 	errs.Handler
 }
 
-func NewApp(a types.SnippetsClient, f IO, t Persister, r Runner, u types.UsersClient,
+func NewApp(a types.SnippetsClient, f IO, t DocStore, r Runner, u types.UsersClient,
 	d Dialog, w vwrite.Writer, up Updater, eh errs.Handler) *KwkApp {
 	out.SetColors(out.ColorsDefault())
 	NewConfig(a, f, u, eh)

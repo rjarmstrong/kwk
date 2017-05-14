@@ -22,7 +22,7 @@ func Test_Update(t *testing.T) {
 			Applier:        am.Apply,
 			Rollbacker:     am.RollbackError,
 			BinRepo:        rm,
-			Persister:      pm,
+			DocStore:       pm,
 			currentVersion: "v0.0.1",
 		}
 

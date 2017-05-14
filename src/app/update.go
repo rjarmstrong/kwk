@@ -33,12 +33,12 @@ type UpdateRunner struct {
 	BinRepo
 	Applier
 	Rollbacker
-	Persister
+	DocStore
 	currentVersion string
 }
 
-func NewUpdateRunner(p Persister, version string) Updater {
-	return &UpdateRunner{currentVersion: version, BinRepo: &S3Repo{}, Applier: gu.Apply, Rollbacker: gu.RollbackError, Persister: p, UpdatePeriod: time.Hour}
+func NewUpdateRunner(p DocStore, version string) Updater {
+	return &UpdateRunner{currentVersion: version, BinRepo: &S3Repo{}, Applier: gu.Apply, Rollbacker: gu.RollbackError, DocStore: p, UpdatePeriod: time.Hour}
 }
 
 type Applier func(update io.Reader, opts gu.Options) error
@@ -95,7 +95,7 @@ func (r *UpdateRunner) Run() error {
 func (r *UpdateRunner) recordUpdate() error {
 	ur := &Record{LastUpdate: time.Now().Unix()}
 	out.Debug("Updating update record.")
-	return r.Persister.Upsert(RecordFile, ur)
+	return r.DocStore.Upsert(RecordFile, ur)
 }
 
 func (r *UpdateRunner) isUpdateDue() (bool, error) {
@@ -106,7 +106,7 @@ func (r *UpdateRunner) isUpdateDue() (bool, error) {
 	ur := &Record{}
 	hiatus := time.Now().Unix() - int64(r.UpdatePeriod/time.Second)
 	out.Debug("Checking update is newer than: %d (Unix time seconds)", hiatus)
-	if err := r.Persister.Get(RecordFile, ur, hiatus); err != nil {
+	if err := r.DocStore.Get(RecordFile, ur, hiatus); err != nil {
 		out.LogErrM("Couldn't get local update record.", err)
 		err2, ok := err.(*errs.Error)
 		if !ok {
