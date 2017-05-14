@@ -76,6 +76,7 @@ func (s *StdIO) upsertDirectory(dir string) error {
 	return nil
 }
 
+// getSubDir gets the directory immediately below the root (~/.kwk/<sub dir>)
 func (s *StdIO) getSubDir(directoryName string) (string, error) {
 	dir := path.Join(out.KwkPath(), directoryName)
 	out.Debug("DIR: %s", dir)
@@ -83,8 +84,9 @@ func (s *StdIO) getSubDir(directoryName string) (string, error) {
 	return dir, err
 }
 
-func (s *StdIO) getHoldingDirectory(subDirName string, fullName string) string {
-	hd := strings.Replace(fullName, ".", "_", -1)
+// getHoldingDirectory gets the directory which holds the file, creates it if it doesn't exist.
+func (s *StdIO) getHoldingDirectory(subDirName string, fileName string) string {
+	hd := strings.Replace(fileName, ".", "_", -1)
 	dirPath := path.Join(out.KwkPath(), subDirName, hd)
 	if e := s.upsertDirectory(dirPath); e != nil {
 		out.Debug("Could not create directory:")
@@ -94,6 +96,7 @@ func (s *StdIO) getHoldingDirectory(subDirName string, fullName string) string {
 	return hd
 }
 
+// getFilePath gets the file path of the actual document.
 func (s *StdIO) getFilePath(subDirName string, suffixPath string, incHoldingDir bool) string {
 	sn := sanitize.Name(suffixPath)
 	if incHoldingDir {

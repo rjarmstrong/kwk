@@ -3,21 +3,9 @@ package app
 import "encoding/json"
 
 /*
-Persist is a simplified file system interface, the idea is that you can read and write to the native file system with json or whichever format you  implement the stack looks like this:
-
-Persister
-|-----------|
-IO
-
-
-Current implementation is:
-
-JSON Persister
-|-----------------------|
-IO
-
+DocStore is a simplified file system interface, the idea is that you can read and write to the native file system with json or whichever format you like.
 */
-type Persister interface {
+type DocStore interface {
 	Upsert(fullKey string, data interface{}) error
 	Get(fullKey string, value interface{}, fresherThan int64) error
 	Delete(fullKey string) error
@@ -31,7 +19,7 @@ type Json struct {
 	System        IO
 }
 
-func NewJson(s IO, subDirName string) Persister {
+func NewJson(s IO, subDirName string) DocStore {
 	return &Json{DirectoryName: subDirName, System: s}
 }
 
