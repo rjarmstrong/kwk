@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"github.com/kwk-super-snippets/cli/src/models"
 	. "github.com/smartystreets/goconvey/convey"
 	"os"
 	"testing"
