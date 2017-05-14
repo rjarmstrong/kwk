@@ -1,0 +1,411 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "types";
+option java_outer_classname = "Snippets";
+
+package types;
+
+service Snippets {
+    rpc Create (CreateRequest) returns (CreateResponse) {
+    }
+    rpc Update (UpdateRequest) returns (UpdateResponse) {
+    }
+    rpc Move (MoveRequest) returns (MoveResponse) {
+    }
+    rpc Rename (RenameRequest) returns (RenameResponse) {
+    }
+    rpc Patch (PatchRequest) returns (PatchResponse) {
+    }
+    rpc Clone (CloneRequest) returns (CloneResponse) {
+    }
+    rpc Tag (TagRequest) returns (TagResponse) {
+    }
+    rpc UnTag (UnTagRequest) returns (UnTagResponse) {
+    }
+    rpc Get (GetRequest) returns (ListResponse) {
+    }
+    rpc List (ListRequest) returns (ListResponse) {
+    }
+    rpc Delete (DeleteRequest) returns (DeleteResponse) {
+    }
+    rpc GetRoot (RootRequest) returns (RootResponse) {
+    }
+    rpc CreatePouch (CreatePouchRequest) returns (CreatePouchResponse) {
+    }
+    rpc RenamePouch (RenamePouchRequest) returns (RenamePouchResponse) {
+    }
+    rpc MakePouchPrivate (MakePrivateRequest) returns (MakePrivateResponse) {
+    }
+    rpc DeletePouch (DeletePouchRequest) returns (DeletePouchResponse) {
+    }
+    rpc Alpha (AlphaRequest) returns (AlphaResponse) {
+    }
+    rpc TypeAhead (TypeAheadRequest) returns (TypeAheadResponse) {
+    }
+    rpc LogUse (UseContext) returns (LogUseResponse) {
+    }
+}
+
+message UseContext {
+    Alias alias = 1;
+    UseType type = 2;
+    UseStatus status = 3;
+    string preview = 4;
+    int64 time = 5;
+    int64 level = 6;
+    string runner = 7;
+    string callerAlias = 8;
+    string os = 9;
+}
+
+message LogUseResponse {
+}
+
+message AlphaRequest {
+    string term = 1;
+    string extension = 2;
+    string username = 3;
+    bool all = 4; // Search both private and public snippets.
+    bool global = 5; // Search everyones snippets.
+}
+
+// AlphaResponse is the actual method response wheras AlphaResult
+// is the search result item.
+message AlphaResponse {
+    repeated AlphaItem results = 1;
+    int64 total = 2;
+    int64 took = 3;
+    string term = 4;
+}
+
+message TypeAheadRequest {
+    string term = 1;
+    string extension = 2;
+    string username = 3;
+    bool all = 4; // Search both private and public snippets.
+    bool global = 5; // Search everyones snippets.
+}
+
+message TypeAheadResponse {
+    repeated TypeAheadItem results = 1;
+    int64 total = 2;
+    int64 took = 3;
+}
+
+message TypeAheadItem {
+    Snippet snippet = 1;
+}
+
+message AlphaItem {
+    Snippet snippet = 1;
+    map<string, string> highlights = 2;
+}
+
+message CreatePouchRequest {
+    string username = 1;
+    string name = 2;
+    bool makePrivate = 3;
+    bool encrypt = 4;
+}
+
+message CreatePouchResponse {
+    string id = 1;
+}
+
+message RenamePouchRequest {
+    string username = 1;
+    string name = 2;
+    string newName = 3;
+}
+
+message RenamePouchResponse {
+    string originalName = 2;
+    string name = 3;
+}
+
+message MakePrivateRequest {
+    string username = 1;
+    string name = 2;
+    bool makePrivate = 3;
+}
+
+message MakePrivateResponse {
+    bool isPrivate = 1;
+}
+
+message DeletePouchRequest {
+    string username = 1;
+    string name = 3;
+}
+
+message DeletePouchResponse {
+}
+
+message CreateRequest {
+    string content = 1;
+    Alias alias = 2;
+    string description = 3;
+    Role role = 4;
+    Tags tags = 5;
+    Alias clonedFrom = 6;
+}
+
+message UpdateRequest {
+    Alias alias = 1;
+    string description = 2;
+}
+
+message MoveRequest {
+    string username = 1;
+    string sourcePouch = 2;
+    string targetPouch = 3;
+    repeated SnipName snipNames = 4;
+}
+
+message Alias {
+    string username = 1;
+    string pouch = 2;
+    string name = 3;
+    string ext = 4;
+    int64 version = 5;
+}
+
+message SnipName {
+    string name = 1;
+    string ext = 2;
+}
+
+message MoveResponse {
+    string pouch = 1;
+}
+
+message RenameRequest {
+    Alias alias = 1;
+    SnipName newName = 3;
+}
+
+message RenameResponse {
+    Snippet snippet = 1;
+    SnipName original = 2;
+}
+
+message PatchRequest {
+    Alias alias = 1;
+    string target = 2;
+    string patch = 3;
+}
+
+message PatchResponse {
+    Snippet snippet = 1;
+}
+
+message UpdateResponse {
+    Snippet snippet = 1;
+}
+
+message CloneRequest {
+    Alias alias = 1;
+    Alias new = 2;
+}
+
+message CloneResponse {
+    Snippet snippet = 1;
+}
+
+message TagRequest {
+    Alias alias = 1;
+    repeated string tags = 2;
+}
+
+message TagResponse {
+    Snippet snippet = 1;
+}
+
+message UnTagRequest {
+    Alias alias = 1;
+    repeated string tags = 2;
+}
+
+message UnTagResponse {
+    Snippet snippet = 1;
+}
+
+message GetRequest {
+    Alias alias = 1;
+    int64 version = 2;
+}
+
+message ListRequest {
+    string username = 1;
+    int64 since = 2;
+    int64 size = 3;
+    repeated string tags = 4;
+    repeated string extensions = 5;
+    bool all = 6;
+    string pouch = 7;
+    // IgnorePouches - In the event an empty pouch is provided it does not allow us to check
+    // whether the intention was to list 'all snippets' or just the root pouch denoted by an empty string
+    // thus this flag resolves the ambiguity.
+    bool ignorePouches = 8;
+    string category = 9;
+}
+
+message RootRequest {
+    string username = 1;
+    bool all = 2;
+}
+
+message RootResponse {
+    repeated Snippet snippets = 1;
+    repeated Pouch pouches = 2;
+    repeated Pouch personal = 3;
+    string Username = 4;
+    UserStats stats = 5;
+}
+
+message UserStats {
+    int64 maxUsePerPouch = 1;
+    int64 maxSnipsPerPouch = 2;
+    repeated string recentPouches = 3;
+    string lastPouch = 4;
+}
+
+message DeleteRequest {
+    string username = 1;
+    string pouch = 2;
+    repeated SnipName names = 3;
+}
+
+message DeleteResponse {
+    repeated Alias deleted = 1;
+    ListResponse list = 2;
+
+}
+
+message CreateResponse {
+    Snippet snippet = 1;
+    TypeMatchResponse typeMatch = 2;
+}
+
+message Pouch {
+    string id = 1;
+    string username = 2;
+    string name = 3;
+    bool makePrivate = 4;
+    bool encrypt = 5;
+    repeated string sharedWith = 6;
+    int64 modified = 7;
+    int64 unOpened = 8;
+    PouchType type = 9;
+    PouchCounts stats = 10;
+    int64 lastUse = 11;
+}
+
+message PouchCounts {
+    int64 views = 1;
+    int64 runs = 2;
+    int64 clones = 3;
+    int64 snips = 5;
+    int64 red = 4;
+    int64 green = 7;
+}
+
+message Snippet {
+    Alias alias = 1;
+    string id = 2;
+    string content = 4;
+    Tags tags = 5;
+    int64 created = 6;
+    int64 updated = 7;
+    string description = 8;
+    string clonedFromURI = 9;
+    int64 clonedFromVersion = 10;
+    string clonedFromId = 11;
+    bool private = 12;
+
+    string checksum = 13;
+    string signature = 14;
+    bool encrypted = 15;
+    string encryptedAlgo = 16;
+    Role role = 17;
+
+    SnipCounts stats = 18;
+    UseStatus runStatus = 19;
+    int64 runStatusTime = 20;
+
+    string preview = 21;
+
+    Dependencies dependencies = 22;
+    Apps apps = 23;
+    Runtimes supportedOn = 24;
+    string attribution = 25;
+    string pouchId = 27;
+    bool latest = 28;
+}
+
+message Tags {
+    repeated string names = 1;
+}
+
+message Dependencies {
+    repeated Alias aliases = 1;
+}
+
+message Apps {
+    repeated Alias aliases = 1;
+}
+message Runtimes {
+    repeated string oss = 1;
+}
+
+message SnipCounts {
+    int64 views = 1;
+    int64 clones = 2;
+    int64 runs = 3;
+}
+
+enum UseStatus {
+    Unknown = 0;
+    Success = 1;
+    Fail = 2;
+}
+
+enum UseType {
+    UnknownUse = 0;
+    View = 1;
+    Run = 2;
+    Clone = 3;
+}
+
+enum Role {
+    Standard = 0;
+    Preferences = 1;
+    Environment = 2;
+    Message = 3;
+}
+
+enum PouchType {
+    Physical   = 0;
+    Virtual    = 1;
+    Personal   = 2;
+    Promoted   = 3;
+}
+
+message TypeMatchResponse {
+    repeated MatchResponse matches = 1;
+}
+
+message MatchResponse {
+    string extension = 1;
+    int64 score = 2;
+}
+
+message ListResponse {
+    repeated Snippet items = 1;
+    int64 total = 2;
+    int64 since = 3;
+    int64 size = 4;
+    string username = 5; // There are cases where pouch will be nil thus username is still relevant here.
+    Pouch pouch = 6;
+}
