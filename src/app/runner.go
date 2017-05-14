@@ -93,7 +93,7 @@ func (r *runner) Edit(s *types.Snippet) error {
 	if err != nil {
 		return err
 	}
-	_, err = r.snippets.Patch(GetCtx(), &types.PatchRequest{Alias: s.Alias, Target: s.Content, Patch: text})
+	_, err = r.snippets.Patch(Ctx(), &types.PatchRequest{Alias: s.Alias, Target: s.Content, Patch: text})
 	if err != nil {
 		return err
 	}
@@ -250,7 +250,7 @@ func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...s
 }
 
 func (r *runner) logUse(a *types.Alias, output string, node *ProcessNode, s types.UseStatus) {
-	r.snippets.LogUse(GetCtx(), &types.UseContext{
+	r.snippets.LogUse(Ctx(), &types.UseContext{
 		Alias:       a,
 		Type:        types.UseType_Run,
 		Status:      s,

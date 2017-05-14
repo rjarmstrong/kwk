@@ -36,7 +36,7 @@ func (c *users) SignUp() error {
 	inviteCode := res.Value.(string)
 
 	req := &types.SignUpRequest{Email: email, Username: username, Password: password, InviteCode: inviteCode}
-	u, err := c.client.SignUp(GetCtx(), req)
+	u, err := c.client.SignUp(Ctx(), req)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func (c *users) SignIn(username string, password string) error {
 		res, _ := c.FormField(out.UserPasswordField, true)
 		password = res.Value.(string)
 	}
-	u, err := c.client.SignIn(GetCtx(), &types.SignInRequest{Username: username, Password: password})
+	u, err := c.client.SignIn(Ctx(), &types.SignInRequest{Username: username, Password: password})
 	if err != nil {
 		return err
 	}
@@ -92,7 +92,7 @@ func (c *users) ChangePassword() error {
 	p.ExistingPassword = res.Value.(string)
 	res, _ = c.FormField(out.FreeText("New password: "), true)
 	p.NewPassword = res.Value.(string)
-	_, err := c.client.ChangePassword(GetCtx(), p)
+	_, err := c.client.ChangePassword(Ctx(), p)
 	if err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func (c *users) ResetPassword(email string) error {
 		email = res.Value.(string)
 	}
 	req := &types.ResetRequest{Email: email}
-	_, err := c.client.ResetPassword(GetCtx(), req)
+	_, err := c.client.ResetPassword(Ctx(), req)
 	if err != nil {
 		return err
 	}

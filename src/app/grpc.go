@@ -78,7 +78,7 @@ func GetConn(serverAddress string, trustAllCerts bool) (*grpc.ClientConn, error)
 	return conn, err
 }
 
-func GetCtx() context.Context {
+func Ctx() context.Context {
 	if principal == nil {
 		return context.Background()
 	} else {

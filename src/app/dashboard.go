@@ -27,7 +27,7 @@ func (d *Dashboard) writer(w io.Writer, templ string, data interface{}) {
 		d.Write(out.SignedOut())
 		return
 	}
-	r, err := d.s.GetRoot(GetCtx(), &types.RootRequest{})
+	r, err := d.s.GetRoot(Ctx(), &types.RootRequest{})
 	if err != nil {
 		d.Handle(err)
 		return
