@@ -89,7 +89,7 @@ func (r *runner) Edit(s *types.Snippet) error {
 		rdr.ReadLine()
 	}
 
-	text, err := r.file.Read(snipCachePath, s.String(), true, 0)
+	text, err := r.file.Read(snipCachePath, s.Alias.URI(), true, 0)
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 	}
 	comp, interp := getSubSection(rs, yamlKey)
 	if comp != nil {
-		if filePath, err := r.file.Write(snipCachePath, s.String(), s.Content, true); err != nil {
+		if filePath, err := r.file.Write(snipCachePath, s.Alias.URI(), s.Content, true); err != nil {
 			return err
 		} else {
 			_, compile := getSubSection(&comp, "compile")
@@ -164,7 +164,7 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 }
 
 func (r *runner) execEdit(a *types.Alias, editor string, arg ...string) error {
-	out.Debug("EXEC EDIT: %s %s %s", a.String(), editor, strings.Join(arg, " "))
+	out.Debug("EXEC EDIT: %s %s %s", a.URI(), editor, strings.Join(arg, " "))
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(Prefs().CommandTimeout)*time.Second)
 	c := exec.CommandContext(ctx, editor, arg...)
 	c.Stdin = os.Stdin
@@ -232,7 +232,7 @@ func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...s
 		node.Complete(c.ProcessState.Pid())
 	}
 	if stderr.Len() > 0 {
-		desc := fmt.Sprintf("Error running '%s' (runner: '%s' %s)\n\n%s", a.String(), runner, err.Error(), stderr.String())
+		desc := fmt.Sprintf("Error running '%s' (runner: '%s' %s)\n\n%s", a.URI(), runner, err.Error(), stderr.String())
 		r.logUse(a, stderr.String(), node, types.UseStatus_Fail)
 		return errs.New(errs.CodeRunnerExit, desc)
 	}
