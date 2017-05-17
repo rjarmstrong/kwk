@@ -22,7 +22,7 @@ func SnippetClonedAs(newName string) vwrite.Handler {
 
 func SnippetCreated(s *types.Snippet) vwrite.Handler {
 	return Success(vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprintf(w, "%s %s created \n\n", snippetIcon(s), s.String())
+		fmt.Fprintf(w, "%s %s created \n\n", snippetIcon(s), s.Alias.URI())
 	}))
 }
 

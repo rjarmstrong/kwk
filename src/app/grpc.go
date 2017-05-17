@@ -17,6 +17,7 @@ import (
 	"os"
 	"runtime"
 	"time"
+	"fmt"
 )
 
 // /etc/ssl/certs/COMODO_RSA_Certification_Authority.pem
@@ -104,7 +105,7 @@ var noAuthMethods = map[string]bool{
 }
 
 func interceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-	out.Debug("GRPC: %s %+v", method, req)
+	out.Debug(fmt.Sprintf("GRPC: %s %+v", method, req))
 	if !principal.HasAccessToken() && !noAuthMethods[method] {
 		out.Debug("AUTH: No token in request.")
 		return errs.NotAuthenticated
@@ -119,7 +120,7 @@ func translateGrpcErr(e error) error {
 		return nil
 	}
 	se, _ := status.FromError(e)
-	out.Debug("API ERROR:%v", se.Message())
+	out.Debug(fmt.Sprintf("API ERROR:%v", se.Message()))
 	switch se.Code() {
 	case codes.InvalidArgument:
 		te := &errs.Error{}

@@ -31,7 +31,6 @@ type ProviderMock struct {
 func (ProviderMock) Load() {
 }
 
-
 type ConfigProvider struct {
 	u              types.UsersClient
 	envResolvers   ConfigResolver
