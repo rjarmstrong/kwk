@@ -12,26 +12,6 @@
 			"Rev": "b7ed37b82869576c289d7d97fb2bbd8b64a0cb28"
 		},
 		{
-			"ImportPath": "github.com/gocql/gocql",
-			"Comment": "pre-node-events-496-g329465a",
-			"Rev": "329465aea2c3e92f96362a2ef1ae5ae225566f93"
-		},
-		{
-			"ImportPath": "github.com/gocql/gocql/internal/lru",
-			"Comment": "pre-node-events-496-g329465a",
-			"Rev": "329465aea2c3e92f96362a2ef1ae5ae225566f93"
-		},
-		{
-			"ImportPath": "github.com/gocql/gocql/internal/murmur",
-			"Comment": "pre-node-events-496-g329465a",
-			"Rev": "329465aea2c3e92f96362a2ef1ae5ae225566f93"
-		},
-		{
-			"ImportPath": "github.com/gocql/gocql/internal/streams",
-			"Comment": "pre-node-events-496-g329465a",
-			"Rev": "329465aea2c3e92f96362a2ef1ae5ae225566f93"
-		},
-		{
 			"ImportPath": "github.com/golang/protobuf/proto",
 			"Rev": "2bba0603135d7d7f5cb73b2125beeda19c09f4ef"
 		},
@@ -40,20 +20,12 @@
 			"Rev": "2bba0603135d7d7f5cb73b2125beeda19c09f4ef"
 		},
 		{
-			"ImportPath": "github.com/golang/snappy",
-			"Rev": "553a641470496b2327abcac10b36396bd98e45c9"
-		},
-		{
 			"ImportPath": "github.com/google/go-genproto/googleapis/rpc/status",
 			"Rev": "411e09b969b1170a9f0c467558eb4c4c110d9c77"
 		},
 		{
 			"ImportPath": "github.com/gopherjs/gopherjs/js",
 			"Rev": "e34a5cd6a1bc7c4fde759f2d3039852fc68b5fcc"
-		},
-		{
-			"ImportPath": "github.com/hailocab/go-hostpool",
-			"Rev": "e80d13ce29ede4452c43dea11e79b9bc8a15b478"
 		},
 		{
 			"ImportPath": "github.com/howeyc/gopass",
@@ -92,23 +64,23 @@
 		},
 		{
 			"ImportPath": "github.com/kwk-super-snippets/types",
-			"Rev": "17283e7b77e225383eee7d5c380b819b2d96d75d"
+			"Rev": "d296ca6c67d648871e8d1e7c9fe57d3c90793491"
 		},
 		{
 			"ImportPath": "github.com/kwk-super-snippets/types/age",
-			"Rev": "17283e7b77e225383eee7d5c380b819b2d96d75d"
+			"Rev": "d296ca6c67d648871e8d1e7c9fe57d3c90793491"
 		},
 		{
 			"ImportPath": "github.com/kwk-super-snippets/types/errs",
-			"Rev": "17283e7b77e225383eee7d5c380b819b2d96d75d"
+			"Rev": "d296ca6c67d648871e8d1e7c9fe57d3c90793491"
 		},
 		{
 			"ImportPath": "github.com/kwk-super-snippets/types/valid",
-			"Rev": "17283e7b77e225383eee7d5c380b819b2d96d75d"
+			"Rev": "d296ca6c67d648871e8d1e7c9fe57d3c90793491"
 		},
 		{
 			"ImportPath": "github.com/kwk-super-snippets/types/vwrite",
-			"Rev": "17283e7b77e225383eee7d5c380b819b2d96d75d"
+			"Rev": "d296ca6c67d648871e8d1e7c9fe57d3c90793491"
 		},
 		{
 			"ImportPath": "github.com/lunixbochs/vtclean",
@@ -291,11 +263,6 @@
 			"ImportPath": "google.golang.org/grpc/transport",
 			"Comment": "v1.2.0-30-g9090ef9",
 			"Rev": "9090ef91c3dbc363b02e1113c619d4d986a53248"
-		},
-		{
-			"ImportPath": "gopkg.in/inf.v0",
-			"Comment": "v0.9.0",
-			"Rev": "3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4"
 		},
 		{
 			"ImportPath": "gopkg.in/natefinch/lumberjack.v2",

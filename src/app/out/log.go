@@ -35,6 +35,7 @@ func LogErrM(message string, err error) error {
 }
 
 func LogErr(err error) error {
+	fileLogger.Println(err)
 	fileLogger.Output(2, string(debug.Stack()))
 	if !DebugEnabled {
 		return nil

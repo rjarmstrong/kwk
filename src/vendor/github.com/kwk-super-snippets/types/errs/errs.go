@@ -40,6 +40,7 @@ const (
 	CodeEmbeddedSnippetsRequireExt      ErrCode = 3200
 	CodeEmbeddedSnippetsRequireUsername ErrCode = 3210
 	CodeNoTags                          ErrCode = 3250
+	CodeClonedFromAliasVersionMissing   ErrCode = 3260
 
 	// Pouches
 	CodeInvalidPouchName      ErrCode = 3500

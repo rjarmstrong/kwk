@@ -21,6 +21,10 @@ type UserWithToken struct {
 	User        types.User
 }
 
+func (m *UserWithToken) HasAccessToken() bool {
+	return m.AccessToken != ""
+}
+
 func NewUsers(u types.UsersClient, s DocStore, w vwrite.Writer, d Dialog, dash *Dashboard) *users {
 	return &users{client: u, persister: s, Writer: w, Dialog: d, dash: dash}
 }

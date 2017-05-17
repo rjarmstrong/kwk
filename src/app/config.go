@@ -40,9 +40,9 @@ type ConfigProvider struct {
 }
 
 func NewConfig(ss types.SnippetsClient, f IO, u types.UsersClient, eh errs.Handler) Provider {
-	env := NewEnvResolvers(ss, f)
-	prefs := NewPrefsResolvers(ss, f)
-	c := &ConfigProvider{envResolvers: env, prefsResolvers: prefs, u: u, Handler: eh}
+	er := NewEnvResolvers(ss, f)
+	pr := NewPrefsResolvers(ss, f)
+	c := &ConfigProvider{envResolvers: er, prefsResolvers: pr, u: u, Handler: eh}
 	c.Load()
 	return c
 }
@@ -107,7 +107,7 @@ func (cs *ConfigProvider) loadPrefs() {
 }
 
 func (cs *ConfigProvider) GetConfig(r ConfigResolver) (string, error) {
-	if principal == nil {
+	if !principal.HasAccessToken() {
 		return r.Anon()
 	}
 	if conf, err := r.Local(); err == nil {

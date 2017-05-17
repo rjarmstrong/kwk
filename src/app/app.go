@@ -13,7 +13,7 @@ import (
 
 var (
 	CLIInfo   = types.AppInfo{}
-	principal *UserWithToken
+	principal = &UserWithToken{}
 )
 
 const profileFileName = "profile.json"
@@ -31,9 +31,10 @@ type KwkApp struct {
 	errs.Handler
 }
 
-func NewApp(a types.SnippetsClient, f IO, t DocStore, r Runner, u types.UsersClient,
+func NewApp(a types.SnippetsClient, f IO, docs DocStore, r Runner, u types.UsersClient,
 	d Dialog, w vwrite.Writer, up Updater, eh errs.Handler) *KwkApp {
 	out.SetColors(out.ColorsDefault())
+	docs.Get(profileFileName, principal, 0)
 	NewConfig(a, f, u, eh)
 	ap := cli.NewApp()
 	ap = setupFlags(ap)
@@ -50,17 +51,17 @@ func NewApp(a types.SnippetsClient, f IO, t DocStore, r Runner, u types.UsersCli
 		},
 	})
 	cli.HelpPrinter = dash.GetWriter()
-	accCli := NewUsers(u, t, w, d, dash)
+	accCli := NewUsers(u, docs, w, d, dash)
 	ap.Commands = append(ap.Commands, userRoutes(accCli)...)
 	sysCli := NewSystem(w, up)
 	ap.Commands = append(ap.Commands, systemRoutes(sysCli)...)
-	snipCli := NewSnippets(a, r, d, w, t)
+	snipCli := NewSnippets(a, r, d, w, docs)
 	ap.Commands = append(ap.Commands, snippetsRoutes(snipCli)...)
 	ap.CommandNotFound = getDefaultCommand(snipCli)
 	return &KwkApp{
 		App:      ap,
 		File:     f,
-		Settings: t,
+		Settings: docs,
 		Runner:   r,
 		Users:    u,
 		Dialogue: d,

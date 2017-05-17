@@ -7,10 +7,26 @@ import (
 	"strings"
 )
 
+func NewBlankSnippet() *Snippet {
+	return &Snippet{
+		Alias:        &Alias{},
+		Content:      "",
+		SupportedOn:  &Runtimes{Oss: map[string]bool{}},
+		Apps:         &Apps{Aliases: []*Alias{}},
+		Dependencies: &Dependencies{Aliases: []*Alias{}},
+		Tags:         &Tags{Names: map[string]bool{}},
+		Stats:        &SnipStats{},
+	}
+}
+
 func NewSnippet(a *Alias, content string) *Snippet {
 	return &Snippet{
-		Alias:   a,
-		Content: content,
+		Alias:        a,
+		Content:      content,
+		SupportedOn:  &Runtimes{Oss: map[string]bool{}},
+		Apps:         &Apps{Aliases: []*Alias{}},
+		Dependencies: &Dependencies{Aliases: []*Alias{}},
+		Tags:         &Tags{Names: map[string]bool{}},
 	}
 }
 

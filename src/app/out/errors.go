@@ -95,8 +95,8 @@ func internalError(err error) vwrite.Handler {
 			return
 		}
 		LogErr(err)
-		fmt.Fprintln(w, "%s  We have a code RED error. \n- To report type: kwk upload-errors \n"+
-			"- You can also try to upgrade: npm update kwkcli -g\n", style.Fire)
+		fmt.Fprintln(w, "🔥  We have a code RED error. \n- To report type: kwk upload-errors \n"+
+			"- You can also try to upgrade: npm update kwkcli -g\n")
 		os.Exit(1)
 	})
 }

@@ -23,7 +23,7 @@ func (d *Dashboard) GetWriter() func(w io.Writer, templ string, data interface{}
 }
 
 func (d *Dashboard) writer(w io.Writer, templ string, data interface{}) {
-	if principal == nil {
+	if !principal.HasAccessToken() {
 		d.Write(out.SignedOut())
 		return
 	}

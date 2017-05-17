@@ -65,9 +65,14 @@ func printSnippetView(w io.Writer, s *types.Snippet) {
 	tbl.Append([]string{
 		style.Fmt16(style.Subdued, "Used by:"),
 		style.FBox(strings.Join(apps, ", "), 50, 5)})
+
+	var oss []string
+	for k := range s.SupportedOn.Oss {
+		oss = append(oss, k)
+	}
 	tbl.Append([]string{
 		style.Fmt16(style.Subdued, "Supported OS:"),
-		style.FBox(strings.Join(s.SupportedOn.Oss, ", "), 50, 5)})
+		style.FBox(strings.Join(oss, ", "), 50, 5)})
 	tbl.Append([]string{
 		style.Fmt16(style.Subdued, "Description:"), style.FBox(FEmpty(s.Description), 50, 3), "", ""})
 
@@ -75,8 +80,8 @@ func printSnippetView(w io.Writer, s *types.Snippet) {
 		style.Fmt16(style.Subdued, "Preview:"), Fpreview(s.Preview, 50, 1), "", ""})
 
 	var tags []string
-	for _, v := range s.Tags.Names {
-		tags = append(tags, v)
+	for k := range s.Tags.Names {
+		tags = append(tags, k)
 	}
 	tbl.Append([]string{
 		style.Fmt16(style.Subdued, "Tags:"), FTags(tags), "", ""})

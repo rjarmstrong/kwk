@@ -110,7 +110,8 @@ message CreatePouchRequest {
 }
 
 message CreatePouchResponse {
-    string id = 1;
+    Pouch pouch = 1;
+    RootResponse root = 2;
 }
 
 message RenamePouchRequest {
@@ -120,8 +121,9 @@ message RenamePouchRequest {
 }
 
 message RenamePouchResponse {
-    string originalName = 2;
-    string name = 3;
+    string originalName = 1;
+    string name = 2;
+    RootResponse root = 3;
 }
 
 message MakePrivateRequest {
@@ -140,6 +142,7 @@ message DeletePouchRequest {
 }
 
 message DeletePouchResponse {
+    RootResponse root = 1;
 }
 
 message CreateRequest {
@@ -161,6 +164,7 @@ message MoveRequest {
     string sourcePouch = 2;
     string targetPouch = 3;
     repeated SnipName snipNames = 4;
+    ListResponse list = 5;
 }
 
 message Alias {
@@ -178,6 +182,7 @@ message SnipName {
 
 message MoveResponse {
     string pouch = 1;
+    ListResponse list = 2;
 }
 
 message RenameRequest {
@@ -211,6 +216,7 @@ message CloneRequest {
 
 message CloneResponse {
     Snippet snippet = 1;
+    ListResponse list = 2;
 }
 
 message TagRequest {
@@ -239,16 +245,12 @@ message GetRequest {
 message ListRequest {
     string username = 1;
     int64 since = 2;
-    int64 size = 3;
+    int64 limit = 3;
     repeated string tags = 4;
     repeated string extensions = 5;
     bool all = 6;
     string pouch = 7;
-    // IgnorePouches - In the event an empty pouch is provided it does not allow us to check
-    // whether the intention was to list 'all snippets' or just the root pouch denoted by an empty string
-    // thus this flag resolves the ambiguity.
-    bool ignorePouches = 8;
-    string category = 9;
+    string category = 8;
 }
 
 message RootRequest {
@@ -286,6 +288,7 @@ message DeleteResponse {
 message CreateResponse {
     Snippet snippet = 1;
     TypeMatchResponse typeMatch = 2;
+    ListResponse list = 3;
 }
 
 message Pouch {
@@ -294,15 +297,16 @@ message Pouch {
     string name = 3;
     bool makePrivate = 4;
     bool encrypt = 5;
-    repeated string sharedWith = 6;
-    int64 modified = 7;
+    SharedWith sharedWith = 6;
+    int64 updated = 7;
     int64 unOpened = 8;
     PouchType type = 9;
-    PouchCounts stats = 10;
+    PouchStats stats = 10;
     int64 lastUse = 11;
+    int64 created = 12;
 }
 
-message PouchCounts {
+message PouchStats {
     int64 views = 1;
     int64 runs = 2;
     int64 clones = 3;
@@ -320,8 +324,6 @@ message Snippet {
     int64 updated = 7;
     string description = 8;
     string clonedFromURI = 9;
-    int64 clonedFromVersion = 10;
-    string clonedFromId = 11;
     bool private = 12;
 
     string checksum = 13;
@@ -330,7 +332,7 @@ message Snippet {
     string encryptedAlgo = 16;
     Role role = 17;
 
-    SnipCounts stats = 18;
+    SnipStats stats = 18;
     UseStatus runStatus = 19;
     int64 runStatusTime = 20;
 
@@ -345,7 +347,7 @@ message Snippet {
 }
 
 message Tags {
-    repeated string names = 1;
+    map<string, bool> names = 1;
 }
 
 message Dependencies {
@@ -356,10 +358,13 @@ message Apps {
     repeated Alias aliases = 1;
 }
 message Runtimes {
-    repeated string oss = 1;
+    map<string, bool> oss = 1;
+}
+message SharedWith {
+    map<string, bool> usernames = 1;
 }
 
-message SnipCounts {
+message SnipStats {
     int64 views = 1;
     int64 clones = 2;
     int64 runs = 3;
@@ -405,7 +410,7 @@ message ListResponse {
     repeated Snippet items = 1;
     int64 total = 2;
     int64 since = 3;
-    int64 size = 4;
+    int64 limit = 4;
     string username = 5; // There are cases where pouch will be nil thus username is still relevant here.
     Pouch pouch = 6;
 }

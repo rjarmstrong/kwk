@@ -99,13 +99,13 @@ func Ctx() context.Context {
 }
 
 var noAuthMethods = map[string]bool{
-	"/usersRpc.UsersRpc/SignIn": true,
-	"/usersRpc.UsersRpc/SignUp": true,
+	"/types.Users/SignIn": true,
+	"/types.Users/SignUp": true,
 }
 
 func interceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 	out.Debug("GRPC: %s %+v", method, req)
-	if principal.AccessToken == "" && !noAuthMethods[method] {
+	if !principal.HasAccessToken() && !noAuthMethods[method] {
 		out.Debug("AUTH: No token in request.")
 		return errs.NotAuthenticated
 	}

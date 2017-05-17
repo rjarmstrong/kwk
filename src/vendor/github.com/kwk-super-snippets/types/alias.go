@@ -70,6 +70,9 @@ func (m *Alias) URI() string {
 }
 
 func (m *Alias) VersionURI() string {
+	if m.Version == 0 {
+		return m.URI()
+	}
 	return fmt.Sprintf("%s?v=%d", m.URI(), m.Version)
 }
 
