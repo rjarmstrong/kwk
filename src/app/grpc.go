@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"fmt"
 	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
@@ -17,7 +18,6 @@ import (
 	"os"
 	"runtime"
 	"time"
-	"fmt"
 )
 
 // /etc/ssl/certs/COMODO_RSA_Certification_Authority.pem
@@ -69,12 +69,16 @@ func GetConn(serverAddress string, trustAllCerts bool) (*grpc.ClientConn, error)
 		DynamicRecordSizingDisabled: false,
 		SessionTicketsDisabled:      false,
 	})
+
+	//https://github.com/coreos/etcd/blob/master/clientv3/naming/grpc.go
+	//https://github.com/lstoll/grpce
+	//b := grpc.RoundRobin(r)
+	//opts = append(opts, grpc.WithBalancer(b))
 	opts = append(opts, grpc.WithTransportCredentials(creds))
 	opts = append(opts, grpc.WithUnaryInterceptor(interceptor))
 	opts = append(opts, grpc.WithTimeout(time.Second*10))
 	opts = append(opts, grpc.WithBlock())
 	grpclog.SetLogger(out.DebugLogger)
-
 	conn, err := grpc.Dial(serverAddress, opts...)
 	return conn, err
 }

@@ -142,20 +142,3 @@ func (a *KwkApp) Run(args ...string) {
 	params = append(params, args...)
 	a.Handle(a.App.Run(params))
 }
-
-//func GetPrincipal() (*types.User, error) {
-//	if principal != nil && principal.Id != "" {
-//		return principal, nil
-//	}
-//	principal = &types.User{}
-//	if err := u.settings.Get(profileFileName, principal, 0); err != nil {
-//		return nil, err
-//	} else {
-//		return principal, nil
-//	}
-//	u, err := c.client.
-//	if err != nil {
-//		return err
-//	}
-//	return c.EWrite(out.UserProfile(u))
-//}
