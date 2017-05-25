@@ -171,7 +171,7 @@ func ParseAlias(uri string) (*Alias, error) {
 	return nil, errs.AliasTooManySegments
 }
 
-// IsAlias determines the likely-hood that a string is an alias
+// IsDefNotPouchedSnippetURI determines the likely-hood that a string is an alias
 func IsDefNotPouchedSnippetURI(uri string) bool {
 	if strings.HasSuffix(uri, "/") {
 		return true

@@ -67,7 +67,7 @@ message AlphaRequest {
     string extension = 2;
     string username = 3;
     bool all = 4; // Search both private and public snippets.
-    bool global = 5; // Search everyones snippets.
+    string os = 5;
 }
 
 // AlphaResponse is the actual method response wheras AlphaResult
@@ -77,14 +77,13 @@ message AlphaResponse {
     int64 total = 2;
     int64 took = 3;
     string term = 4;
+    string fallbackTitle = 5;
 }
 
 message TypeAheadRequest {
     string term = 1;
-    string extension = 2;
-    string username = 3;
-    bool all = 4; // Search both private and public snippets.
-    bool global = 5; // Search everyones snippets.
+    bool all = 2; // Search both private and public snippets.
+    string os = 3;
 }
 
 message TypeAheadResponse {
@@ -134,6 +133,7 @@ message MakePrivateRequest {
 
 message MakePrivateResponse {
     bool isPrivate = 1;
+    RootResponse root = 2;
 }
 
 message DeletePouchRequest {
@@ -324,12 +324,12 @@ message Snippet {
     int64 updated = 7;
     string description = 8;
     string clonedFromURI = 9;
-    bool private = 12;
+    bool public = 12;
 
-    string checksum = 13;
-    string signature = 14;
+    string checksum = 13; // not indexed
+    string signature = 14; // not indexed
     bool encrypted = 15;
-    string encryptedAlgo = 16;
+    string encryptedAlgo = 16; // not indexed
     Role role = 17;
 
     SnipStats stats = 18;

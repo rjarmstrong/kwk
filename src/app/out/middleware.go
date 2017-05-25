@@ -7,6 +7,14 @@ import (
 	"io"
 )
 
+
+func Fatal(h vwrite.Handler) vwrite.Handler {
+	return vwrite.HandlerFunc(func(w io.Writer) {
+		fmt.Fprintf(w, "%s  ", style.Fire)
+		h.Write(w)
+	})
+}
+
 func Warn(h vwrite.Handler) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
 		fmt.Fprintf(w, "%s  ", style.Warning)

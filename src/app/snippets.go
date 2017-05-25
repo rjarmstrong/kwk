@@ -431,7 +431,7 @@ func (sc *snippets) CreatePouch(name string) error {
 	if err != nil {
 		return err
 	}
-	sc.EWrite(out.PrintRoot(&CLIInfo, res.Root, &principal.User))
+	sc.EWrite(out.PrintRoot(&cliInfo, res.Root, &principal.User))
 	return sc.EWrite(out.PouchCreated(name))
 }
 
@@ -486,7 +486,7 @@ func (sc *snippets) List(username string, pouch string) error {
 		if err != nil {
 			return err
 		}
-		return sc.EWrite(out.PrintRoot(&CLIInfo, r, &principal.User))
+		return sc.EWrite(out.PrintRoot(&cliInfo, r, &principal.User))
 	}
 	var size int64
 	list, err := sc.s.List(Ctx(), &types.ListRequest{Username: username, Pouch: pouch, Limit: size, All: Prefs().ListAll})
@@ -599,6 +599,6 @@ func (sc *snippets) deletePouch(pouch string) error {
 	if err != nil {
 		return err
 	}
-	sc.EWrite(out.PrintRoot(&CLIInfo, dres.Root, &principal.User))
+	sc.EWrite(out.PrintRoot(&cliInfo, dres.Root, &principal.User))
 	return sc.EWrite(out.PouchDeleted(pouch))
 }

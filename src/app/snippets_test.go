@@ -17,7 +17,7 @@ var wm = &WriterMock{Buffer: &bytes.Buffer{}}
 var dm = &DialogMock{}
 var udm = &UpdaterMock{}
 var em = &ErrorHandlerMock{}
-var app *KwkApp
+var app *KwkCLI
 
 func TestMain(m *testing.M) {
 	app = NewApp(sm, iom, pm, rm, urm, dm, wm, udm, em)

@@ -19,18 +19,16 @@ func NewDashBoard(w vwrite.Writer, eh errs.Handler, s types.SnippetsClient) *Das
 }
 
 func (d *Dashboard) GetWriter() func(w io.Writer, templ string, data interface{}) {
-	return d.writer
-}
-
-func (d *Dashboard) writer(w io.Writer, templ string, data interface{}) {
-	if !principal.HasAccessToken() {
-		d.Write(out.SignedOut())
-		return
+	return func(w io.Writer, templ string, data interface{}) {
+		if !principal.HasAccessToken() {
+			d.Write(out.SignedOut())
+			return
+		}
+		r, err := d.s.GetRoot(Ctx(), &types.RootRequest{})
+		if err != nil {
+			d.Handle(err)
+			return
+		}
+		d.Write(out.Dashboard(&cliInfo, r, &principal.User))
 	}
-	r, err := d.s.GetRoot(Ctx(), &types.RootRequest{})
-	if err != nil {
-		d.Handle(err)
-		return
-	}
-	d.Write(out.Dashboard(&CLIInfo, r, &principal.User))
 }

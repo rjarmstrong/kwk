@@ -5,29 +5,35 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"strings"
+	"time"
 )
 
 func NewBlankSnippet() *Snippet {
 	return &Snippet{
-		Alias:        &Alias{},
-		Content:      "",
-		SupportedOn:  &Runtimes{Oss: map[string]bool{}},
-		Apps:         &Apps{Aliases: []*Alias{}},
-		Dependencies: &Dependencies{Aliases: []*Alias{}},
-		Tags:         &Tags{Names: map[string]bool{}},
-		Stats:        &SnipStats{},
+		Alias:   &Alias{},
+		Content: "",
+		SupportedOn: &Runtimes{Oss:map[string]bool{}},
+		Apps: &Apps{Aliases:[]*Alias{}},
+		Dependencies: &Dependencies{Aliases:[]*Alias{}},
+		Tags: &Tags{Names:map[string]bool{}},
+		Stats: &SnipStats{},
+		Public: true,
 	}
 }
 
 func NewSnippet(a *Alias, content string) *Snippet {
 	return &Snippet{
-		Alias:        a,
-		Content:      content,
-		SupportedOn:  &Runtimes{Oss: map[string]bool{}},
-		Apps:         &Apps{Aliases: []*Alias{}},
-		Dependencies: &Dependencies{Aliases: []*Alias{}},
-		Tags:         &Tags{Names: map[string]bool{}},
+		Alias:   a,
+		Content: content,
+		SupportedOn: &Runtimes{Oss:map[string]bool{}},
+		Apps: &Apps{Aliases:[]*Alias{}},
+		Dependencies: &Dependencies{Aliases:[]*Alias{}},
+		Tags: &Tags{Names:map[string]bool{}},
 	}
+}
+
+func KwkTime(t time.Time) int64 {
+	return t.UnixNano()/int64(time.Millisecond)
 }
 
 func (m *Snippet) IsApp() bool {

@@ -35,6 +35,7 @@ const (
 	CodeNoSnipNamesProvided          ErrCode = 3160
 	CodeNoSnipNamesFound             ErrCode = 3170
 	CodeListCategoryNotFound         ErrCode = 3180
+	CodeSpecifiedVersionNotPermitted ErrCode = 3185
 
 	CodeEmbeddedSnippetCantCallItself   ErrCode = 3190
 	CodeEmbeddedSnippetsRequireExt      ErrCode = 3200

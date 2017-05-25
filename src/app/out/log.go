@@ -20,11 +20,11 @@ var fileLogger = log.New(fileOut, "KWK: ", log.Ldate|log.Lmicroseconds|log.Lshor
 var ErrorLogger = log.New(os.Stderr, "KWKCLI ERR: ", log.Ldate|log.Lmicroseconds|log.Lshortfile)
 var DebugLogger = log.New(os.Stdout, "KWKCLI: ", log.Ldate|log.Lmicroseconds|log.Lshortfile)
 
-func Debug(in ...interface{}) {
+func Debug(format string, in ...interface{}) {
 	if !DebugEnabled {
 		return
 	}
-	DebugLogger.Output(2, fmt.Sprintf("%v", in))
+	DebugLogger.Output(2, fmt.Sprintf(format, in))
 }
 
 // LogErrM allows to log an error and specify a custom message.

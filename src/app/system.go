@@ -19,5 +19,5 @@ func (c *system) Update() error {
 }
 
 func (c *system) GetVersion() error {
-	return c.EWrite(out.Version(CLIInfo))
+	return c.EWrite(out.Version(cliInfo))
 }

@@ -38,7 +38,7 @@ type ConfigProvider struct {
 	errs.Handler
 }
 
-func NewConfig(ss types.SnippetsClient, f IO, u types.UsersClient, eh errs.Handler) Provider {
+func InitConfig(ss types.SnippetsClient, f IO, u types.UsersClient, eh errs.Handler) Provider {
 	er := NewEnvResolvers(ss, f)
 	pr := NewPrefsResolvers(ss, f)
 	c := &ConfigProvider{envResolvers: er, prefsResolvers: pr, u: u, Handler: eh}
@@ -92,7 +92,6 @@ func (cs *ConfigProvider) loadPrefs() {
 		prefs.PersistedPrefs = ph.Preferences
 		return prefs, nil
 	}
-	out.Debug("Loaded prefs:%+v", c)
 	res, err := parse(c)
 	if err != nil {
 		cs.Handle(errs.New(errs.CodeInvalidConfigSection,
@@ -101,7 +100,7 @@ func (cs *ConfigProvider) loadPrefs() {
 		fb, _ := cs.prefsResolvers.Fallback()
 		res, _ = parse(fb)
 	}
-	out.Debug("SETTING PREFS: %+v", res)
+	out.Debug("SETTING PREFS: %+v", *res)
 	SetPrefs(res)
 }
 

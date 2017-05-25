@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
-	"fmt"
 	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
@@ -79,7 +78,9 @@ func GetConn(serverAddress string, trustAllCerts bool) (*grpc.ClientConn, error)
 	opts = append(opts, grpc.WithTimeout(time.Second*10))
 	opts = append(opts, grpc.WithBlock())
 	grpclog.SetLogger(out.DebugLogger)
-	conn, err := grpc.Dial(serverAddress, opts...)
+	grpc.EnableTracing = true
+	out.Debug("API: %s", serverAddress)
+	conn, err := grpc.Dial("localhost:8000", opts...)
 	return conn, err
 }
 
@@ -96,7 +97,7 @@ func Ctx() context.Context {
 				"host", hostname,
 				"os", runtime.GOOS,
 				"agnt", "<not implemented>", //agent //ps -p $$ | tail -1 | awk '{print $NF}'
-				"v", CLIInfo.String(),
+				"v", cliInfo.String(),
 			),
 		)
 		return ctx
@@ -109,12 +110,13 @@ var noAuthMethods = map[string]bool{
 }
 
 func interceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-	out.Debug(fmt.Sprintf("GRPC: %s %+v", method, req))
+	out.Debug("GRPC: %s", method)
 	if !principal.HasAccessToken() && !noAuthMethods[method] {
 		out.Debug("AUTH: No token in request.")
 		return errs.NotAuthenticated
 	}
-	return translateGrpcErr(invoker(ctx, method, req, reply, cc, opts...))
+	err := invoker(ctx, method, req, reply, cc, opts...)
+	return translateGrpcErr(err)
 }
 
 // ParseGrpcErr should be used at RPC service call level. i.e. the errors
@@ -124,7 +126,7 @@ func translateGrpcErr(e error) error {
 		return nil
 	}
 	se, _ := status.FromError(e)
-	out.Debug(fmt.Sprintf("API ERROR:%v", se.Message()))
+	out.Debug("API ERROR: %v", e)
 	switch se.Code() {
 	case codes.InvalidArgument:
 		te := &errs.Error{}

@@ -84,7 +84,7 @@ func notFound(name string) vwrite.Handler {
 }
 
 func internalError(err error) vwrite.Handler {
-	return vwrite.HandlerFunc(func(w io.Writer) {
+	return Fatal(vwrite.HandlerFunc(func(w io.Writer) {
 		ce, ok := err.(*errs.Error)
 		if ok {
 			o := getMessageOverride(ce.Code)
@@ -95,10 +95,10 @@ func internalError(err error) vwrite.Handler {
 			return
 		}
 		LogErr(err)
-		fmt.Fprintln(w, "🔥  We have a code RED error. \n- To report type: kwk upload-errors \n"+
+		fmt.Fprintln(w, "Something broke. \n- To report type: kwk upload-errors \n"+
 			"- You can also try to upgrade: npm update kwkcli -g\n")
 		os.Exit(1)
-	})
+	}))
 }
 
 var notImplemented = Warn(vwrite.HandlerFunc(func(w io.Writer) {

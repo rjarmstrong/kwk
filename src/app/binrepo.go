@@ -44,7 +44,7 @@ func (r *S3Repo) LatestInfo() (*ReleaseInfo, error) {
 	info, err := ioutil.ReadAll(i.Body)
 	json.Unmarshal(info, ri)
 	if err != nil {
-		out.Debug("Failed unmarshalling release info.", err)
+		out.Debug("Failed unmarshalling release info. %v", err)
 		return nil, err
 	}
 	i.Body.Close()

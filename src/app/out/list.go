@@ -159,7 +159,7 @@ func listNaked(list *types.ListResponse) interface{} {
 	tbl.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
 	for _, v := range list.Items {
 		var private string
-		if v.Private {
+		if !v.Public {
 			private = "private"
 		} else {
 			private = "public"

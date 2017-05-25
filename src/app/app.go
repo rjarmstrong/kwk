@@ -9,16 +9,19 @@ import (
 	"github.com/kwk-super-snippets/types/vwrite"
 	"github.com/urfave/cli"
 	"strings"
+	"os"
+	"bufio"
 )
 
 var (
-	CLIInfo   = types.AppInfo{}
+	cliInfo   = types.AppInfo{}
 	principal = &UserWithToken{}
+	Config    CLIConfig
 )
 
 const profileFileName = "profile.json"
 
-type KwkApp struct {
+type KwkCLI struct {
 	App      *cli.App
 	Users    types.UsersClient
 	Snippets types.SnippetsClient
@@ -31,15 +34,36 @@ type KwkApp struct {
 	errs.Handler
 }
 
-func NewApp(a types.SnippetsClient, f IO, docs DocStore, r Runner, u types.UsersClient,
-	d Dialog, w vwrite.Writer, up Updater, eh errs.Handler) *KwkApp {
+func NewCLI(info types.AppInfo, up Updater, eh errs.Handler) *KwkCLI {
+
+	cliInfo = info
+
+	conn, err := GetConn(Config.APIHost, Config.TestMode)
+	if err != nil {
+		eh.Handle(errs.ApiDown)
+		return nil
+	}
+
+	w := vwrite.New(os.Stdout)
+	defer conn.Close()
+	r := bufio.NewReader(os.Stdin)
+	d := NewDialog(w, r)
+	sc := types.NewSnippetsClient(conn)
+	uc := types.NewUsersClient(conn)
+	f := NewIO()
+	jsn := NewJson(f, "settings")
+	run := NewRunner(f, sc)
+
 	out.SetColors(out.ColorsDefault())
-	docs.Get(profileFileName, principal, 0)
-	NewConfig(a, f, u, eh)
+
+	jsn.Get(profileFileName, principal, 0)
+
+	InitConfig(sc, f, uc, eh)
+
 	ap := cli.NewApp()
 	ap = setupFlags(ap)
-	ap.Version = CLIInfo.String()
-	dash := NewDashBoard(w, eh, a)
+	ap.Version = cliInfo.String()
+	dash := NewDashBoard(w, eh, sc)
 	help := cli.HelpPrinter
 	ap.Commands = append(ap.Commands, cli.Command{
 		Name:    "help",
@@ -50,22 +74,22 @@ func NewApp(a types.SnippetsClient, f IO, docs DocStore, r Runner, u types.Users
 			return nil
 		},
 	})
-	cli.HelpPrinter = dash.GetWriter()
-	accCli := NewUsers(u, docs, w, d, dash)
+	accCli := NewUsers(uc, jsn, w, d, dash)
 	ap.Commands = append(ap.Commands, userRoutes(accCli)...)
 	sysCli := NewSystem(w, up)
 	ap.Commands = append(ap.Commands, systemRoutes(sysCli)...)
-	snipCli := NewSnippets(a, r, d, w, docs)
+	snipCli := NewSnippets(sc, run, d, w, jsn)
 	ap.Commands = append(ap.Commands, snippetsRoutes(snipCli)...)
 	ap.CommandNotFound = getDefaultCommand(snipCli)
-	return &KwkApp{
+	cli.HelpPrinter = dash.GetWriter()
+	return &KwkCLI{
 		App:      ap,
 		File:     f,
-		Settings: docs,
-		Runner:   r,
-		Users:    u,
+		Settings: jsn,
+		Runner:   run,
+		Users:    uc,
 		Dialogue: d,
-		Snippets: a,
+		Snippets: sc,
 		Writer:   w,
 		Handler:  eh,
 	}
@@ -137,7 +161,7 @@ func setupFlags(ap *cli.App) *cli.App {
 	return ap
 }
 
-func (a *KwkApp) Run(args ...string) {
+func (a *KwkCLI) Run(args ...string) {
 	params := []string{"[app]"}
 	params = append(params, args...)
 	a.Handle(a.App.Run(params))
