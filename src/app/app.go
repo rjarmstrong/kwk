@@ -1,6 +1,7 @@
 package app
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/cli/src/style"
@@ -8,9 +9,8 @@ import (
 	"github.com/kwk-super-snippets/types/errs"
 	"github.com/kwk-super-snippets/types/vwrite"
 	"github.com/urfave/cli"
+	"io"
 	"strings"
-	"os"
-	"bufio"
 )
 
 var (
@@ -34,7 +34,7 @@ type KwkCLI struct {
 	errs.Handler
 }
 
-func NewCLI(info types.AppInfo, up Updater, eh errs.Handler) *KwkCLI {
+func NewCLI(rd io.Reader, wr io.Writer, info types.AppInfo, up Updater, eh errs.Handler) *KwkCLI {
 
 	cliInfo = info
 
@@ -43,10 +43,12 @@ func NewCLI(info types.AppInfo, up Updater, eh errs.Handler) *KwkCLI {
 		eh.Handle(errs.ApiDown)
 		return nil
 	}
-
-	w := vwrite.New(os.Stdout)
 	defer conn.Close()
-	r := bufio.NewReader(os.Stdin)
+
+	// I/O
+	w := vwrite.New(wr)
+	r := bufio.NewReader(rd)
+
 	d := NewDialog(w, r)
 	sc := types.NewSnippetsClient(conn)
 	uc := types.NewUsersClient(conn)
@@ -81,7 +83,7 @@ func NewCLI(info types.AppInfo, up Updater, eh errs.Handler) *KwkCLI {
 	snipCli := NewSnippets(sc, run, d, w, jsn)
 	ap.Commands = append(ap.Commands, snippetsRoutes(snipCli)...)
 	ap.CommandNotFound = getDefaultCommand(snipCli)
-	cli.HelpPrinter = dash.GetWriter()
+	//cli.HelpPrinter = dash.GetWriter()
 	return &KwkCLI{
 		App:      ap,
 		File:     f,

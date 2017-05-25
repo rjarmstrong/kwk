@@ -1,35 +1,29 @@
 package app
 
 import (
-	"bytes"
 	"github.com/bmizerany/assert"
+	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/types"
 	"os"
 	"testing"
 )
 
-var iom = &IoMock{}
-var pm = &PersisterMock{}
-var sm = &SnippetsMock{}
-var rm = &RunnerMock{}
-var urm = &UsersMock{}
-var wm = &WriterMock{Buffer: &bytes.Buffer{}}
-var dm = &DialogMock{}
-var udm = &UpdaterMock{}
-var em = &ErrorHandlerMock{}
 var app *KwkCLI
 
 func TestMain(m *testing.M) {
-	app = NewApp(sm, iom, pm, rm, urm, dm, wm, udm, em)
+	eh := out.NewErrHandler(os.Stdout)
+	jsn := NewJson(NewIO(), "settings")
+	up := NewUpdateRunner(jsn, "1.0.0-test")
+	Config.TestMode = true
+	app = NewCLI(os.Stdin, os.Stdout, cliInfo, up, eh)
 	code := m.Run()
 	os.Exit(code)
 }
 
 func TestSnippets_InspectListOrRun(t *testing.T) {
-	sm.ReturnItemsForGet = []*types.Snippet{{Id: "uno"}}
-	app.Run("hola.js")
-	//t.Log(wm.Buffer.String())
-	assert.Equal(t, sm.GetCalledWith, types.NewAlias("", "", "hola", "js"))
+	res, err := app.Snippets.Get(Ctx(), &types.GetRequest{Alias: types.NewAlias("richard", "", "tmap", "")})
+	assert.Equal(t, nil, err)
+	assert.Equal(t, "tmap", res.Items[0].Name())
 }
 
 //func Test_Snippet(t *testing.T) {

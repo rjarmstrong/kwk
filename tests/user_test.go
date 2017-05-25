@@ -1,11 +1,11 @@
-package app
+package tests
 
 import (
+	"github.com/kwk-super-snippets/cli/src/vendor/github.com/bmizerany/assert"
 	"testing"
-	"github.com/bmizerany/assert"
 )
 
-func Test_UserRoutes (t *testing.T) {
+func Test_UserRoutes(t *testing.T) {
 	app := NewApp()
 	//d := app.Dialogue.(*dlg.DialogMock)
 
@@ -17,7 +17,6 @@ func Test_UserRoutes (t *testing.T) {
 	p := app.App.Command("me")
 	assert.Equal(t, "me", p.Name)
 }
-
 
 //func Test_App(t *testing.T) {
 //	Convey("ACCOUNT COMMANDS", t, func() {

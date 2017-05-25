@@ -1,10 +1,10 @@
-package app
+package tests
 
 import (
 	"errors"
-	gu "github.com/inconshreveable/go-update"
-	"github.com/kwk-super-snippets/types/errs"
-	. "github.com/smartystreets/goconvey/convey"
+	gu "github.com/kwk-super-snippets/cli/src/vendor/github.com/inconshreveable/go-update"
+	"github.com/kwk-super-snippets/cli/src/vendor/github.com/kwk-super-snippets/types/errs"
+	. "github.com/kwk-super-snippets/cli/src/vendor/github.com/smartystreets/goconvey/convey"
 	"io"
 	"io/ioutil"
 	"strings"
