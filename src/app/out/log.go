@@ -24,7 +24,13 @@ func Debug(format string, in ...interface{}) {
 	if !DebugEnabled {
 		return
 	}
-	DebugLogger.Output(2, fmt.Sprintf(format, in))
+	var mess string
+	if len(in) > 0 {
+	  mess = fmt.Sprintf(format, in)
+	} else {
+	  mess = format
+	}
+	DebugLogger.Output(2, mess)
 }
 
 // LogErrM allows to log an error and specify a custom message.

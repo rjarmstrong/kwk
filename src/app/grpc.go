@@ -115,6 +115,8 @@ func interceptor(ctx context.Context, method string, req, reply interface{}, cc 
 		out.Debug("AUTH: No token in request.")
 		return errs.NotAuthenticated
 	}
+	out.Debug("CTX: %+v", ctx)
+	out.Debug("OPTS: %+v", opts)
 	err := invoker(ctx, method, req, reply, cc, opts...)
 	return translateGrpcErr(err)
 }
