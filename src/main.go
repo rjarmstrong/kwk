@@ -46,7 +46,7 @@ func main() {
 
 	/// The app
 	eh := out.NewErrHandler(os.Stdout)
-	cli := app.NewCLI(info, up, eh)
+	cli := app.NewCLI(os.Stdin, os.Stdout, info, up, eh)
 	if cli == nil {
 		return
 	}

@@ -32,7 +32,7 @@ func Test_Grpc(t *testing.T) {
 	assert.Equal(t, sur.Username, res.User.Username)
 
 	t.Log("SIGN-IN")
-	sires, err := uc.SignIn(Ctx(), &types.SignInRequest{Username:sur.Username, Password:sur.Password})
+	sires, err := uc.SignIn(Ctx(), &types.SignInRequest{Username: sur.Username, Password: sur.Password})
 	assert.Nil(t, err)
 	assert.Equal(t, sur.Email, sires.User.Email)
 	assert.Equal(t, sur.Username, sires.User.Username)
@@ -48,12 +48,13 @@ func Test_Grpc(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, al.URI(), snres.Snippet.Alias.URI())
 	assert.Equal(t, cr.Content, snres.Snippet.Content)
-	//res, err := sc.Get(Ctx(), &types.GetRequest{Alias: types.NewAlias("richard", "", "tmap", "")})
-	//	assert.Equal(t, nil, err)
-	//	assert.Equal(t, "tmap", res.Items[0].Name())
+
+	t.Log("GET SNIPPET")
+	gres, err := sc.Get(Ctx(), &types.GetRequest{Alias: al})
+	assert.Equal(t, nil, err)
+	assert.Equal(t, al.Name, gres.Items[0].Name())
 
 }
-
 
 func cleanRoach(t *testing.T) {
 	cmd := exec.Command("docker", "exec", "roach", "./cockroach.sh", "sql", "--database", "kwk_test", "--insecure", "-e", "truncate snippets; truncate pouches;")

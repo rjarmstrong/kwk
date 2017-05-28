@@ -38,18 +38,17 @@ func NewCLI(rd io.Reader, wr io.Writer, info types.AppInfo, up Updater, eh errs.
 
 	cliInfo = info
 
-	conn, err := GetConn(Config.APIHost, Config.TestMode)
-	if err != nil {
-		eh.Handle(errs.ApiDown)
-		return nil
-	}
-	defer conn.Close()
-
 	// I/O
 	w := vwrite.New(wr)
 	r := bufio.NewReader(rd)
 
 	d := NewDialog(w, r)
+
+	conn, err := GetConn(Config.APIHost, Config.TestMode)
+	if err != nil {
+		eh.Handle(errs.ApiDown)
+		return nil
+	}
 	sc := types.NewSnippetsClient(conn)
 	uc := types.NewUsersClient(conn)
 	f := NewIO()
@@ -83,7 +82,7 @@ func NewCLI(rd io.Reader, wr io.Writer, info types.AppInfo, up Updater, eh errs.
 	snipCli := NewSnippets(sc, run, d, w, jsn)
 	ap.Commands = append(ap.Commands, snippetsRoutes(snipCli)...)
 	ap.CommandNotFound = getDefaultCommand(snipCli)
-	//cli.HelpPrinter = dash.GetWriter()
+	cli.HelpPrinter = dash.GetWriter()
 	return &KwkCLI{
 		App:      ap,
 		File:     f,
