@@ -19,6 +19,7 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	"github.com/kwk-super-snippets/cli/src/store"
 )
 
 type Runner interface {
@@ -28,11 +29,11 @@ type Runner interface {
 
 type runner struct {
 	snippets types.SnippetsClient
-	file     IO
+	file     store.File
 }
 
-func NewRunner(s IO, ss types.SnippetsClient) Runner {
-	return &runner{snippets: ss, file: s}
+func NewRunner(f store.File, ss types.SnippetsClient) Runner {
+	return &runner{snippets: ss, file: f}
 }
 
 /*
@@ -57,7 +58,7 @@ func (r *runner) Edit(s *types.Snippet) error {
 	}
 	_, cli := getSubSection(a, candidates[0])
 
-	filePath, err := r.file.Write(snipCachePath, s.Alias.URI(), s.Content, true)
+	filePath, err := r.file.Write(cfg.SnippetPath, s.Alias.URI(), s.Content, true)
 	if err != nil {
 		return err
 	}
@@ -89,7 +90,7 @@ func (r *runner) Edit(s *types.Snippet) error {
 		rdr.ReadLine()
 	}
 
-	text, err := r.file.Read(snipCachePath, s.Alias.URI(), true, 0)
+	text, err := r.file.Read(cfg.SnippetPath, s.Alias.URI(), true, 0)
 	if err != nil {
 		return err
 	}
@@ -117,7 +118,7 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 	}
 	comp, interp := getSubSection(rs, yamlKey)
 	if comp != nil {
-		if filePath, err := r.file.Write(snipCachePath, s.Alias.URI(), s.Content, true); err != nil {
+		if filePath, err := r.file.Write(cfg.SnippetPath, s.Alias.URI(), s.Content, true); err != nil {
 			return err
 		} else {
 			_, compile := getSubSection(&comp, "compile")

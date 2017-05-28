@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/kwk-super-snippets/cli/src/app/out"
+	"github.com/kwk-super-snippets/cli/src/store"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
 	"github.com/kwk-super-snippets/types/vwrite"
@@ -9,8 +10,8 @@ import (
 )
 
 type users struct {
-	client    types.UsersClient
-	persister DocStore
+	client types.UsersClient
+	doc    store.Doc
 	vwrite.Writer
 	Dialog
 	dash *Dashboard
@@ -25,8 +26,8 @@ func (m *UserWithToken) HasAccessToken() bool {
 	return m.AccessToken != ""
 }
 
-func NewUsers(u types.UsersClient, s DocStore, w vwrite.Writer, d Dialog, dash *Dashboard) *users {
-	return &users{client: u, persister: s, Writer: w, Dialog: d, dash: dash}
+func NewUsers(u types.UsersClient, s store.Doc, w vwrite.Writer, d Dialog, dash *Dashboard) *users {
+	return &users{client: u, doc: s, Writer: w, Dialog: d, dash: dash}
 }
 
 func (c *users) SignUp() error {
@@ -45,7 +46,7 @@ func (c *users) SignUp() error {
 		return err
 	}
 	if len(u.AccessToken) > 50 {
-		err := c.persister.Upsert(profileFileName, UserWithToken{AccessToken: u.AccessToken, User: *u.User})
+		err := c.doc.Upsert(cfg.UserDocName, UserWithToken{AccessToken: u.AccessToken, User: *u.User})
 		if err != nil {
 			return err
 		}
@@ -69,7 +70,7 @@ func (c *users) SignIn(username string, password string) error {
 		return err
 	}
 	if len(u.AccessToken) > 50 {
-		err := c.persister.Upsert(profileFileName, UserWithToken{AccessToken: u.AccessToken, User: *u.User})
+		err := c.doc.Upsert(cfg.UserDocName, UserWithToken{AccessToken: u.AccessToken, User: *u.User})
 		if err != nil {
 			return err
 		}
@@ -80,7 +81,7 @@ func (c *users) SignIn(username string, password string) error {
 }
 
 func (c *users) SignOut() error {
-	err := c.persister.DeleteAll()
+	err := c.doc.DeleteAll()
 	if err != nil {
 		return err
 	}

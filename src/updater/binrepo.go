@@ -1,4 +1,4 @@
-package app
+package updater
 
 import (
 	"archive/tar"
@@ -18,9 +18,9 @@ const workFolder = "./update_work"
 
 type BinRepo interface {
 	// LatestInfo gets information about the latest build.
-	LatestInfo() (*ReleaseInfo, error)
+	GetLatestInfo() (*ReleaseInfo, error)
 	// Latest gets the actual binary.
-	LatestBinary() (io.ReadCloser, error)
+	GetLatestBinary() (io.ReadCloser, error)
 	// Delete any residual files post update.
 	CleanUp()
 }
@@ -35,7 +35,7 @@ type ReleaseInfo struct {
 type S3Repo struct {
 }
 
-func (r *S3Repo) LatestInfo() (*ReleaseInfo, error) {
+func (r *S3Repo) GetLatestInfo() (*ReleaseInfo, error) {
 	i, err := http.Get("https://s3.amazonaws.com/kwk-cli/release-info.json")
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (r *S3Repo) LatestInfo() (*ReleaseInfo, error) {
 	return ri, nil
 }
 
-func (r *S3Repo) LatestBinary() (io.ReadCloser, error) {
+func (r *S3Repo) GetLatestBinary() (io.ReadCloser, error) {
 	fn := fmt.Sprintf("kwk-%s-%s", runtime.GOOS, runtime.GOARCH)
 	fnt := fmt.Sprintf("%s.tar.gz", fn)
 	url := fmt.Sprintf("https://s3.amazonaws.com/kwk-cli/latest/bin/%s", fnt)
@@ -67,13 +67,13 @@ func (r *S3Repo) LatestBinary() (io.ReadCloser, error) {
 		return nil, err
 	}
 
-	out, err := os.Create(fnt)
-	_, err = io.Copy(out, resp.Body)
+	o, err := os.Create(fnt)
+	_, err = io.Copy(o, resp.Body)
 	if err != nil {
 		return nil, err
 	}
 	resp.Body.Close()
-	out.Close()
+	o.Close()
 	tarFile := path.Join(workFolder, fn+".tar")
 	target := path.Join(workFolder, fn)
 	err = unGZip(fnt, tarFile)

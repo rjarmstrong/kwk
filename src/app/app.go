@@ -3,6 +3,7 @@ package app
 import (
 	"bufio"
 	"fmt"
+	gu "github.com/inconshreveable/go-update"
 	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/kwk-super-snippets/types"
@@ -11,53 +12,48 @@ import (
 	"github.com/urfave/cli"
 	"io"
 	"strings"
+	"github.com/kwk-super-snippets/cli/src/updater"
+	"github.com/kwk-super-snippets/cli/src/store"
 )
 
 var (
 	cliInfo   = types.AppInfo{}
 	principal = &UserWithToken{}
-	Config    CLIConfig
+	cfg       = &CLIConfig{}
 )
-
-const profileFileName = "profile.json"
 
 type KwkCLI struct {
 	App      *cli.App
 	Users    types.UsersClient
 	Snippets types.SnippetsClient
-	File     IO
-	Settings DocStore
-	Updater  *Updater
+	store.File
+	store.Doc
+	Updater  *updater.Runner
 	Runner   Runner
 	Dialogue Dialog
 	vwrite.Writer
 	errs.Handler
 }
 
-func NewCLI(rd io.Reader, wr io.Writer, info types.AppInfo, up Updater, eh errs.Handler) *KwkCLI {
-
+func NewCLI(rd io.Reader, wr io.Writer, info types.AppInfo, eh errs.Handler) *KwkCLI {
 	cliInfo = info
-
-	// I/O
 	w := vwrite.New(wr)
 	r := bufio.NewReader(rd)
-
 	d := NewDialog(w, r)
 
-	conn, err := GetConn(Config.APIHost, Config.TestMode)
+	conn, err := GetConn(cfg.APIHost, cfg.TestMode)
 	if err != nil {
 		eh.Handle(errs.ApiDown)
 		return nil
 	}
 	sc := types.NewSnippetsClient(conn)
 	uc := types.NewUsersClient(conn)
-	f := NewIO()
-	jsn := NewJson(f, "settings")
-	run := NewRunner(f, sc)
+	f := store.NewDiskFile()
+	jsn := store.NewJson(f, cfg.DocPath)
+	jsn.Get(cfg.UserDocName, principal, 0)
+	runner := NewRunner(f, sc)
 
 	out.SetColors(out.ColorsDefault())
-
-	jsn.Get(profileFileName, principal, 0)
 
 	InitConfig(sc, f, uc, eh)
 
@@ -77,23 +73,23 @@ func NewCLI(rd io.Reader, wr io.Writer, info types.AppInfo, up Updater, eh errs.
 	})
 	accCli := NewUsers(uc, jsn, w, d, dash)
 	ap.Commands = append(ap.Commands, userRoutes(accCli)...)
-	sysCli := NewSystem(w, up)
+	sysCli := NewSystem(w, updater.New(info.String(), &updater.S3Repo{}, gu.Apply, gu.RollbackError, jsn))
 	ap.Commands = append(ap.Commands, systemRoutes(sysCli)...)
-	snipCli := NewSnippets(sc, run, d, w, jsn)
+	snipCli := NewSnippets(sc, runner, d, w)
 	ap.Commands = append(ap.Commands, snippetsRoutes(snipCli)...)
 	ap.CommandNotFound = getDefaultCommand(snipCli)
 	cli.HelpPrinter = dash.GetWriter()
 	return &KwkCLI{
 		App:      ap,
 		File:     f,
-		Settings: jsn,
-		Runner:   run,
+		Doc:      jsn,
+		Runner:   runner,
 		Users:    uc,
 		Dialogue: d,
 		Snippets: sc,
 		Writer:   w,
 		Handler:  eh,
-	}
+}
 }
 
 func getDefaultCommand(snipCli *snippets) func(*cli.Context, string) {
@@ -128,12 +124,6 @@ func setupFlags(ap *cli.App) *cli.App {
 			Name:        "covert, x",
 			Usage:       "Open browser in covert mode.",
 			Destination: &Prefs().Covert,
-		},
-		cli.BoolFlag{
-			Name:        "debug, d",
-			Usage:       "Debug.",
-			Destination: &out.DebugEnabled,
-			EnvVar:      "DEBUG",
 		},
 		cli.BoolFlag{
 			Name:        "naked, n",

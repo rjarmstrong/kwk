@@ -7,24 +7,25 @@ import (
 	"github.com/kwk-super-snippets/types/errs"
 	"runtime"
 	"strings"
+	"github.com/kwk-super-snippets/cli/src/store"
 )
 
 // TODO: check yml version is compatible with this build else force upgrade.
 
 type ConfigEnv struct {
 	snippets types.SnippetsClient
-	file     IO
+	file     store.File
 	alias    *types.Alias
 	runtime  string
 }
 
-func NewEnvResolvers(s types.SnippetsClient, sys IO) ConfigResolver {
+func NewEnvResolvers(s types.SnippetsClient, f store.File) ConfigResolver {
 	r := strings.ToLower(fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH))
 	return &ConfigEnv{
 		runtime:  r,
 		alias:    NewSetupAlias("env", "yml", true),
 		snippets: s,
-		file:     sys,
+		file:     f,
 	}
 }
 
@@ -33,7 +34,7 @@ func (e *ConfigEnv) Anon() (string, error) {
 }
 
 func (e *ConfigEnv) Local() (string, error) {
-	return e.file.Read(snipCachePath, e.alias.URI(), true, 0)
+	return e.file.Read(cfg.SnippetPath, e.alias.URI(), true, 0)
 }
 
 func (e *ConfigEnv) Own() (string, error) {
@@ -43,7 +44,7 @@ func (e *ConfigEnv) Own() (string, error) {
 		return "", err
 	}
 	content := res.Items[0].Content
-	_, err = e.file.Write(snipCachePath, e.alias.URI(), content, true)
+	_, err = e.file.Write(cfg.SnippetPath, e.alias.URI(), content, true)
 	if err != nil {
 		return "", err
 	}
@@ -59,7 +60,7 @@ func (e *ConfigEnv) Default() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	_, err = e.file.Write(snipCachePath, e.alias.String(), env, true)
+	_, err = e.file.Write(cfg.SnippetPath, e.alias.String(), env, true)
 	if err != nil {
 		return "", err
 	}

@@ -2,17 +2,13 @@ package main
 
 import (
 	"github.com/kwk-super-snippets/cli/src/app"
-	//"runtime/pprof"
 	"github.com/kwk-super-snippets/cli/src/app/out"
+	"github.com/kwk-super-snippets/cli/src/updater"
 	"github.com/kwk-super-snippets/types"
 	"os"
-	"github.com/kelseyhightower/envconfig"
-	"encoding/json"
-	"log"
-	"strconv"
 	"runtime/pprof"
+	"strconv"
 )
-
 
 var (
 	version     string = "v-.-.-"
@@ -21,52 +17,41 @@ var (
 )
 
 func main() {
-	initVariables()
-	if app.Config.Profile {
-		defer profile().Close()
+	cfg := app.GetConfig()
+	if cfg.CpuProfile {
+		defer runCpuProfile().Close()
 	}
-	// Init binary info.
-	var info = types.AppInfo {
-		Version: version,
-		Build:   build,
-	}
-	info.Time, _ = strconv.ParseInt(releaseTime, 10, 64)
-
-	//  Updater
-	//args := strings.Join(os.Args[1:], "+")
-	jsn := app.NewJson(app.NewIO(), "settings")
-	up := app.NewUpdateRunner(jsn, info.String())
-	//if args == "update+silent" {
-	//	up.Run()
-	//	return
-	//}
-	//if args != "update" {
-	//	app.SilentCheckAndRun()
-	//}
-
-	/// The app
+	update()
 	eh := out.NewErrHandler(os.Stdout)
-	cli := app.NewCLI(os.Stdin, os.Stdout, info, up, eh)
+	info := getAppInfo()
+	cli := app.NewCLI(os.Stdin, os.Stdout, info, eh)
 	if cli == nil {
 		return
 	}
 	eh.Handle(cli.App.Run(os.Args))
 }
 
-func initVariables() {
-	err := envconfig.Process("KWK", &app.Config)
-	if err != nil {
-		log.Fatal(err.Error())
+func update() {
+	// If update argument supplied then we don't want to spawn an update,
+	// rather actually run the update in this process.
+	if len(os.Args) > 1 && os.Args[1] == "update" {
+		return
 	}
-	out.DebugEnabled = app.Config.Debug
-	if app.Config.TestMode {
-		app.Config.APIHost = "localhost:8000"
-	}
-	b, _ := json.MarshalIndent(app.Config, "", "  ")
-	out.Debug("CONFIG: %s", string(b))
+	// If update argument not supplied then run update in a new process.
+	updater.SpawnUpdate()
+
 }
 
-func profile() *os.File {
+func getAppInfo() types.AppInfo {
+	var info = types.AppInfo{
+		Version: version,
+		Build:   build,
+	}
+	info.Time, _ = strconv.ParseInt(releaseTime, 10, 64)
+	return info
+}
+
+func runCpuProfile() *os.File {
 	var prof = "kwk_profile"
 	f, err := os.Create(prof)
 	if err != nil {

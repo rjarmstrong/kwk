@@ -1,4 +1,4 @@
-package app
+package store
 
 import (
 	"github.com/kennygrant/sanitize"
@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-type IO interface {
+type File interface {
 	Delete(subDirName string, suffixPath string) error
 	Write(subDirName string, suffixPath string, snippet string, incHoldingDir bool) (string, error)
 	// ReadFromFile fresherThan = get record as long as it was last modified after this unix time value in seconds.
@@ -18,21 +18,24 @@ type IO interface {
 	DeleteAll() error
 }
 
-func NewIO() IO {
-	return &StdIO{}
+func NewDiskFile() File {
+	return &DiskFile{}
 }
 
-type StdIO struct {
+type DiskFile struct {
 }
 
-func (s *StdIO) Write(subDirName string, suffixPath string, snippet string, incHoldingDir bool) (filePath string, err error) {
+func (s *DiskFile) Write(subDirName string, suffixPath string, content string, incHoldingDir bool) (filePath string, err error) {
+	if suffixPath == "" {
+		return "", errs.New(errs.CodeInternalError, "file.*Write: No suffixPath provided.")
+	}
 	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
 	out.Debug("WRITE: %s", fp)
-	err = ioutil.WriteFile(fp, []byte(snippet), out.StandardFilePermission)
+	err = ioutil.WriteFile(fp, []byte(content), out.StandardFilePermission)
 	return fp, err
 }
 
-func (s *StdIO) Read(subDirName string, suffixPath string, incHoldingDir bool, after int64) (string, error) {
+func (s *DiskFile) Read(subDirName string, suffixPath string, incHoldingDir bool, after int64) (string, error) {
 	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
 	out.Debug("READ: %s", fp)
 	if fi, err := os.Stat(fp); err != nil {
@@ -52,11 +55,11 @@ func (s *StdIO) Read(subDirName string, suffixPath string, incHoldingDir bool, a
 	}
 }
 
-func (s *StdIO) DeleteAll() error {
+func (s *DiskFile) DeleteAll() error {
 	return os.RemoveAll(out.KwkPath())
 }
 
-func (s *StdIO) Delete(directoryName string, fileName string) error {
+func (s *DiskFile) Delete(directoryName string, fileName string) error {
 	dirPath, err := s.getSubDir(directoryName)
 	if err != nil {
 		return err
@@ -66,7 +69,7 @@ func (s *StdIO) Delete(directoryName string, fileName string) error {
 	return os.RemoveAll(fp)
 }
 
-func (s *StdIO) upsertDirectory(dir string) error {
+func (s *DiskFile) upsertDirectory(dir string) error {
 	if err := os.MkdirAll(dir, out.StandardFilePermission); err != nil {
 		if os.IsExist(err) {
 			return nil
@@ -77,7 +80,7 @@ func (s *StdIO) upsertDirectory(dir string) error {
 }
 
 // getSubDir gets the directory immediately below the root (~/.kwk/<sub dir>)
-func (s *StdIO) getSubDir(directoryName string) (string, error) {
+func (s *DiskFile) getSubDir(directoryName string) (string, error) {
 	dir := path.Join(out.KwkPath(), directoryName)
 	out.Debug("DIR: %s", dir)
 	err := s.upsertDirectory(dir)
@@ -85,7 +88,7 @@ func (s *StdIO) getSubDir(directoryName string) (string, error) {
 }
 
 // getHoldingDirectory gets the directory which holds the file, creates it if it doesn't exist.
-func (s *StdIO) getHoldingDirectory(subDirName string, fileName string) string {
+func (s *DiskFile) getHoldingDirectory(subDirName string, fileName string) string {
 	hd := strings.Replace(fileName, ".", "_", -1)
 	dirPath := path.Join(out.KwkPath(), subDirName, hd)
 	if e := s.upsertDirectory(dirPath); e != nil {
@@ -97,7 +100,7 @@ func (s *StdIO) getHoldingDirectory(subDirName string, fileName string) string {
 }
 
 // getFilePath gets the file path of the actual document.
-func (s *StdIO) getFilePath(subDirName string, suffixPath string, incHoldingDir bool) string {
+func (s *DiskFile) getFilePath(subDirName string, suffixPath string, incHoldingDir bool) string {
 	sn := sanitize.Name(suffixPath)
 	if incHoldingDir {
 		hd := s.getHoldingDirectory(subDirName, sn)

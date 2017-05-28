@@ -12,12 +12,12 @@ const (
 	StandardFilePermission = 0700
 )
 
-var cachePath string
+var kwkPath string
 
 // TODO: CHANGE TO STATIC PATH RESOLUTION
 func KwkPath() string {
-	if cachePath != "" {
-		return cachePath
+	if kwkPath != "" {
+		return kwkPath
 	}
 	var p string
 	u, _ := user.Current()
@@ -36,6 +36,6 @@ func KwkPath() string {
 		fmt.Println("kwk might not be able to run on your system please copy error and report to: https://github.com/kwk-cli/cli-issues", err)
 		return ""
 	}
-	cachePath = p
-	return cachePath
+	kwkPath = p
+	return kwkPath
 }

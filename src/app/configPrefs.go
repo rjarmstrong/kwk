@@ -3,15 +3,16 @@ package app
 import (
 	"github.com/kwk-super-snippets/types"
 	"gopkg.in/yaml.v2"
+	"github.com/kwk-super-snippets/cli/src/store"
 )
 
 type ConfigPrefs struct {
 	snippets types.SnippetsClient
-	file     IO
+	file     store.File
 	a        *types.Alias
 }
 
-func NewPrefsResolvers(s types.SnippetsClient, f IO) ConfigResolver {
+func NewPrefsResolvers(s types.SnippetsClient, f store.File) ConfigResolver {
 	return &ConfigPrefs{
 		a:        NewSetupAlias("prefs", "yml", false),
 		snippets: s,
@@ -24,7 +25,7 @@ func (p *ConfigPrefs) Anon() (string, error) {
 }
 
 func (p *ConfigPrefs) Local() (string, error) {
-	return p.file.Read(snipCachePath, p.a.String(), true, 0)
+	return p.file.Read(cfg.SnippetPath, p.a.String(), true, 0)
 }
 
 func (p *ConfigPrefs) Own() (string, error) {
@@ -32,7 +33,7 @@ func (p *ConfigPrefs) Own() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	_, err = p.file.Write(snipCachePath, p.a.String(), l.Items[0].Content, true)
+	_, err = p.file.Write(cfg.SnippetPath, p.a.String(), l.Items[0].Content, true)
 	if err != nil {
 		return "", err
 	}

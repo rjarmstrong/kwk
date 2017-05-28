@@ -6,10 +6,7 @@ import (
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
 	"gopkg.in/yaml.v2"
-)
-
-const (
-	snipCachePath = "snip-cache"
+	"github.com/kwk-super-snippets/cli/src/store"
 )
 
 type Provider interface {
@@ -38,7 +35,7 @@ type ConfigProvider struct {
 	errs.Handler
 }
 
-func InitConfig(ss types.SnippetsClient, f IO, u types.UsersClient, eh errs.Handler) Provider {
+func InitConfig(ss types.SnippetsClient, f store.File, u types.UsersClient, eh errs.Handler) Provider {
 	er := NewEnvResolvers(ss, f)
 	pr := NewPrefsResolvers(ss, f)
 	c := &ConfigProvider{envResolvers: er, prefsResolvers: pr, u: u, Handler: eh}

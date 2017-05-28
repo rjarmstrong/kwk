@@ -26,7 +26,7 @@ func Debug(format string, in ...interface{}) {
 	}
 	var mess string
 	if len(in) > 0 {
-	  mess = fmt.Sprintf(format, in)
+	  mess = fmt.Sprintf(format, in...)
 	} else {
 	  mess = format
 	}

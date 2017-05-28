@@ -31,7 +31,7 @@ func errHandler(e error) vwrite.Handler {
 		if ok {
 			switch ce.Code {
 			case errs.CodeInvalidArgument:
-				invalidArgument(ce)
+				invalidArgument(ce).Write(w)
 			case errs.CodeNotAuthenticated:
 				NotAuthenticated.Write(w)
 			case errs.CodeNotFound:

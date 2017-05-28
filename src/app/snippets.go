@@ -18,13 +18,12 @@ import (
 type snippets struct {
 	s        types.SnippetsClient
 	runner   Runner
-	settings DocStore
 	Dialog
 	vwrite.Writer
 }
 
-func NewSnippets(s types.SnippetsClient, r Runner, d Dialog, w vwrite.Writer, t DocStore) *snippets {
-	return &snippets{s: s, runner: r, Dialog: d, Writer: w, settings: t}
+func NewSnippets(s types.SnippetsClient, r Runner, d Dialog, w vwrite.Writer) *snippets {
+	return &snippets{s: s, runner: r, Dialog: d, Writer: w}
 }
 
 func (sc *snippets) Search(args ...string) error {
