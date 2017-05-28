@@ -53,48 +53,48 @@ type runner struct {
 func (r *runner) Run() error {
 	li, err := r.GetLatestInfo()
 	if err != nil {
-		out.LogErrM("Couldn't get remote release info.", err)
-		return err
+		out.LogErrM("UPDATER: Couldn't get remote release info.", err)
+		return nil
 	}
 	if !r.isUpdateDue() {
-		out.Debug("Update not due.")
+		out.Debug("UPDATER: Update not due.")
 		return nil
 	}
 	if li.Version == r.currentVersion {
-		out.Debug("Local is same as latest version: %s", li.Version)
+		out.Debug("UPDATER: Local is same as latest version: %s", li.Version)
 		r.recordUpdate()
 		return nil
 	}
 	latest, err := r.GetLatestBinary()
 	if err != nil {
-		out.LogErrM("Couldn't get latest from remote.", err)
-		return err
+		out.LogErrM("UPDATER: Couldn't get latest from remote.", err)
+		return nil
 	}
 	defer latest.Close() //TODO: Currently NOOP, should be real closer
-	out.Debug("Applying update.")
+	out.Debug("UPDATER: Applying update.")
 	err = r.Applier(latest, gu.Options{})
 	if err != nil {
-		out.LogErrM("Couldn't apply update.", err)
+		out.LogErrM("UPDATER: Couldn't apply update.", err)
 		err = r.Rollbacker(err)
 		r.CleanUp()
 		r.recordUpdate()
-		return err
+		return nil
 	}
 	r.CleanUp()
 	r.recordUpdate()
-	out.Debug("Updated to version: %s build: %s", li.Version, li.Build)
+	out.Debug("UPDATER: Updated to version: %s build: %s", li.Version, li.Build)
 	return nil
 }
 
 func (r *runner) isUpdateDue() bool {
 	ur := &Record{}
 	hiatus := time.Now().Unix() - r.UpdateHiatusSecs
-	out.Debug("Checking update is newer than: %d (Unix time seconds)", hiatus)
+	out.Debug("UPDATER: Check update record greater than: %d (Unix time seconds)", hiatus)
 	err := r.doc.Get(recordFile, ur, hiatus)
 	if err != nil {
-		out.Debug("Couldn't get local update record. %s", err)
+		out.Debug("UPDATER: Couldn't get local update record. %s", err)
 		// TODO: Force update if there is any error when attempted to find this out.
-		out.Debug("Updating...")
+		out.Debug("UPDATER: Updating...")
 		return true
 	}
 	return false
@@ -102,7 +102,7 @@ func (r *runner) isUpdateDue() bool {
 
 func (r *runner) recordUpdate() error {
 	ur := &Record{LastUpdate: time.Now().Unix()}
-	out.Debug("Updating update record.")
+	out.Debug("UPDATER: saving update record.")
 	return r.doc.Upsert(recordFile, ur)
 }
 
@@ -112,7 +112,8 @@ func exe(wait bool, name string, arg ...string) {
 	c.Stdin = os.Stdin
 	stdOut, err := c.StdoutPipe()
 	if err != nil {
-		out.LogErrM("If you are running nacl or OpenBSD they are not supported.", err)
+		out.LogErrM("UPDATER: If you are running nacl or OpenBSD they are not supported.", err)
+		return
 	}
 	var stderr bytes.Buffer
 	c.Stdout = os.Stdout
@@ -124,7 +125,7 @@ func exe(wait bool, name string, arg ...string) {
 	}
 
 	if err != nil {
-		out.LogErrM("Couldn't execute command.", err)
+		out.LogErrM("UPDATER: Couldn't execute command.", err)
 	}
 	stdOut.Close()
 }
