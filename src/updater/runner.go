@@ -1,20 +1,18 @@
-package app
+package updater
 
 import (
 	"bytes"
 	gu "github.com/inconshreveable/go-update"
 	"github.com/kwk-super-snippets/cli/src/app/out"
-	"github.com/kwk-super-snippets/types/errs"
 	"io"
 	"os"
 	"os/exec"
 	"time"
+	"github.com/kwk-super-snippets/cli/src/store"
 )
 
-const RecordFile = "update-record.json"
-
-// SilentCheckAndRun spawns a new process to check for updates and run.
-func SilentCheckAndRun() {
+// SilentUpdate spawns a new process to check for updates and runs.
+func SilentUpdate() {
 	cmd, err := os.Executable()
 	out.Debug("Initiating silent update check for: %s", cmd)
 	if err != nil {
@@ -24,21 +22,12 @@ func SilentCheckAndRun() {
 	exe(false, cmd, "update", "silent")
 }
 
-type Updater interface {
+type Runner interface {
 	Run() error
 }
 
-type UpdateRunner struct {
-	UpdatePeriod time.Duration
-	BinRepo
-	Applier
-	Rollbacker
-	DocStore
-	currentVersion string
-}
-
-func NewUpdateRunner(p DocStore, version string) Updater {
-	return &UpdateRunner{currentVersion: version, BinRepo: &S3Repo{}, Applier: gu.Apply, Rollbacker: gu.RollbackError, DocStore: p, UpdatePeriod: time.Hour}
+func New(version string) Runner {
+	return &runner{currentVersion: version, BinRepo: &S3Repo{}, Applier: gu.Apply, Rollbacker: gu.RollbackError, UpdatePeriod: time.Hour}
 }
 
 type Applier func(update io.Reader, opts gu.Options) error
@@ -49,17 +38,17 @@ type Record struct {
 	LastUpdate int64
 }
 
-func (r *UpdateRunner) Run() error {
-	due, err := r.isUpdateDue()
-	if !due {
-		out.Debug("Update not due.")
-		return nil
-	}
-	if err != nil {
-		out.Debug("%+v", err)
-		return err
-	}
 
+type runner struct {
+	UpdatePeriod   time.Duration
+	BinRepo
+	Applier
+	Rollbacker
+	currentVersion string
+	store.Doc
+}
+
+func (r *runner) Run() error {
 	li, err := r.LatestInfo()
 	if err != nil {
 		out.LogErrM("Couldn't get remote release info.", err)
@@ -92,33 +81,9 @@ func (r *UpdateRunner) Run() error {
 	}
 }
 
-func (r *UpdateRunner) recordUpdate() error {
-	ur := &Record{LastUpdate: time.Now().Unix()}
-	out.Debug("Updating update record.")
-	return r.DocStore.Upsert(RecordFile, ur)
-}
-
-func (r *UpdateRunner) isUpdateDue() (bool, error) {
-	if !Prefs().RegulateUpdates {
-		out.Debug("Updates not regulated.")
-		return true, nil
-	}
-	ur := &Record{}
-	hiatus := time.Now().Unix() - int64(r.UpdatePeriod/time.Second)
-	out.Debug("Checking update is newer than: %d (Unix time seconds)", hiatus)
-	if err := r.DocStore.Get(RecordFile, ur, hiatus); err != nil {
-		out.LogErrM("Couldn't get local update record.", err)
-		err2, ok := err.(*errs.Error)
-		if !ok {
-			return false, err
-		}
-		if err2.Code == errs.CodeNotFound {
-			// If no record is found then lets update.
-			return true, nil
-		}
-		return false, err2
-	}
-	return false, nil
+func (r *runner) recordUpdate() error {
+	out.Debug("Updated: %+v", Record{LastUpdate: time.Now().Unix()})
+	return nil
 }
 
 func exe(wait bool, name string, arg ...string) {
