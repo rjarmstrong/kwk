@@ -54,7 +54,7 @@ func (r *runner) Run() error {
 	li, err := r.GetLatestInfo()
 	if err != nil {
 		out.LogErrM("UPDATER: Couldn't get remote release info.", err)
-		return nil
+		return err
 	}
 	if !r.isUpdateDue() {
 		out.Debug("UPDATER: Update not due.")
@@ -68,7 +68,7 @@ func (r *runner) Run() error {
 	latest, err := r.GetLatestBinary()
 	if err != nil {
 		out.LogErrM("UPDATER: Couldn't get latest from remote.", err)
-		return nil
+		return err
 	}
 	defer latest.Close() //TODO: Currently NOOP, should be real closer
 	out.Debug("UPDATER: Applying update.")
@@ -78,7 +78,7 @@ func (r *runner) Run() error {
 		err = r.Rollbacker(err)
 		r.CleanUp()
 		r.recordUpdate()
-		return nil
+		return err
 	}
 	r.CleanUp()
 	r.recordUpdate()
@@ -113,7 +113,6 @@ func exe(wait bool, name string, arg ...string) {
 	stdOut, err := c.StdoutPipe()
 	if err != nil {
 		out.LogErrM("UPDATER: If you are running nacl or OpenBSD they are not supported.", err)
-		return
 	}
 	var stderr bytes.Buffer
 	c.Stdout = os.Stdout
