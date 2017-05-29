@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/kwk-super-snippets/cli/src/app"
-	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/cli/src/updater"
 	"github.com/kwk-super-snippets/types"
 	"os"
@@ -22,13 +21,12 @@ func main() {
 		defer runCpuProfile().Close()
 	}
 	update()
-	eh := out.NewErrHandler(os.Stdout)
 	info := getAppInfo()
-	cli := app.NewCLI(os.Stdin, os.Stdout, info, eh)
+	cli := app.NewCLI(os.Stdin, os.Stdout, info)
 	if cli == nil {
 		return
 	}
-	eh.Handle(cli.App.Run(os.Args))
+	cli.Run(os.Args...)
 }
 
 func update() {

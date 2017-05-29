@@ -13,6 +13,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"github.com/kwk-super-snippets/cli/src/app/runtime"
 )
 
 type snippets struct {
@@ -28,7 +29,11 @@ func NewSnippets(s types.SnippetsClient, r Runner, d Dialog, w vwrite.Writer) *s
 
 func (sc *snippets) Search(args ...string) error {
 	term := strings.Join(args, " ")
-	res, err := sc.s.Alpha(Ctx(), &types.AlphaRequest{Term: term})
+	req := &types.AlphaRequest{ Term: term, All: prefs.ListAll }
+	if !prefs.GlobalSearch {
+		req.Username = principal.User.Username
+	}
+	res, err := sc.s.Alpha(Ctx(), req)
 	if err != nil {
 		return err
 	}
@@ -187,7 +192,7 @@ func (sc *snippets) Edit(distinctName string) error {
 		return sc.EWrite(out.SnippetEdited(s))
 	}
 	if distinctName == "env" {
-		distinctName = NewSetupAlias(distinctName, "yml", true).String()
+		distinctName = runtime.EnvURI
 	}
 	list, _, err := sc.getSnippet(distinctName)
 	if err != nil {
@@ -265,7 +270,7 @@ func (sc *snippets) InspectListOrRun(distinctName string, forceInspect bool, arg
 		return sc.typeAhead(distinctName, sc.run)
 	}
 	s := sc.handleMultiResponse(distinctName, list.Items)
-	if forceInspect || Prefs().RequireRunKeyword {
+	if forceInspect || prefs.RequireRunKeyword {
 		sc.Write(out.SnippetView(s))
 	}
 	return sc.runner.Run(s, args)
@@ -435,7 +440,7 @@ func (sc *snippets) CreatePouch(name string) error {
 }
 
 func (sc *snippets) Flatten(username string) error {
-	list, err := sc.s.List(Ctx(), &types.ListRequest{Username: username, All: Prefs().ListAll})
+	list, err := sc.s.List(Ctx(), &types.ListRequest{Username: username, All: prefs.ListAll})
 	if err != nil {
 		return err
 	}
@@ -444,7 +449,7 @@ func (sc *snippets) Flatten(username string) error {
 
 // GetEra lists snippets by special filters: @today @week @month @old
 func (sc *snippets) GetEra(virtualPouch string) error {
-	list, err := sc.s.List(Ctx(), &types.ListRequest{All: Prefs().ListAll})
+	list, err := sc.s.List(Ctx(), &types.ListRequest{All: prefs.ListAll})
 	if err != nil {
 		return err
 	}
@@ -481,14 +486,14 @@ func (sc *snippets) GetEra(virtualPouch string) error {
 
 func (sc *snippets) List(username string, pouch string) error {
 	if pouch == "" {
-		r, err := sc.s.GetRoot(Ctx(), &types.RootRequest{Username: username, All: Prefs().ListAll})
+		r, err := sc.s.GetRoot(Ctx(), &types.RootRequest{Username: username, All: prefs.ListAll})
 		if err != nil {
 			return err
 		}
 		return sc.EWrite(out.PrintRoot(&cliInfo, r, &principal.User))
 	}
 	var size int64
-	list, err := sc.s.List(Ctx(), &types.ListRequest{Username: username, Pouch: pouch, Limit: size, All: Prefs().ListAll})
+	list, err := sc.s.List(Ctx(), &types.ListRequest{Username: username, Pouch: pouch, Limit: size, All: prefs.ListAll})
 	if err != nil {
 		return err
 	}
@@ -577,7 +582,7 @@ func (sc *snippets) deleteSnippet(args []string) error {
 	if err != nil {
 		return err
 	}
-	r := sc.Modal(out.SnippetCheckDelete(sn), Prefs().AutoYes)
+	r := sc.Modal(out.SnippetCheckDelete(sn), prefs.AutoYes)
 	if !r.Ok {
 		sc.EWrite(out.SnippetsNotDeleted(sn))
 	}

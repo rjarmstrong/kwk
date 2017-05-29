@@ -21,7 +21,7 @@ func printSnippetView(w io.Writer, s *types.Snippet) {
 	fmt.Fprint(w, FSnippetType(s))
 	fmt.Fprint(w, "\n")
 	fmt.Fprint(w, style.TwoLines)
-	fmt.Fprint(w, FCodeview(s, 100, 0, false, prefs.AlwaysExpandRows))
+	fmt.Fprint(w, FCodeview(s, 100, 0, false, prefs.ExpandedRows))
 	fmt.Fprint(w, "\n\n")
 
 	tbl := tablewriter.NewWriter(w)

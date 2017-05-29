@@ -5,158 +5,34 @@ import (
 )
 
 func snippetsRoutes(s *snippets) []cli.Command {
+	cat := "Snipppets"
 	c := []cli.Command{
 		{
-			Name:    "new",
-			Aliases: []string{"create", "save"},
+			Category: cat,
+			Name:     "new",
 			Action: func(c *cli.Context) error {
 				return s.Create(c.Args())
 			},
 		},
 		{
-			Name: "ls",
-			Action: func(c *cli.Context) error {
-				Prefs().ListHorizontal = true
-				return s.List("", c.Args().First())
-			},
-		},
-		{
-			Name:    "enchilada",
-			Aliases: []string{""},
-			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:  "all, a",
-					Usage: "List all snippets.",
-				},
-			},
-			Action: func(c *cli.Context) error {
-				all := c.Bool("all")
-				if all {
-					Prefs().ListAll = true
-				}
-				return s.Flatten(c.Args().First())
-			},
-		},
-		{
-			Name:    "expand",
-			Aliases: []string{"x"},
-			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:  "all, a",
-					Usage: "List all snippets.",
-				},
-			},
-			Action: func(c *cli.Context) error {
-				all := c.Bool("all")
-				if all {
-					Prefs().ListAll = true
-				}
-				Prefs().AlwaysExpandRows = true
-				// TODO: This is not quite right as it means we can't expand other users lists
-				return s.List("", c.Args().First())
-			},
-		},
-		{
-			Name:    "mkdir",
-			Aliases: []string{""},
-			Action: func(c *cli.Context) error {
-				return s.CreatePouch(c.Args().First())
-			},
-		},
-		{
-			Name: "lock",
-			Action: func(c *cli.Context) error {
-				return s.Lock(c.Args().First())
-			},
-		},
-		{
-			Name: "unlock",
-			Action: func(c *cli.Context) error {
-				return s.UnLock(c.Args().First())
-			},
-		},
-		{
-			Name:    "find",
-			Aliases: []string{"f"},
-			Action: func(c *cli.Context) error {
-				args := []string(c.Args())
-				return s.Search(args...)
-			},
-		},
-
-		/*
-			The following are actions on existing snippets (and in some cases pouches):
-		*/
-		{
-			Name: "describe",
-			Action: func(c *cli.Context) error {
-				return s.Describe(c.Args().Get(0), c.Args().Get(1))
-
-			},
-		},
-		{
-			Name:    "run",
-			Aliases: []string{"r"},
-			Action: func(c *cli.Context) error {
-				covert := c.Bool("covert")
-				if covert {
-					Prefs().Covert = true
-				}
-				return s.Run(c.Args().First(), []string(c.Args())[1:])
-
-			},
-		},
-		{
-			Name:    "view",
-			Aliases: []string{"get"},
+			Category: cat,
+			Name:     "view",
 			Action: func(c *cli.Context) error {
 				return s.InspectListOrRun(c.Args().First(), true)
 
 			},
 		},
 		{
-			Name:    "raw",
-			Aliases: []string{"cat"},
+			Category: cat,
+			Name:     "cat",
 			Action: func(c *cli.Context) error {
 				return s.Cat(c.Args().First())
 
 			},
 		},
 		{
-			Name:    "rename",
-			Aliases: []string{"mv", "move"},
-			Action: func(c *cli.Context) error {
-				return s.Move(c.Args())
-
-			},
-		},
-		{
-			Name:    "clone",
-			Aliases: []string{"cp", "copy"},
-			Action: func(c *cli.Context) error {
-				return s.Clone(c.Args().First(), c.Args().Get(1))
-
-			},
-		},
-		{
-			Name:    "edit",
-			Aliases: []string{"e"},
-			Action: func(c *cli.Context) error {
-				return s.Edit(c.Args().First())
-
-			},
-		},
-		{
-			Name:    "patch",
-			Aliases: []string{"replace"},
-			Action: func(c *cli.Context) error {
-				return s.Patch(c.Args().First(), c.Args().Get(1), c.Args().Get(2))
-
-			},
-		},
-		{
-			Name:    "delete",
-			Aliases: []string{"rm"},
+			Category: cat,
+			Name:     "rm",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "yes, y",
@@ -166,15 +42,103 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Action: func(c *cli.Context) error {
 				autoYes := c.Bool("yes")
 				if autoYes {
-					Prefs().AutoYes = true
+					prefs.AutoYes = true
 				}
 				return s.Delete(c.Args())
 
 			},
 		},
 		{
-			Name:    "tag",
-			Aliases: []string{"t"},
+			Category: cat,
+			Name:     "mv",
+			Action: func(c *cli.Context) error {
+				return s.Move(c.Args())
+
+			},
+		},
+		{
+			Category: cat,
+			Name:     "edit",
+			Aliases:  []string{"e"},
+			Action: func(c *cli.Context) error {
+				return s.Edit(c.Args().First())
+
+			},
+		},
+		{
+			Category: cat,
+			Name:     "find",
+			Flags: []cli.Flag {
+				cli.BoolFlag{
+					Name: "global, g",
+					Usage: "Search everyone's public snippets, including yours.",
+				},
+			},
+			Aliases:  []string{"f"},
+			Action: func(c *cli.Context) error {
+				args := []string(c.Args())
+				return s.Search(args...)
+			},
+		},
+		{
+			Category: cat,
+			Name:     "clone",
+			Action: func(c *cli.Context) error {
+				return s.Clone(c.Args().First(), c.Args().Get(1))
+
+			},
+		},
+
+		{
+			Category: cat,
+			Name:     "enchilada",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "all, a",
+					Usage: "List all snippets.",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				all := c.Bool("all")
+				if all {
+					prefs.ListAll = true
+				}
+				return s.Flatten(c.Args().First())
+			},
+		},
+		{
+			Category: cat,
+			Name:     "describe",
+			Action: func(c *cli.Context) error {
+				return s.Describe(c.Args().Get(0), c.Args().Get(1))
+
+			},
+		},
+		{
+			Category: cat,
+			Name:     "run",
+			Aliases:  []string{"r"},
+			Action: func(c *cli.Context) error {
+				covert := c.Bool("covert")
+				if covert {
+					prefs.Covert = true
+				}
+				return s.Run(c.Args().First(), []string(c.Args())[1:])
+
+			},
+		},
+		{
+			Category: cat,
+			Name:     "patch",
+			Action: func(c *cli.Context) error {
+				return s.Patch(c.Args().First(), c.Args().Get(1), c.Args().Get(2))
+
+			},
+		},
+		{
+			Category: cat,
+			Name:     "tag",
+			Aliases:  []string{"t"},
 			Action: func(c *cli.Context) error {
 				args := []string(c.Args())
 				return s.Tag(args[0], args[1:]...)
@@ -182,8 +146,8 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			},
 		},
 		{
-			Name:    "untag",
-			Aliases: []string{"ut"},
+			Category: cat,
+			Name:     "untag",
 			Action: func(c *cli.Context) error {
 				args := []string(c.Args())
 				return s.UnTag(args[0], args[1:]...)

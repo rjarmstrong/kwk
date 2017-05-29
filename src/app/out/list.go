@@ -243,10 +243,10 @@ func printSnippets(w io.Writer, pouchName string, list []*types.Snippet, showFul
 		}
 		// col2
 		var lines int
-		if prefs.AlwaysExpandRows {
-			lines = prefs.ExpandedRows
+		if prefs.ExpandedRows {
+			lines = prefs.ExpandedThumbRows
 		} else {
-			lines = prefs.SlimRows
+			lines = prefs.SnippetThumbRows
 		}
 		status := &bytes.Buffer{}
 		runCount := fmtRunCount(v.Stats.Runs)
@@ -258,7 +258,7 @@ func printSnippets(w io.Writer, pouchName string, list []*types.Snippet, showFul
 			status.WriteString(t)
 		}
 		//col3
-		snip := FCodeview(v, 60, lines, (i+1)%2 == 0, prefs.AlwaysExpandRows)
+		snip := FCodeview(v, 60, lines, (i+1)%2 == 0, prefs.ExpandedRows)
 		if prefs.RowSpaces {
 			snip = snip + "\n"
 		}

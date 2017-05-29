@@ -5,43 +5,52 @@ import (
 )
 
 func userRoutes(a *users) []cli.Command {
+	cat := "Account"
 	c := []cli.Command{
 		{
-			Name:    "profile",
-			Aliases: []string{"me", "whoami"},
-			Action: func(c *cli.Context) error {
-				return a.Profile()
-			},
-		},
-		{
-			Name:    "signin",
-			Aliases: []string{"login", "switch", "cd"},
-			Action: func(c *cli.Context) error {
-				return a.SignIn(c.Args().Get(0), c.Args().Get(1))
-			},
-		},
-		{
+			Category: cat,
+			Usage: "Create an account with kwk",
 			Name:    "signup",
-			Aliases: []string{"register"},
 			Action: func(c *cli.Context) error {
 				return a.SignUp()
 			},
 		},
 		{
-			Name:    "signout",
-			Aliases: []string{"logout"},
+			Category: cat,
+			Name:    "login",
+			Usage: "Login to kwk using username and password",
+			Action: func(c *cli.Context) error {
+				return a.SignIn(c.Args().Get(0), c.Args().Get(1))
+			},
+		},
+		{
+			Category: cat,
+			Usage: "Logout from kwk and remove all locally cached data",
+			Name:    "logout",
 			Action: func(c *cli.Context) error {
 				return a.SignOut()
 			},
 		},
 		{
-			Name: "reset-password",
+			Category: cat,
+			Usage: "Show currently signed in user",
+			Name:    "me",
+			Action: func(c *cli.Context) error {
+				return a.Profile()
+			},
+		},
+		{
+			Category: cat,
+			Name: "forgot-pass",
+			Usage: "Send a password reset code to the given email address",
 			Action: func(c *cli.Context) error {
 				return a.ResetPassword(c.Args().First())
 			},
 		},
 		{
-			Name: "change-password",
+			Category: cat,
+			Name: "change-pass",
+			Usage: "Change current password to provided new password",
 			Action: func(c *cli.Context) error {
 				return a.ChangePassword()
 			},

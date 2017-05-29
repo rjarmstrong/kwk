@@ -1,3 +1,4 @@
+// Package out provides the UX for kwk super snippets CLI
 package out
 
 import (

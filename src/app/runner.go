@@ -30,10 +30,11 @@ type Runner interface {
 type runner struct {
 	snippets types.SnippetsClient
 	file     store.File
+	snippetPath string
 }
 
-func NewRunner(f store.File, ss types.SnippetsClient) Runner {
-	return &runner{snippets: ss, file: f}
+func NewRunner(f store.File, ss types.SnippetsClient, snippetPath string) Runner {
+	return &runner{snippets: ss, file: f, snippetPath:snippetPath}
 }
 
 /*
@@ -58,7 +59,7 @@ func (r *runner) Edit(s *types.Snippet) error {
 	}
 	_, cli := getSubSection(a, candidates[0])
 
-	filePath, err := r.file.Write(cfg.SnippetPath, s.Alias.URI(), s.Content, true)
+	filePath, err := r.file.Write(r.snippetPath, s.Alias.URI(), s.Content, true)
 	if err != nil {
 		return err
 	}
@@ -90,7 +91,7 @@ func (r *runner) Edit(s *types.Snippet) error {
 		rdr.ReadLine()
 	}
 
-	text, err := r.file.Read(cfg.SnippetPath, s.Alias.URI(), true, 0)
+	text, err := r.file.Read(r.snippetPath, s.Alias.URI(), true, 0)
 	if err != nil {
 		return err
 	}
@@ -113,12 +114,12 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 	if err != nil {
 		return err
 	}
-	if Prefs().Covert {
+	if prefs.Covert {
 		yamlKey += "-covert"
 	}
 	comp, interp := getSubSection(rs, yamlKey)
 	if comp != nil {
-		if filePath, err := r.file.Write(cfg.SnippetPath, s.Alias.URI(), s.Content, true); err != nil {
+		if filePath, err := r.file.Write(r.snippetPath, s.Alias.URI(), s.Content, true); err != nil {
 			return err
 		} else {
 			_, compile := getSubSection(&comp, "compile")
@@ -166,7 +167,7 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 
 func (r *runner) execEdit(a *types.Alias, editor string, arg ...string) error {
 	out.Debug("EXEC EDIT: %s %s %s", a.URI(), editor, strings.Join(arg, " "))
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(Prefs().CommandTimeout)*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(prefs.CommandTimeout)*time.Second)
 	c := exec.CommandContext(ctx, editor, arg...)
 	c.Stdin = os.Stdin
 	var stderr bytes.Buffer
@@ -187,7 +188,7 @@ func (r *runner) execEdit(a *types.Alias, editor string, arg ...string) error {
 exec realArgs are args that were passed to the snippet, and not the derived args which are passed to the runner.
 */
 func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...string) error {
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(Prefs().CommandTimeout)*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(prefs.CommandTimeout)*time.Second)
 	c := exec.CommandContext(ctx, runner, arg...)
 	c.Stdin = os.Stdin
 	stdout, err := c.StdoutPipe()
@@ -264,7 +265,7 @@ func (r *runner) logUse(a *types.Alias, output string, node *ProcessNode, s type
 }
 
 func (r *runner) getEnvSection(name string) (*yaml.MapSlice, error) {
-	rs, _ := getSubSection(Env(), name)
+	rs, _ := getSubSection(env, name)
 	if rs == nil {
 		return nil, errors.New(fmt.Sprintf("No %s section in env.yml", name))
 	}

@@ -7,6 +7,7 @@ import (
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/vwrite"
 	"github.com/siddontang/go/num"
+	"io"
 )
 
 // Dialogue creates CLI ui elements to perform common interactions.
@@ -26,8 +27,8 @@ type DialogResponse struct {
 	Value interface{}
 }
 
-func NewDialog(w vwrite.Writer, reader *bufio.Reader) *StdDialog {
-	return &StdDialog{Writer: w, reader: reader}
+func NewDialog(w vwrite.Writer, r io.Reader) *StdDialog {
+	return &StdDialog{Writer: w, reader: bufio.NewReader(r)}
 }
 
 // StdDialogue is the default dialogue type.
