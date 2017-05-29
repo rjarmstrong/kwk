@@ -91,7 +91,7 @@ func internalError(err error) vwrite.Handler {
 			if o != "" {
 				ce.Message = o
 			}
-			fmt.Fprintln(w, ce.Message)
+			fmt.Fprintln(w, ce.Message, ce.Code)
 			return
 		}
 		LogErr(err)

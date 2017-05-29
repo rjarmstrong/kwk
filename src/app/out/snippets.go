@@ -56,15 +56,15 @@ func SnippetEditNewPrompt(uri string) vwrite.Handler {
 	}))
 }
 
-func SnippetList(list *types.ListResponse) vwrite.Handler {
+func SnippetList(prefs *Prefs, list *types.ListResponse) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		printPouchSnippets(w, list)
+		printPouchSnippets(w, prefs, list)
 	})
 }
 
-func PrintRoot(cli *types.AppInfo, rr *types.RootResponse, u *types.User) vwrite.Handler {
+func PrintRoot(prefs *Prefs, cli *types.AppInfo, rr *types.RootResponse, u *types.User) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		printRoot(w, cli, rr, u)
+		printRoot(w, prefs, cli, rr, u)
 	})
 }
 
@@ -128,8 +128,8 @@ func SnippetPouchCreatePrompt() vwrite.Handler {
 	}))
 }
 
-func SnippetView(s *types.Snippet) vwrite.Handler {
+func SnippetView(prefs *Prefs, s *types.Snippet) vwrite.Handler {
 	return Info(vwrite.HandlerFunc(func(w io.Writer) {
-		printSnippetView(w, s)
+		printSnippetView(w, prefs, s)
 	}))
 }

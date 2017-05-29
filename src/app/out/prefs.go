@@ -1,7 +1,5 @@
 package out
 
-var prefs Prefs
-
 // Prefs to control display formatting.
 type Prefs struct {
 	// Always opens browser in covert mode, when set to true.

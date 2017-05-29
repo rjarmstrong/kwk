@@ -17,9 +17,9 @@ func FreeText(text string) vwrite.Handler {
 	})
 }
 
-func Dashboard(cli *types.AppInfo, rr *types.RootResponse, u *types.User) vwrite.Handler {
+func Dashboard(prefs *Prefs, cli *types.AppInfo, rr *types.RootResponse, u *types.User) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		PrintRoot(cli, rr, u).Write(w)
+		PrintRoot(prefs, cli, rr, u).Write(w)
 	})
 }
 
@@ -64,7 +64,7 @@ func multiChoice(w io.Writer, in interface{}) {
 	fmt.Fprint(w, style.Margin+style.Fmt256(style.ColorPouchCyan, "Please select a snippet: "))
 }
 
-func Fpreview(in string, wrapAt int, lines int) string {
+func Fpreview(in string, prefs *Prefs, wrapAt int, lines int) string {
 	if prefs.DisablePreview {
 		return ""
 	}

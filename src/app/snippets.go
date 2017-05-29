@@ -247,7 +247,7 @@ func (sc *snippets) InspectListOrRun(distinctName string, forceInspect bool, arg
 	if err != nil {
 		return err
 	}
-	rr, err := sc.s.GetRoot(Ctx(), &types.RootRequest{Username: a.Username, All: true})
+	rr, err := sc.s.GetRoot(Ctx(), &types.RootRequest{Username: a.Username, All: prefs.ListAll})
 	if err != nil {
 		return err
 	}
@@ -271,7 +271,7 @@ func (sc *snippets) InspectListOrRun(distinctName string, forceInspect bool, arg
 	}
 	s := sc.handleMultiResponse(distinctName, list.Items)
 	if forceInspect || prefs.RequireRunKeyword {
-		sc.Write(out.SnippetView(s))
+		sc.Write(out.SnippetView(prefs, s))
 	}
 	return sc.runner.Run(s, args)
 }
@@ -402,7 +402,7 @@ func (sc *snippets) Clone(distinctName string, newFullName string) error {
 	if err != nil {
 		return err
 	}
-	sc.EWrite(out.SnippetList(res.List))
+	sc.EWrite(out.SnippetList(prefs, res.List))
 	return sc.EWrite(out.SnippetClonedAs(res.Snippet.Alias.URI()))
 }
 
@@ -435,7 +435,7 @@ func (sc *snippets) CreatePouch(name string) error {
 	if err != nil {
 		return err
 	}
-	sc.EWrite(out.PrintRoot(&cliInfo, res.Root, &principal.User))
+	sc.EWrite(out.PrintRoot(prefs, &cliInfo, res.Root, &principal.User))
 	return sc.EWrite(out.PouchCreated(name))
 }
 
@@ -444,7 +444,7 @@ func (sc *snippets) Flatten(username string) error {
 	if err != nil {
 		return err
 	}
-	return sc.EWrite(out.SnippetList(list))
+	return sc.EWrite(out.SnippetList(prefs, list))
 }
 
 // GetEra lists snippets by special filters: @today @week @month @old
@@ -481,7 +481,7 @@ func (sc *snippets) GetEra(virtualPouch string) error {
 		return era[i].RunStatusTime < era[j].RunStatusTime
 	})
 	list.Items = era
-	return sc.EWrite(out.SnippetList(list))
+	return sc.EWrite(out.SnippetList(prefs, list))
 }
 
 func (sc *snippets) List(username string, pouch string) error {
@@ -490,7 +490,7 @@ func (sc *snippets) List(username string, pouch string) error {
 		if err != nil {
 			return err
 		}
-		return sc.EWrite(out.PrintRoot(&cliInfo, r, &principal.User))
+		return sc.EWrite(out.PrintRoot(prefs, &cliInfo, r, &principal.User))
 	}
 	var size int64
 	list, err := sc.s.List(Ctx(), &types.ListRequest{Username: username, Pouch: pouch, Limit: size, All: prefs.ListAll})
@@ -511,7 +511,7 @@ func (sc *snippets) listSnippets(l *types.ListResponse) error {
 	if err != nil {
 		return err
 	}
-	return sc.EWrite(out.SnippetList(l))
+	return sc.EWrite(out.SnippetList(prefs, l))
 }
 
 func (sc *snippets) typeAhead(term string, onSelect func(s *types.Snippet, args []string) error) error {
@@ -590,7 +590,7 @@ func (sc *snippets) deleteSnippet(args []string) error {
 	if err != nil {
 		return err
 	}
-	sc.EWrite(out.SnippetList(res.List))
+	sc.EWrite(out.SnippetList(prefs, res.List))
 	return sc.EWrite(out.SnippetsDeleted(sn))
 }
 
@@ -603,6 +603,6 @@ func (sc *snippets) deletePouch(pouch string) error {
 	if err != nil {
 		return err
 	}
-	sc.EWrite(out.PrintRoot(&cliInfo, dres.Root, &principal.User))
+	sc.EWrite(out.PrintRoot(prefs, &cliInfo, dres.Root, &principal.User))
 	return sc.EWrite(out.PouchDeleted(pouch))
 }

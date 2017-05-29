@@ -92,19 +92,20 @@ func (cs *Runtime) getPrefs() *out.Prefs {
 	return res
 }
 
-func (cs *Runtime) resolveDoc(alias *types.Alias, fallback DocGetter, role types.Role) (string, error) {
+func (cs *Runtime) resolveDoc(a *types.Alias, fallback DocGetter, role types.Role) (string, error) {
 	if !cs.loggedIn {
+		out.Debug("RUNTIME: Getting Fallback %s", a.URI())
 		return fallback()
 	}
-	conf, err := cs.getLocalDoc(alias)
+	conf, err := cs.getLocalDoc(a)
 	if err == nil {
 		return conf, nil
 	}
-	conf, err = cs.getRemoteDoc(alias)
+	conf, err = cs.getRemoteDoc(a)
 	if err == nil {
 		return conf, nil
 	}
-	conf, err = cs.getDefaultDoc(alias, fallback, role)
+	conf, err = cs.getDefaultDoc(a, fallback, role)
 	if err == nil {
 		return conf, nil
 	}
@@ -112,11 +113,12 @@ func (cs *Runtime) resolveDoc(alias *types.Alias, fallback DocGetter, role types
 }
 
 func (cs *Runtime) getLocalDoc(a *types.Alias) (string, error) {
+	out.Debug("RUNTIME: Getting Local %s", a.URI())
 	return cs.file.Read(cs.snippetPath, a.URI(), true, 0)
 }
 
 func (cs *Runtime) getRemoteDoc(a *types.Alias) (string, error) {
-	out.Debug("GETTING: %s", a.URI())
+	out.Debug("RUNTIME: Getting Remote %s", a.URI())
 	res, err := cs.sg(&types.GetRequest{Alias: a})
 	if err != nil {
 		return "", err
@@ -130,6 +132,7 @@ func (cs *Runtime) getRemoteDoc(a *types.Alias) (string, error) {
 }
 
 func (cs *Runtime) getDefaultDoc(a *types.Alias, fallback DocGetter, role types.Role) (string, error) {
+	out.Debug("RUNTIME: Getting Default %s", a.URI())
 	content, err := fallback()
 	if err != nil {
 		return "", err

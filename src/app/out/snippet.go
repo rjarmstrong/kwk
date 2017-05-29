@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func printSnippetView(w io.Writer, s *types.Snippet) {
+func printSnippetView(w io.Writer, prefs *Prefs, s *types.Snippet) {
 	fmt.Fprintln(w, "")
 	fmt.Fprint(w, style.Margin)
 	fmtHeader(w, s.Username(), s.Pouch(), s.Alias.FileName())
@@ -77,7 +77,7 @@ func printSnippetView(w io.Writer, s *types.Snippet) {
 		style.Fmt16(style.Subdued, "Description:"), style.FBox(FEmpty(s.Description), 50, 3), "", ""})
 
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued, "Preview:"), Fpreview(s.Preview, 50, 1), "", ""})
+		style.Fmt16(style.Subdued, "Preview:"), Fpreview(s.Preview, prefs, 50, 1), "", ""})
 
 	var tags []string
 	for k := range s.Tags.Names {

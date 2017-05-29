@@ -14,7 +14,7 @@ const oneMin = int64(60)
 const oneHour = oneMin * 60
 const oneDay = oneHour * 24
 
-func horizontalPouches(l []*types.Pouch, stats *types.UserStats) []byte {
+func horizontalPouches(prefs *Prefs, l []*types.Pouch, stats *types.UserStats) []byte {
 	var buff bytes.Buffer
 	w := tabwriter.NewWriter(&buff, 5, 1, 3, ' ', tabwriter.TabIndent)
 	var item bytes.Buffer

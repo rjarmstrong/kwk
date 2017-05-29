@@ -49,7 +49,7 @@ func FStatus(s *types.Snippet, includeText bool) string {
 	return style.Fmt16(style.Subdued, "? ")
 }
 
-func printRoot(w io.Writer, cli *types.AppInfo, r *types.RootResponse, p *types.User) {
+func printRoot(w io.Writer, prefs *Prefs, cli *types.AppInfo, r *types.RootResponse, p *types.User) {
 	var all []*types.Pouch
 	for _, v := range r.Pouches {
 		if v.Name != "" {
@@ -63,11 +63,11 @@ func printRoot(w io.Writer, cli *types.AppInfo, r *types.RootResponse, p *types.
 	fmtHeader(w, r.Username, "", "")
 	fmt.Fprint(w, strings.Repeat(" ", 50), style.Fmt16(style.Subdued, "◉  "+p.Username+"    TLS12"))
 	fmt.Fprint(w, style.TwoLines)
-	w.Write(horizontalPouches(all, r.Stats))
+	w.Write(horizontalPouches(prefs, all, r.Stats))
 
 	if len(r.Snippets) > 0 {
 		fmt.Fprintf(w, "\n%sLast:", style.Margin)
-		printSnippets(w, "", r.Snippets, true)
+		printSnippets(w, prefs,"", r.Snippets, true)
 	}
 
 	if clientIsNew(cli.Time) {
@@ -123,7 +123,7 @@ func locked(locked bool) string {
 	return "Public"
 }
 
-func printPouchSnippets(w io.Writer, list *types.ListResponse) {
+func printPouchSnippets(w io.Writer, prefs *Prefs, list *types.ListResponse) {
 	if prefs.Naked {
 		fmt.Fprint(w, listNaked(list))
 	} else {
@@ -133,7 +133,7 @@ func printPouchSnippets(w io.Writer, list *types.ListResponse) {
 		if list.Pouch != nil {
 			printPouchHeadAndFoot(w, list.Pouch, list.Items)
 		}
-		printSnippets(w, list.Pouch.Name, list.Items, false)
+		printSnippets(w, prefs, list.Pouch.Name, list.Items, false)
 		if list.Pouch != nil && len(list.Items) > 10 && !prefs.ListHorizontal {
 			printPouchHeadAndFoot(w, list.Pouch, list.Items)
 		}
@@ -183,7 +183,7 @@ func listNaked(list *types.ListResponse) interface{} {
 }
 
 // printSnippets is the standard way snippets are viewed in as a list.
-func printSnippets(w io.Writer, pouchName string, list []*types.Snippet, showFullName bool) {
+func printSnippets(w io.Writer, prefs *Prefs, pouchName string, list []*types.Snippet, showFullName bool) {
 	if prefs.ListHorizontal {
 		sort.Slice(list, func(i, j int) bool {
 			return list[i].Name() < list[j].Name()
@@ -263,7 +263,7 @@ func printSnippets(w io.Writer, pouchName string, list []*types.Snippet, showFul
 			snip = snip + "\n"
 		}
 		if len(v.Preview) >= 10 {
-			snip = snip + "\n\n" + style.Margin + style.Fmt256(style.ColorMonthGrey, Fpreview(v.Preview, 120, 1))
+			snip = snip + "\n\n" + style.Margin + style.Fmt256(style.ColorMonthGrey, Fpreview(v.Preview, prefs,120, 1))
 		}
 
 		tbl.Append([]string{
