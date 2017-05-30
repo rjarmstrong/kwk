@@ -18,7 +18,7 @@ import (
 
 var (
 	cliInfo   = types.AppInfo{}
-	principal = &UserWithToken{}
+	principal = &UserWithToken{User:types.User{}}
 	cfg       = &CLIConfig{}
 	prefs     = runtime.DefaultPrefs()
 	env       = runtime.DefaultEnv()
@@ -39,6 +39,7 @@ func NewCLI(r io.Reader, wr io.Writer, info types.AppInfo) *KwkCLI {
 	d := NewDialog(w, r)
 	f := store.NewDiskFile()
 	jsn := store.NewJson(f, cfg.DocPath)
+	srw := NewSnippetReadWriter(f)
 
 	// API
 	conn, err := GetConn(cfg.APIHost, cfg.TestMode)
@@ -48,17 +49,18 @@ func NewCLI(r io.Reader, wr io.Writer, info types.AppInfo) *KwkCLI {
 	}
 	sc := types.NewSnippetsClient(conn)
 	uc := types.NewUsersClient(conn)
-	runner := NewRunner(f, sc, cfg.SnippetPath)
 
 	// SERVICES
 	dash := NewDashBoard(w, eh, sc)
 	users := NewUsers(uc, jsn, w, d, dash)
+	runner := NewRunner(srw, sc)
 	snippets := NewSnippets(sc, runner, d, w)
 	system := NewSystem(w, updater.New(info.String(), &updater.S3Repo{}, gu.Apply, gu.RollbackError, jsn))
 
+
 	// APP
 	jsn.Get(cfg.UserDocName, principal, 0)
-	runtime.Configure(env, prefs, principal.HasAccessToken(), snippetGetter(sc), snippetMaker(sc), cfg.SnippetPath, f, eh)
+	runtime.Configure(env, prefs, principal.User.Username, snippetGetter(sc), snippetMaker(sc), srw, eh)
 	out.Debug("PREFS: %+v", prefs)
 	ap := cli.NewApp()
 	ap.Name = "kwk super snippets"

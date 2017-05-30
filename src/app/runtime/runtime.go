@@ -16,85 +16,73 @@ type Resolver interface {
 	Fallback() (string, error)
 }
 
-var (
-	envAlias   = newRuntimeAlias("env", "yml", true)
-	prefsAlias = newRuntimeAlias("prefs", "yml", false)
-	EnvURI = envAlias.URI()
-)
-
 type SnippetGetter func(req *types.GetRequest) (*types.ListResponse, error)
 type SnippetMaker func(req *types.CreateRequest) error
 type DocGetter func() (string, error)
 
 type Runtime struct {
 	errs.Handler
-	sg          SnippetGetter
-	sm          SnippetMaker
-	file        store.File
-	snippetPath string
-	loggedIn    bool
+	sg         SnippetGetter
+	sm         SnippetMaker
+	file       store.SnippetReadWriter
 }
 
-func Configure(env *yaml.MapSlice, prefs *out.Prefs, loggedIn bool, sg SnippetGetter, sm SnippetMaker, path string, f store.File, eh errs.Handler) {
-	c := &Runtime{loggedIn: loggedIn, sg: sg, sm: sm, snippetPath: path, file: f, Handler: eh}
-	env = c.getEnv()
-	prefs = c.getPrefs()
-}
+var (
+	envAlias *types.Alias
+	prefsAlias *types.Alias
+)
 
-func (cs *Runtime) getEnv() *yaml.MapSlice {
-	content, err := cs.resolveDoc(envAlias, func() (string, error) { return defaultEnv, nil }, types.Role_Environment)
-	if err != nil {
-		out.Debug("Failed to load env settings.")
-		out.LogErr(err)
-		content = defaultEnv
+func GetEnvURI() string {
+	if envAlias == nil {
+		return ""
 	}
-	env := &yaml.MapSlice{}
+	return envAlias.URI()
+}
+
+func Configure(env *yaml.MapSlice, prefs *out.Prefs, username string, sg SnippetGetter, sm SnippetMaker, f store.SnippetReadWriter, eh errs.Handler) {
+	c := &Runtime{sg: sg, sm: sm, file: f, Handler: eh}
+	envAlias = newRuntimeAlias(username, "env", "yml", true)
+	prefsAlias = newRuntimeAlias(username, "prefs", "yml", false)
+	c.resolvePrefs(prefs)
+	c.resolveEnv(env)
+}
+
+func (cs *Runtime) resolveEnv(env *yaml.MapSlice) {
+	content, err := cs.resolveDoc(envAlias, func() (string, error) { return defaultEnvString, nil }, types.Role_Environment)
 	err = yaml.Unmarshal([]byte(content), env)
 	if err != nil {
-		cs.Handle(errs.New(errs.CodeInvalidConfigSection,
-			fmt.Sprintf("Invalid kwk *env.yml detected. `kwk edit env` to fix. %s", err)))
-		return DefaultEnv()
+		cs.Handle(errs.New(errs.CodeInvalidConfigSection, fmt.Sprintf("Invalid kwk *env.yml detected. `kwk edit env` to fix. %s", err)))
+		*env = *DefaultEnv()
 	}
-	return env
+	//out.Debug("ENV: %+v", *env)
 }
 
-func (cs *Runtime) getPrefs() *out.Prefs {
+func (cs *Runtime) resolvePrefs(prefs *out.Prefs) {
 	fallback := func() (string, error) {
-		ph := &PrefsFile{KwkPrefs: "v1", Options: *DefaultPrefs()}
-		b, err := yaml.Marshal(ph)
-		if err != nil {
-			return "", err
-		}
-		return string(b), nil
+		return getPrefsAsString(*DefaultPrefs()), nil
 	}
-	c, err := cs.resolveDoc(prefsAlias, fallback, types.Role_Preferences)
-	if err != nil {
-		cs.Handle(err)
-		return nil
-	}
-	prefs := &out.Prefs{}
-	parse := func(p string) (*out.Prefs, error) {
+	content, err := cs.resolveDoc(prefsAlias, fallback, types.Role_Preferences)
+	parse := func(p string) error {
 		ph := &PrefsFile{}
 		err := yaml.Unmarshal([]byte(p), ph)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		prefs = &ph.Options
-		return prefs, nil
+		*prefs = ph.Options
+		return nil
 	}
-	res, err := parse(c)
+	err = parse(content)
 	if err != nil {
 		cs.Handle(errs.New(errs.CodeInvalidConfigSection,
 			fmt.Sprintf("Invalid kwk *prefs.yml detected. `kwk edit prefs` to fix. %s", err)))
-		return DefaultPrefs()
+		*prefs = *DefaultPrefs()
 	}
-	out.Debug("SETTING PREFS: %+v", *res)
-	return res
+	//out.Debug("PREFS: %+v", *prefs)
 }
 
 func (cs *Runtime) resolveDoc(a *types.Alias, fallback DocGetter, role types.Role) (string, error) {
-	if !cs.loggedIn {
-		out.Debug("RUNTIME: Getting Fallback %s", a.URI())
+	if a.Username == "" {
+		out.Debug("RUNTIME: No username available. Getting Fallback %s", a.URI())
 		return fallback()
 	}
 	conf, err := cs.getLocalDoc(a)
@@ -105,16 +93,17 @@ func (cs *Runtime) resolveDoc(a *types.Alias, fallback DocGetter, role types.Rol
 	if err == nil {
 		return conf, nil
 	}
-	conf, err = cs.getDefaultDoc(a, fallback, role)
+	conf, err = cs.createSnippetWithDefault(a, fallback, role)
 	if err == nil {
 		return conf, nil
 	}
-	return "", err
+	out.Debug("Failed to resolve any %s. Using fallback.", a.URI())
+	return fallback()
 }
 
 func (cs *Runtime) getLocalDoc(a *types.Alias) (string, error) {
 	out.Debug("RUNTIME: Getting Local %s", a.URI())
-	return cs.file.Read(cs.snippetPath, a.URI(), true, 0)
+	return cs.file.Read(a.URI())
 }
 
 func (cs *Runtime) getRemoteDoc(a *types.Alias) (string, error) {
@@ -124,14 +113,14 @@ func (cs *Runtime) getRemoteDoc(a *types.Alias) (string, error) {
 		return "", err
 	}
 	content := res.Items[0].Content
-	_, err = cs.file.Write(cs.snippetPath, a.URI(), content, true)
+	_, err = cs.file.Write(a.URI(), content)
 	if err != nil {
 		return "", err
 	}
 	return content, nil
 }
 
-func (cs *Runtime) getDefaultDoc(a *types.Alias, fallback DocGetter, role types.Role) (string, error) {
+func (cs *Runtime) createSnippetWithDefault(a *types.Alias, fallback DocGetter, role types.Role) (string, error) {
 	out.Debug("RUNTIME: Getting Default %s", a.URI())
 	content, err := fallback()
 	if err != nil {
@@ -141,7 +130,7 @@ func (cs *Runtime) getDefaultDoc(a *types.Alias, fallback DocGetter, role types.
 	if err != nil {
 		return "", err
 	}
-	_, err = cs.file.Write(cs.snippetPath, a.URI(), content, true)
+	_, err = cs.file.Write(a.URI(), content)
 	if err != nil {
 		return "", err
 	}

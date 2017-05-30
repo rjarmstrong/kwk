@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -ef -o pipefail
-KWK_VERSION=v0.8.0
+KWK_VERSION=v0.8.1
 BUILD_NUMBER=$1
 RELEASE_TIME=$(date +%s)
 RELEASE_NOTES="- ....\n"
@@ -11,7 +11,8 @@ echo -e "\n\n\n**** kwk-cli build ${KWK_VERSION}+${BUILD_NUMBER} *****\n\n\n"
 ARCH=amd64
 
 # TESTING
-#go test ./app
+./src/test.sh
+
 
 # PREP OUTPUT
 releasePath=/builds/${KWK_VERSION}

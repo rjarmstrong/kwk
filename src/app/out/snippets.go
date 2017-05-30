@@ -40,13 +40,13 @@ func SnippetAmbiguousCat(snippets []*types.Snippet) vwrite.Handler {
 
 func SnippetEdited(s *types.Snippet) vwrite.Handler {
 	return Success(vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprintf(w, "Successfully updated %s %s\n\n", snippetIcon(s), s.String())
+		fmt.Fprintf(w, "Successfully updated %s %s\n\n", snippetIcon(s), s.Alias.URI())
 	}))
 }
 
 func SnippetEditing(s *types.Snippet) vwrite.Handler {
 	return Success(vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprintf(w, "Editing: %s %s... \nHit ENTER to upload changes. CTRL+C to cancel.\n", snippetIcon(s), s.String())
+		fmt.Fprintf(w, "Editing: %s %s... \nHit ENTER to upload changes. CTRL+C to cancel.\n", snippetIcon(s), s.Alias.URI())
 	}))
 }
 

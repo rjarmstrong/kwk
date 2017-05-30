@@ -8,7 +8,6 @@ import (
 	"github.com/rjarmstrong/tablewriter"
 	"io"
 	"strings"
-	"time"
 )
 
 func printSnippetView(w io.Writer, prefs *Prefs, s *types.Snippet) {
@@ -40,7 +39,7 @@ func printSnippetView(w io.Writer, prefs *Prefs, s *types.Snippet) {
 	if s.Stats.Runs < 1 {
 		lastRun = "never"
 	} else {
-		lastRun = pad(20, style.Time(time.Unix(s.RunStatusTime, 0))).String()
+		lastRun = pad(20, formatTime(s.RunStatusTime)).String()
 	}
 	tbl.Append([]string{
 		style.Fmt16(colors.Subdued, "Run Status:"), FStatus(s, true),
@@ -88,7 +87,7 @@ func printSnippetView(w io.Writer, prefs *Prefs, s *types.Snippet) {
 	tbl.Append([]string{
 		style.Fmt16(style.Subdued, "sha256:"), FVerified(s)})
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued, "Updated:"), fmt.Sprintf("%s - %s", style.Time(time.Unix(s.Created, 0)), fmt.Sprintf("v%d", s.Version)),
+		style.Fmt16(style.Subdued, "Updated:"), fmt.Sprintf("%s - %s", formatTime(s.Updated), fmt.Sprintf("v%d", s.Version())),
 	})
 	tbl.Render()
 

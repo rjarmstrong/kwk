@@ -1,6 +1,6 @@
 package runtime
 
-const defaultEnv  = `kwkenv: "1"
+const defaultEnvString = `kwkenv: "1"
 editors:
 #  Specify one app for each file type to edit.
 #  sh: [vim]

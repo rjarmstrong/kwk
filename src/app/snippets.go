@@ -182,7 +182,7 @@ func (sc *snippets) Create(args []string) error {
 	return sc.EWrite(out.SnippetCreated(res.Snippet))
 }
 
-func (sc *snippets) Edit(distinctName string) error {
+func (sc *snippets) Edit(uri string) error {
 	innerEdit := func(s *types.Snippet) error {
 		sc.Write(out.SnippetEditing(s))
 		err := sc.runner.Edit(s)
@@ -191,13 +191,13 @@ func (sc *snippets) Edit(distinctName string) error {
 		}
 		return sc.EWrite(out.SnippetEdited(s))
 	}
-	if distinctName == "env" {
-		distinctName = runtime.EnvURI
+	if uri == "env" {
+		uri = runtime.GetEnvURI()
 	}
-	list, _, err := sc.getSnippet(distinctName)
+	list, _, err := sc.getSnippet(uri)
 	if err != nil {
 		if errs.HasCode(err, errs.CodeNotFound) {
-			a, err := types.ParseAlias(distinctName)
+			a, err := types.ParseAlias(uri)
 			if err != nil {
 				return err
 			}
@@ -212,7 +212,7 @@ func (sc *snippets) Edit(distinctName string) error {
 		}
 		return err
 	}
-	snippet := sc.handleMultiResponse(distinctName, list.Items)
+	snippet := sc.handleMultiResponse(uri, list.Items)
 	if snippet != nil {
 		return innerEdit(snippet)
 	}
@@ -242,7 +242,7 @@ func (sc *snippets) Describe(distinctName string, description string) error {
 	return sc.EWrite(out.SnippetDescriptionUpdated(alias.String(), description))
 }
 
-func (sc *snippets) InspectListOrRun(distinctName string, forceInspect bool, args ...string) error {
+func (sc *snippets) InspectListOrRun(distinctName string, forceView bool, args ...string) error {
 	a, err := types.ParseAlias(distinctName)
 	if err != nil {
 		return err
@@ -270,8 +270,10 @@ func (sc *snippets) InspectListOrRun(distinctName string, forceInspect bool, arg
 		return sc.typeAhead(distinctName, sc.run)
 	}
 	s := sc.handleMultiResponse(distinctName, list.Items)
-	if forceInspect || prefs.RequireRunKeyword {
+	if forceView || prefs.RequireRunKeyword {
+		out.Debug("RUN KEYWORD REQUIRED, VIEWING.")
 		sc.Write(out.SnippetView(prefs, s))
+		return nil
 	}
 	return sc.runner.Run(s, args)
 }

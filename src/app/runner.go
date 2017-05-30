@@ -29,12 +29,11 @@ type Runner interface {
 
 type runner struct {
 	snippets types.SnippetsClient
-	file     store.File
-	snippetPath string
+	file     store.SnippetReadWriter
 }
 
-func NewRunner(f store.File, ss types.SnippetsClient, snippetPath string) Runner {
-	return &runner{snippets: ss, file: f, snippetPath:snippetPath}
+func NewRunner(f store.SnippetReadWriter, ss types.SnippetsClient) Runner {
+	return &runner{snippets: ss, file: f}
 }
 
 /*
@@ -59,12 +58,13 @@ func (r *runner) Edit(s *types.Snippet) error {
 	}
 	_, cli := getSubSection(a, candidates[0])
 
-	filePath, err := r.file.Write(r.snippetPath, s.Alias.URI(), s.Content, true)
+	filePath, err := r.file.Write(s.Alias.URI(), s.Content)
+	out.Debug("SAVED TO: %s", filePath)
 	if err != nil {
 		return err
 	}
 	replaceVariables(&cli, filePath, s)
-	out.Debug("EDITING:%v %v", s.Alias, cli)
+	out.Debug("EDITING:%v %v", s.Alias.URI(), cli)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func (r *runner) Edit(s *types.Snippet) error {
 		rdr.ReadLine()
 	}
 
-	text, err := r.file.Read(r.snippetPath, s.Alias.URI(), true, 0)
+	text, err := r.file.Read(s.Alias.URI())
 	if err != nil {
 		return err
 	}
@@ -119,7 +119,7 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 	}
 	comp, interp := getSubSection(rs, yamlKey)
 	if comp != nil {
-		if filePath, err := r.file.Write(r.snippetPath, s.Alias.URI(), s.Content, true); err != nil {
+		if filePath, err := r.file.Write(s.Alias.URI(), s.Content); err != nil {
 			return err
 		} else {
 			_, compile := getSubSection(&comp, "compile")

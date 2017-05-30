@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"log"
 )
 
 type File interface {
@@ -16,6 +17,11 @@ type File interface {
 	// ReadFromFile fresherThan = get record as long as it was last modified after this unix time value in seconds.
 	Read(subDirName string, suffixPath string, incHoldingDir bool, fresherThan int64) (string, error)
 	DeleteAll() error
+}
+
+type SnippetReadWriter interface {
+	Write(uri string, content string) (string, error)
+	Read(uri string) (string, error)
 }
 
 func NewDiskFile() File {
@@ -105,10 +111,11 @@ func (s *DiskFile) getFilePath(subDirName string, suffixPath string, incHoldingD
 	if incHoldingDir {
 		hd := s.getHoldingDirectory(subDirName, sn)
 		return path.Join(out.KwkPath(), subDirName, hd, sn)
-	} else {
-		if err := s.upsertDirectory(path.Join(out.KwkPath(), subDirName)); err != nil {
-			panic(err)
-		}
-		return path.Join(out.KwkPath(), subDirName, sn)
 	}
+	err := s.upsertDirectory(path.Join(out.KwkPath(), subDirName))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return path.Join(out.KwkPath(), subDirName, sn)
+
 }

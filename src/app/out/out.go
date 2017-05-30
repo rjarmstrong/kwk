@@ -9,12 +9,17 @@ import (
 	"github.com/lunixbochs/vtclean"
 	"io"
 	"text/tabwriter"
+	"time"
 )
 
 func FreeText(text string) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
 		fmt.Fprint(w, text)
 	})
+}
+
+func formatTime(millis int64) string {
+	return style.Time(time.Unix(millis/1000, 0))
 }
 
 func Dashboard(prefs *Prefs, cli *types.AppInfo, rr *types.RootResponse, u *types.User) vwrite.Handler {

@@ -10,13 +10,13 @@ import (
 	"log"
 )
 
-func newRuntimeAlias(name string, ext string, uniquePerMachine bool) *types.Alias {
+func newRuntimeAlias(username, name string, ext string, uniquePerMachine bool) *types.Alias {
 	if uniquePerMachine {
 		s, _ := os.Hostname()
-		//u, _ := user.Current()
 		name = fmt.Sprintf("%s-%s", name, strings.ToLower(s))
 	}
 	return &types.Alias{
+		Username: username,
 		Pouch: types.PouchSettings,
 		Name:  name,
 		Ext:   ext,
@@ -25,23 +25,32 @@ func newRuntimeAlias(name string, ext string, uniquePerMachine bool) *types.Alia
 
 func DefaultPrefs() *out.Prefs {
 	return &out.Prefs{
-		GlobalSearch:      false,
+		GlobalSearch:      true,
 		AutoYes:           false,
 		Covert:            false,
-		RequireRunKeyword: true,
+		RequireRunKeyword: false,
 		ListAll:           true,
 		Quiet:             false,
 		SnippetThumbRows:  3,
 		ExpandedThumbRows: 15,
 		CommandTimeout:    60,
 		RowSpaces:         true,
-		RowLines:          false,
+		RowLines:          true,
 	}
+}
+
+func getPrefsAsString(prefs out.Prefs) string {
+	ph := &PrefsFile{KwkPrefs: "v1", Options: prefs}
+	b, err := yaml.Marshal(ph)
+	if err != nil {
+		out.LogErr(err)
+	}
+	return string(b)
 }
 
 func DefaultEnv() *yaml.MapSlice {
 	env := &yaml.MapSlice{}
-	err := yaml.Unmarshal([]byte(defaultEnv), env)
+	err := yaml.Unmarshal([]byte(defaultEnvString), env)
 	if err != nil {
 		log.Fatal(err)
 	}
