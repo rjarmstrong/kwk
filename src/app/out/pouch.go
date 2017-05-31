@@ -118,7 +118,7 @@ func newerThan(unix int64, seconds int64) bool {
 
 func decayColor(unix int64, whiteToday bool) types.AnsiCode {
 	local := time.Now()
-	pouchT := time.Unix(unix, 0)
+	pouchT := time.Unix(unix/1000, 0)
 	today := local.YearDay() == pouchT.YearDay() && local.Year() == pouchT.Year()
 	if today {
 		if whiteToday {
