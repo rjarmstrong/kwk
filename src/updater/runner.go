@@ -19,7 +19,7 @@ const (
 // SilentUpdate spawns a new process to check for updates and runs.
 func SpawnUpdate() {
 	cmd, err := os.Executable()
-	out.Debug("Initiating silent update check for: %s", cmd)
+	out.Debug("RUNNER: update in new proc: %s", cmd)
 	if err != nil {
 		out.Debug("If you are running nacl or OpenBSD they are not supported.")
 		out.LogErr(err)
