@@ -3,13 +3,15 @@ package main
 import (
 	gu "github.com/inconshreveable/go-update"
 	"github.com/kwk-super-snippets/cli/src/app"
-	"github.com/kwk-super-snippets/types"
-	"os"
-	"runtime/pprof"
-	"strconv"
-	"github.com/kwk-super-snippets/cli/src/updater"
 	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/cli/src/store"
+	"github.com/kwk-super-snippets/cli/src/updater"
+	"github.com/kwk-super-snippets/types"
+	"gopkg.in/natefinch/lumberjack.v2"
+	"os"
+	"path"
+	"runtime/pprof"
+	"strconv"
 )
 
 var (
@@ -42,9 +44,15 @@ func main() {
 	updater.SpawnUpdate()
 }
 
-
 func runUpdate(cfg *app.CLIConfig, info types.AppInfo) {
-	eh := out.NewErrHandler(os.Stdout)
+	out.DebugEnabled = false
+	var fileOut = &lumberjack.Logger{
+		Filename:   path.Join(out.KwkPath(), "update.log"),
+		MaxSize:    3, // megabytes
+		MaxBackups: 2,
+		MaxAge:     5, //days})
+	}
+	eh := out.NewErrHandler(fileOut)
 	f := store.NewDiskFile()
 	jsn := store.NewJson(f, cfg.DocPath)
 	up := updater.New(info.String(), &updater.S3Repo{}, gu.Apply, gu.RollbackError, jsn)

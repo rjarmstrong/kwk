@@ -13,24 +13,24 @@ import (
 const PROCESS_NODE = "PROCESS_NODE"
 
 type ProcessNode struct {
-	AliasString string       `msg:"ali" json:"ali"`
-	Level       int64        `msg:"l" json:"lvl"`
-	Args        []string     `msg:"args" json:"args"`
-	Caller      *ProcessNode `msg:"c" json:"c"`
-	Runner      string       `msg:"rnr" json:"rnr"`
-	PPid        int          `msg:"ppid" json:"ppid"` //Parent pid
-	PRunner     string       `msg:"prnr" json:"prnr"` //Parent exe
-	Pid         int          `msg:"pid" json:"pid"`   //Can only be retrospectively set.
+	URI     string       `msg:"ali" json:"uri"`
+	Level   int64        `msg:"l" json:"lvl"`
+	Args    []string     `msg:"args" json:"args"`
+	Caller  *ProcessNode `msg:"c" json:"c"`
+	Runner  string       `msg:"rnr" json:"rnr"`
+	PPid    int          `msg:"ppid" json:"ppid"` //Parent pid
+	PRunner string       `msg:"prnr" json:"prnr"` //Parent exe
+	Pid     int          `msg:"pid" json:"pid"`   //Can only be retrospectively set.
 }
 
 var nodes = []*ProcessNode{}
 
-var emptyCaller = &ProcessNode{AliasString: "-"}
+var emptyCaller = &ProcessNode{URI: "-"}
 
 func NewProcessNode(a types.Alias, runner string, args []string, caller *ProcessNode) *ProcessNode {
 	//printTree(os.Getpid(), args)
 	exe, _ := os.Executable()
-	n := &ProcessNode{AliasString: a.String(), Runner: runner, Args: args, PPid: os.Getpid(), PRunner: exe}
+	n := &ProcessNode{URI: a.URI(), Runner: runner, Args: args, PPid: os.Getpid(), PRunner: exe}
 	if caller != nil {
 		n.Caller = caller
 		n.Level = caller.Level + 1
@@ -44,7 +44,7 @@ func NewProcessNode(a types.Alias, runner string, args []string, caller *Process
 
 func (node *ProcessNode) Complete(pid int) {
 	node.Pid = pid
-	out.Debug("NODE: %+v", node)
+	out.Debug("NODE: %s", node.URI)
 }
 
 //func printTree(pid int, args []string) {

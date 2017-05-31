@@ -103,7 +103,7 @@ func setProcessLevel(err error, eh errs.Handler) {
 		out.Debug("NODE:", err)
 	}
 	if node != nil {
-		out.DebugLogger.SetPrefix(fmt.Sprintf("%d%sKWK: ", node.Level, strings.Repeat("--", int(node.Level))))
+		out.DebugLogger.SetPrefix(fmt.Sprintf("%s%d-KWK: ", strings.Repeat("--", int(node.Level)), node.Level))
 	}
 }
 

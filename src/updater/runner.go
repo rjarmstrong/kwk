@@ -122,7 +122,7 @@ func exe(name string, arg ...string) {
 	var stderr bytes.Buffer
 	c.Stdout = os.Stdout
 	c.Stderr = &stderr
-	err = c.Run()
+	err = c.Start()
 	if err != nil {
 		out.LogErrM("UPDATER: Couldn't execute command.", err)
 	}

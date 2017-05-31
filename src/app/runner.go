@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/kwk-super-snippets/cli/src/app/out"
+	"github.com/kwk-super-snippets/cli/src/store"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
 	"github.com/lunixbochs/vtclean"
@@ -19,7 +20,6 @@ import (
 	"strings"
 	"syscall"
 	"time"
-	"github.com/kwk-super-snippets/cli/src/store"
 )
 
 type Runner interface {
@@ -206,7 +206,7 @@ func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...s
 	// KEEP TRACK OF PROCESS GRAPH
 	node, err := getCurrentNode(*a, runner, snipArgs, c)
 	if node.Level > types.MaxProcessLevel {
-		return errs.New(errs.CodeErrTooDeep, "Maximum levels in an app is %d. Not executing:%s", types.MaxProcessLevel, node.AliasString)
+		return errs.New(errs.CodeErrTooDeep, "Maximum levels in an app is %d. Not executing: %s", types.MaxProcessLevel, node.URI)
 	}
 	if err != nil {
 		return err
@@ -225,9 +225,9 @@ func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...s
 		res := <-sigChan
 		var caller string
 		if node.Caller != nil {
-			caller = node.Caller.AliasString
+			caller = node.Caller.URI
 		}
-		out.Debug("INTERRUPTED: %s|Level:%d|Caller:%s|Message:%s", node.AliasString, node.Level, caller, res.String())
+		out.Debug("INTERRUPTED: %s|Level:%d|Caller:%s|Message:%s", node.URI, node.Level, caller, res.String())
 	}()
 	err = c.Run()
 	if c.ProcessState != nil {
@@ -257,7 +257,7 @@ func (r *runner) logUse(a *types.Alias, output string, node *ProcessNode, s type
 		Type:        types.UseType_Run,
 		Status:      s,
 		Preview:     LimitPreview(output, types.PreviewMaxRuneLength),
-		CallerAlias: node.Caller.AliasString,
+		CallerAlias: node.Caller.URI,
 		Level:       node.Level,
 		Runner:      node.Runner,
 		Os:          runtime.GOOS,
