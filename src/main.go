@@ -1,12 +1,15 @@
 package main
 
 import (
+	gu "github.com/inconshreveable/go-update"
 	"github.com/kwk-super-snippets/cli/src/app"
-	"github.com/kwk-super-snippets/cli/src/updater"
 	"github.com/kwk-super-snippets/types"
 	"os"
 	"runtime/pprof"
 	"strconv"
+	"github.com/kwk-super-snippets/cli/src/updater"
+	"github.com/kwk-super-snippets/cli/src/app/out"
+	"github.com/kwk-super-snippets/cli/src/store"
 )
 
 var (
@@ -20,24 +23,37 @@ func main() {
 	if cfg.CpuProfile {
 		defer runCpuProfile().Close()
 	}
-	update()
 	info := getAppInfo()
+
+	// If update argument supplied then we don't want to run the app
+	// rather actually run the update.
+	if hasUpdateFlag() {
+		runUpdate(cfg, info)
+		return
+	}
+
 	cli := app.NewCLI(os.Stdin, os.Stdout, info)
 	if cli == nil {
 		return
 	}
-	cli.Run(os.Args...)
-}
 
-func update() {
-	// If update argument supplied then we don't want to spawn an update,
-	// rather actually run the update in this process.
-	if len(os.Args) > 1 && os.Args[1] == "update" {
-		return
-	}
+	cli.Run(os.Args...)
 	// If update argument not supplied then run update in a new process.
 	updater.SpawnUpdate()
+}
 
+
+func runUpdate(cfg *app.CLIConfig, info types.AppInfo) {
+	eh := out.NewErrHandler(os.Stdout)
+	f := store.NewDiskFile()
+	jsn := store.NewJson(f, cfg.DocPath)
+	up := updater.New(info.String(), &updater.S3Repo{}, gu.Apply, gu.RollbackError, jsn)
+	eh.Handle(up.Run())
+}
+
+func hasUpdateFlag() bool {
+	out.Debug("UPDATE MODE: %+v", os.Args)
+	return len(os.Args) > 1 && os.Args[1] == updater.UpdateFlag
 }
 
 func getAppInfo() types.AppInfo {

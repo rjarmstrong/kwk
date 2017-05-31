@@ -6,11 +6,12 @@ import (
 
 func pouchRoutes(s *snippets) []cli.Command {
 	cat := "Pouches"
+	spc := "  "
 	c := []cli.Command{
 		{
 			Category:cat,
-			Name:    "mkdir",
-			Usage: "Create a pouch with given name",
+			Name:  "mkdir",
+			Usage: spc + "Create a pouch with given name",
 			Action: func(c *cli.Context) error {
 				return s.CreatePouch(c.Args().First())
 			},
@@ -18,7 +19,7 @@ func pouchRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:    "mv",
-			Usage: "Rename a pouch",
+			Usage: spc + "Rename a pouch",
 			Action: func(c *cli.Context) error {
 				return s.Move(c.Args())
 
@@ -27,7 +28,7 @@ func pouchRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:    "rm",
-			Usage: "Delete a pouch and all its contained snippets",
+			Usage: spc + "Delete a pouch and all its contained snippets",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "yes, y",
@@ -46,7 +47,7 @@ func pouchRoutes(s *snippets) []cli.Command {
 		{
 			Category:cat,
 			Name: "ls",
-			Usage: "List snippets of pouch horizontally",
+			Usage: spc + "List snippets of pouch horizontally",
 			Action: func(c *cli.Context) error {
 				prefs.ListHorizontal = true
 				return s.List("", c.Args().First())
@@ -55,7 +56,7 @@ func pouchRoutes(s *snippets) []cli.Command {
 		{
 			Category:cat,
 			Name: "lock",
-			Usage: "Make all snippets in or created in this pouch PRIVATE",
+			Usage: spc + "Make all snippets in or created in this pouch PRIVATE",
 			Action: func(c *cli.Context) error {
 				return s.Lock(c.Args().First())
 			},
@@ -63,7 +64,7 @@ func pouchRoutes(s *snippets) []cli.Command {
 		{
 			Category:cat,
 			Name: "unlock",
-			Usage: "Make all the snippets in or created in this pouch PUBLIC",
+			Usage: spc + "Make all the snippets in or created in this pouch PUBLIC",
 			Action: func(c *cli.Context) error {
 				return s.UnLock(c.Args().First())
 			},
@@ -71,7 +72,7 @@ func pouchRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:     "expand",
-			Usage: "Fully expand all snippets when viewing a pouch",
+			Usage: spc + "Fully expand all snippets when viewing a pouch",
 			Aliases:  []string{"x"},
 			Flags: []cli.Flag{
 				cli.BoolFlag{

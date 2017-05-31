@@ -11,7 +11,10 @@ import (
 	"time"
 )
 
-const recordFile = `updateRecord`
+const (
+	recordFile = `updateRecord`
+	UpdateFlag = `--update`
+)
 
 // SilentUpdate spawns a new process to check for updates and runs.
 func SpawnUpdate() {
@@ -21,7 +24,7 @@ func SpawnUpdate() {
 		out.Debug("If you are running nacl or OpenBSD they are not supported.")
 		out.LogErr(err)
 	}
-	exe(false, cmd, "update", "silent")
+	exe(false, cmd, UpdateFlag)
 }
 
 type Runner interface {
@@ -107,6 +110,7 @@ func (r *runner) recordUpdate() error {
 }
 
 func exe(wait bool, name string, arg ...string) {
+	defer os.Exit(0)
 	c := exec.Command(name, arg...)
 	c.Env = os.Environ()
 	c.Stdin = os.Stdin
@@ -114,6 +118,8 @@ func exe(wait bool, name string, arg ...string) {
 	if err != nil {
 		out.LogErrM("UPDATER: If you are running nacl or OpenBSD they are not supported.", err)
 	}
+	defer stdOut.Close()
+
 	var stderr bytes.Buffer
 	c.Stdout = os.Stdout
 	c.Stderr = &stderr
@@ -126,5 +132,4 @@ func exe(wait bool, name string, arg ...string) {
 	if err != nil {
 		out.LogErrM("UPDATER: Couldn't execute command.", err)
 	}
-	stdOut.Close()
 }

@@ -2,8 +2,9 @@ package app
 
 import (
 	"fmt"
-	gu "github.com/inconshreveable/go-update"
 	"github.com/kwk-super-snippets/cli/src/app/out"
+	"github.com/kwk-super-snippets/cli/src/app/runtime"
+	"github.com/kwk-super-snippets/cli/src/store"
 	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
@@ -11,14 +12,11 @@ import (
 	"github.com/urfave/cli"
 	"io"
 	"strings"
-	"github.com/kwk-super-snippets/cli/src/updater"
-	"github.com/kwk-super-snippets/cli/src/store"
-	"github.com/kwk-super-snippets/cli/src/app/runtime"
 )
 
 var (
 	cliInfo   = types.AppInfo{}
-	principal = &UserWithToken{User:types.User{}}
+	principal = &UserWithToken{User: types.User{}}
 	cfg       = &CLIConfig{}
 	prefs     = runtime.DefaultPrefs()
 	env       = runtime.DefaultEnv()
@@ -55,8 +53,6 @@ func NewCLI(r io.Reader, wr io.Writer, info types.AppInfo) *KwkCLI {
 	users := NewUsers(uc, jsn, w, d, dash)
 	runner := NewRunner(srw, sc)
 	snippets := NewSnippets(sc, runner, d, w)
-	system := NewSystem(w, updater.New(info.String(), &updater.S3Repo{}, gu.Apply, gu.RollbackError, jsn))
-
 
 	// APP
 	jsn.Get(cfg.UserDocName, principal, 0)
@@ -72,7 +68,7 @@ func NewCLI(r io.Reader, wr io.Writer, info types.AppInfo) *KwkCLI {
 	help := cli.HelpPrinter
 	ap.Commands = append(ap.Commands, cli.Command{
 		Name:    "help",
-		Aliases: []string{"h"},
+		Aliases: []string{"h", "?"},
 		Action: func(c *cli.Context) error {
 			cli.HelpPrinter = help
 			cli.ShowAppHelp(c)
@@ -82,8 +78,7 @@ func NewCLI(r io.Reader, wr io.Writer, info types.AppInfo) *KwkCLI {
 	ap.Commands = append(ap.Commands, userRoutes(users)...)
 	ap.Commands = append(ap.Commands, snippetsRoutes(snippets)...)
 	ap.Commands = append(ap.Commands, pouchRoutes(snippets)...)
-	ap.Commands = append(ap.Commands, systemRoutes(system)...)
-	ap.CommandNotFound = getDefaultCommand(snippets)
+	ap.CommandNotFound = getDefaultCommand(snippets, eh)
 	cli.HelpPrinter = dash.GetWriter()
 
 	return &KwkCLI{
@@ -109,7 +104,7 @@ func snippetMaker(sc types.SnippetsClient) runtime.SnippetMaker {
 	}
 }
 
-func getDefaultCommand(snipCli *snippets) func(*cli.Context, string) {
+func getDefaultCommand(snipCli *snippets, eh errs.Handler) func(*cli.Context, string) {
 	return func(c *cli.Context, firstArg string) {
 		i := c.Args().Get(1)
 		if strings.HasPrefix(firstArg, "@") {
@@ -117,21 +112,22 @@ func getDefaultCommand(snipCli *snippets) func(*cli.Context, string) {
 			snipCli.GetEra(firstArg)
 			return
 		}
+		var err error
 		switch i {
 		case "run":
-			snipCli.Run(c.Args().First(), []string(c.Args())[2:])
-			return
+			err = snipCli.Run(c.Args().First(), []string(c.Args())[2:])
 		case "r":
-			snipCli.Run(c.Args().First(), []string(c.Args())[2:])
-			return
+			err = snipCli.Run(c.Args().First(), []string(c.Args())[2:])
 		case "edit":
-			snipCli.Edit(c.Args().First())
-			return
+			err = snipCli.Edit(c.Args().First())
 		case "e":
-			snipCli.Edit(c.Args().First())
-			return
+			err = snipCli.Edit(c.Args().First())
+		default:
+			err = snipCli.InspectListOrRun(c.Args().First(), false, []string(c.Args())[1:]...)
 		}
-		snipCli.InspectListOrRun(c.Args().First(), false, []string(c.Args())[1:]...)
+		if err != nil {
+			eh.Handle(err)
+		}
 	}
 }
 
