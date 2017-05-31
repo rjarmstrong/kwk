@@ -12,7 +12,7 @@ import (
 var DebugEnabled bool
 
 var fileOut = &lumberjack.Logger{
-	Filename:   path.Join(KwkPath(), "kwk.log"),
+	Filename:   path.Join(KwkPath(), "main.log"),
 	MaxSize:    3, // megabytes
 	MaxBackups: 2,
 	MaxAge:     5, //days})

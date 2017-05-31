@@ -97,6 +97,27 @@ func (sc *snippets) run(selected *types.Snippet, args []string) error {
 	return sc.runner.Run(selected, args)
 }
 
+func (sc *snippets) NodeRun(uri string, args []string) error {
+	out.Debug("RUN:%s %s", uri, args)
+	a, err := types.ParseAlias(uri)
+	if err != nil {
+		return err
+	}
+	list, err := sc.s.Get(Ctx(), &types.GetRequest{Alias: a})
+	if err != nil {
+		if errs.HasCode(err, errs.CodeNoSnipNamesFound) {
+			return sc.EWrite(out.NotFoundInApp(node.URI, uri))
+		}
+		return err
+	}
+	s := sc.handleMultiResponse(uri, list.Items)
+	if s == nil {
+		return sc.EWrite(out.NotFoundInApp(node.URI, uri))
+	}
+	//TODO: If username is not the current user or 'kwk' then prompt before executing.
+	return sc.runner.Run(s, args)
+}
+
 func (sc *snippets) Run(uri string, args []string) error {
 	a, err := types.ParseAlias(uri)
 	if err != nil {
@@ -108,7 +129,6 @@ func (sc *snippets) Run(uri string, args []string) error {
 	}
 	alias := sc.handleMultiResponse(uri, list.Items)
 	if alias != nil {
-		//TODO: If username is not the current user or 'kwk' then prompt before executing.
 		return sc.runner.Run(alias, args)
 	}
 	return sc.typeAhead(uri, sc.run)
@@ -242,8 +262,8 @@ func (sc *snippets) Describe(distinctName string, description string) error {
 	return sc.EWrite(out.SnippetDescriptionUpdated(alias.String(), description))
 }
 
-func (sc *snippets) InspectListOrRun(distinctName string, forceView bool, args ...string) error {
-	a, err := types.ParseAlias(distinctName)
+func (sc *snippets) InspectListOrRun(uri string, forceView bool, args ...string) error {
+	a, err := types.ParseAlias(uri)
 	if err != nil {
 		return err
 	}
@@ -267,9 +287,9 @@ func (sc *snippets) InspectListOrRun(distinctName string, forceView bool, args .
 	// GET SNIPPET
 	list, err := sc.s.Get(Ctx(), &types.GetRequest{Alias: a})
 	if err != nil {
-		return sc.typeAhead(distinctName, sc.run)
+		return sc.typeAhead(uri, sc.run)
 	}
-	s := sc.handleMultiResponse(distinctName, list.Items)
+	s := sc.handleMultiResponse(uri, list.Items)
 	if s == nil {
 		return out.LogErrM("Snippet not found", errs.NotFound)
 	}

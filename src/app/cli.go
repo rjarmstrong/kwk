@@ -11,10 +11,12 @@ import (
 	"github.com/kwk-super-snippets/types/vwrite"
 	"github.com/urfave/cli"
 	"io"
+	"os"
 	"strings"
 )
 
 var (
+	node      *ProcessNode
 	cliInfo   = types.AppInfo{}
 	principal = &UserWithToken{User: types.User{}}
 	cfg       = &CLIConfig{}
@@ -52,13 +54,19 @@ func NewCLI(r io.Reader, wr io.Writer, info types.AppInfo) *KwkCLI {
 	dash := NewDashBoard(w, eh, sc)
 	users := NewUsers(uc, jsn, w, d, dash)
 	runner := NewRunner(srw, sc)
-	setProcessLevel(err, eh)
 	snippets := NewSnippets(sc, runner, d, w)
 
-	// APP
+	// RUNTIME
 	jsn.Get(cfg.UserDocName, principal, 0)
 	runtime.Configure(env, prefs, principal.User.Username, snippetGetter(sc), snippetMaker(sc), srw, eh)
 	out.Debug("PREFS: %+v", prefs)
+	setProcessLevel()
+	if node != nil && node.Level > 0 {
+		eh.Handle(nodeRun(snippets))
+		return nil
+	}
+
+	// APP
 	ap := cli.NewApp()
 
 	ap.Name = style.Fmt256(style.ColorPouchCyan, style.IconSnippet) + "  kwk super snippets"
@@ -68,8 +76,8 @@ func NewCLI(r io.Reader, wr io.Writer, info types.AppInfo) *KwkCLI {
 	ap.EnableBashCompletion = true
 	ap.Authors = []cli.Author{
 		{
-			Name:  "Richard J Armstrong",
-			Email: "richard.armstrong@gimanzo.com",
+			Name:  "R J Armstrong",
+			Email: "rj@kwk.co",
 		},
 	}
 	ap.Copyright = "© 2017 Gimanzo Systems Ltd \n"
@@ -97,11 +105,24 @@ func NewCLI(r io.Reader, wr io.Writer, info types.AppInfo) *KwkCLI {
 		Handler: eh,
 	}
 }
-func setProcessLevel(err error, eh errs.Handler) {
-	node, err := GetCallerNode()
+
+func nodeRun(snippets *snippets) error {
+	if len(os.Args) < 3 {
+		return errs.New(errs.CodeInvalidArgument, "Invalid kwk call '%+v' in app.\n Invoke snippets as follows: kwk run <uri>", strings.Join(os.Args, " "))
+	}
+	if os.Args[1] != "run" {
+		return errs.New(errs.CodeInvalidArgument, "'run' keyword required as first arg within an app.")
+	}
+
+	return snippets.NodeRun(os.Args[2], os.Args[3:])
+}
+
+func setProcessLevel() {
+	n, err := GetCallerNode()
 	if err != nil {
 		out.Debug("NODE:", err)
 	}
+	node = n
 	if node != nil {
 		out.DebugLogger.SetPrefix(fmt.Sprintf("%s%d-KWK: ", strings.Repeat("--", int(node.Level)), node.Level))
 	}

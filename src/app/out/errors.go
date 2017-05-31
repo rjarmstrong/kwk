@@ -83,6 +83,12 @@ func notFound(name string) vwrite.Handler {
 	}))
 }
 
+func NotFoundInApp(callerUri string, uri string) vwrite.Handler {
+	return Warn(vwrite.HandlerFunc(func(w io.Writer) {
+		fmt.Fprintf(w, "The uri: %s called by %s couldn't be found.\n", uri, callerUri)
+	}))
+}
+
 func internalError(err error) vwrite.Handler {
 	return Fatal(vwrite.HandlerFunc(func(w io.Writer) {
 		ce, ok := err.(*errs.Error)
