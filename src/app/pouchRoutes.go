@@ -1,25 +1,27 @@
 package app
 
 import (
+	"fmt"
+	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/urfave/cli"
 )
 
 func pouchRoutes(s *snippets) []cli.Command {
-	cat := "Pouches"
+	cat := fmt.Sprintf("\n     %s  Pouches", style.Fmt256(style.ColorPouchCyan, style.IconPouch))
 	spc := "  "
 	c := []cli.Command{
 		{
-			Category:cat,
-			Name:  "mkdir",
-			Usage: spc + "Create a pouch with given name",
+			Category: cat,
+			Name:     "mkdir",
+			Usage:    spc + "Create a pouch",
 			Action: func(c *cli.Context) error {
 				return s.CreatePouch(c.Args().First())
 			},
 		},
 		{
 			Category: cat,
-			Name:    "mv",
-			Usage: spc + "Rename a pouch",
+			Name:     "mv",
+			Usage:    spc + "Rename a pouch",
 			Action: func(c *cli.Context) error {
 				return s.Move(c.Args())
 
@@ -27,8 +29,8 @@ func pouchRoutes(s *snippets) []cli.Command {
 		},
 		{
 			Category: cat,
-			Name:    "rm",
-			Usage: spc + "Delete a pouch and all its contained snippets",
+			Name:     "rm",
+			Usage:    spc + "Delete a pouch and all its contained snippets",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "yes, y",
@@ -45,26 +47,26 @@ func pouchRoutes(s *snippets) []cli.Command {
 			},
 		},
 		{
-			Category:cat,
-			Name: "ls",
-			Usage: spc + "List snippets of pouch horizontally",
+			Category: cat,
+			Name:     "ls",
+			Usage:    spc + "List snippets of pouch horizontally",
 			Action: func(c *cli.Context) error {
 				prefs.ListHorizontal = true
 				return s.List("", c.Args().First())
 			},
 		},
 		{
-			Category:cat,
-			Name: "lock",
-			Usage: spc + "Make all snippets in or created in this pouch PRIVATE",
+			Category: cat,
+			Name:     "lock",
+			Usage:    spc + "Make all snippets in or created in this pouch PRIVATE",
 			Action: func(c *cli.Context) error {
 				return s.Lock(c.Args().First())
 			},
 		},
 		{
-			Category:cat,
-			Name: "unlock",
-			Usage: spc + "Make all the snippets in or created in this pouch PUBLIC",
+			Category: cat,
+			Name:     "unlock",
+			Usage:    spc + "Make all the snippets in or created in this pouch PUBLIC",
 			Action: func(c *cli.Context) error {
 				return s.UnLock(c.Args().First())
 			},
@@ -72,7 +74,7 @@ func pouchRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:     "expand",
-			Usage: spc + "Fully expand all snippets when viewing a pouch",
+			Usage:    spc + "Fully expand all snippets when viewing a pouch\n",
 			Aliases:  []string{"x"},
 			Flags: []cli.Flag{
 				cli.BoolFlag{

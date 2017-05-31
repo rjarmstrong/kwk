@@ -61,13 +61,13 @@ func printRoot(w io.Writer, prefs *Prefs, cli *types.AppInfo, r *types.RootRespo
 	}
 
 	fmtHeader(w, r.Username, "", "")
-	fmt.Fprint(w, strings.Repeat(" ", 50), style.Fmt16(style.Subdued, "◉  "+p.Username+"    TLS12"))
+	fmt.Fprint(w, strings.Repeat(" ", 50), style.Fmt16(style.Subdued, style.IconAccount+"  "+p.Username+"    TLS12"))
 	fmt.Fprint(w, style.TwoLines)
 	w.Write(horizontalPouches(prefs, all, r.Stats))
 
 	if len(r.Snippets) > 0 {
 		fmt.Fprintf(w, "\n%sLast:", style.Margin)
-		printSnippets(w, prefs,"", r.Snippets, true)
+		printSnippets(w, prefs, "", r.Snippets, true)
 	}
 
 	if clientIsNew(cli.Time) {
@@ -263,7 +263,7 @@ func printSnippets(w io.Writer, prefs *Prefs, pouchName string, list []*types.Sn
 			snip = snip + "\n"
 		}
 		if len(v.Preview) >= 10 {
-			snip = snip + "\n\n" + style.Margin + style.Fmt256(style.ColorMonthGrey, Fpreview(v.Preview, prefs,120, 1))
+			snip = snip + "\n\n" + style.Margin + style.Fmt256(style.ColorMonthGrey, Fpreview(v.Preview, prefs, 120, 1))
 		}
 
 		tbl.Append([]string{

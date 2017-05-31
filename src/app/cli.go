@@ -59,10 +59,20 @@ func NewCLI(r io.Reader, wr io.Writer, info types.AppInfo) *KwkCLI {
 	runtime.Configure(env, prefs, principal.User.Username, snippetGetter(sc), snippetMaker(sc), srw, eh)
 	out.Debug("PREFS: %+v", prefs)
 	ap := cli.NewApp()
-	ap.Name = "kwk super snippets"
-	ap.Description = "A super snippet manager for the CLI"
-	ap.Usage = "kwk COMMAND"
+
+	ap.Name = style.Fmt256(style.ColorPouchCyan, style.IconSnippet) + "  kwk super snippets"
+	ap.Description = "A smart & friendly snippet manager for the CLI"
+	ap.Usage = ""
 	ap.UsageText = "kwk [global options] command [command options] [arguments...]"
+	ap.EnableBashCompletion = true
+	ap.Authors = []cli.Author{
+		{
+			Name:  "Richard J Armstrong",
+			Email: "richard.armstrong@gimanzo.com",
+		},
+	}
+	ap.Copyright = "© 2017 Gimanzo Systems Ltd \n"
+
 	ap = setupFlags(ap)
 	ap.Version = cliInfo.String()
 	help := cli.HelpPrinter

@@ -78,8 +78,7 @@ const (
 	IconPrivatePouch = "◤"
 	IconBroke        = "▦"
 	InfoDeskPerson   = "\xF0\x9F\x92\x81"
-
-	Ambulance = "\xF0\x9F\x9A\x91"
+	IconAccount      = "◉"
 
 	ColorBrightRed      types.AnsiCode = 196
 	ColorPouchCyan      types.AnsiCode = 122

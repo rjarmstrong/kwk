@@ -1,18 +1,20 @@
 package app
 
 import (
+	"fmt"
+	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/urfave/cli"
 )
 
 func snippetsRoutes(s *snippets) []cli.Command {
-	cat := "Snipppets"
+	cat := fmt.Sprintf("  %s  Snippets", style.Fmt256(style.ColorPouchCyan, style.IconSnippet))
 	spc := "  "
 	c := []cli.Command{
 		{
 			Category: cat,
 			Name:     "new",
-			Usage: spc + "Create a new snippet",
-			Aliases: []string{"n"},
+			Usage:    spc + "Create a new snippet",
+			Aliases:  []string{"n"},
 			Action: func(c *cli.Context) error {
 				return s.Create(c.Args())
 			},
@@ -20,8 +22,8 @@ func snippetsRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:     "view",
-			Aliases: []string{"v"},
-			Usage: spc + "View details of snippet",
+			Aliases:  []string{"v"},
+			Usage:    spc + "View details of snippet",
 			Action: func(c *cli.Context) error {
 				return s.InspectListOrRun(c.Args().First(), true)
 
@@ -30,7 +32,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:     "edit",
-			Usage: spc + "Edit a snippet in the configured editor",
+			Usage:    spc + "Edit a snippet in the configured editor",
 			Aliases:  []string{"e"},
 			Action: func(c *cli.Context) error {
 				return s.Edit(c.Args().First())
@@ -40,14 +42,14 @@ func snippetsRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:     "find",
-			Usage: spc + "Find a snippet by keyword",
-			Flags: []cli.Flag {
+			Usage:    spc + "Find a snippet by keyword",
+			Flags: []cli.Flag{
 				cli.BoolFlag{
-					Name: "global, g",
+					Name:  "global, g",
 					Usage: "Search everyone's public snippets, including yours",
 				},
 			},
-			Aliases:  []string{"f"},
+			Aliases: []string{"f"},
 			Action: func(c *cli.Context) error {
 				args := []string(c.Args())
 				return s.Search(args...)
@@ -56,7 +58,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:     "tag",
-			Usage: spc + "Add n number of tags",
+			Usage:    spc + "Add n number of tags",
 			Aliases:  []string{"t"},
 			Action: func(c *cli.Context) error {
 				args := []string(c.Args())
@@ -67,7 +69,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:     "untag",
-			Usage: spc + "Remove n number of tags",
+			Usage:    spc + "Remove n number of tags",
 			Action: func(c *cli.Context) error {
 				args := []string(c.Args())
 				return s.UnTag(args[0], args[1:]...)
@@ -77,7 +79,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:     "describe",
-			Usage: spc + "Add a short description to a snippet",
+			Usage:    spc + "Add a short description to a snippet",
 			Action: func(c *cli.Context) error {
 				return s.Describe(c.Args().Get(0), c.Args().Get(1))
 
@@ -86,7 +88,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:     "cat",
-			Usage: spc + "Print the raw content of the snippet",
+			Usage:    spc + "Print the raw content of the snippet",
 			Action: func(c *cli.Context) error {
 				return s.Cat(c.Args().First())
 
@@ -95,7 +97,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:     "mv",
-			Usage: spc + "Move snippets between pouches",
+			Usage:    spc + "Move snippets between pouches",
 			Action: func(c *cli.Context) error {
 				return s.Move(c.Args())
 
@@ -104,7 +106,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:     "rm",
-			Usage: spc + "Delete snippets",
+			Usage:    spc + "Delete snippets",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "yes, y",
@@ -123,7 +125,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:     "clone",
-			Usage: spc + "Clone another snippet given any snippet URI",
+			Usage:    spc + "Clone another snippet given any snippet URI",
 			Action: func(c *cli.Context) error {
 				return s.Clone(c.Args().First(), c.Args().Get(1))
 
@@ -132,7 +134,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:     "enchilada",
-			Usage: spc + "List all snippets 'un-pouched', useful for exporting or for other bulk management",
+			Usage:    spc + "List all snippets 'un-pouched', useful for exporting or for other bulk management",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "all, a",
@@ -150,7 +152,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:     "run",
-			Usage: spc + "When prefs.yml has RequireRunKeyword=true, run is required to execute a snippet",
+			Usage:    spc + "When prefs.yml has RequireRunKeyword=true, run is required to execute a snippet",
 			Aliases:  []string{"r"},
 			Action: func(c *cli.Context) error {
 				covert := c.Bool("covert")
@@ -164,7 +166,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 		{
 			Category: cat,
 			Name:     "patch",
-			Usage: spc + "Replace matching string within a snippet",
+			Usage:    spc + "Replace matching string within a snippet\n",
 			Action: func(c *cli.Context) error {
 				return s.Patch(c.Args().First(), c.Args().Get(1), c.Args().Get(2))
 
