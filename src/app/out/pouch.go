@@ -28,7 +28,7 @@ func horizontalPouches(prefs *Prefs, l []*types.Pouch, stats *types.UserStats) [
 			if colWidths[i%5] < len(v.Name) {
 				colWidths[i%5] = len(v.Name)
 			}
-			isLast := stats.LastPouch == v.Id
+			isLast := stats.LastPouch == v.Name
 			item.WriteString(pouchIcon(v, isLast))
 			if isLast {
 				item.WriteString(style.Fmt256(style.ColorBrightestWhite, "  ❯ "+v.Name))

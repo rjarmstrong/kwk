@@ -32,7 +32,7 @@ type Runner interface {
 }
 
 func New(version string, repo BinRepo, a Applier, rb Rollbacker, doc store.Doc) Runner {
-	return &runner{doc: doc, currentVersion: version,BinRepo: repo, Applier: a, Rollbacker: rb, UpdateHiatusSecs:60*5}
+	return &runner{doc: doc, currentVersion: version, BinRepo: repo, Applier: a, Rollbacker: rb, UpdateHiatusSecs: 60 * 5}
 }
 
 type Applier func(update io.Reader, opts gu.Options) error
