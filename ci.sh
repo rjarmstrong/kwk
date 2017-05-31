@@ -5,4 +5,4 @@ docker run \
     -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
     -v $PWD:/go/src/github.com/kwk-super-snippets/cli \
     --rm \
-    rjarmstrong/goaws ./build.sh ${TRAVIS_JOB_ID}
+    rjarmstrong/goaws ./build.sh $(git log --pretty=format:'%h' -n 1)
