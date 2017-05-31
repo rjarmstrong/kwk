@@ -52,6 +52,7 @@ func NewCLI(r io.Reader, wr io.Writer, info types.AppInfo) *KwkCLI {
 	dash := NewDashBoard(w, eh, sc)
 	users := NewUsers(uc, jsn, w, d, dash)
 	runner := NewRunner(srw, sc)
+	setProcessLevel(err, eh)
 	snippets := NewSnippets(sc, runner, d, w)
 
 	// APP
@@ -94,6 +95,15 @@ func NewCLI(r io.Reader, wr io.Writer, info types.AppInfo) *KwkCLI {
 	return &KwkCLI{
 		app:     ap,
 		Handler: eh,
+	}
+}
+func setProcessLevel(err error, eh errs.Handler) {
+	node, err := GetCallerNode()
+	if err != nil {
+		out.Debug("NODE:", err)
+	}
+	if node != nil {
+		out.DebugLogger.SetPrefix(fmt.Sprintf("%d%sKWK: ", node.Level, strings.Repeat("--", int(node.Level))))
 	}
 }
 

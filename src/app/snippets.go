@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/kwk-super-snippets/cli/src/app/out"
+	"github.com/kwk-super-snippets/cli/src/app/runtime"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/age"
 	"github.com/kwk-super-snippets/types/errs"
@@ -13,12 +14,11 @@ import (
 	"sort"
 	"strings"
 	"time"
-	"github.com/kwk-super-snippets/cli/src/app/runtime"
 )
 
 type snippets struct {
-	s        types.SnippetsClient
-	runner   Runner
+	s      types.SnippetsClient
+	runner Runner
 	Dialog
 	vwrite.Writer
 }
@@ -29,7 +29,7 @@ func NewSnippets(s types.SnippetsClient, r Runner, d Dialog, w vwrite.Writer) *s
 
 func (sc *snippets) Search(args ...string) error {
 	term := strings.Join(args, " ")
-	req := &types.AlphaRequest{ Term: term, All: prefs.ListAll }
+	req := &types.AlphaRequest{Term: term, All: prefs.ListAll}
 	if !prefs.GlobalSearch {
 		req.Username = principal.User.Username
 	}
@@ -270,6 +270,9 @@ func (sc *snippets) InspectListOrRun(distinctName string, forceView bool, args .
 		return sc.typeAhead(distinctName, sc.run)
 	}
 	s := sc.handleMultiResponse(distinctName, list.Items)
+	if s == nil {
+		return out.LogErrM("Snippet not found", errs.NotFound)
+	}
 	if forceView || prefs.RequireRunKeyword {
 		out.Debug("RUN KEYWORD REQUIRED, VIEWING.")
 		sc.Write(out.SnippetView(prefs, s))

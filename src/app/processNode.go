@@ -62,6 +62,18 @@ func (node *ProcessNode) Complete(pid int) {
 //}
 
 func getCurrentNode(a types.Alias, runner string, args []string, c *exec.Cmd) (*ProcessNode, error) {
+	caller, err := GetCallerNode()
+	if err != nil {
+		return nil, err
+	}
+	node := NewProcessNode(a, runner, args, caller)
+	b, _ := json.Marshal(node)
+	nodeString := fmt.Sprintf("%s=%s", PROCESS_NODE, b)
+	c.Env = append(os.Environ(), nodeString)
+	return node, nil
+}
+
+func GetCallerNode() (*ProcessNode, error) {
 	callerString, ok := os.LookupEnv(PROCESS_NODE)
 	var caller *ProcessNode
 	if ok && callerString != "" {
@@ -74,9 +86,5 @@ func getCurrentNode(a types.Alias, runner string, args []string, c *exec.Cmd) (*
 			caller = nil
 		}
 	}
-	node := NewProcessNode(a, runner, args, caller)
-	b, _ := json.Marshal(node)
-	nodeString := fmt.Sprintf("%s=%s", PROCESS_NODE, b)
-	c.Env = append(os.Environ(), nodeString)
-	return node, nil
+	return caller, nil
 }

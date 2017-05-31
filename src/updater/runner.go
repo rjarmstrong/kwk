@@ -24,7 +24,7 @@ func SpawnUpdate() {
 		out.Debug("If you are running nacl or OpenBSD they are not supported.")
 		out.LogErr(err)
 	}
-	exe(false, cmd, UpdateFlag)
+	exe(cmd, UpdateFlag)
 }
 
 type Runner interface {
@@ -55,6 +55,7 @@ type runner struct {
 
 func (r *runner) Run() error {
 	li, err := r.GetLatestInfo()
+
 	if err != nil {
 		out.LogErrM("UPDATER: Couldn't get remote release info.", err)
 		return err
@@ -109,11 +110,9 @@ func (r *runner) recordUpdate() error {
 	return r.doc.Upsert(recordFile, ur)
 }
 
-func exe(wait bool, name string, arg ...string) {
-	defer os.Exit(0)
+func exe(name string, arg ...string) {
 	c := exec.Command(name, arg...)
 	c.Env = os.Environ()
-	c.Stdin = os.Stdin
 	stdOut, err := c.StdoutPipe()
 	if err != nil {
 		out.LogErrM("UPDATER: If you are running nacl or OpenBSD they are not supported.", err)
@@ -123,12 +122,7 @@ func exe(wait bool, name string, arg ...string) {
 	var stderr bytes.Buffer
 	c.Stdout = os.Stdout
 	c.Stderr = &stderr
-	if wait {
-		err = c.Run()
-	} else {
-		err = c.Start()
-	}
-
+	err = c.Run()
 	if err != nil {
 		out.LogErrM("UPDATER: Couldn't execute command.", err)
 	}
