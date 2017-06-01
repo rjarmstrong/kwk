@@ -100,6 +100,9 @@ func (sc *snippets) run(selected *types.Snippet, args []string) error {
 func (sc *snippets) NodeRun(uri string, args []string) error {
 	out.Debug("RUN:%s %s", uri, args)
 	a, err := types.ParseAlias(uri)
+	if a.Version < 1 {
+		return sc.EWrite(out.VersionMissing(a.URI()))
+	}
 	if err != nil {
 		return err
 	}

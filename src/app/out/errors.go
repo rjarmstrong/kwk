@@ -83,6 +83,12 @@ func notFound(name string) vwrite.Handler {
 	}))
 }
 
+func VersionMissing(uri string) vwrite.Handler {
+	return Warn(vwrite.HandlerFunc(func(w io.Writer) {
+		fmt.Fprintf(w, "The uri: %s called does not have a version, you need to specify it as a query string e.g.: '?v=3'.\n", uri)
+	}))
+}
+
 func NotFoundInApp(callerUri string, uri string) vwrite.Handler {
 	return Warn(vwrite.HandlerFunc(func(w io.Writer) {
 		fmt.Fprintf(w, "The uri: %s called by %s couldn't be found.\n", uri, callerUri)

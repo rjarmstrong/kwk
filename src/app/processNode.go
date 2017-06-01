@@ -30,7 +30,7 @@ var emptyCaller = &ProcessNode{URI: "-"}
 func NewProcessNode(a types.Alias, runner string, args []string, caller *ProcessNode) *ProcessNode {
 	//printTree(os.Getpid(), args)
 	exe, _ := os.Executable()
-	n := &ProcessNode{URI: a.URI(), Runner: runner, Args: args, PPid: os.Getpid(), PRunner: exe}
+	n := &ProcessNode{URI: a.VersionURI(), Runner: runner, Args: args, PPid: os.Getpid(), PRunner: exe}
 	if caller != nil {
 		n.Caller = caller
 		n.Level = caller.Level + 1

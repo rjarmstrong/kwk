@@ -40,7 +40,7 @@ func SnippetAmbiguousCat(snippets []*types.Snippet) vwrite.Handler {
 
 func SnippetEdited(s *types.Snippet) vwrite.Handler {
 	return Success(vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprintf(w, "Successfully updated %s %s\n\n", snippetIcon(s), s.Alias.URI())
+		fmt.Fprintf(w, "Successfully updated %s %s\n\n", snippetIcon(s), s.Alias.VersionURI())
 	}))
 }
 
