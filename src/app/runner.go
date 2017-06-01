@@ -234,8 +234,13 @@ func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...s
 		node.Complete(c.ProcessState.Pid())
 	}
 	if stderr.Len() > 0 {
-		//desc := fmt.Sprintf("Error running '%s' (runner: '%s' %s)\n\n%s", a.URI(), runner, err.Error(), stderr.String())
-		desc := fmt.Sprintf("Error running '%s' (runner: '%s')\n\n%s", a.URI(), runner, stderr.String())
+		var desc string
+		if err != nil {
+			desc = fmt.Sprintf("Error running '%s' (runner: '%s' %s)\n\n%s", a.URI(), runner, err.Error(), stderr.String())
+		} else {
+			desc = fmt.Sprintf("Error running '%s' (runner: '%s')\n\n%s", a.URI(), runner, stderr.String())
+		}
+		out.Debug("RUNNER:%s", desc)
 		r.logUse(a, stderr.String(), node, types.UseStatus_Fail)
 		return errs.New(errs.CodeRunnerExit, desc)
 	}
