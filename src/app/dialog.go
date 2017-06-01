@@ -8,6 +8,7 @@ import (
 	"github.com/kwk-super-snippets/types/vwrite"
 	"github.com/siddontang/go/num"
 	"io"
+	"fmt"
 )
 
 // Dialogue creates CLI ui elements to perform common interactions.
@@ -51,6 +52,13 @@ func (d *StdDialog) Modal(handler vwrite.Handler, autoYes bool) *DialogResponse 
 
 func (d *StdDialog) MultiChoice(question vwrite.Handler, list []*types.Snippet) (*types.Snippet, error) {
 	d.Write(question)
+	for i, v := range list {
+		if i%3 == 0 {
+			d.Writer.Write(out.FreeText("\n"))
+		}
+		d.Writer.Write(out.FreeText(fmt.Sprintf("%d)  %s    ", i+1, v.Alias.URI())))
+	}
+	d.Writer.Write(out.FreeText("\n"))
 	input, _, err := d.reader.ReadRune()
 	if err != nil {
 		return nil, err
