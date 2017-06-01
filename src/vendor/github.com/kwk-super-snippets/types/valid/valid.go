@@ -7,7 +7,7 @@ var (
 	RgxOneUpper        = regexp.MustCompile(`[A-Z]+`)
 	RgxOneNumeric      = regexp.MustCompile(`\d+`)
 	RgxPasswordLength  = regexp.MustCompile(`^.{7,15}$`)
-	RgxSnipName        = regexp.MustCompile(`^[a-zA-Z0-9\-\._]{3,50}$`)
+	RgxSnipName        = regexp.MustCompile(`^[a-zA-Z0-9\-\._]{1,50}$`)
 	RgxExtension       = regexp.MustCompile(`^[a-zA-Z0-9]{1,12}$`)
 	RgxPouchName       = regexp.MustCompile(`^[a-zA-Z0-9\-_]{1,30}$`)
 	RgxSnipDescription = regexp.MustCompile(`.*`)
