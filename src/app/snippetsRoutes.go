@@ -15,8 +15,15 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Name:     "new",
 			Usage:    spc + "Create a new snippet",
 			Aliases:  []string{"n"},
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "pipe, p",
+					Usage: "Pipe output creates content of new snippet",
+				},
+			},
 			Action: func(c *cli.Context) error {
-				return s.Create(c.Args())
+				pipe := c.Bool("pipe")
+				return s.Create(c.Args(), pipe)
 			},
 		},
 		{

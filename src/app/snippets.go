@@ -170,7 +170,7 @@ func GuessArgs(a string, b string) (*types.Alias, string, error) {
 	return alias, a, nil
 }
 
-func (sc *snippets) Create(args []string) error {
+func (sc *snippets) Create(args []string, pipe bool) error {
 	a1 := &types.Alias{}
 	var snippet string
 	if len(args) == 1 {
@@ -193,8 +193,8 @@ func (sc *snippets) Create(args []string) error {
 		a1 = a
 		snippet = s
 	}
-	if snippet == "" {
-		snippet = "" //stdInAsString()
+	if pipe {
+		snippet = stdInAsString()
 	}
 	res, err := sc.s.Create(Ctx(), &types.CreateRequest{Content: snippet, Alias: a1, Role: types.Role_Standard})
 	if err != nil {
