@@ -13,6 +13,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"time"
 )
 
 var (
@@ -83,7 +84,8 @@ func NewCLI(r io.Reader, wr io.Writer, info types.AppInfo) *KwkCLI {
 	ap.Copyright = "© 2017 Gimanzo Systems Ltd \n"
 
 	ap = setupFlags(ap)
-	ap.Version = cliInfo.String()
+	ap.Version = fmt.Sprintf("\n\n%s Version : %s\n%s Revision: %s\n%s Released: %s\n",
+		style.Margin, cliInfo.Version, style.Margin, cliInfo.Build, style.Margin, time.Unix(cliInfo.Time, 0).Format(time.RFC822))
 	help := cli.HelpPrinter
 	ap.Commands = append(ap.Commands, cli.Command{
 		Name:    "help",
