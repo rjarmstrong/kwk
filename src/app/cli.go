@@ -54,7 +54,7 @@ func NewCLI(r io.Reader, wr io.Writer, info types.AppInfo) *KwkCLI {
 	// SERVICES
 	dash := NewDashBoard(w, eh, sc)
 	users := NewUsers(uc, jsn, w, d, dash)
-	runner := NewRunner(srw, sc)
+	runner := NewRunner(w, srw, sc)
 	snippets := NewSnippets(sc, runner, d, w)
 
 	// RUNTIME
@@ -157,6 +157,8 @@ func getDefaultCommand(snipCli *snippets, eh errs.Handler) func(*cli.Context, st
 		}
 		var err error
 		switch i {
+		case "version" :
+			fmt.Println(cliInfo.String())
 		case "run":
 			err = snipCli.Run(c.Args().First(), []string(c.Args())[2:])
 		case "r":
@@ -190,6 +192,11 @@ func setupFlags(ap *cli.App) *cli.App {
 			Name:        "ansi",
 			Usage:       "Prints ansi escape sequences for debugging purposes",
 			Destination: &style.PrintAnsi,
+		},
+		cli.BoolFlag{
+			Name:        "quiet, q",
+			Usage:       "list names only",
+			Destination: &prefs.Quiet,
 		},
 
 		//cli.BoolFlag{

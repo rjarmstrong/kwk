@@ -20,6 +20,7 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	"github.com/kwk-super-snippets/types/vwrite"
 )
 
 type Runner interface {
@@ -30,10 +31,11 @@ type Runner interface {
 type runner struct {
 	snippets types.SnippetsClient
 	file     store.SnippetReadWriter
+	w vwrite.Writer
 }
 
-func NewRunner(f store.SnippetReadWriter, ss types.SnippetsClient) Runner {
-	return &runner{snippets: ss, file: f}
+func NewRunner(w vwrite.Writer, f store.SnippetReadWriter, ss types.SnippetsClient) Runner {
+	return &runner{snippets: ss, file: f, w: w}
 }
 
 /*
@@ -143,9 +145,7 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 		}
 	} else {
 		if len(interp) > 1 && interp[0] == "echo" && interp[1] == "$SNIP" {
-			fmt.Println("Not executable. Printing to screen.")
-			fmt.Println(s.Content)
-			return nil
+			return r.w.EWrite(out.NotExecutable(s))
 		}
 		if s.Ext() == "sh" || s.Ext() == "bash" {
 			// Set unofficial safe-mode

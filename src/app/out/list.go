@@ -124,21 +124,28 @@ func locked(locked bool) string {
 }
 
 func printPouchSnippets(w io.Writer, prefs *Prefs, list *types.ListResponse) {
+	if prefs.Quiet {
+		for _, v := range list.Items {
+			fmt.Fprint(w, v.Alias.URI())
+			fmt.Fprint(w, "\n")
+		}
+		return
+	}
 	if prefs.Naked {
 		fmt.Fprint(w, listNaked(list))
-	} else {
-		//sort.Slice(list.Snippets, func(i, j int) bool {
-		//	return list.Snippets[i].Created <= list.Snippets[j].Created
-		//})
-		if list.Pouch != nil {
-			printPouchHeadAndFoot(w, list.Pouch, list.Items)
-		}
-		printSnippets(w, prefs, list.Pouch.Name, list.Items, false)
-		if list.Pouch != nil && len(list.Items) > 10 && !prefs.ListHorizontal {
-			printPouchHeadAndFoot(w, list.Pouch, list.Items)
-		}
-		fmt.Fprint(w, "\n")
+		return
 	}
+	//sort.Slice(list.Snippets, func(i, j int) bool {
+	//	return list.Snippets[i].Created <= list.Snippets[j].Created
+	//})
+	if list.Pouch != nil {
+		printPouchHeadAndFoot(w, list.Pouch, list.Items)
+	}
+	printSnippets(w, prefs, list.Pouch.Name, list.Items, false)
+	if list.Pouch != nil && len(list.Items) > 10 && !prefs.ListHorizontal {
+		printPouchHeadAndFoot(w, list.Pouch, list.Items)
+	}
+	fmt.Fprint(w, "\n")
 }
 
 const timeLayout = "2 Jan 15:04 06"
