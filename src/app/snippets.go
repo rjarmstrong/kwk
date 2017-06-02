@@ -29,7 +29,7 @@ func NewSnippets(s types.SnippetsClient, r Runner, d Dialog, w vwrite.Writer) *s
 
 func (sc *snippets) Search(args ...string) error {
 	term := strings.Join(args, " ")
-	req := &types.AlphaRequest{Term: term, All: prefs.ListAll}
+	req := &types.AlphaRequest{Term: term, All: prefs.GlobalSearch }
 	if !prefs.GlobalSearch {
 		req.Username = principal.User.Username
 	}
@@ -82,16 +82,6 @@ func (sc *snippets) Search(args ...string) error {
 //	return sc.EWrite(out.) sc.Render("snippet:notfound", map[string]interface{}{"fullKey": distinctName})
 //}
 
-func (sc *snippets) Suggest(term string) error {
-	res, err := sc.s.TypeAhead(Ctx(), &types.TypeAheadRequest{Term: term})
-	if err != nil {
-		return err
-	}
-	if res.Total > 0 {
-		return sc.EWrite(out.AlphaTypeAhead(res))
-	}
-	return nil
-}
 
 func (sc *snippets) run(selected *types.Snippet, args []string) error {
 	return sc.runner.Run(selected, args)
@@ -270,6 +260,7 @@ func (sc *snippets) InspectListOrRun(uri string, forceView bool, args ...string)
 	if err != nil {
 		return err
 	}
+	// TASK: Heavy handed, cache preferable
 	rr, err := sc.s.GetRoot(Ctx(), &types.RootRequest{Username: a.Username, All: prefs.ListAll})
 	if err != nil {
 		return err
@@ -346,12 +337,16 @@ func (sc *snippets) Move(args []string) error {
 		return err
 	}
 	last := args[len(args)-1]
+	// If first argument is pouch is a pouch rename
 	if root.IsPouch(args[0]) {
-		sc.rename(args[0], last)
-		sc.List("", types.PouchRoot)
+		res, err := sc.s.RenamePouch(Ctx(), &types.RenamePouchRequest{Name:args[0], NewName:args[1]})
+		if err != nil {
+			return err
+		}
+		return sc.EWrite(out.PrintRoot(prefs, &cliInfo, res.Root, &principal.User))
 	} else if !root.IsPouch(last) && len(args) == 2 {
 		// rename single snippet
-		snip, original, err := sc.rename(args[0], args[1])
+		snip, original, err := sc.renameSnippet(args[0], args[1])
 		if err != nil {
 			return err
 		}
@@ -547,6 +542,12 @@ func (sc *snippets) typeAhead(term string, onSelect func(s *types.Snippet, args 
 	if err != nil {
 		return err
 	}
+	if len(res.Results) == 0 {
+		return errs.NotFound
+	}
+	if len(res.Results) == 1 {
+		// TASK: Add 'Did you mean <snippet>?
+	}
 	snips := []*types.Snippet{}
 	for _, v := range res.Results {
 		snips = append(snips, v.Snippet)
@@ -592,8 +593,8 @@ func (sc *snippets) getSnippet(uri string) (*types.ListResponse, *types.Alias, e
 	return list, a, nil
 }
 
-func (sc *snippets) rename(distinctName string, newSnipName string) (*types.Snippet, *types.SnipName, error) {
-	a, err := types.ParseAlias(distinctName)
+func (sc *snippets) renameSnippet(uri string, newSnipName string) (*types.Snippet, *types.SnipName, error) {
+	a, err := types.ParseAlias(uri)
 	if err != nil {
 		return nil, nil, err
 	}

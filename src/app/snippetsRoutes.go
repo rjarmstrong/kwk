@@ -54,6 +54,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 				cli.BoolFlag{
 					Name:  "global, g",
 					Usage: "Search everyone's public snippets, including yours",
+					Destination: &prefs.GlobalSearch,
 				},
 			},
 			Aliases: []string{"f"},
