@@ -2,6 +2,7 @@ package out
 
 import (
 	"fmt"
+	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/vwrite"
 	"io"
@@ -37,36 +38,50 @@ func AlphaTypeAhead(res *types.TypeAheadResponse) vwrite.Handler {
 	})
 }
 
-func AlphaSearchResult(res *types.AlphaResponse) vwrite.Handler {
+func AlphaSearchResult(prefs *Prefs, res *types.AlphaResponse) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprintf(w, "\n\033[7m  \"%s\" found in %d results in %d ms  \033[0m", res.Term, res.Total, res.Took)
-		//fmt.Fprint(w, "\n\n")
-		// {{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{ . | result}}\n
 
-		//view := &models.ListView{Snippets: []*types.Snippet{}}
-		//for _, v := range res.Results {
-		//	view.Snippets = append(view.Snippets, v.Snippet)
-		//}
-		//
-		//printSnippets(w, view, true)
+		if res.FallbackTitle != "" {
+			fmt.Fprintln(w)
+			fmt.Fprintln(w, style.Margin, res.FallbackTitle)
+		}
 
-		//for _, v := range res.Results {
-		//	fmt.Fprintf(w, "%s%s\n", MARGIN, v.String())
-		//if v.Highlights == nil {
-		//	v.Highlights = map[string]string{}
-		//}
-		//if v.Highlights["snip"] == "" {
-		//	v.Highlights["snip"] = v.Snip
-		//}
-		//lines := highlightsToLines(v.Highlights)
-		//f := ""
-		//for _, line := range lines {
-		//	f = f + line.Key[:4] + "\u2847  " + line.Line + "\n"
-		//}
-		//f = style.Fmt(style.Subdued, f)
-		//f = style.ColourSpan(style.Black, f, "<em>", "</em>", style.Subdued)
-		//fmt.Fprint(w, f)
-		//}
-		//fmt.Fprint(w, "\n")
+		fmt.Fprintf(w, "\n%s\033[7m  \"%s\" found in %d results      %d ms  \033[0m",
+			style.Margin, res.Term, res.Total, res.Took)
+		fmt.Fprint(w, "\n")
+
+		hltStart := fmt.Sprintf("%s%dm", style.Start255Fg, style.ColorPouchCyan)
+		subdued := fmt.Sprintf("%s%dm", style.Start255Fg, style.Grey243)
+		for _, v := range res.Results {
+			fmt.Fprintf(w, "\n%s%s %s\n", style.Margin, style.Fmt256(style.ColorPouchCyan, style.IconSnippet), v.Snippet.Alias.URI())
+			if v.Highlights == nil {
+				v.Highlights = map[string]string{}
+			}
+			if v.Highlights["content"] == "" {
+				v.Highlights["content"] = Fpreview(v.Snippet.Content, prefs, 30, 5)
+			}
+			lines := highlightsToLines(v.Highlights)
+
+			for _, line := range lines {
+				fmt.Fprint(w, style.Margin)
+				fmt.Fprint(w, subdued)
+				fmt.Fprint(w, pad(7, line.Key).String())
+				fmt.Fprint(w, " |  ")
+				fmt.Fprint(w, strings.Replace(strings.Replace(line.Line, "<em>", hltStart, -1), "</em>", style.End+subdued, -1))
+				fmt.Fprint(w, "\n")
+			}
+			fmt.Fprint(w, style.End)
+		}
+		fmt.Fprint(w, "\n")
 	})
 }
+
+//fmt.Fprint(w, "\n\n")
+// {{ .Username }}{{ \"/\" }}{{ .Name | blue }}.{{ .Extension | subdued }}\n{{ . | result}}\n
+
+//view := &models.ListView{Snippets: []*types.Snippet{}}
+//for _, v := range res.Results {
+//	view.Snippets = append(view.Snippets, v.Snippet)
+//}
+//
+//printSnippets(w, view, true)

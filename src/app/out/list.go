@@ -323,13 +323,13 @@ func fmtRunCount(count int64) string {
 func fmtHeader(w io.Writer, username string, pouch string, fileName string) {
 	fmt.Fprint(w, "\n")
 	fmt.Fprint(w, style.Margin)
-	fmt.Fprint(w, style.Start)
+	fmt.Fprint(w, style.Esc)
 	fmt.Fprint(w, "7m")
 	fmt.Fprint(w, " ❯ ")
 	fmt.Fprint(w, types.KwkHost)
 	fmt.Fprint(w, "/")
 	if pouch == "" && fileName == "" {
-		fmt.Fprint(w, style.Start)
+		fmt.Fprint(w, style.Esc)
 		fmt.Fprint(w, "1m")
 		fmt.Fprint(w, username)
 		fmt.Fprint(w, " ")
@@ -339,7 +339,7 @@ func fmtHeader(w io.Writer, username string, pouch string, fileName string) {
 	fmt.Fprint(w, username)
 	fmt.Fprint(w, "/")
 	if fileName == "" {
-		fmt.Fprint(w, style.Start)
+		fmt.Fprint(w, style.Esc)
 		fmt.Fprint(w, "1m")
 		fmt.Fprint(w, pouch)
 		fmt.Fprint(w, " ")
@@ -350,7 +350,7 @@ func fmtHeader(w io.Writer, username string, pouch string, fileName string) {
 		fmt.Fprint(w, pouch)
 		fmt.Fprint(w, "/")
 	}
-	fmt.Fprint(w, style.Start)
+	fmt.Fprint(w, style.Esc)
 	fmt.Fprint(w, "1m")
 	fmt.Fprint(w, fileName)
 	fmt.Fprint(w, " ")

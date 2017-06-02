@@ -59,8 +59,9 @@ const (
 	MoveBack  = "\033[9D"
 	Block     = "2588"
 
-	Start      = "\033["
+	Esc        = "\033["
 	End        = "\033[0m"
+	Start255Fg = "\033[38;5;"
 	Start255   = "\033[48;5;"
 	End255     = "\033[0;00m"
 	HideCursor = "\033[?25l"

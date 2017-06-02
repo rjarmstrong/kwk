@@ -24,7 +24,7 @@ func Fmt256(c types.AnsiCode, in interface{}) string {
 
 // FmtFgBg formats both foreground and background. FStart is the recommended way to achieve the same effect.
 func FmtFgBg(in string, fg types.AnsiCode, bg types.AnsiCode) string {
-	r := fmt.Sprintf("%s38;5;%dm%s48;5;%dm%s%s", Start, fg, Start, bg, in, End)
+	r := fmt.Sprintf("%s38;5;%dm%s48;5;%dm%s%s", Esc, fg, Esc, bg, in, End)
 	return r
 }
 
@@ -73,7 +73,7 @@ func Squeeze(text string) string {
 func fmtColor(c types.AnsiCode, in interface{}, ansiPattern string) string {
 	a := strings.Split(fmt.Sprintf("%v", in), "\n")
 	for i, v := range a {
-		ansi := fmt.Sprintf("%s%s%dm%s%s", Start, ansiPattern, c, v, End)
+		ansi := fmt.Sprintf("%s%s%dm%s%s", Esc, ansiPattern, c, v, End)
 		if PrintAnsi {
 			a[i] = fmt.Sprintf("%q", ansi)
 			continue

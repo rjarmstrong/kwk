@@ -37,7 +37,7 @@ func (sc *snippets) Search(args ...string) error {
 	if err != nil {
 		return err
 	}
-	return sc.EWrite(out.AlphaSearchResult(res))
+	return sc.EWrite(out.AlphaSearchResult(prefs, res))
 }
 
 //func (sc *SnippetCli) ListCategory(category string, args ...string) {
