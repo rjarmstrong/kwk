@@ -52,8 +52,8 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Usage:    spc + "Find a snippet by keyword",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
-					Name:  "global, g",
-					Usage: "Search everyone's public snippets, including yours",
+					Name:        "global, g",
+					Usage:       "Search everyone's public snippets, including yours",
 					Destination: &prefs.GlobalSearch,
 				},
 			},

@@ -29,7 +29,7 @@ func NewSnippets(s types.SnippetsClient, r Runner, d Dialog, w vwrite.Writer) *s
 
 func (sc *snippets) Search(args ...string) error {
 	term := strings.Join(args, " ")
-	req := &types.AlphaRequest{Term: term, All: prefs.GlobalSearch }
+	req := &types.AlphaRequest{Term: term, All: prefs.GlobalSearch}
 	if !prefs.GlobalSearch {
 		req.Username = principal.User.Username
 	}
@@ -81,7 +81,6 @@ func (sc *snippets) Search(args ...string) error {
 //	}
 //	return sc.EWrite(out.) sc.Render("snippet:notfound", map[string]interface{}{"fullKey": distinctName})
 //}
-
 
 func (sc *snippets) run(selected *types.Snippet, args []string) error {
 	return sc.runner.Run(selected, args)
@@ -339,7 +338,7 @@ func (sc *snippets) Move(args []string) error {
 	last := args[len(args)-1]
 	// If first argument is pouch is a pouch rename
 	if root.IsPouch(args[0]) {
-		res, err := sc.s.RenamePouch(Ctx(), &types.RenamePouchRequest{Name:args[0], NewName:args[1]})
+		res, err := sc.s.RenamePouch(Ctx(), &types.RenamePouchRequest{Name: args[0], NewName: args[1]})
 		if err != nil {
 			return err
 		}
