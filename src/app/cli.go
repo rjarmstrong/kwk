@@ -157,7 +157,7 @@ func getDefaultCommand(snipCli *snippets, eh errs.Handler) func(*cli.Context, st
 		}
 		var err error
 		switch i {
-		case "version" :
+		case "version":
 			fmt.Println(cliInfo.String())
 		case "run":
 			err = snipCli.Run(c.Args().First(), []string(c.Args())[2:])

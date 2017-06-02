@@ -10,6 +10,7 @@ import (
 	"github.com/kwk-super-snippets/cli/src/store"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
+	"github.com/kwk-super-snippets/types/vwrite"
 	"github.com/lunixbochs/vtclean"
 	"gopkg.in/yaml.v2"
 	"io"
@@ -20,7 +21,6 @@ import (
 	"strings"
 	"syscall"
 	"time"
-	"github.com/kwk-super-snippets/types/vwrite"
 )
 
 type Runner interface {
@@ -31,7 +31,7 @@ type Runner interface {
 type runner struct {
 	snippets types.SnippetsClient
 	file     store.SnippetReadWriter
-	w vwrite.Writer
+	w        vwrite.Writer
 }
 
 func NewRunner(w vwrite.Writer, f store.SnippetReadWriter, ss types.SnippetsClient) Runner {
