@@ -2,7 +2,6 @@ package out
 
 import (
 	"fmt"
-	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/kwk-super-snippets/types/errs"
 	"github.com/kwk-super-snippets/types/vwrite"
 	"io"
@@ -121,8 +120,8 @@ var notPermitted = Warn(vwrite.HandlerFunc(func(w io.Writer) {
 	fmt.Fprintln(w, "Permission denied.")
 }))
 
-var notAvailable = Warn(vwrite.HandlerFunc(func(w io.Writer) {
-	fmt.Fprintf(w, "%s  Kwk is DOWN! Please try again in a bit.\n", style.Fire)
+var notAvailable = Fatal(vwrite.HandlerFunc(func(w io.Writer) {
+	fmt.Fprintf(w, "Kwk is DOWN! Please try again in a bit.\n\n\n")
 }))
 
 func invalidArgument(err *errs.Error) vwrite.Handler {

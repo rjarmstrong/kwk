@@ -4,7 +4,9 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"fmt"
 	"github.com/kwk-super-snippets/cli/src/app/out"
+	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
 	"golang.org/x/net/context"
@@ -14,6 +16,7 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/grpc/transport"
 	"os"
 	"runtime"
 	"time"
@@ -55,6 +58,8 @@ QOhTsiedSrnAdyGN/4fy3ryM7xfft0kL0fJuMAsaDk527RH89elWsn2/x20Kk4yl
 NVOFBkpdn627G190
 -----END CERTIFICATE-----`
 
+var lg = logger{}
+
 func GetConn(serverAddress string, trustAllCerts bool) (*grpc.ClientConn, error) {
 	var opts []grpc.DialOption
 
@@ -77,8 +82,8 @@ func GetConn(serverAddress string, trustAllCerts bool) (*grpc.ClientConn, error)
 	opts = append(opts, grpc.WithUnaryInterceptor(interceptor))
 	opts = append(opts, grpc.WithTimeout(time.Second*10))
 	opts = append(opts, grpc.WithBlock())
-	grpclog.SetLogger(out.DebugLogger)
-	grpc.EnableTracing = true
+	grpclog.SetLogger(lg)
+	//grpc.EnableTracing = false
 	out.Debug("API: %s", serverAddress)
 	conn, err := grpc.Dial("localhost:8000", opts...)
 	return conn, err
@@ -153,4 +158,41 @@ func translateGrpcErr(e error) error {
 		return errs.ApiDown
 	}
 	return e
+}
+
+type logger struct {
+}
+
+func (logger) Fatal(args ...interface{}) {
+	out.DebugLogger.Fatal(args...)
+}
+
+func (logger) Fatalf(format string, args ...interface{}) {
+	out.DebugLogger.Fatalf(format, args...)
+}
+
+func (logger) Fatalln(args ...interface{}) {
+	out.DebugLogger.Fatalln(args...)
+}
+
+func (logger) Print(args ...interface{}) {
+	out.DebugLogger.Print(args...)
+}
+
+var attempts = 0
+
+func (logger) Printf(format string, args ...interface{}) {
+	_, ok := args[0].(transport.ConnectionError)
+	if ok {
+		if attempts == 0 {
+			fmt.Print("\n", style.Margin, "Connecting to kwk .")
+		}
+		fmt.Print(".")
+		attempts++
+	}
+	out.Debug(format, args)
+}
+
+func (logger) Println(args ...interface{}) {
+	out.DebugLogger.Println(args...)
 }
