@@ -18,13 +18,14 @@ import (
 
 type snippets struct {
 	s      types.SnippetsClient
-	runner Runner
+	runner runtime.Runner
+	editor runtime.Editor
 	Dialog
 	vwrite.Writer
 }
 
-func NewSnippets(s types.SnippetsClient, r Runner, d Dialog, w vwrite.Writer) *snippets {
-	return &snippets{s: s, runner: r, Dialog: d, Writer: w}
+func NewSnippets(s types.SnippetsClient, r runtime.Runner, e runtime.Editor, d Dialog, w vwrite.Writer) *snippets {
+	return &snippets{s: s, runner: r, Dialog: d, Writer: w, editor: e}
 }
 
 func (sc *snippets) Search(args ...string) error {
@@ -198,7 +199,7 @@ func (sc *snippets) Create(args []string, pipe bool) error {
 func (sc *snippets) Edit(uri string) error {
 	innerEdit := func(s *types.Snippet) error {
 		sc.Write(out.SnippetEditing(s))
-		err := sc.runner.Edit(s)
+		err := sc.editor.Edit(s)
 		if err != nil {
 			return err
 		}

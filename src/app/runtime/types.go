@@ -8,7 +8,14 @@ import (
 	"log"
 	"os"
 	"strings"
+	"errors"
 )
+
+type SnippetPatcher func(req *types.PatchRequest) (*types.PatchResponse, error)
+type SnippetGetter func(req *types.GetRequest) (*types.ListResponse, error)
+type SnippetMaker func(req *types.CreateRequest) error
+type UseLogger func(req *types.UseContext) (*types.LogUseResponse, error)
+type DocGetter func() (string, error)
 
 func newRuntimeAlias(username, name string, ext string, uniquePerMachine bool) *types.Alias {
 	if uniquePerMachine {
@@ -54,6 +61,45 @@ func DefaultEnv() *yaml.MapSlice {
 		log.Fatal(err)
 	}
 	return env
+}
+
+func GetSection(yml *yaml.MapSlice, name string) (*yaml.MapSlice, error) {
+	rs, _ := getSubSection(yml, name)
+	if rs == nil {
+		return nil, errors.New(fmt.Sprintf("No %s section in given .yml", name))
+	}
+	return &rs, nil
+}
+
+func getSubSection(yml *yaml.MapSlice, name string) (yaml.MapSlice, []string) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Printf("The yml config section '%s' is not valid please check it.", name)
+		}
+	}()
+	f := func(yml *yaml.MapSlice, name string) (yaml.MapSlice, []string) {
+		for _, v := range *yml {
+			if v.Key == name {
+				if slice, ok := v.Value.(yaml.MapSlice); ok {
+					return slice, nil
+				}
+				if _, ok := v.Value.([]interface{}); ok {
+					items := []string{}
+					for _, v2 := range v.Value.([]interface{}) {
+						items = append(items, v2.(string))
+					}
+					return nil, items
+				}
+				return nil, []string{v.Value.(string)}
+			}
+		}
+		return nil, nil
+	}
+	sub, bottom := f(yml, name)
+	if sub == nil && bottom == nil {
+		return f(yml, "default")
+	}
+	return sub, bottom
 }
 
 type PrefsFile struct {

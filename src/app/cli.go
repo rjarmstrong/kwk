@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	node      *ProcessNode
+	node      *runtime.ProcessNode
 	cliInfo   = types.AppInfo{}
 	principal = &UserWithToken{User: types.User{}}
 	cfg       = &CLIConfig{}
@@ -53,8 +53,9 @@ func NewCLI(r io.Reader, wr io.Writer, info types.AppInfo) *KwkCLI {
 	// SERVICES
 	dash := NewDashBoard(w, eh, sc)
 	users := NewUsers(uc, jsn, w, d, dash)
-	runner := NewRunner(w, srw, sc)
-	snippets := NewSnippets(sc, runner, d, w)
+	runner := runtime.NewRunner(prefs, env, w, srw, useLogger(sc))
+	editor := runtime.NewEditor(env, prefs, snippetPatcher(sc), srw)
+	snippets := NewSnippets(sc, runner, editor, d, w)
 
 	// RUNTIME
 	jsn.Get(cfg.UserDocName, principal, 0)
@@ -119,7 +120,7 @@ func nodeRun(snippets *snippets) error {
 }
 
 func setProcessLevel() {
-	n, err := GetCallerNode()
+	n, err := runtime.GetCallerNode()
 	if err != nil {
 		out.Debug("NODE:", err)
 	}
@@ -131,6 +132,19 @@ func setProcessLevel() {
 
 func (a *KwkCLI) Run(args ...string) {
 	a.Handle(a.app.Run(args))
+}
+
+
+func snippetPatcher(sc types.SnippetsClient) runtime.SnippetPatcher {
+	return func(req *types.PatchRequest) (*types.PatchResponse, error) {
+		return sc.Patch(Ctx(), req)
+	}
+}
+
+func useLogger(sc types.SnippetsClient) runtime.UseLogger {
+	return func(req *types.UseContext) (*types.LogUseResponse, error) {
+		return sc.LogUse(Ctx(), req)
+	}
 }
 
 func snippetGetter(sc types.SnippetsClient) runtime.SnippetGetter {

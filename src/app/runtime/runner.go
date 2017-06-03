@@ -1,10 +1,8 @@
-package app
+package runtime
 
 import (
-	"bufio"
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/cli/src/store"
@@ -17,98 +15,33 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
-	"runtime"
 	"strings"
 	"syscall"
 	"time"
+	rt "runtime"
 )
 
 type Runner interface {
 	Run(s *types.Snippet, args []string) error
-	Edit(s *types.Snippet) error
 }
 
 type runner struct {
-	snippets types.SnippetsClient
-	file     store.SnippetReadWriter
-	w        vwrite.Writer
+	prefs *out.Prefs
+	env   *yaml.MapSlice
+	file  store.SnippetReadWriter
+	w     vwrite.Writer
+	ul    UseLogger
 }
 
-func NewRunner(w vwrite.Writer, f store.SnippetReadWriter, ss types.SnippetsClient) Runner {
-	return &runner{snippets: ss, file: f, w: w}
-}
-
-/*
- Limits a preview adding an ascii escape at the end and fixing the length.
-*/
-func LimitPreview(in string, length int) string {
-	in = vtclean.Clean(in, true)
-	return types.Limit(in, length-5) + "\033[0m"
-}
-
-func (r *runner) Edit(s *types.Snippet) error {
-	//TODO: if we pull out the env from getSection we can improve speed
-	a, err := r.getEnvSection("apps")
-	eRoot, err := r.getEnvSection("editors")
-
-	if err != nil {
-		return err
-	}
-	_, candidates := getSubSection(eRoot, s.Ext())
-	if len(candidates) != 1 {
-		return errs.New(0, "No editors have been specified for  %s. And default editor is not specified.", s.Ext())
-	}
-	_, cli := getSubSection(a, candidates[0])
-
-	filePath, err := r.file.Write(s.Alias.URI(), s.Content)
-	out.Debug("SAVED TO: %s", filePath)
-	if err != nil {
-		return err
-	}
-	replaceVariables(&cli, filePath, s)
-	out.Debug("EDITING:%v %v", s.Alias.URI(), cli)
-	if err != nil {
-		return err
-	}
-	editor := cli[0]
-	cliEditors := map[string]bool{
-		"vi":   true,
-		"nano": true,
-	}
-	if cliEditors[editor] {
-		done := make(chan bool)
-		go func() {
-			out.Debug("EDIT asynchronously.")
-			err = r.execEdit(s.Alias, editor, cli[1:]...)
-			done <- true
-			if err != nil {
-				out.Debug("Error editing:")
-				out.LogErr(err)
-			}
-		}()
-		<-done
-	} else {
-		err = r.execEdit(s.Alias, editor, cli[1:]...)
-		rdr := bufio.NewReader(os.Stdin)
-		rdr.ReadLine()
-	}
-
-	text, err := r.file.Read(s.Alias.URI())
-	if err != nil {
-		return err
-	}
-	_, err = r.snippets.Patch(Ctx(), &types.PatchRequest{Alias: s.Alias, Target: s.Content, Patch: text})
-	if err != nil {
-		return err
-	}
-	return nil
+func NewRunner(prefs *out.Prefs, env *yaml.MapSlice, w vwrite.Writer, f store.SnippetReadWriter, ul UseLogger) Runner {
+	return &runner{prefs:prefs, env: env, file: f, w: w, ul: ul}
 }
 
 func (r *runner) Run(s *types.Snippet, args []string) error {
 	if !s.VerifyChecksum() {
 		return errs.SnippetNotVerified
 	}
-	rs, err := r.getEnvSection("runners")
+	rs, err := GetSection(r.env, "runners")
 	if err != nil {
 		return err
 	}
@@ -116,7 +49,7 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 	if err != nil {
 		return err
 	}
-	if prefs.Covert {
+	if r.prefs.Covert {
 		yamlKey += "-covert"
 	}
 	comp, interp := getSubSection(rs, yamlKey)
@@ -167,30 +100,11 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 	return nil
 }
 
-func (r *runner) execEdit(a *types.Alias, editor string, arg ...string) error {
-	out.Debug("EXEC EDIT: %s %s %s", a.URI(), editor, strings.Join(arg, " "))
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(prefs.CommandTimeout)*time.Second)
-	c := exec.CommandContext(ctx, editor, arg...)
-	c.Stdin = os.Stdin
-	var stderr bytes.Buffer
-	c.Stdout = os.Stdout
-	c.Stderr = &stderr
-	err := c.Run()
-	if err != nil {
-		return err
-	}
-	//if stderr.Len() > 0 {
-	//	desc := fmt.Sprintf("Error editing '%s' (editor: %s)\n\n%s", a.String(), editor, stderr.String())
-	//	return nil, ErrOneLine(Code_RunnerExitError, desc)
-	//}
-	return nil
-}
-
 /*
 exec realArgs are args that were passed to the snippet, and not the derived args which are passed to the runner.
 */
 func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...string) error {
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(prefs.CommandTimeout)*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(r.prefs.CommandTimeout)*time.Second)
 	c := exec.CommandContext(ctx, runner, arg...)
 	c.Stdin = os.Stdin
 	stdout, err := c.StdoutPipe()
@@ -259,26 +173,26 @@ func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...s
 	return nil
 }
 
+/*
+ Limits a preview adding an ascii escape at the end and fixing the length.
+*/
+func limitPreview(in string, length int) string {
+	in = vtclean.Clean(in, true)
+	return types.Limit(in, length-5) + "\033[0m"
+}
+
 func (r *runner) logUse(a *types.Alias, output string, node *ProcessNode, s types.UseStatus) {
-	r.snippets.LogUse(Ctx(), &types.UseContext{
+	r.ul(&types.UseContext{
 		Alias:       a,
 		Type:        types.UseType_Run,
 		Status:      s,
-		Preview:     LimitPreview(output, types.PreviewMaxRuneLength),
+		Preview:     limitPreview(output, types.PreviewMaxRuneLength),
 		CallerAlias: node.Caller.URI,
 		Level:       node.Level,
 		Runner:      node.Runner,
-		Os:          runtime.GOOS,
+		Os:          rt.GOOS,
 		Time:        types.KwkTime(time.Now()),
 	})
-}
-
-func (r *runner) getEnvSection(name string) (*yaml.MapSlice, error) {
-	rs, _ := getSubSection(env, name)
-	if rs == nil {
-		return nil, errors.New(fmt.Sprintf("No %s section in env.yml", name))
-	}
-	return &rs, nil
 }
 
 /*
@@ -292,37 +206,6 @@ func replaceVariables(cliArgs *[]string, filePath string, s *types.Snippet) {
 		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$FULL_NAME", filePath, -1)
 		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$DIR", strings.Replace(filePath, s.Alias.URI(), "", -1), -1)
 		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$NAME", strings.Replace(filePath, "."+s.Ext(), "", -1), -1)
-	}
-}
-
-func getSubSection(yml *yaml.MapSlice, name string) (yaml.MapSlice, []string) {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Printf("The yml config section '%s' is not valid please check it.", name)
-		}
-	}()
-	f := func(yml *yaml.MapSlice, name string) (yaml.MapSlice, []string) {
-		for _, v := range *yml {
-			if v.Key == name {
-				if slice, ok := v.Value.(yaml.MapSlice); ok {
-					return slice, nil
-				}
-				if _, ok := v.Value.([]interface{}); ok {
-					items := []string{}
-					for _, v2 := range v.Value.([]interface{}) {
-						items = append(items, v2.(string))
-					}
-					return nil, items
-				}
-				return nil, []string{v.Value.(string)}
-			}
-		}
-		return nil, nil
-	}
-	if sub, bottom := f(yml, name); sub == nil && bottom == nil {
-		return f(yml, "default")
-	} else {
-		return sub, bottom
 	}
 }
 

@@ -9,17 +9,6 @@ import (
 	"github.com/kwk-super-snippets/cli/src/store"
 )
 
-type Resolver interface {
-	Local() (string, error)
-	Own() (string, error)
-	Default() (string, error)
-	Fallback() (string, error)
-}
-
-type SnippetGetter func(req *types.GetRequest) (*types.ListResponse, error)
-type SnippetMaker func(req *types.CreateRequest) error
-type DocGetter func() (string, error)
-
 type Runtime struct {
 	errs.Handler
 	sg         SnippetGetter
