@@ -3,7 +3,7 @@ package main
 import (
 	gu "github.com/inconshreveable/go-update"
 	"github.com/kwk-super-snippets/cli/src/app"
-	"github.com/kwk-super-snippets/cli/src/app/out"
+	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/cli/src/store"
 	"github.com/kwk-super-snippets/cli/src/updater"
 	"github.com/kwk-super-snippets/types"

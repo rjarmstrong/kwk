@@ -3,7 +3,7 @@ package runtime
 import (
 	"testing"
 	"gopkg.in/yaml.v2"
-	"github.com/kwk-super-snippets/cli/src/app/out"
+	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/kwk-super-snippets/types/errs"

@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/kelseyhightower/envconfig"
-	"github.com/kwk-super-snippets/cli/src/app/out"
+	"github.com/kwk-super-snippets/cli/src/out"
 	"encoding/json"
 	"log"
 )
