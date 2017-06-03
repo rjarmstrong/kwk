@@ -24,7 +24,7 @@ func (d *Dashboard) GetWriter() func(w io.Writer, templ string, data interface{}
 			d.Write(out.SignedOut())
 			return
 		}
-		r, err := d.s.GetRoot(Ctx(), &types.RootRequest{ PrivateView: prefs.PrivateView })
+		r, err := d.s.GetRoot(Ctx(), &types.RootRequest{PrivateView: prefs.PrivateView})
 		out.Debug("DASHBOARD: Standard: %d  Personal: %d", len(r.Pouches), len(r.Personal))
 		if err != nil {
 			d.Handle(err)

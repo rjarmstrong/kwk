@@ -50,7 +50,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Category: cat,
 			Name:     "find",
 			Usage:    spc + "Find a snippet by keyword",
-			Aliases: []string{"f"},
+			Aliases:  []string{"f"},
 			Action: func(c *cli.Context) error {
 				args := []string(c.Args())
 				return s.Search(args...)

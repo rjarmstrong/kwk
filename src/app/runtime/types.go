@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"github.com/kwk-super-snippets/cli/src/app/out"
 	"github.com/kwk-super-snippets/types"
-	"os"
-	"strings"
 	"gopkg.in/yaml.v2"
 	"log"
+	"os"
+	"strings"
 )
 
 func newRuntimeAlias(username, name string, ext string, uniquePerMachine bool) *types.Alias {
@@ -17,15 +17,15 @@ func newRuntimeAlias(username, name string, ext string, uniquePerMachine bool) *
 	}
 	return &types.Alias{
 		Username: username,
-		Pouch: types.PouchSettings,
-		Name:  name,
-		Ext:   ext,
+		Pouch:    types.PouchSettings,
+		Name:     name,
+		Ext:      ext,
 	}
 }
 
 func DefaultPrefs() *out.Prefs {
 	return &out.Prefs{
-		PrivateView:    true,
+		PrivateView:       true,
 		AutoYes:           false,
 		Covert:            false,
 		RequireRunKeyword: false,
