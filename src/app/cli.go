@@ -32,7 +32,6 @@ type KwkCLI struct {
 
 func NewCLI(r io.Reader, wr io.Writer, info types.AppInfo) *KwkCLI {
 	cliInfo = info
-
 	// IO
 	out.SetColors(out.ColorsDefault())
 	eh := out.NewErrHandler(wr)

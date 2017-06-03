@@ -145,7 +145,9 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 		}
 	} else {
 		if len(interp) > 1 && interp[0] == "echo" && interp[1] == "$SNIP" {
-			return r.w.EWrite(out.NotExecutable(s))
+			err := r.w.EWrite(out.NotExecutable(s))
+			r.logUse(s.Alias, "", NewProcessNode(*s.Alias, "", args, nil), types.UseStatus_Success)
+			return err
 		}
 		if s.Ext() == "sh" || s.Ext() == "bash" {
 			// Set unofficial safe-mode
@@ -267,6 +269,7 @@ func (r *runner) logUse(a *types.Alias, output string, node *ProcessNode, s type
 		Level:       node.Level,
 		Runner:      node.Runner,
 		Os:          runtime.GOOS,
+		Time:        types.KwkTime(time.Now()),
 	})
 }
 

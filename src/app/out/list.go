@@ -266,7 +266,7 @@ func printSnippets(w io.Writer, prefs *Prefs, pouchName string, list []*types.Sn
 		status.WriteString(PadRight(runCount, " ", 21))
 		status.WriteString(" ")
 		if v.RunStatusTime > 0 {
-			h := PadLeft(style.Time(time.Unix(v.RunStatusTime, 0)), " ", 4)
+			h := PadLeft(formatTime(v.RunStatusTime), " ", 4)
 			t := fmt.Sprintf("%s", style.Fmt256(239, h))
 			status.WriteString(t)
 		}

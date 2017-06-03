@@ -530,6 +530,7 @@ func (sc *snippets) listSnippets(l *types.ListResponse) error {
 			Alias:  a,
 			Type:   types.UseType_View,
 			Status: types.UseStatus_Success,
+			Time: types.KwkTime(time.Now()),
 		})
 	if err != nil {
 		return err

@@ -19,7 +19,8 @@ func FreeText(text string) vwrite.Handler {
 }
 
 func formatTime(millis int64) string {
-	return style.Time(time.Unix(millis/1000, 0))
+	t := time.Unix(millis/1000, 0)
+	return style.Time(t)
 }
 
 func Dashboard(prefs *Prefs, cli *types.AppInfo, rr *types.RootResponse, u *types.User) vwrite.Handler {
