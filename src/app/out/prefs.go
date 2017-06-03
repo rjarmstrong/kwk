@@ -15,8 +15,7 @@ type Prefs struct {
 
 	AutoYes bool // TASK: Security
 
-	ListAll           bool // List all snippets including private.
-	GlobalSearch      bool // Search all accounts (not just yours).
+	PrivateView       bool // When you have shoulder surfers, turn this off so your private snippets aren't visible.
 	Naked             bool // Disable ansi styling, useful for scripting kwk.
 	SnippetThumbRows  int  // Number of lines of code to show in lists.
 	ExpandedThumbRows int  // Number of lines of code to show when list is expanded.

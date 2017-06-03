@@ -24,7 +24,7 @@ func horizontalPouches(prefs *Prefs, l []*types.Pouch, stats *types.UserStats) [
 		if i%5 == 0 {
 			item.WriteString("  ")
 		}
-		if prefs.ListAll || !v.MakePrivate {
+		if prefs.PrivateView || !v.MakePrivate {
 			if colWidths[i%5] < len(v.Name) {
 				colWidths[i%5] = len(v.Name)
 			}

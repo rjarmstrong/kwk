@@ -85,7 +85,7 @@ func pouchRoutes(s *snippets) []cli.Command {
 			Action: func(c *cli.Context) error {
 				all := c.Bool("all")
 				if all {
-					prefs.ListAll = true
+					prefs.PrivateView = true
 				}
 				prefs.ExpandedRows = true
 				// TODO: This is not quite right as it means we can't expand other users lists

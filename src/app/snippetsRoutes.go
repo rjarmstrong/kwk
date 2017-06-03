@@ -50,13 +50,6 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Category: cat,
 			Name:     "find",
 			Usage:    spc + "Find a snippet by keyword",
-			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:        "global, g",
-					Usage:       "Search everyone's public snippets, including yours",
-					Destination: &prefs.GlobalSearch,
-				},
-			},
 			Aliases: []string{"f"},
 			Action: func(c *cli.Context) error {
 				args := []string(c.Args())
@@ -143,17 +136,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Category: cat,
 			Name:     "enchilada",
 			Usage:    spc + "List all snippets 'un-pouched', useful for exporting or for other bulk management",
-			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:  "all, a",
-					Usage: "List all snippets.",
-				},
-			},
 			Action: func(c *cli.Context) error {
-				all := c.Bool("all")
-				if all {
-					prefs.ListAll = true
-				}
 				return s.Flatten(c.Args().First())
 			},
 		},
@@ -163,10 +146,6 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Usage:    spc + "When prefs.yml has RequireRunKeyword=true, run is required to execute a snippet",
 			Aliases:  []string{"r"},
 			Action: func(c *cli.Context) error {
-				covert := c.Bool("covert")
-				if covert {
-					prefs.Covert = true
-				}
 				return s.Run(c.Args().First(), []string(c.Args())[1:])
 
 			},

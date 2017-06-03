@@ -29,8 +29,8 @@ func NewSnippets(s types.SnippetsClient, r Runner, d Dialog, w vwrite.Writer) *s
 
 func (sc *snippets) Search(args ...string) error {
 	term := strings.Join(args, " ")
-	req := &types.AlphaRequest{Term: term, All: prefs.GlobalSearch}
-	if !prefs.GlobalSearch {
+	req := &types.AlphaRequest{Term: term, PrivateView: prefs.PrivateView}
+	if !prefs.PrivateView {
 		req.Username = principal.User.Username
 	}
 	res, err := sc.s.Alpha(Ctx(), req)
@@ -260,7 +260,7 @@ func (sc *snippets) InspectListOrRun(uri string, forceView bool, args ...string)
 		return err
 	}
 	// TASK: Heavy handed, cache preferable
-	rr, err := sc.s.GetRoot(Ctx(), &types.RootRequest{Username: a.Username, All: prefs.ListAll})
+	rr, err := sc.s.GetRoot(Ctx(), &types.RootRequest{Username: a.Username, PrivateView: prefs.PrivateView})
 	if err != nil {
 		return err
 	}
@@ -295,7 +295,7 @@ func (sc *snippets) InspectListOrRun(uri string, forceView bool, args ...string)
 }
 
 func (sc *snippets) Delete(args []string) error {
-	r, err := sc.s.GetRoot(Ctx(), &types.RootRequest{All: true})
+	r, err := sc.s.GetRoot(Ctx(), &types.RootRequest{PrivateView: prefs.PrivateView})
 	if err != nil {
 		return err
 	}
@@ -331,7 +331,7 @@ func (sc *snippets) Move(args []string) error {
 	if len(args) < 2 {
 		return errs.TwoArgumentsReqForMove
 	}
-	root, err := sc.s.GetRoot(Ctx(), &types.RootRequest{All: true})
+	root, err := sc.s.GetRoot(Ctx(), &types.RootRequest{PrivateView: prefs.PrivateView})
 	if err != nil {
 		return err
 	}
@@ -462,7 +462,7 @@ func (sc *snippets) CreatePouch(name string) error {
 }
 
 func (sc *snippets) Flatten(username string) error {
-	list, err := sc.s.List(Ctx(), &types.ListRequest{Username: username, All: prefs.ListAll})
+	list, err := sc.s.List(Ctx(), &types.ListRequest{Username: username, PrivateView: prefs.PrivateView})
 	if err != nil {
 		return err
 	}
@@ -471,7 +471,7 @@ func (sc *snippets) Flatten(username string) error {
 
 // GetEra lists snippets by special filters: @today @week @month @old
 func (sc *snippets) GetEra(virtualPouch string) error {
-	list, err := sc.s.List(Ctx(), &types.ListRequest{All: prefs.ListAll})
+	list, err := sc.s.List(Ctx(), &types.ListRequest{PrivateView: prefs.PrivateView})
 	if err != nil {
 		return err
 	}
@@ -508,14 +508,14 @@ func (sc *snippets) GetEra(virtualPouch string) error {
 
 func (sc *snippets) List(username string, pouch string) error {
 	if pouch == "" {
-		r, err := sc.s.GetRoot(Ctx(), &types.RootRequest{Username: username, All: prefs.ListAll})
+		r, err := sc.s.GetRoot(Ctx(), &types.RootRequest{Username: username, PrivateView: prefs.PrivateView})
 		if err != nil {
 			return err
 		}
 		return sc.EWrite(out.PrintRoot(prefs, &cliInfo, r, &principal.User))
 	}
 	var size int64
-	list, err := sc.s.List(Ctx(), &types.ListRequest{Username: username, Pouch: pouch, Limit: size, All: prefs.ListAll})
+	list, err := sc.s.List(Ctx(), &types.ListRequest{Username: username, Pouch: pouch, Limit: size, PrivateView: prefs.PrivateView})
 	if err != nil {
 		return err
 	}

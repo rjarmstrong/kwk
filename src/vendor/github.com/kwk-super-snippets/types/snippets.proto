@@ -66,7 +66,7 @@ message AlphaRequest {
     string term = 1;
     string extension = 2;
     string username = 3;
-    bool all = 4; // Search both private and public snippets.
+    bool privateView = 4; // Search both private and public snippets.
     string os = 5;
 }
 
@@ -82,7 +82,7 @@ message AlphaResponse {
 
 message TypeAheadRequest {
     string term = 1;
-    bool all = 2; // Search both private and public snippets.
+    bool privateView = 2; // Search both private and public snippets.
     string os = 3;
 }
 
@@ -248,14 +248,14 @@ message ListRequest {
     int64 limit = 3;
     repeated string tags = 4;
     repeated string extensions = 5;
-    bool all = 6;
+    bool privateView = 6;
     string pouch = 7;
     string category = 8;
 }
 
 message RootRequest {
     string username = 1;
-    bool all = 2;
+    bool privateView = 2;
 }
 
 message RootResponse {

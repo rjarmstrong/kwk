@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"github.com/kwk-super-snippets/cli/src/vendor/github.com/bmizerany/assert"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 

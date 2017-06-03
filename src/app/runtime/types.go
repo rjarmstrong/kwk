@@ -25,11 +25,10 @@ func newRuntimeAlias(username, name string, ext string, uniquePerMachine bool) *
 
 func DefaultPrefs() *out.Prefs {
 	return &out.Prefs{
-		GlobalSearch:      true,
+		PrivateView:    true,
 		AutoYes:           false,
 		Covert:            false,
 		RequireRunKeyword: false,
-		ListAll:           true,
 		Quiet:             false,
 		SnippetThumbRows:  3,
 		ExpandedThumbRows: 15,

@@ -95,7 +95,7 @@ var (
 	NoAuthToken      = New(CodeEmptyToken, "No auth token supplied.")
 	// kwk level
 	SnipNameInvalid = New(CodeInvalidSnipName,
-		"Snippet names should contain: alphanumeric, '.', '-' or '_' and be between 3 and 50 characters.")
+		"Snippet names should contain: alphanumeric, '.', '-' or '_' and be between 1 and 50 characters.")
 	ExtensionInvalid = New(CodeInvalidSnipName,
 		"Extensions should have only alphanumeric characters and be at most 12 characters.")
 	PouchNameInvalid = New(CodeInvalidPouchName,
@@ -103,7 +103,7 @@ var (
 	UsernameInvalid = New(CodeInvalidUsername,
 		"Username should contain: alphanumeric, '-' or '_' and be be between 3 and 15 characters.")
 	SnippetNameRequired       = New(CodeSnippetNameRequired, "Snippet name required")
-	SnippetNotVerified        = New(CodeSnippetNotVerified, "The checksum doesn't match the snippet.")
+	SnippetNotVerified        = New(CodeSnippetNotVerified, "The checksum doesn't match the snippet. Please `kwk edit <uri>` to fix.")
 	SnipNameExists            = New(CodeAlreadyExists, "That name/ext combo already exists.")
 	TwoArgumentsReqForMove    = New(CodeTwoArgumentsRequiredForMove, "Two arguments are required for the move command.")
 	EmbeddedRequiresExtension = New(CodeEmbeddedSnippetsRequireExt, "Embedded snippets require an ext.")

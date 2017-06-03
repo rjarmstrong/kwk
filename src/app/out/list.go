@@ -61,7 +61,13 @@ func printRoot(w io.Writer, prefs *Prefs, cli *types.AppInfo, r *types.RootRespo
 	}
 
 	fmtHeader(w, r.Username, "", "")
-	fmt.Fprint(w, strings.Repeat(" ", 50), style.Fmt16(style.Subdued, style.IconAccount+"  "+p.Username+"    TLS12"))
+	status := fmt.Sprintf("%s  %s    TLS12", style.IconAccount, p.Username)
+	fmt.Fprint(w, strings.Repeat(" ", 45), style.Fmt16(style.Subdued, status))
+	if prefs.PrivateView {
+		fmt.Fprint(w, style.Fmt256(style.Grey243," Pvt"))
+	} else {
+		fmt.Fprint(w, style.Fmt256(style.Grey243," Pub"))
+	}
 	fmt.Fprint(w, style.TwoLines)
 	w.Write(horizontalPouches(prefs, all, r.Stats))
 

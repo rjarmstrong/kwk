@@ -185,7 +185,7 @@ func setupFlags(ap *cli.App) *cli.App {
 		},
 		cli.BoolFlag{
 			Name:        "naked, n",
-			Usage:       "list without styles",
+			Usage:       "List without styles",
 			Destination: &prefs.Naked,
 		},
 		cli.BoolFlag{
@@ -195,7 +195,7 @@ func setupFlags(ap *cli.App) *cli.App {
 		},
 		cli.BoolFlag{
 			Name:        "quiet, q",
-			Usage:       "list names only",
+			Usage:       "List names only",
 			Destination: &prefs.Quiet,
 		},
 
