@@ -19,65 +19,47 @@ type Editor interface {
 	Edit(s *types.Snippet) error
 }
 
+type EditOptions struct {
+	CommandTimeout int64
+}
+
+type EditFunc func(a *types.Alias, app string, args []string, opts EditOptions) error
+
 func NewEditor(env *yaml.MapSlice, prefs *out.Prefs, p SnippetPatcher, f store.SnippetReadWriter) Editor {
-	return &editor{env : env, prefs: prefs, patch: p, file : f }
+	return &editor{env : env, prefs: prefs, patch: p, file : f , inlineFunc: inlineRunner, guiFunc: guiRunner}
 }
 
 type editor struct {
-	env *yaml.MapSlice
-	prefs *out.Prefs
-	patch SnippetPatcher
-	file  store.SnippetReadWriter
+	env        *yaml.MapSlice
+	prefs      *out.Prefs
+	patch      SnippetPatcher
+	file       store.SnippetReadWriter
+	inlineFunc EditFunc
+	guiFunc    EditFunc
 }
 
-func (r *editor) Edit(s *types.Snippet) error {
-	//TODO: if we pull out the env from getSection we can improve speed
-	a, err := GetSection(r.env,"apps")
-	eRoot, err := GetSection(r.env,"editors")
-
-	if err != nil {
-		return err
-	}
-	_, candidates := getSubSection(eRoot, s.Ext())
-	if len(candidates) != 1 {
-		return errs.New(0, "No editors have been specified for  %s. And default editor is not specified.", s.Ext())
-	}
-	_, cli := getSubSection(a, candidates[0])
-
-	filePath, err := r.file.Write(s.Alias.URI(), s.Content)
+func (ed *editor) Edit(s *types.Snippet) error {
+	filePath, err := ed.file.Write(s.Alias.URI(), s.Content)
 	out.Debug("SAVED TO: %s", filePath)
 	if err != nil {
 		return err
 	}
-	replaceVariables(&cli, filePath, s)
-	out.Debug("EDITING:%v %v", s.Alias.URI(), cli)
+	edArgs, err := getEditArgs(ed.env, s.Ext())
 	if err != nil {
 		return err
 	}
-	editor := cli[0]
-	cliEditors := map[string]bool{
-		"vi":   true,
-		"nano": true,
-	}
-	if cliEditors[editor] {
-		done := make(chan bool)
-		go func() {
-			out.Debug("EDIT asynchronously.")
-			err = r.execEdit(s.Alias, editor, cli[1:]...)
-			done <- true
-			if err != nil {
-				out.Debug("Error editing:")
-				out.LogErr(err)
-			}
-		}()
-		<-done
+	replaceVariables(edArgs, filePath, s)
+	out.Debug("EDITING:%v %v", s.Alias.URI(), edArgs)
+	app := edArgs[0]
+	opts := EditOptions{CommandTimeout: ed.prefs.CommandTimeout}
+
+	if editInline(app) {
+		ed.inlineFunc(s.Alias, app, edArgs[1:], opts)
 	} else {
-		err = r.execEdit(s.Alias, editor, cli[1:]...)
-		rdr := bufio.NewReader(os.Stdin)
-		rdr.ReadLine()
+		ed.guiFunc(s.Alias, app, edArgs[1:], opts)
 	}
 
-	text, err := r.file.Read(s.Alias.URI())
+	text, err := ed.file.Read(s.Alias.URI())
 	if err != nil {
 		return err
 	}
@@ -85,17 +67,65 @@ func (r *editor) Edit(s *types.Snippet) error {
 		out.FreeText("File unchanged.")
 		return nil
 	}
-	_, err = r.patch(&types.PatchRequest{Alias: s.Alias, Target: s.Content, Patch: text})
+	_, err = ed.patch(&types.PatchRequest{Alias: s.Alias, Target: s.Content, Patch: text})
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *editor) execEdit(a *types.Alias, editor string, arg ...string) error {
-	out.Debug("EXEC EDIT: %s %s %s", a.URI(), editor, strings.Join(arg, " "))
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(r.prefs.CommandTimeout)*time.Second)
-	c := exec.CommandContext(ctx, editor, arg...)
+var guiRunner = func (a *types.Alias, app string, args []string, opts EditOptions) error {
+	err := execEdit(a, app, args, opts)
+	if err != nil {
+		return err
+	}
+	rdr := bufio.NewReader(os.Stdin)
+	rdr.ReadLine()
+	return nil
+}
+
+var inlineRunner = func (a *types.Alias, app string, args []string, opts EditOptions) error {
+	done := make(chan bool)
+	go func() {
+		out.Debug("Editing inline.")
+		err := execEdit(a, app, args, opts)
+		done <- true
+		if err != nil {
+			out.Debug("Error editing:")
+			out.LogErr(err)
+		}
+	}()
+	<-done
+	// TASK: Write golang func error back to current proc
+	return nil
+}
+
+func editInline(editor string) bool {
+	return map[string]bool{
+		"vi":   true,
+		"nano": true,
+	}[editor]
+}
+
+func getEditArgs(env *yaml.MapSlice, ext string) ([]string, error) {
+	a, err := GetSection(env,"apps")
+	eRoot, err := GetSection(env,"editors")
+	if err != nil {
+		return nil, err
+	}
+	_, candidates := getSubSection(eRoot, ext)
+	if len(candidates) != 1 {
+		return nil,
+			errs.New(0, "No editors have been specified for  %s. And default editor is not specified.", ext)
+	}
+	_, ed := getSubSection(a, candidates[0])
+	return ed, nil
+}
+
+func execEdit(a *types.Alias, app string, arg []string, opts EditOptions) error {
+	out.Debug("EXEC EDIT: %s %s %s", a.URI(), app, strings.Join(arg, " "))
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(opts.CommandTimeout)*time.Second)
+	c := exec.CommandContext(ctx, app, arg...)
 	c.Stdin = os.Stdin
 	var stderr bytes.Buffer
 	c.Stdout = os.Stdout

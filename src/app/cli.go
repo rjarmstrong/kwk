@@ -69,7 +69,6 @@ func NewCLI(r io.Reader, wr io.Writer, info types.AppInfo) *KwkCLI {
 
 	// APP
 	ap := cli.NewApp()
-
 	ap.Name = style.Fmt256(style.ColorPouchCyan, style.IconSnippet) + "  kwk super snippets"
 	ap.Description = "A smart & friendly snippet manager for the CLI"
 	ap.Usage = ""

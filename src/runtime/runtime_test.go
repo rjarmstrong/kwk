@@ -45,7 +45,7 @@ func Test_Runtime(t *testing.T) {
 	assert.EqualValues(t, 0, makerCalled)
 
 
-	t.Log("Remote Not found, creates snippet with default conent and writes to local cache")
+	t.Log("Remote Not found, creates snippet with default content and writes to local cache")
 	fileMock.readVal = ""
 	fileMock.writeCalledWith = []string{}
 	Configure(env, prefs, username, nilGetter, maker(&makerCalled),  fileMock, eh)

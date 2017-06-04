@@ -59,7 +59,7 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 		} else {
 			_, compile := getSubSection(&comp, "compile")
 			if compile != nil {
-				replaceVariables(&compile, filePath, s)
+				replaceVariables(compile, filePath, s)
 				out.Debug("COMPILE: %s", compile)
 				err := r.exec(s.Alias, args, compile[0], compile[1:]...)
 				if err != nil {
@@ -67,7 +67,7 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 				}
 			}
 			_, run := getSubSection(&comp, "run")
-			replaceVariables(&run, filePath, s)
+			replaceVariables(run, filePath, s)
 
 			out.Debug("RUN: %s", run)
 			run = append(run, args...)
@@ -201,11 +201,11 @@ func (r *runner) logUse(a *types.Alias, output string, node *ProcessNode, s type
  $DIR = directory of the snippet on disk. Useful when editing a file in a directory structure or when compilation needs it.
  $CLASS_NAME = for java and scala these will be the class name in the snippet. Used when attempting to run the compiled file.
 */
-func replaceVariables(cliArgs *[]string, filePath string, s *types.Snippet) {
-	for i := range *cliArgs {
-		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$FULL_NAME", filePath, -1)
-		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$DIR", strings.Replace(filePath, s.Alias.URI(), "", -1), -1)
-		(*cliArgs)[i] = strings.Replace((*cliArgs)[i], "$NAME", strings.Replace(filePath, "."+s.Ext(), "", -1), -1)
+func replaceVariables(cliArgs []string, filePath string, s *types.Snippet) {
+	for i := range cliArgs {
+		(cliArgs)[i] = strings.Replace((cliArgs)[i], "$FULL_NAME", filePath, -1)
+		(cliArgs)[i] = strings.Replace((cliArgs)[i], "$DIR", strings.Replace(filePath, s.Alias.URI(), "", -1), -1)
+		(cliArgs)[i] = strings.Replace((cliArgs)[i], "$NAME", strings.Replace(filePath, "."+s.Ext(), "", -1), -1)
 	}
 }
 
