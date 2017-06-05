@@ -13,6 +13,8 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+	"fmt"
+	"github.com/kwk-super-snippets/cli/src/style"
 )
 
 type Editor interface {
@@ -60,11 +62,29 @@ func (ed *editor) Invoke(s *types.Snippet, onchange func(a types.Snippet)) error
 	} else {
 		invoke = ed.gui
 	}
+	printEditor(edArgs)
 	err = invoke(s.Alias, app, edArgs[1:], opts)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+
+func printEditor(edArgs []string) {
+	// TASK: Move this presentation out of editor
+	editor := "default editor"
+	for _, v := range edArgs {
+		if v == "open" ||
+			strings.HasPrefix(v, "-") ||
+			strings.HasPrefix(v, "/") ||
+			strings.HasPrefix(v, "$") {
+			continue
+		}
+		editor = v
+		break
+	}
+	fmt.Printf("\n%s%s\n\n", style.Margin, style.Fmt16(style.Subdued, "(" + editor + ")"))
 }
 
 func (ed *editor) Close(s *types.Snippet) (uint, error) {
