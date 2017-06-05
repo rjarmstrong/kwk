@@ -14,6 +14,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"github.com/kwk-super-snippets/cli/src/cli"
 )
 
 type snippets struct {
@@ -22,10 +23,11 @@ type snippets struct {
 	editor runtime.Editor
 	Dialog
 	vwrite.Writer
+	cxf    cli.ContextFunc
 }
 
-func NewSnippets(s types.SnippetsClient, r runtime.Runner, e runtime.Editor, d Dialog, w vwrite.Writer) *snippets {
-	return &snippets{s: s, runner: r, Dialog: d, Writer: w, editor: e}
+func NewSnippets(s types.SnippetsClient, r runtime.Runner, e runtime.Editor, d Dialog, w vwrite.Writer, c cli.ContextFunc) *snippets {
+	return &snippets{s: s, runner: r, Dialog: d, Writer: w, editor: e, cxf: c}
 }
 
 func (sc *snippets) Search(args ...string) error {
@@ -34,7 +36,7 @@ func (sc *snippets) Search(args ...string) error {
 	if !prefs.PrivateView {
 		req.Username = principal.User.Username
 	}
-	res, err := sc.s.Alpha(Ctx(), req)
+	res, err := sc.s.Alpha(sc.cxf(), req)
 	if err != nil {
 		return err
 	}
@@ -97,7 +99,7 @@ func (sc *snippets) NodeRun(uri string, args []string) error {
 	if err != nil {
 		return err
 	}
-	list, err := sc.s.Get(Ctx(), &types.GetRequest{Alias: a})
+	list, err := sc.s.Get(sc.cxf(), &types.GetRequest{Alias: a})
 	if err != nil {
 		if errs.HasCode(err, errs.CodeNoSnipNamesFound) {
 			return sc.EWrite(out.NotFoundInApp(node.URI, uri))
@@ -117,7 +119,7 @@ func (sc *snippets) Run(uri string, args []string) error {
 	if err != nil {
 		return err
 	}
-	list, err := sc.s.Get(Ctx(), &types.GetRequest{Alias: a})
+	list, err := sc.s.Get(sc.cxf(), &types.GetRequest{Alias: a})
 	if err != nil {
 		sc.typeAhead(uri, sc.run)
 	}
@@ -187,7 +189,7 @@ func (sc *snippets) Create(args []string, pipe bool) error {
 	if pipe {
 		snippet = stdInAsString()
 	}
-	res, err := sc.s.Create(Ctx(), &types.CreateRequest{Content: snippet, Alias: a1, Role: types.Role_Standard})
+	res, err := sc.s.Create(sc.cxf(), &types.CreateRequest{Content: snippet, Alias: a1, Role: types.Role_Standard})
 	if err != nil {
 		return err
 		//TODO: If snippet is similar to an existing one prompt for it here.
@@ -217,7 +219,7 @@ func (sc *snippets) Edit(uri string) error {
 			}
 			r := sc.Dialog.Modal(out.SnippetEditNewPrompt(a.String()), false)
 			if r.Ok {
-				r, err := sc.s.Create(Ctx(), &types.CreateRequest{Alias: a, Role: types.Role_Standard})
+				r, err := sc.s.Create(sc.cxf(), &types.CreateRequest{Alias: a, Role: types.Role_Standard})
 				if err != nil {
 					return err
 				}
@@ -249,7 +251,7 @@ func (sc *snippets) Describe(distinctName string, description string) error {
 	if err != nil {
 		return err
 	}
-	alias, err := sc.s.Update(Ctx(), &types.UpdateRequest{Alias: a, Description: description})
+	alias, err := sc.s.Update(sc.cxf(), &types.UpdateRequest{Alias: a, Description: description})
 	if err != nil {
 		return err
 	}
@@ -262,7 +264,7 @@ func (sc *snippets) InspectListOrRun(uri string, forceView bool, args ...string)
 		return err
 	}
 	// TASK: Heavy handed, cache preferable
-	rr, err := sc.s.GetRoot(Ctx(), &types.RootRequest{Username: a.Username, PrivateView: prefs.PrivateView})
+	rr, err := sc.s.GetRoot(sc.cxf(), &types.RootRequest{Username: a.Username, PrivateView: prefs.PrivateView})
 	if err != nil {
 		return err
 	}
@@ -280,7 +282,7 @@ func (sc *snippets) InspectListOrRun(uri string, forceView bool, args ...string)
 	}
 
 	// GET SNIPPET
-	list, err := sc.s.Get(Ctx(), &types.GetRequest{Alias: a})
+	list, err := sc.s.Get(sc.cxf(), &types.GetRequest{Alias: a})
 	if err != nil {
 		return sc.typeAhead(uri, sc.run)
 	}
@@ -297,7 +299,7 @@ func (sc *snippets) InspectListOrRun(uri string, forceView bool, args ...string)
 }
 
 func (sc *snippets) Delete(args []string) error {
-	r, err := sc.s.GetRoot(Ctx(), &types.RootRequest{PrivateView: prefs.PrivateView})
+	r, err := sc.s.GetRoot(sc.cxf(), &types.RootRequest{PrivateView: prefs.PrivateView})
 	if err != nil {
 		return err
 	}
@@ -308,7 +310,7 @@ func (sc *snippets) Delete(args []string) error {
 }
 
 func (sc *snippets) Lock(pouch string) error {
-	_, err := sc.s.MakePouchPrivate(Ctx(), &types.MakePrivateRequest{Name: pouch, MakePrivate: true})
+	_, err := sc.s.MakePouchPrivate(sc.cxf(), &types.MakePrivateRequest{Name: pouch, MakePrivate: true})
 	if err != nil {
 		return err
 	}
@@ -318,7 +320,7 @@ func (sc *snippets) Lock(pouch string) error {
 func (sc *snippets) UnLock(pouch string) error {
 	res := sc.Dialog.Modal(out.PouchCheckUnLock(pouch), false)
 	if res.Ok {
-		_, err := sc.s.MakePouchPrivate(Ctx(), &types.MakePrivateRequest{Name: pouch, MakePrivate: false})
+		_, err := sc.s.MakePouchPrivate(sc.cxf(), &types.MakePrivateRequest{Name: pouch, MakePrivate: false})
 		if err != nil {
 			return err
 		}
@@ -333,18 +335,18 @@ func (sc *snippets) Move(args []string) error {
 	if len(args) < 2 {
 		return errs.TwoArgumentsReqForMove
 	}
-	root, err := sc.s.GetRoot(Ctx(), &types.RootRequest{PrivateView: prefs.PrivateView})
+	root, err := sc.s.GetRoot(sc.cxf(), &types.RootRequest{PrivateView: prefs.PrivateView})
 	if err != nil {
 		return err
 	}
 	last := args[len(args)-1]
 	// If first argument is pouch is a pouch rename
 	if root.IsPouch(args[0]) {
-		res, err := sc.s.RenamePouch(Ctx(), &types.RenamePouchRequest{Name: args[0], NewName: args[1]})
+		res, err := sc.s.RenamePouch(sc.cxf(), &types.RenamePouchRequest{Name: args[0], NewName: args[1]})
 		if err != nil {
 			return err
 		}
-		return sc.EWrite(out.PrintRoot(prefs, &cliInfo, res.Root, &principal.User))
+		return sc.EWrite(out.PrintRoot(prefs, &info, res.Root, &principal.User))
 	} else if !root.IsPouch(last) && len(args) == 2 {
 		// rename single snippet
 		snip, original, err := sc.renameSnippet(args[0], args[1])
@@ -360,7 +362,7 @@ func (sc *snippets) Move(args []string) error {
 		return err
 	}
 	// move snippets into a pouch
-	p, err := sc.s.Move(Ctx(), &types.MoveRequest{SourcePouch: source, TargetPouch: last, SnipNames: as})
+	p, err := sc.s.Move(sc.cxf(), &types.MoveRequest{SourcePouch: source, TargetPouch: last, SnipNames: as})
 	if err != nil {
 		return err
 	}
@@ -381,7 +383,7 @@ func (sc *snippets) Cat(distinctName string) error {
 	if !a.IsSnippet() {
 		return errs.SnippetNameRequired
 	}
-	list, err := sc.s.Get(Ctx(), &types.GetRequest{Alias: a})
+	list, err := sc.s.Get(sc.cxf(), &types.GetRequest{Alias: a})
 	if err != nil {
 		if errs.HasCode(err, errs.CodeNotFound) {
 			return sc.typeAhead(distinctName, func(s *types.Snippet, args []string) error {
@@ -406,7 +408,7 @@ func (sc *snippets) Patch(distinctName string, target string, patch string) erro
 	if err != nil {
 		return err
 	}
-	alias, err := sc.s.Patch(Ctx(), &types.PatchRequest{Alias: a, Target: target, Patch: patch})
+	alias, err := sc.s.Patch(sc.cxf(), &types.PatchRequest{Alias: a, Target: target, Patch: patch})
 	if err != nil {
 		return err
 	}
@@ -422,7 +424,7 @@ func (sc *snippets) Clone(distinctName string, newFullName string) error {
 	if err != nil {
 		return err
 	}
-	res, err := sc.s.Clone(Ctx(), &types.CloneRequest{Alias: a, New: newA})
+	res, err := sc.s.Clone(sc.cxf(), &types.CloneRequest{Alias: a, New: newA})
 	if err != nil {
 		return err
 	}
@@ -435,7 +437,7 @@ func (sc *snippets) Tag(distinctName string, tags ...string) error {
 	if err != nil {
 		return err
 	}
-	alias, err := sc.s.Tag(Ctx(), &types.TagRequest{Alias: a, Tags: tags})
+	alias, err := sc.s.Tag(sc.cxf(), &types.TagRequest{Alias: a, Tags: tags})
 	if err != nil {
 		return err
 	}
@@ -447,7 +449,7 @@ func (sc *snippets) UnTag(distinctName string, tags ...string) error {
 	if err != nil {
 		return err
 	}
-	alias, err := sc.s.UnTag(Ctx(), &types.UnTagRequest{Alias: a, Tags: tags})
+	alias, err := sc.s.UnTag(sc.cxf(), &types.UnTagRequest{Alias: a, Tags: tags})
 	if err != nil {
 		return err
 	}
@@ -455,16 +457,16 @@ func (sc *snippets) UnTag(distinctName string, tags ...string) error {
 }
 
 func (sc *snippets) CreatePouch(name string) error {
-	res, err := sc.s.CreatePouch(Ctx(), &types.CreatePouchRequest{Name: name})
+	res, err := sc.s.CreatePouch(sc.cxf(), &types.CreatePouchRequest{Name: name})
 	if err != nil {
 		return err
 	}
-	sc.EWrite(out.PrintRoot(prefs, &cliInfo, res.Root, &principal.User))
+	sc.EWrite(out.PrintRoot(prefs, &info, res.Root, &principal.User))
 	return sc.EWrite(out.PouchCreated(name))
 }
 
 func (sc *snippets) Flatten(username string) error {
-	list, err := sc.s.List(Ctx(), &types.ListRequest{Username: username, PrivateView: prefs.PrivateView})
+	list, err := sc.s.List(sc.cxf(), &types.ListRequest{Username: username, PrivateView: prefs.PrivateView})
 	if err != nil {
 		return err
 	}
@@ -473,7 +475,7 @@ func (sc *snippets) Flatten(username string) error {
 
 // GetEra lists snippets by special filters: @today @week @month @old
 func (sc *snippets) GetEra(virtualPouch string) error {
-	list, err := sc.s.List(Ctx(), &types.ListRequest{PrivateView: prefs.PrivateView})
+	list, err := sc.s.List(sc.cxf(), &types.ListRequest{PrivateView: prefs.PrivateView})
 	if err != nil {
 		return err
 	}
@@ -510,14 +512,14 @@ func (sc *snippets) GetEra(virtualPouch string) error {
 
 func (sc *snippets) List(username string, pouch string) error {
 	if pouch == "" {
-		r, err := sc.s.GetRoot(Ctx(), &types.RootRequest{Username: username, PrivateView: prefs.PrivateView})
+		r, err := sc.s.GetRoot(sc.cxf(), &types.RootRequest{Username: username, PrivateView: prefs.PrivateView})
 		if err != nil {
 			return err
 		}
-		return sc.EWrite(out.PrintRoot(prefs, &cliInfo, r, &principal.User))
+		return sc.EWrite(out.PrintRoot(prefs, &info, r, &principal.User))
 	}
 	var size int64
-	list, err := sc.s.List(Ctx(), &types.ListRequest{Username: username, Pouch: pouch, Limit: size, PrivateView: prefs.PrivateView})
+	list, err := sc.s.List(sc.cxf(), &types.ListRequest{Username: username, Pouch: pouch, Limit: size, PrivateView: prefs.PrivateView})
 	if err != nil {
 		return err
 	}
@@ -526,7 +528,7 @@ func (sc *snippets) List(username string, pouch string) error {
 
 func (sc *snippets) listSnippets(l *types.ListResponse) error {
 	a := types.NewAlias(l.Username, l.Pouch.Name, "", "")
-	_, err := sc.s.LogUse(Ctx(),
+	_, err := sc.s.LogUse(sc.cxf(),
 		&types.UseContext{
 			Alias:  a,
 			Type:   types.UseType_View,
@@ -540,7 +542,7 @@ func (sc *snippets) listSnippets(l *types.ListResponse) error {
 }
 
 func (sc *snippets) typeAhead(term string, onSelect func(s *types.Snippet, args []string) error) error {
-	res, err := sc.s.TypeAhead(Ctx(), &types.TypeAheadRequest{Term: term})
+	res, err := sc.s.TypeAhead(sc.cxf(), &types.TypeAheadRequest{Term: term})
 	if err != nil {
 		return err
 	}
@@ -588,7 +590,7 @@ func (sc *snippets) getSnippet(uri string) (*types.ListResponse, *types.Alias, e
 	if err != nil {
 		return nil, nil, err
 	}
-	list, err := sc.s.Get(Ctx(), &types.GetRequest{Alias: a})
+	list, err := sc.s.Get(sc.cxf(), &types.GetRequest{Alias: a})
 	if err != nil {
 		return nil, a, err
 	}
@@ -604,7 +606,7 @@ func (sc *snippets) renameSnippet(uri string, newSnipName string) (*types.Snippe
 	if err != nil {
 		return nil, nil, err
 	}
-	res, err := sc.s.Rename(Ctx(), &types.RenameRequest{Alias: a, NewName: sn})
+	res, err := sc.s.Rename(sc.cxf(), &types.RenameRequest{Alias: a, NewName: sn})
 	return res.Snippet, res.Original, nil
 }
 
@@ -617,7 +619,7 @@ func (sc *snippets) deleteSnippet(args []string) error {
 	if !r.Ok {
 		sc.EWrite(out.SnippetsNotDeleted(sn))
 	}
-	res, err := sc.s.Delete(Ctx(), &types.DeleteRequest{Pouch: pouch, Names: sn})
+	res, err := sc.s.Delete(sc.cxf(), &types.DeleteRequest{Pouch: pouch, Names: sn})
 	if err != nil {
 		return err
 	}
@@ -630,10 +632,10 @@ func (sc *snippets) deletePouch(pouch string) error {
 	if !res.Ok {
 		return sc.EWrite(out.PouchNotDeleted(pouch))
 	}
-	dres, err := sc.s.DeletePouch(Ctx(), &types.DeletePouchRequest{Name: pouch})
+	dres, err := sc.s.DeletePouch(sc.cxf(), &types.DeletePouchRequest{Name: pouch})
 	if err != nil {
 		return err
 	}
-	sc.EWrite(out.PrintRoot(prefs, &cliInfo, dres.Root, &principal.User))
+	sc.EWrite(out.PrintRoot(prefs, &info, dres.Root, &principal.User))
 	return sc.EWrite(out.PouchDeleted(pouch))
 }

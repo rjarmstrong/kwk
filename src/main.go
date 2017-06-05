@@ -10,6 +10,7 @@ import (
 	"os"
 	"runtime/pprof"
 	"strconv"
+	"github.com/kwk-super-snippets/cli/src/cli"
 )
 
 var (
@@ -42,7 +43,7 @@ func main() {
 	updater.SpawnUpdate()
 }
 
-func runUpdate(cfg *app.CLIConfig, info types.AppInfo) {
+func runUpdate(cfg *cli.AppConfig, info types.AppInfo) {
 	out.DebugEnabled = false
 	f := store.NewDiskFile()
 	jsn := store.NewJson(f, cfg.DocPath)

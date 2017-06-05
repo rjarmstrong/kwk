@@ -33,7 +33,6 @@ func Test_Editor(t *testing.T) {
 	err = editor.Edit(s)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, patcherCalled)
-
 }
 
 

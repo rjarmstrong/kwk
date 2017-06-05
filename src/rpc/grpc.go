@@ -1,4 +1,4 @@
-package app
+package rpc
 
 import (
 	"crypto/tls"
@@ -20,6 +20,7 @@ import (
 	"os"
 	"runtime"
 	"time"
+	"github.com/kwk-super-snippets/cli/src/cli"
 )
 
 // /etc/ssl/certs/COMODO_RSA_Certification_Authority.pem
@@ -58,9 +59,20 @@ QOhTsiedSrnAdyGN/4fy3ryM7xfft0kL0fJuMAsaDk527RH89elWsn2/x20Kk4yl
 NVOFBkpdn627G190
 -----END CERTIFICATE-----`
 
-var lg = logger{}
+var (
+	lg = logger{}
+)
 
-func GetConn(serverAddress string, trustAllCerts bool) (*grpc.ClientConn, error) {
+type Rpc struct {
+	*grpc.ClientConn
+	pr *cli.UserWithToken
+	cliInfo *types.AppInfo
+}
+
+
+func GetRpc(pr *cli.UserWithToken, cliInfo *types.AppInfo, serverAddress string, trustAllCerts bool) (*Rpc, error) {
+	rpc := &Rpc{pr:pr, cliInfo:cliInfo}
+
 	var opts []grpc.DialOption
 
 	pool := x509.NewCertPool()
@@ -79,18 +91,22 @@ func GetConn(serverAddress string, trustAllCerts bool) (*grpc.ClientConn, error)
 	//b := grpc.RoundRobin(r)
 	//opts = append(opts, grpc.WithBalancer(b))
 	opts = append(opts, grpc.WithTransportCredentials(creds))
-	opts = append(opts, grpc.WithUnaryInterceptor(interceptor))
+	opts = append(opts, grpc.WithUnaryInterceptor(rpc.interceptor))
 	opts = append(opts, grpc.WithTimeout(time.Second*10))
 	opts = append(opts, grpc.WithBlock())
 	grpclog.SetLogger(lg)
 	//grpc.EnableTracing = false
 	out.Debug("API: %s", serverAddress)
 	conn, err := grpc.Dial("localhost:8000", opts...)
-	return conn, err
+	if err != nil {
+		return nil, err
+	}
+	rpc.ClientConn = conn
+	return rpc, err
 }
 
-func Ctx() context.Context {
-	if principal == nil {
+func (rp *Rpc) Cxf() context.Context {
+	if rp.pr == nil {
 		return context.Background()
 	} else {
 		hostname, _ := os.Hostname()
@@ -98,11 +114,11 @@ func Ctx() context.Context {
 			context.Background(),
 			metadata.Pairs(
 				types.TokenHeaderName,
-				principal.AccessToken,
+				rp.pr.AccessToken,
 				"host", hostname,
 				"os", runtime.GOOS,
 				"agnt", "<not implemented>", //agent //ps -p $$ | tail -1 | awk '{print $NF}'
-				"v", cliInfo.String(),
+				"v", rp.cliInfo.String(),
 			),
 		)
 		return ctx
@@ -114,9 +130,9 @@ var noAuthMethods = map[string]bool{
 	"/types.Users/SignUp": true,
 }
 
-func interceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+func (rp *Rpc) interceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 	out.Debug("GRPC: %s", method)
-	if !principal.HasAccessToken() && !noAuthMethods[method] {
+	if !rp.pr.HasAccessToken() && !noAuthMethods[method] {
 		out.Debug("AUTH: No token in request.")
 		return errs.NotAuthenticated
 	}

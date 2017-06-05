@@ -16,6 +16,7 @@ type SnippetGetter func(req *types.GetRequest) (*types.ListResponse, error)
 type SnippetMaker func(req *types.CreateRequest) error
 type UseLogger func(req *types.UseContext) (*types.LogUseResponse, error)
 type DocGetter func() (string, error)
+type RootGetter func(req *types.RootRequest) (*types.RootResponse, error)
 
 func newRuntimeAlias(username, name string, ext string, uniquePerMachine bool) *types.Alias {
 	if uniquePerMachine {
