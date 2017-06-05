@@ -6,33 +6,46 @@ import (
 	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/types"
 	"github.com/stretchr/testify/assert"
+	"crypto/sha256"
+	"fmt"
 )
+
+var content = "some content"
 
 func Test_Editor(t *testing.T) {
 	out.DebugEnabled = true
-	fileMock := &snippetReadWriter{}
+	fileMock := &snippetReadWriter{
+	}
 	//username := "test-man"
 	env := &yaml.MapSlice{}
 	prefs := &out.Prefs{}
 	yaml.Unmarshal([]byte(testEnvString), env)
 	var patcherCalled int
-	var content = "some content"
 	fileMock.readVal = content
 	editor := NewEditor(env, prefs, patcher(&patcherCalled), fileMock).(*editor)
-	editor.guiFunc = mockRunner
+	editor.gui = mockRunner
 	s := types.NewBlankSnippet()
 	s.Content = content
+	shaa := sha256.Sum256([]byte(content))
+	s.Checksum = fmt.Sprintf("%x", shaa)
 
 	t.Log("If file unchanged should Not patch file.")
-	err := editor.Edit(s)
+	onchange := func(s types.Snippet) {}
+	err := editor.Invoke(s, onchange)
+	assert.Nil(t, err)
+	changes, err := editor.Close(s)
 	assert.Nil(t, err)
 	assert.Equal(t, 0, patcherCalled)
+	assert.Equal(t, uint(0), changes)
 
 	t.Log("If file changed Should patch file.")
 	fileMock.readVal = "changed content"
-	err = editor.Edit(s)
+	err = editor.Invoke(s, onchange)
+	assert.Nil(t, err)
+	changes, err = editor.Close(s)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, patcherCalled)
+	assert.Equal(t, uint(1), changes)
 }
 
 
@@ -43,6 +56,8 @@ var mockRunner = func (a *types.Alias, app string, args []string, opts EditOptio
 var patcher = func(called *int) SnippetPatcher {
 	return func(req *types.PatchRequest) (*types.PatchResponse, error) {
 		*called += 1
-		return &types.PatchResponse{}, nil
+		snippet := types.NewBlankSnippet()
+		snippet.Content = content
+		return &types.PatchResponse{Snippet: snippet}, nil
 	}
 }

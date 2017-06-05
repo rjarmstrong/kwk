@@ -6,6 +6,7 @@ import (
 	"github.com/kwk-super-snippets/types/vwrite"
 	"io"
 	"strings"
+	"github.com/kwk-super-snippets/cli/src/style"
 )
 
 func SnippetDescriptionUpdated(uri string, desc string) vwrite.Handler {
@@ -44,10 +45,17 @@ func SnippetEdited(s *types.Snippet) vwrite.Handler {
 	}))
 }
 
-func SnippetEditing(s *types.Snippet) vwrite.Handler {
+func SnippetNoChanges(s *types.Snippet) vwrite.Handler {
 	return Success(vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprintf(w, "Editing: %s %s... \nHit ENTER to upload changes. CTRL+C to cancel.\n", snippetIcon(s), s.Alias.URI())
+		fmt.Fprintf(w, "No changes to %s %s\n\n", snippetIcon(s), s.Alias.VersionURI())
 	}))
+}
+
+func SnippetEditing(s *types.Snippet) vwrite.Handler {
+	return vwrite.HandlerFunc(func(w io.Writer) {
+		fmt.Fprintf(w, "\n%sEditing:  %s %s...\n\n", style.Margin, snippetIcon(s), s.Alias.VersionURI())
+		fmt.Fprintf(w, "%sCTRL+C to CANCEL | Any key to COMMIT\n", style.Margin)
+	})
 }
 
 func SnippetEditNewPrompt(uri string) vwrite.Handler {

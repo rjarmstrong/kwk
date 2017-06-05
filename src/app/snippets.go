@@ -201,11 +201,20 @@ func (sc *snippets) Create(args []string, pipe bool) error {
 func (sc *snippets) Edit(uri string) error {
 	innerEdit := func(s *types.Snippet) error {
 		sc.Write(out.SnippetEditing(s))
-		err := sc.editor.Edit(s)
+		err := sc.editor.Invoke(s, func(s types.Snippet) {
+			out.FreeText("Changed")
+		})
 		if err != nil {
 			return err
 		}
-		return sc.EWrite(out.SnippetEdited(s))
+		changes, err := sc.editor.Close(s)
+		if err != nil {
+			return err
+		}
+		if changes > 0 {
+			return sc.EWrite(out.SnippetEdited(s))
+		}
+		return sc.EWrite(out.SnippetNoChanges(s))
 	}
 	if uri == "env" {
 		uri = runtime.GetEnvURI()

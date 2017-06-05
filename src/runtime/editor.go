@@ -8,6 +8,7 @@ import (
 	"github.com/kwk-super-snippets/cli/src/store"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
+	"github.com/rjeczalik/notify"
 	"os"
 	"os/exec"
 	"strings"
@@ -16,65 +17,124 @@ import (
 )
 
 type Editor interface {
-	Edit(s *types.Snippet) error
+	Invoke(s *types.Snippet, onchange func(s types.Snippet)) error
+	Close(s *types.Snippet) (uint, error)
 }
 
 type EditOptions struct {
 	CommandTimeout int64
 }
 
-type EditFunc func(a *types.Alias, app string, args []string, opts EditOptions) error
+type AppInvoker func(a *types.Alias, app string, args []string, opts EditOptions) error
 
 func NewEditor(env *yaml.MapSlice, prefs *out.Prefs, p SnippetPatcher, f store.SnippetReadWriter) Editor {
-	return &editor{env : env, prefs: prefs, patch: p, file : f , inlineFunc: inlineRunner, guiFunc: guiRunner}
+	return &editor{env: env, prefs: prefs, patch: p, file: f, inline: inlineInvoker, gui: guiInvoker}
 }
 
 type editor struct {
-	env        *yaml.MapSlice
-	prefs      *out.Prefs
-	patch      SnippetPatcher
-	file       store.SnippetReadWriter
-	inlineFunc EditFunc
-	guiFunc    EditFunc
+	env    *yaml.MapSlice
+	prefs  *out.Prefs
+	patch  SnippetPatcher
+	file   store.SnippetReadWriter
+	inline AppInvoker
+	gui    AppInvoker
+
+	changes uint
+	events  chan notify.EventInfo
 }
 
-func (ed *editor) Edit(s *types.Snippet) error {
+func (ed *editor) Invoke(s *types.Snippet, onchange func(a types.Snippet)) error {
 	filePath, err := ed.file.Write(s.Alias.URI(), s.Content)
 	out.Debug("SAVED TO: %s", filePath)
 	if err != nil {
 		return err
 	}
+
+	// TASK: review usefulness of watching
+	//err = ed.watch(filePath)
+	//if err != nil {
+	//	return err
+	//}
+
 	edArgs, err := getEditArgs(ed.env, s.Ext())
 	if err != nil {
 		return err
 	}
 	replaceVariables(edArgs, filePath, s)
-	out.Debug("EDITING:%v %v", s.Alias.URI(), edArgs)
+	out.Debug("EDIT:%v %v", s.Alias.URI(), edArgs)
 	app := edArgs[0]
 	opts := EditOptions{CommandTimeout: ed.prefs.CommandTimeout}
 
+	var invoke AppInvoker
 	if editInline(app) {
-		ed.inlineFunc(s.Alias, app, edArgs[1:], opts)
+		invoke = ed.inline
 	} else {
-		ed.guiFunc(s.Alias, app, edArgs[1:], opts)
+		invoke = ed.gui
 	}
-
-	text, err := ed.file.Read(s.Alias.URI())
-	if err != nil {
-		return err
-	}
-	if s.Content == text {
-		out.FreeText("File unchanged.")
-		return nil
-	}
-	_, err = ed.patch(&types.PatchRequest{Alias: s.Alias, Target: s.Content, Patch: text})
+	err = invoke(s.Alias, app, edArgs[1:], opts)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-var guiRunner = func (a *types.Alias, app string, args []string, opts EditOptions) error {
+func (ed *editor) Close(s *types.Snippet) (uint, error) {
+	// TASK: review usefulness of watching
+	//changes, err := ed.closeWatch()
+	//if err != nil {
+	//	return changes, err
+	//}
+	//if changes == 0 {
+	//	return 0, nil
+	//}
+	text, err := ed.file.Read(s.Alias.URI())
+	if err != nil {
+		return 0, err
+	}
+	out.Debug("EDIT: new:%s, orig: %s, checksum: %s", text, s.Content, s.Checksum)
+	if text == s.Content && s.VerifyChecksum() {
+		out.Debug("EDIT: Content not changed, not patching")
+		return 0, nil
+	}
+	out.Debug("EDIT: Content changed, patching...")
+	res, err := ed.patch(&types.PatchRequest{Alias: s.Alias, Target: s.Content, Patch: text})
+	if err != nil {
+		return 1, err
+	}
+	s.Alias.Version = res.Snippet.Alias.Version
+	s.Content = res.Snippet.Content
+	s.Updated = res.Snippet.Updated
+	return 1, nil
+}
+
+func (ed *editor) watch(filePath string) error {
+	ed.events = make(chan notify.EventInfo)
+	err := notify.Watch(filePath, ed.events, notify.All)
+	if err != nil {
+		return err
+	}
+	go func() {
+		for {
+			select {
+			case event := <-ed.events:
+				out.Debug("EDIT: %+v", event)
+				ed.changes += 1
+				out.Debug("modified file: %s", event.Event())
+			}
+		}
+	}()
+	return nil
+}
+
+func (ed *editor) closeWatch() (uint, error) {
+	out.Debug("EDIT: %s, %d changes.", "closing watch", ed.changes)
+	notify.Stop(ed.events)
+	changes := ed.changes
+	ed.changes = 0
+	return changes, nil
+}
+
+var guiInvoker = func(a *types.Alias, app string, args []string, opts EditOptions) error {
 	err := execEdit(a, app, args, opts)
 	if err != nil {
 		return err
@@ -84,16 +144,15 @@ var guiRunner = func (a *types.Alias, app string, args []string, opts EditOption
 	return nil
 }
 
-var inlineRunner = func (a *types.Alias, app string, args []string, opts EditOptions) error {
+var inlineInvoker = func(a *types.Alias, app string, args []string, opts EditOptions) error {
 	done := make(chan bool)
 	go func() {
 		out.Debug("Editing inline.")
 		err := execEdit(a, app, args, opts)
-		done <- true
 		if err != nil {
-			out.Debug("Error editing:")
-			out.LogErr(err)
+			out.LogErrM("EDIT ERR:", err)
 		}
+		done <- true
 	}()
 	<-done
 	// TASK: Write golang func error back to current proc
@@ -108,8 +167,8 @@ func editInline(editor string) bool {
 }
 
 func getEditArgs(env *yaml.MapSlice, ext string) ([]string, error) {
-	a, err := GetSection(env,"apps")
-	eRoot, err := GetSection(env,"editors")
+	a, err := GetSection(env, "apps")
+	eRoot, err := GetSection(env, "editors")
 	if err != nil {
 		return nil, err
 	}
