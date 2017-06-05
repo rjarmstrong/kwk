@@ -8,6 +8,8 @@ const (
 	BrightWhite types.AnsiCode = 1
 	Subdued     types.AnsiCode = 2
 
+	WhiteBg types.AnsiCode = 7
+
 	// 16 COLORS
 	Black     types.AnsiCode = 30
 	Red       types.AnsiCode = 31
