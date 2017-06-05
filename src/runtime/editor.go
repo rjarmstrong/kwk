@@ -8,12 +8,11 @@ import (
 	"github.com/kwk-super-snippets/cli/src/store"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
-	"github.com/rjeczalik/notify"
+	"gopkg.in/yaml.v2"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
-	"gopkg.in/yaml.v2"
 )
 
 type Editor interface {
@@ -38,9 +37,6 @@ type editor struct {
 	file   store.SnippetReadWriter
 	inline AppInvoker
 	gui    AppInvoker
-
-	changes uint
-	events  chan notify.EventInfo
 }
 
 func (ed *editor) Invoke(s *types.Snippet, onchange func(a types.Snippet)) error {
@@ -49,13 +45,6 @@ func (ed *editor) Invoke(s *types.Snippet, onchange func(a types.Snippet)) error
 	if err != nil {
 		return err
 	}
-
-	// TASK: review usefulness of watching
-	//err = ed.watch(filePath)
-	//if err != nil {
-	//	return err
-	//}
-
 	edArgs, err := getEditArgs(ed.env, s.Ext())
 	if err != nil {
 		return err
@@ -79,14 +68,6 @@ func (ed *editor) Invoke(s *types.Snippet, onchange func(a types.Snippet)) error
 }
 
 func (ed *editor) Close(s *types.Snippet) (uint, error) {
-	// TASK: review usefulness of watching
-	//changes, err := ed.closeWatch()
-	//if err != nil {
-	//	return changes, err
-	//}
-	//if changes == 0 {
-	//	return 0, nil
-	//}
 	text, err := ed.file.Read(s.Alias.URI())
 	if err != nil {
 		return 0, err
@@ -105,33 +86,6 @@ func (ed *editor) Close(s *types.Snippet) (uint, error) {
 	s.Content = res.Snippet.Content
 	s.Updated = res.Snippet.Updated
 	return 1, nil
-}
-
-func (ed *editor) watch(filePath string) error {
-	ed.events = make(chan notify.EventInfo)
-	err := notify.Watch(filePath, ed.events, notify.All)
-	if err != nil {
-		return err
-	}
-	go func() {
-		for {
-			select {
-			case event := <-ed.events:
-				out.Debug("EDIT: %+v", event)
-				ed.changes += 1
-				out.Debug("modified file: %s", event.Event())
-			}
-		}
-	}()
-	return nil
-}
-
-func (ed *editor) closeWatch() (uint, error) {
-	out.Debug("EDIT: %s, %d changes.", "closing watch", ed.changes)
-	notify.Stop(ed.events)
-	changes := ed.changes
-	ed.changes = 0
-	return changes, nil
 }
 
 var guiInvoker = func(a *types.Alias, app string, args []string, opts EditOptions) error {
