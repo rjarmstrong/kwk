@@ -221,7 +221,7 @@ func (sc *snippets) Edit(uri string) error {
 	}
 	list, _, err := sc.getSnippet(uri)
 	if err != nil {
-		if errs.HasCode(err, errs.CodeNotFound) {
+		if errs.HasCode(err, errs.CodeNoSnipNamesFound) {
 			a, err := types.ParseAlias(uri)
 			if err != nil {
 				return err
@@ -276,6 +276,9 @@ func (sc *snippets) InspectListOrRun(uri string, forceView bool, args ...string)
 	rr, err := sc.s.GetRoot(sc.cxf(), &types.RootRequest{Username: a.Username, PrivateView: prefs.PrivateView})
 	if err != nil {
 		return err
+	}
+	if a.IsUsername() {
+		return sc.EWrite(out.PrintRoot(prefs, &info, rr, &principal.User))
 	}
 	if a.Ext == "" && rr.IsPouch(a.Name) {
 		p := rr.GetPouch(a.Name)

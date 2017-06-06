@@ -3,6 +3,7 @@ syntax = "proto3";
 option java_multiple_files = true;
 option java_package = "types";
 option java_outer_classname = "Users";
+import "snippets.proto";
 
 package types;
 
@@ -21,11 +22,13 @@ message ResetRequest {
 message SignInResponse {
     User user = 1;
     string accessToken = 2;
+    RootResponse root = 3;
 }
 
 message SignUpResponse {
     User user = 1;
     string accessToken = 2;
+    RootResponse root = 3;
 }
 
 message ResetResponse {
@@ -60,6 +63,7 @@ message SignInRequest {
     string password = 2;
     string email = 3;
     string key = 4;
+    bool privateView = 5; // clients should assume that this is false, unless there is a prefs file on local machine.
 }
 
 message ListUsersRequest {

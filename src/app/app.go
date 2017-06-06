@@ -54,7 +54,7 @@ func NewCLI(r io.Reader, wr io.Writer, i types.AppInfo) *KwkCLI {
 
 	// SERVICES
 	dash := NewDashBoard(w, eh, rootGetter(rpc.Cxf, sc))
-	users := NewUsers(uc, jsn, w, d, dash, rpc.Cxf)
+	users := NewUsers(uc, jsn, w, d, rootGetter(rpc.Cxf, sc), rpc.Cxf)
 	runner := runtime.NewRunner(prefs, env, w, srw, useLogger(rpc.Cxf, sc))
 	editor := runtime.NewEditor(env, prefs, snippetPatcher(rpc.Cxf, sc), srw)
 	snippets := NewSnippets(sc, runner, editor, d, w, rpc.Cxf)

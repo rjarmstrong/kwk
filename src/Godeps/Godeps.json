@@ -51,23 +51,23 @@
 		},
 		{
 			"ImportPath": "github.com/kwk-super-snippets/types",
-			"Rev": "7e9491f44680f9a5f8203b66c64cc408ab374afc"
+			"Rev": "a904b3112cd36bc4ac275a8a55046e9a54538629"
 		},
 		{
 			"ImportPath": "github.com/kwk-super-snippets/types/age",
-			"Rev": "7e9491f44680f9a5f8203b66c64cc408ab374afc"
+			"Rev": "a904b3112cd36bc4ac275a8a55046e9a54538629"
 		},
 		{
 			"ImportPath": "github.com/kwk-super-snippets/types/errs",
-			"Rev": "7e9491f44680f9a5f8203b66c64cc408ab374afc"
+			"Rev": "a904b3112cd36bc4ac275a8a55046e9a54538629"
 		},
 		{
 			"ImportPath": "github.com/kwk-super-snippets/types/valid",
-			"Rev": "7e9491f44680f9a5f8203b66c64cc408ab374afc"
+			"Rev": "a904b3112cd36bc4ac275a8a55046e9a54538629"
 		},
 		{
 			"ImportPath": "github.com/kwk-super-snippets/types/vwrite",
-			"Rev": "7e9491f44680f9a5f8203b66c64cc408ab374afc"
+			"Rev": "a904b3112cd36bc4ac275a8a55046e9a54538629"
 		},
 		{
 			"ImportPath": "github.com/lunixbochs/vtclean",

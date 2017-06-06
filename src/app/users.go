@@ -6,8 +6,8 @@ import (
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
 	"github.com/kwk-super-snippets/types/vwrite"
-	"os"
 	"github.com/kwk-super-snippets/cli/src/cli"
+	"github.com/kwk-super-snippets/cli/src/runtime"
 )
 
 type users struct {
@@ -15,12 +15,12 @@ type users struct {
 	doc    store.Doc
 	vwrite.Writer
 	Dialog
-	dash *Dashboard
 	cxf cli.ContextFunc
+	rg runtime.RootGetter
 }
 
-func NewUsers(u types.UsersClient, s store.Doc, w vwrite.Writer, d Dialog, dash *Dashboard, c cli.ContextFunc) *users {
-	return &users{client: u, doc: s, Writer: w, Dialog: d, dash: dash, cxf: c}
+func NewUsers(u types.UsersClient, s store.Doc, w vwrite.Writer, d Dialog, rg runtime.RootGetter, c cli.ContextFunc) *users {
+	return &users{client: u, doc: s, Writer: w, Dialog: d, cxf: c, rg : rg}
 }
 
 func (c *users) SignUp() error {
@@ -58,17 +58,20 @@ func (c *users) SignIn(username string, password string) error {
 		res, _ := c.FormField(out.UserPasswordField, true)
 		password = res.Value.(string)
 	}
-	u, err := c.client.SignIn(c.cxf(), &types.SignInRequest{Username: username, Password: password})
+	ures, err := c.client.SignIn(c.cxf(), &types.SignInRequest{Username: username, Password: password, PrivateView:prefs.PrivateView})
 	if err != nil {
 		return err
 	}
-	if len(u.AccessToken) > 50 {
-		err := c.doc.Upsert(cfg.UserDocName, cli.UserWithToken{AccessToken: u.AccessToken, User: *u.User})
+	principal.User = *ures.User
+	principal.AccessToken = ures.AccessToken
+
+	if len(ures.AccessToken) > 50 {
+		err := c.doc.Upsert(cfg.UserDocName, cli.UserWithToken{AccessToken: ures.AccessToken, User: *ures.User})
 		if err != nil {
 			return err
 		}
-		c.Write(out.UserSignedIn(u.User.Username))
-		c.dash.GetWriter()(os.Stdout, "", nil)
+		c.Write(out.UserSignedIn(ures.User.Username))
+		return c.EWrite(out.Dashboard(prefs, &info, ures.Root, &principal.User))
 	}
 	return nil
 }
