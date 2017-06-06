@@ -70,7 +70,6 @@ func (ed *editor) Invoke(s *types.Snippet, onchange func(a types.Snippet)) error
 	return nil
 }
 
-
 func printEditor(edArgs []string) {
 	// TASK: Move this presentation out of editor
 	editor := "default editor"
@@ -84,10 +83,20 @@ func printEditor(edArgs []string) {
 		editor = v
 		break
 	}
-	fmt.Printf("\n%s%s\n\n", style.Margin, style.Fmt16(style.Subdued, "(" + editor + ")"))
+	fmt.Printf("\n%s%s\n\n", style.Margin, style.Fmt16(style.Subdued, "("+editor+")"))
 }
 
 func (ed *editor) Close(s *types.Snippet) (uint, error) {
+	defer func() {
+		if s.Role == types.Role_Preferences || s.Role == types.Role_Environment {
+			// We want to keep these to save remote requests.
+			return
+		}
+		err := ed.file.RmDir(s.Alias.URI())
+		if err != nil {
+			out.LogErr(err)
+		}
+	}()
 	text, err := ed.file.Read(s.Alias.URI())
 	if err != nil {
 		return 0, err

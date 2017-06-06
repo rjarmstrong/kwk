@@ -27,3 +27,7 @@ func (sr *snippetReadWriter) Write(uri string, content string) (string, error) {
 func (sr *snippetReadWriter) Read(uri string) (string, error) {
 	return sr.file.Read(subDir, makePath(uri), true, 0)
 }
+
+func (sr *snippetReadWriter) RmDir(uri string) error {
+	return sr.file.RmDir(subDir, makePath(uri))
+}

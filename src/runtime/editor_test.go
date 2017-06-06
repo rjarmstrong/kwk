@@ -37,15 +37,18 @@ func Test_Editor(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 0, patcherCalled)
 	assert.Equal(t, uint(0), changes)
+	assert.Equal(t, 1, fileMock.rmDirCalled)
 
 	t.Log("If file changed Should patch file.")
 	fileMock.readVal = "changed content"
+	fileMock.rmDirCalled = 0
 	err = editor.Invoke(s, onchange)
 	assert.Nil(t, err)
 	changes, err = editor.Close(s)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, patcherCalled)
 	assert.Equal(t, uint(1), changes)
+	assert.Equal(t, 1, fileMock.rmDirCalled)
 }
 
 

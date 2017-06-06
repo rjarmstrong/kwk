@@ -86,6 +86,7 @@ func (*ehMock) Handle(err error) {
 type snippetReadWriter struct {
 	readVal         string
 	writeCalledWith []string
+	rmDirCalled int
 }
 
 func (sm *snippetReadWriter) Write(uri string, content string) (string, error) {
@@ -98,6 +99,11 @@ func (sm *snippetReadWriter) Read(uri string) (string, error) {
 		return "", errs.NotFound
 	}
 	return sm.readVal, nil
+}
+
+func (sm *snippetReadWriter) RmDir(uri string) error {
+	sm.rmDirCalled++
+	return nil
 }
 
 const testEnvString = `kwkenv: "1"

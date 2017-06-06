@@ -16,12 +16,14 @@ type File interface {
 	Write(subDirName string, suffixPath string, snippet string, incHoldingDir bool) (string, error)
 	// ReadFromFile fresherThan = get record as long as it was last modified after this unix time value in seconds.
 	Read(subDirName string, suffixPath string, incHoldingDir bool, fresherThan int64) (string, error)
+	RmDir(subDirName string, suffixPath string) error
 	DeleteAll() error
 }
 
 type SnippetReadWriter interface {
 	Write(uri string, content string) (string, error)
 	Read(uri string) (string, error)
+	RmDir(uri string) error
 }
 
 func NewDiskFile() File {
@@ -59,6 +61,15 @@ func (s *DiskFile) Read(subDirName string, suffixPath string, incHoldingDir bool
 		}
 
 	}
+}
+
+func (s *DiskFile) RmDir(subDirName string, suffixPath string) error {
+	fp := s.getFilePath(subDirName, suffixPath, true)
+	parts := strings.Split(fp, "/")
+	// Path will (probably) never be less than 3 segments so not checking length
+	dp := strings.Join(parts[0:len(parts)-1], "/")
+	out.Debug("EDIT: deleting%s", dp)
+	return os.RemoveAll(dp)
 }
 
 func (s *DiskFile) DeleteAll() error {
