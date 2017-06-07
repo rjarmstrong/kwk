@@ -2,11 +2,11 @@ package out
 
 import (
 	"fmt"
+	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/vwrite"
 	"io"
 	"strings"
-	"github.com/kwk-super-snippets/cli/src/style"
 )
 
 func SnippetDescriptionUpdated(uri string, desc string) vwrite.Handler {
@@ -31,12 +31,6 @@ func SnippetCat(s *types.Snippet) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
 		fmt.Fprintln(w, s.Content)
 	})
-}
-
-func SnippetAmbiguousCat(snippets []*types.Snippet) vwrite.Handler {
-	return Info(vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprintln(w, "That snippet name is ambiguous, please choose one of the following: ")
-	}))
 }
 
 func SnippetEdited(s *types.Snippet) vwrite.Handler {
@@ -137,7 +131,7 @@ func SnippetPouchCreatePrompt() vwrite.Handler {
 }
 
 func SnippetView(prefs *Prefs, s *types.Snippet) vwrite.Handler {
-	return Info(vwrite.HandlerFunc(func(w io.Writer) {
+	return vwrite.HandlerFunc(func(w io.Writer) {
 		printSnippetView(w, prefs, s)
-	}))
+	})
 }

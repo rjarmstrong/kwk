@@ -1,21 +1,20 @@
 package runtime
 
 import (
-	"testing"
-	"gopkg.in/yaml.v2"
+	"crypto/sha256"
+	"fmt"
 	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/types"
 	"github.com/stretchr/testify/assert"
-	"crypto/sha256"
-	"fmt"
+	"gopkg.in/yaml.v2"
+	"testing"
 )
 
 var content = "some content"
 
 func Test_Editor(t *testing.T) {
 	out.DebugEnabled = true
-	fileMock := &snippetReadWriter{
-	}
+	fileMock := &snippetReadWriter{}
 	//username := "test-man"
 	env := &yaml.MapSlice{}
 	prefs := &out.Prefs{}
@@ -51,8 +50,7 @@ func Test_Editor(t *testing.T) {
 	assert.Equal(t, 1, fileMock.rmDirCalled)
 }
 
-
-var mockRunner = func (a *types.Alias, app string, args []string, opts EditOptions) error {
+var mockRunner = func(a *types.Alias, app string, args []string, opts EditOptions) error {
 	return nil
 }
 

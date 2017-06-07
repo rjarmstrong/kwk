@@ -1,17 +1,15 @@
-package app
+package store
 
 import (
-	"github.com/kwk-super-snippets/cli/src/store"
-	//"strings"
 	"strings"
 )
 
-func NewSnippetReadWriter(file store.File) store.SnippetReadWriter {
+func NewSnippetReadWriter(file File) SnippetReadWriter {
 	return &snippetReadWriter{file: file}
 }
 
 type snippetReadWriter struct {
-    file store.File
+	file File
 }
 
 const subDir = "snippets"

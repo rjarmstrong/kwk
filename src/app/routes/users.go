@@ -1,12 +1,13 @@
-package app
+package routes
 
 import (
 	"fmt"
+	"github.com/kwk-super-snippets/cli/src/app/handlers"
 	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/urfave/cli"
 )
 
-func userRoutes(a *users) []cli.Command {
+func Users(a *handlers.Users) []cli.Command {
 	cat := fmt.Sprintf("  %s  Account", style.Fmt256(style.ColorPouchCyan, style.IconAccount))
 	c := []cli.Command{
 		{
@@ -22,7 +23,7 @@ func userRoutes(a *users) []cli.Command {
 			Name:     "login",
 			Usage:    "Login to kwk using username and password",
 			Action: func(c *cli.Context) error {
-				return a.SignIn(c.Args().Get(0), c.Args().Get(1))
+				return a.LogIn(c.Args().Get(0), c.Args().Get(1))
 			},
 		},
 		{
@@ -30,7 +31,7 @@ func userRoutes(a *users) []cli.Command {
 			Usage:    "Logout from kwk and remove all locally cached data",
 			Name:     "logout",
 			Action: func(c *cli.Context) error {
-				return a.SignOut()
+				return a.LogOut()
 			},
 		},
 		{

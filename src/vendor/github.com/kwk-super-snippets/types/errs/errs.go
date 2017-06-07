@@ -33,7 +33,6 @@ const (
 	CodeSnippetNotYetConsistent      ErrCode = 3130
 	CodeBothNameAndExtensionRequired ErrCode = 3150
 	CodeNoSnipNamesProvided          ErrCode = 3160
-	CodeNoSnipNamesFound             ErrCode = 3170
 	CodeListCategoryNotFound         ErrCode = 3180
 	CodeSpecifiedVersionNotPermitted ErrCode = 3185
 

@@ -1,13 +1,13 @@
 package rpc
 
 import (
-	"github.com/kwk-super-snippets/types"
-	"os"
-	"testing"
 	"bytes"
-	"github.com/stretchr/testify/assert"
-	"os/exec"
 	"github.com/kwk-super-snippets/cli/src/cli"
+	"github.com/kwk-super-snippets/types"
+	"github.com/stretchr/testify/assert"
+	"os"
+	"os/exec"
+	"testing"
 )
 
 func TestMain(m *testing.M) {
@@ -22,7 +22,7 @@ func Test_Grpc(t *testing.T) {
 	pr := &cli.UserWithToken{}
 	info := &types.AppInfo{}
 
-	cc, err := GetRpc(pr, info,"localhost:8000", true)
+	cc, err := GetRpc(pr, info, "localhost:8000", true)
 	assert.Equal(t, nil, err)
 	uc := types.NewUsersClient(cc)
 

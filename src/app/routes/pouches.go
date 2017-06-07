@@ -1,12 +1,14 @@
-package app
+package routes
 
 import (
 	"fmt"
+	"github.com/kwk-super-snippets/cli/src/app/handlers"
+	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/urfave/cli"
 )
 
-func pouchRoutes(s *snippets) []cli.Command {
+func Pouches(prefs *out.Prefs, s *handlers.Snippets) []cli.Command {
 	cat := fmt.Sprintf("\n     %s  Pouches", style.Fmt256(style.ColorPouchCyan, style.IconPouch))
 	spc := "  "
 	c := []cli.Command{

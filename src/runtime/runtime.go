@@ -3,21 +3,21 @@ package runtime
 import (
 	"fmt"
 	"github.com/kwk-super-snippets/cli/src/out"
+	"github.com/kwk-super-snippets/cli/src/store"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
 	"gopkg.in/yaml.v2"
-	"github.com/kwk-super-snippets/cli/src/store"
 )
 
 type Runtime struct {
 	errs.Handler
-	sg         SnippetGetter
-	sm         SnippetMaker
-	file       store.SnippetReadWriter
+	sg   SnippetGetter
+	sm   SnippetMaker
+	file store.SnippetReadWriter
 }
 
 var (
-	envAlias *types.Alias
+	envAlias   *types.Alias
 	prefsAlias *types.Alias
 )
 

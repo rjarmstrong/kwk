@@ -1,45 +1,62 @@
-package app
+package handlers
 
 import (
+	"github.com/kwk-super-snippets/cli/src/cli"
 	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/cli/src/store"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
 	"github.com/kwk-super-snippets/types/vwrite"
-	"github.com/kwk-super-snippets/cli/src/cli"
-	"github.com/kwk-super-snippets/cli/src/runtime"
 )
 
-type users struct {
+const userDocName = "user"
+
+type Users struct {
 	client types.UsersClient
 	doc    store.Doc
 	vwrite.Writer
-	Dialog
-	cxf cli.ContextFunc
-	rg runtime.RootGetter
+	out.Dialog
+	cxf         cli.ContextFunc
+	pr          *cli.UserWithToken
+	prefs       *out.Prefs
+	rootPrinter cli.RootPrinter
 }
 
-func NewUsers(u types.UsersClient, s store.Doc, w vwrite.Writer, d Dialog, rg runtime.RootGetter, c cli.ContextFunc) *users {
-	return &users{client: u, doc: s, Writer: w, Dialog: d, cxf: c, rg : rg}
+func NewUsers(pr *cli.UserWithToken, uc types.UsersClient, doc store.Doc, w vwrite.Writer,
+	d out.Dialog, c cli.ContextFunc, prefs *out.Prefs, rp cli.RootPrinter) *Users {
+
+	return &Users{
+		prefs:       prefs,
+		pr:          pr,
+		client:      uc,
+		doc:         doc,
+		Writer:      w,
+		Dialog:      d,
+		cxf:         c,
+		rootPrinter: rp,
+	}
 }
 
-func (c *users) SignUp() error {
+// SignUp
+func (c *Users) SignUp() error {
+	// TASK: Add dynamic 'exists' checks
 	res, _ := c.FormField(out.UserEmailField, false)
 	email := res.Value.(string)
 	res, _ = c.FormField(out.UserUsernameField, false)
 	username := res.Value.(string)
+	// TASK: Add client side validation check
 	res, _ = c.FormField(out.UserPasswordField, true)
 	password := res.Value.(string)
-	res, _ = c.FormField(out.UserInviteTokenField, false)
-	inviteCode := res.Value.(string)
+	//res, _ = c.FormField(out.UserInviteTokenField, false)
+	//inviteCode := res.Value.(string)
 
-	req := &types.SignUpRequest{Email: email, Username: username, Password: password, InviteCode: inviteCode}
+	req := &types.SignUpRequest{Email: email, Username: username, Password: password}
 	u, err := c.client.SignUp(c.cxf(), req)
 	if err != nil {
 		return err
 	}
 	if len(u.AccessToken) > 50 {
-		err := c.doc.Upsert(cfg.UserDocName, cli.UserWithToken{AccessToken: u.AccessToken, User: *u.User})
+		err := c.doc.Upsert(userDocName, cli.UserWithToken{AccessToken: u.AccessToken, User: *u.User})
 		if err != nil {
 			return err
 		}
@@ -48,7 +65,8 @@ func (c *users) SignUp() error {
 	return nil
 }
 
-func (c *users) SignIn(username string, password string) error {
+// LogIn
+func (c *Users) LogIn(username string, password string) error {
 	if username == "" {
 		res, _ := c.FormField(out.UserUsernameField, false)
 		username = res.Value.(string)
@@ -58,25 +76,28 @@ func (c *users) SignIn(username string, password string) error {
 		res, _ := c.FormField(out.UserPasswordField, true)
 		password = res.Value.(string)
 	}
-	ures, err := c.client.SignIn(c.cxf(), &types.SignInRequest{Username: username, Password: password, PrivateView:prefs.PrivateView})
+	ures, err := c.client.SignIn(c.cxf(),
+		&types.SignInRequest{Username: username, Password: password, PrivateView: c.prefs.PrivateView})
 	if err != nil {
 		return err
 	}
-	principal.User = *ures.User
-	principal.AccessToken = ures.AccessToken
+	c.pr.User = *ures.User
+	c.pr.AccessToken = ures.AccessToken
 
 	if len(ures.AccessToken) > 50 {
-		err := c.doc.Upsert(cfg.UserDocName, cli.UserWithToken{AccessToken: ures.AccessToken, User: *ures.User})
+		err := c.doc.Upsert(userDocName, cli.UserWithToken{AccessToken: ures.AccessToken, User: *ures.User})
 		if err != nil {
 			return err
 		}
 		c.Write(out.UserSignedIn(ures.User.Username))
-		return c.EWrite(out.Dashboard(prefs, &info, ures.Root, &principal.User))
+		// TASK: RootPrinter should be in UserSignedIn
+		return c.rootPrinter(ures.Root)
 	}
 	return nil
 }
 
-func (c *users) SignOut() error {
+// LogOut
+func (c *Users) LogOut() error {
 	err := c.doc.DeleteAll()
 	if err != nil {
 		return err
@@ -84,13 +105,15 @@ func (c *users) SignOut() error {
 	return c.EWrite(out.UserSignedOut)
 }
 
-func (c *users) ChangePassword() error {
+// ChangePassword
+func (c *Users) ChangePassword() error {
 	p := &types.ChangeRequest{}
 	res, _ := c.Dialog.FormField(out.FreeText("Please provide an email or username: "), false)
 	p.Username = res.Value.(string)
 
 	res, _ = c.FormField(out.FreeText("Current password: "), true)
 	p.ExistingPassword = res.Value.(string)
+	// TASK: Client side validation
 	res, _ = c.FormField(out.FreeText("New password: "), true)
 	p.NewPassword = res.Value.(string)
 	_, err := c.client.ChangePassword(c.cxf(), p)
@@ -100,7 +123,8 @@ func (c *users) ChangePassword() error {
 	return c.EWrite(out.UserPasswordChanged)
 }
 
-func (c *users) ResetPassword(email string) error {
+// ResetPassword
+func (c *Users) ResetPassword(email string) error {
 	if email == "" {
 		res, _ := c.FormField(out.FreeText("Enter your email to reset your password:  "), false)
 		email = res.Value.(string)
@@ -113,9 +137,15 @@ func (c *users) ResetPassword(email string) error {
 	return c.EWrite(out.UserPasswordResetSent(email))
 }
 
-func (c *users) Profile() error {
-	if principal == nil {
+// Profile
+func (c *Users) Profile() error {
+	if c.pr == nil {
 		return errs.NotAuthenticated
 	}
-	return c.EWrite(out.UserProfile(&principal.User))
+	return c.EWrite(out.UserProfile(&c.pr.User))
+}
+
+// LoadPrincipal load the currently signed in user from cache.
+func (c *Users) LoadPrincipal(pr *cli.UserWithToken) {
+	c.doc.Get(userDocName, pr, 0)
 }

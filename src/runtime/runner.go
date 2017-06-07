@@ -15,10 +15,10 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	rt "runtime"
 	"strings"
 	"syscall"
 	"time"
-	rt "runtime"
 )
 
 type Runner interface {
@@ -34,7 +34,7 @@ type runner struct {
 }
 
 func NewRunner(prefs *out.Prefs, env *yaml.MapSlice, w vwrite.Writer, f store.SnippetReadWriter, ul UseLogger) Runner {
-	return &runner{prefs:prefs, env: env, file: f, w: w, ul: ul}
+	return &runner{prefs: prefs, env: env, file: f, w: w, ul: ul}
 }
 
 func (r *runner) Run(s *types.Snippet, args []string) error {

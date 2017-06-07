@@ -1,12 +1,12 @@
 package runtime
 
 import (
-	"testing"
-	"gopkg.in/yaml.v2"
 	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/types"
-	"github.com/stretchr/testify/assert"
 	"github.com/kwk-super-snippets/types/errs"
+	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v2"
+	"testing"
 )
 
 func Test_Runtime(t *testing.T) {
@@ -27,28 +27,27 @@ func Test_Runtime(t *testing.T) {
 
 	t.Log("Logged in and found in local cache")
 	fileMock.readVal = getPrefsAsString(out.Prefs{ExpandedThumbRows: 7})
-	Configure(env, prefs, username, getter(nil), maker(nil),  fileMock, eh)
+	Configure(env, prefs, username, getter(nil), maker(nil), fileMock, eh)
 	assert.EqualValues(t, 7, prefs.ExpandedThumbRows)
 
 	fileMock.readVal = testEnvString
-	Configure(env, prefs, username, getter(nil), maker(nil),  fileMock, eh)
+	Configure(env, prefs, username, getter(nil), maker(nil), fileMock, eh)
 	assert.EqualValues(t, testEnv, env)
 
 	t.Log("Not found in local cache but found remote")
 	fileMock.readVal = ""
 	var makerCalled int
 	var getterCalled int
-	Configure(env, prefs, username, getter(&getterCalled), maker(&makerCalled),  fileMock, eh)
+	Configure(env, prefs, username, getter(&getterCalled), maker(&makerCalled), fileMock, eh)
 	assert.EqualValues(t, 16, prefs.SnippetThumbRows)
 	assert.EqualValues(t, testEnv, env)
 	assert.EqualValues(t, 2, getterCalled)
 	assert.EqualValues(t, 0, makerCalled)
 
-
 	t.Log("Remote Not found, creates snippet with default content and writes to local cache")
 	fileMock.readVal = ""
 	fileMock.writeCalledWith = []string{}
-	Configure(env, prefs, username, nilGetter, maker(&makerCalled),  fileMock, eh)
+	Configure(env, prefs, username, nilGetter, maker(&makerCalled), fileMock, eh)
 	assert.Equal(t, 2, makerCalled)
 	makerCalled = 0
 	// Write called twice, we are only checking the most recent call here
@@ -59,7 +58,7 @@ var nilGetter = func(req *types.GetRequest) (*types.ListResponse, error) {
 	return nil, errs.NotFound
 }
 
-var getter = func (called *int) SnippetGetter {
+var getter = func(called *int) SnippetGetter {
 	return func(req *types.GetRequest) (*types.ListResponse, error) {
 		*called += 1
 		if req.Alias.Name == "prefs" {
@@ -86,7 +85,7 @@ func (*ehMock) Handle(err error) {
 type snippetReadWriter struct {
 	readVal         string
 	writeCalledWith []string
-	rmDirCalled int
+	rmDirCalled     int
 }
 
 func (sm *snippetReadWriter) Write(uri string, content string) (string, error) {

@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"fmt"
 	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/cli/src/store"
+	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/errs"
 	"gopkg.in/yaml.v2"
@@ -13,8 +15,6 @@ import (
 	"os/exec"
 	"strings"
 	"time"
-	"fmt"
-	"github.com/kwk-super-snippets/cli/src/style"
 )
 
 type Editor interface {

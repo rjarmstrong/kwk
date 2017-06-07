@@ -3,6 +3,8 @@ package main
 import (
 	gu "github.com/inconshreveable/go-update"
 	"github.com/kwk-super-snippets/cli/src/app"
+	"github.com/kwk-super-snippets/cli/src/app/routes"
+	"github.com/kwk-super-snippets/cli/src/cli"
 	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/cli/src/store"
 	"github.com/kwk-super-snippets/cli/src/updater"
@@ -10,7 +12,6 @@ import (
 	"os"
 	"runtime/pprof"
 	"strconv"
-	"github.com/kwk-super-snippets/cli/src/cli"
 )
 
 var (
@@ -26,20 +27,20 @@ func main() {
 	}
 	info := getAppInfo()
 
-	// If update argument supplied then we don't want to run the app
-	// rather actually run the update.
+	// If update argument supplied then we don't want to run the app rather actually run the update.
 	if isUpdateMode() {
 		runUpdate(cfg, info)
 		return
 	}
 
-	cli := app.NewCLI(os.Stdin, os.Stdout, info)
-	if cli == nil {
+	kwkCLI := app.NewCLI(os.Stdin, os.Stdout, info)
+	if kwkCLI == nil {
 		return
 	}
 
-	cli.Run(os.Args...)
-	// If update argument not supplied then run update in a new process.
+	kwkCLI.Run(os.Args...)
+
+	// If update argument not supplied then always run update.
 	updater.SpawnUpdate()
 }
 
@@ -55,7 +56,7 @@ func runUpdate(cfg *cli.AppConfig, info types.AppInfo) {
 }
 
 func isUpdateMode() bool {
-	ok := len(os.Args) == 2 && os.Args[1] == updater.UpdateFlag
+	ok := routes.FirstIs(updater.Command)
 	if ok {
 		out.DebugLogger.SetPrefix("KWK:UM: ")
 	}

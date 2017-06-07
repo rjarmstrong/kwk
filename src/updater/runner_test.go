@@ -1,16 +1,15 @@
 package updater
 
 import (
-	"testing"
-	"github.com/kwk-super-snippets/types/errs"
-	gu "github.com/inconshreveable/go-update"
-	"strings"
-	"io/ioutil"
-	"io"
-	"github.com/stretchr/testify/assert"
 	"errors"
+	gu "github.com/inconshreveable/go-update"
+	"github.com/kwk-super-snippets/types/errs"
+	"github.com/stretchr/testify/assert"
+	"io"
+	"io/ioutil"
+	"strings"
+	"testing"
 )
-
 
 func TestRunner_Run(t *testing.T) {
 	am := &ApplierMock{}
@@ -55,21 +54,20 @@ func TestRunner_Run(t *testing.T) {
 
 	// //TODO: Run on ad-hoc basis
 	//Convey(`Test remoter info and bin downloader`, func() {
-		//r := S3Remoter{}
-		//ri, err := r.LatestInfo()
-		//So(err, ShouldBeNil)
-		//So(ri.Version, ShouldEqual, "1.2.3")
-		//So(ri.Build, ShouldEqual, "12")
-		//So(ri.Time, ShouldEqual, 233423423)
-		//So(ri.Notes, ShouldResemble, "Feature A\nFeature B\n")
-		//rdr, err := r.LatestBinary()
-		//So(err, ShouldBeNil)
-		//out, err := os.Create("kwk")
-		//So(err, ShouldBeNil)
-		//io.Copy(out, rdr)
+	//r := S3Remoter{}
+	//ri, err := r.LatestInfo()
+	//So(err, ShouldBeNil)
+	//So(ri.Version, ShouldEqual, "1.2.3")
+	//So(ri.Build, ShouldEqual, "12")
+	//So(ri.Time, ShouldEqual, 233423423)
+	//So(ri.Notes, ShouldResemble, "Feature A\nFeature B\n")
+	//rdr, err := r.LatestBinary()
+	//So(err, ShouldBeNil)
+	//out, err := os.Create("kwk")
+	//So(err, ShouldBeNil)
+	//io.Copy(out, rdr)
 	//})
 }
-
 
 type DocMock struct {
 	GetErr      error

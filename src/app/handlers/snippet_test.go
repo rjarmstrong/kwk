@@ -1,10 +1,59 @@
-package app
+package handlers
 
-//func Test_Snippet(t *testing.T) {
-//	Convey("SNIPPET CLI", t, func() {
+import (
+	"github.com/kwk-super-snippets/types"
+	"github.com/kwk-super-snippets/types/errs"
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
+
+func TestSnippets_Create(t *testing.T) {
+	var cases = []struct {
+		args    []string
+		pipe    bool
+		content string
+		code    errs.ErrCode
+	}{
+		{args: []string{"content"}, pipe: false, code: errs.CodeInvalidArgument},
+		{args: []string{"conte$nt"}, pipe: false, code: errs.CodeInvalidArgument},
+		{args: []string{"pouch/name"}, pipe: false, content: ""},
+		{args: []string{"pouch/name", "content"}, pipe: false, content: "content"},
+		{args: []string{"content", "pouch/name"}, pipe: false, content: "content"},
+		{args: []string{"content", "name"}, pipe: false, code: errs.CodeInvalidArgument},
+		{args: []string{"pouch/name", "pouch/name"}, pipe: false, code: errs.CodeInvalidArgument},
+		{args: []string{"pouch$)/name", "content"}, pipe: false, code: errs.CodeInvalidPouchName},
+	}
+
+	for _, c := range cases {
+		err := snippets.Create(c.args, c.pipe)
+		if err != nil {
+			assert.True(t, errs.HasCode(err, c.code), "Case: %+v %+v", err.(*errs.Error).Code, c)
+			snippetClient.PopCalled("Create")
+			continue
+		}
+		requestContent := snippetClient.PopCalled("Create").(*types.CreateRequest).Content
+		assert.Equal(t, c.content, requestContent, "Case: %+v", c)
+	}
+}
+
+func TestSnippets_Search(t *testing.T) {
+	prefs.PrivateView = true
+	un := "username1"
+	err := snippets.Search(un, "term")
+	assert.Nil(t, err)
+	req := snippetClient.PopCalled("Alpha").(*types.AlphaRequest)
+	assert.Equal(t, true, req.PrivateView)
+	assert.Equal(t, un, req.Username)
+
+	prefs.PrivateView = false
+	err = snippets.Search(un, "term")
+	assert.Nil(t, err)
+	req = snippetClient.PopCalled("Alpha").(*types.AlphaRequest)
+	assert.Equal(t, false, req.PrivateView)
+}
 
 //username := "richard"
-
+//
 //Convey(`Snippet Running`, func() {
 //	Convey(`Should call 'run' and open if found`, func() {
 //		a := models.NewAlias(username, "", "hola", "js")

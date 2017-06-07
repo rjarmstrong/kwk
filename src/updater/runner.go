@@ -13,7 +13,7 @@ import (
 
 const (
 	recordFile = `updateRecord`
-	UpdateFlag = `--update`
+	Command    = `@update`
 )
 
 // SilentUpdate spawns a new process to check for updates and runs.
@@ -24,7 +24,7 @@ func SpawnUpdate() {
 		out.Debug("If you are running nacl or OpenBSD they are not supported.")
 		out.LogErr(err)
 	}
-	exe(cmd, UpdateFlag)
+	exe(cmd, Command)
 }
 
 type Runner interface {

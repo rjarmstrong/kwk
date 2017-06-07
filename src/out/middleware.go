@@ -7,7 +7,6 @@ import (
 	"io"
 )
 
-
 func Fatal(h vwrite.Handler) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
 		fmt.Fprintf(w, "%s  ", style.Fire)
@@ -31,7 +30,7 @@ func Success(h vwrite.Handler) vwrite.Handler {
 
 func Info(h vwrite.Handler) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprintf(w, "%s%s  ", style.Margin, style.InfoDeskPerson)
+		fmt.Fprintf(w, "%s%s  ", style.Margin, style.Info)
 		h.Write(w)
 	})
 }

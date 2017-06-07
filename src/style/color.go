@@ -80,7 +80,7 @@ const (
 	IconCross        = "✘" // 2718
 	IconPrivatePouch = "◤"
 	IconBroke        = "▦"
-	InfoDeskPerson   = "\xF0\x9F\x92\x81"
+	Info             = "Ⓘ"
 	IconAccount      = "◉"
 
 	ColorBrightRed      types.AnsiCode = 196

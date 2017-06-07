@@ -1,6 +1,5 @@
 package runtime
 
-
 const defaultEnvString = `kwkenv: "1"
 editors:
 #  Specify one app for each file type to edit.

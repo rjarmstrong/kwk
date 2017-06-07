@@ -1,12 +1,15 @@
-package app
+package routes
 
 import (
 	"fmt"
+	"github.com/kwk-super-snippets/cli/src/app/handlers"
+	kwkCli "github.com/kwk-super-snippets/cli/src/cli"
+	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/urfave/cli"
 )
 
-func snippetsRoutes(s *snippets) []cli.Command {
+func Snippets(pr kwkCli.UserWithToken, prefs *out.Prefs, s *handlers.Snippets) []cli.Command {
 	cat := fmt.Sprintf("  %s  Snippets", style.Fmt256(style.ColorPouchCyan, style.IconSnippet))
 	spc := "  "
 	c := []cli.Command{
@@ -53,7 +56,7 @@ func snippetsRoutes(s *snippets) []cli.Command {
 			Aliases:  []string{"f"},
 			Action: func(c *cli.Context) error {
 				args := []string(c.Args())
-				return s.Search(args...)
+				return s.Search(pr.User.Username, args...)
 			},
 		},
 		{
@@ -134,10 +137,10 @@ func snippetsRoutes(s *snippets) []cli.Command {
 		},
 		{
 			Category: cat,
-			Name:     "enchilada",
+			Name:     "dump",
 			Usage:    spc + "List all snippets 'un-pouched', useful for exporting or for other bulk management",
 			Action: func(c *cli.Context) error {
-				return s.Flatten(c.Args().First())
+				return s.Dump(c.Args().First())
 			},
 		},
 		{
@@ -159,14 +162,6 @@ func snippetsRoutes(s *snippets) []cli.Command {
 
 			},
 		},
-		//{
-		//	Name:    "share",
-		//	Aliases: []string{"send"},
-		//	Action: func(c *cli.Context) error {
-		//		return s.Share(c.Args().First(), c.Args().Get(2))
-		//
-		//	},
-		//},
 	}
 	return c
 }

@@ -1,6 +1,7 @@
 package runtime
 
 import (
+	"errors"
 	"fmt"
 	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/types"
@@ -8,9 +9,9 @@ import (
 	"log"
 	"os"
 	"strings"
-	"errors"
 )
 
+// TASK: These probably bet in cli package
 type SnippetPatcher func(req *types.PatchRequest) (*types.PatchResponse, error)
 type SnippetGetter func(req *types.GetRequest) (*types.ListResponse, error)
 type SnippetMaker func(req *types.CreateRequest) error

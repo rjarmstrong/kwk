@@ -1,11 +1,11 @@
 package app
 
 import (
-	"github.com/kelseyhightower/envconfig"
-	"github.com/kwk-super-snippets/cli/src/out"
 	"encoding/json"
-	"log"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/kwk-super-snippets/cli/src/cli"
+	"github.com/kwk-super-snippets/cli/src/out"
+	"log"
 )
 
 func GetConfig() *cli.AppConfig {
@@ -14,8 +14,8 @@ func GetConfig() *cli.AppConfig {
 		log.Fatal(err.Error())
 	}
 	out.DebugEnabled = cfg.Debug
-	if cfg.TestMode {
-		cfg.APIHost = "localhost:8000"
+	if cfg.TestMode && cfg.APIHost != cli.DefaultApiHost {
+		cfg.APIHost = cli.DefaultTestApiHost
 	}
 	b, _ := json.MarshalIndent(cfg, "", "  ")
 	out.Debug("CONFIG: %s", string(b))

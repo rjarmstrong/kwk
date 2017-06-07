@@ -5,10 +5,10 @@ import (
 	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/types/errs"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"strings"
-	"log"
 )
 
 type File interface {

@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	"github.com/kwk-super-snippets/cli/src/cli"
 	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/cli/src/style"
 	"github.com/kwk-super-snippets/types"
@@ -20,7 +21,6 @@ import (
 	"os"
 	"runtime"
 	"time"
-	"github.com/kwk-super-snippets/cli/src/cli"
 )
 
 // /etc/ssl/certs/COMODO_RSA_Certification_Authority.pem
@@ -65,13 +65,12 @@ var (
 
 type Rpc struct {
 	*grpc.ClientConn
-	pr *cli.UserWithToken
+	pr      *cli.UserWithToken
 	cliInfo *types.AppInfo
 }
 
-
 func GetRpc(pr *cli.UserWithToken, cliInfo *types.AppInfo, serverAddress string, trustAllCerts bool) (*Rpc, error) {
-	rpc := &Rpc{pr:pr, cliInfo:cliInfo}
+	rpc := &Rpc{pr: pr, cliInfo: cliInfo}
 
 	var opts []grpc.DialOption
 
