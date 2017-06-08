@@ -29,7 +29,7 @@ func DefaultRoute(info *types.AppInfo, snippets *handlers.Snippets, eh errs.Hand
 		case "e":
 			err = snippets.Edit(c.Args().First())
 		default:
-			err = snippets.InspectListOrRun(c.Args().First(), false, []string(c.Args())[1:]...)
+			err = snippets.ViewListOrRun(c.Args().First(), false, []string(c.Args())[1:]...)
 		}
 		if err != nil {
 			eh.Handle(err)

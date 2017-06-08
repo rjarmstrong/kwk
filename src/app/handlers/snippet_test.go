@@ -52,6 +52,32 @@ func TestSnippets_Search(t *testing.T) {
 	assert.Equal(t, false, req.PrivateView)
 }
 
+func TestSnippets_ViewListOrRun(t *testing.T) {
+	var cases = []struct {
+		uri  string
+		args []string
+		view bool
+		code errs.ErrCode
+		handler string
+	}{
+		{uri : "hello", args: []string{}, view: true, code: 0, handler : "SnippetView" },
+	}
+	for _, c := range cases {
+		err := snippets.ViewListOrRun(c.uri, c.view, c.args...)
+		if err != nil {
+			if !errs.HasCode(err, c.code) {
+				t.Errorf( "Case: %+v %+v", err, c)
+			}
+			snippetClient.PopCalled("Get")
+			continue
+		}
+		uri := snippetClient.PopCalled("Get").(*types.GetRequest).Alias.URI()
+		assert.Equal(t, c.uri, uri, "Case: %+v", c)
+		handler := writer.PopCalled("EWrite")
+		assert.Equal(t, c.handler, handler, "Case: %+v", c)
+	}
+}
+
 //username := "richard"
 //
 //Convey(`Snippet Running`, func() {

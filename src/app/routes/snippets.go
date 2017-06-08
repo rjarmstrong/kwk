@@ -35,7 +35,7 @@ func Snippets(pr kwkCli.UserWithToken, prefs *out.Prefs, s *handlers.Snippets) [
 			Aliases:  []string{"v"},
 			Usage:    spc + "View details of snippet",
 			Action: func(c *cli.Context) error {
-				return s.InspectListOrRun(c.Args().First(), true)
+				return s.ViewListOrRun(c.Args().First(), true)
 
 			},
 		},

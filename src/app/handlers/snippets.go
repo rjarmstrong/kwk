@@ -64,7 +64,7 @@ func (sc *Snippets) RunNode(node *runtime.ProcessNode, uri string, args []string
 		}
 		return err
 	}
-	s := sc.SnippetChooser(list.Items)
+	s := sc.ChooseSnippet(list.Items)
 	if s == nil {
 		return sc.EWrite(out.NotFoundInApp(node.URI, uri))
 	}
@@ -168,7 +168,7 @@ func (sc *Snippets) Describe(uri string, description string) error {
 	return sc.EWrite(out.SnippetDescriptionUpdated(alias.String(), description))
 }
 
-func (sc *Snippets) InspectListOrRun(uri string, forceView bool, args ...string) error {
+func (sc *Snippets) ViewListOrRun(uri string, forceView bool, args ...string) error {
 	// TASK: refactor into parts
 	a, err := types.ParseAlias(uri)
 	if err != nil {
@@ -200,14 +200,13 @@ func (sc *Snippets) InspectListOrRun(uri string, forceView bool, args ...string)
 	if err != nil {
 		return sc.suggest(uri, sc.runner.Run)
 	}
-	s := sc.SnippetChooser(list.Items)
+	s := sc.ChooseSnippet(list.Items)
 	if s == nil {
 		return out.LogErrM("Snippet not found", errs.NotFound)
 	}
 	if forceView || sc.prefs.RequireRunKeyword {
 		out.Debug("RUN KEYWORD REQUIRED, VIEWING.")
-		sc.Write(out.SnippetView(sc.prefs, s))
-		return nil
+		return sc.EWrite(out.SnippetView(sc.prefs, s))
 	}
 	return sc.runner.Run(s, args)
 }
@@ -286,7 +285,7 @@ func (sc *Snippets) Cat(uri string) error {
 		}
 		return nil
 	}
-	snippet := sc.Dialog.SnippetChooser(list.Items)
+	snippet := sc.Dialog.ChooseSnippet(list.Items)
 	if snippet != nil {
 		return sc.EWrite(out.SnippetCat(list.Items[0]))
 	}
@@ -454,7 +453,7 @@ func (sc *Snippets) suggest(term string, onSelect func(s *types.Snippet, args []
 	for _, v := range res.Results {
 		snips = append(snips, v.Snippet)
 	}
-	res2 := sc.Dialog.SnippetChooser(snips)
+	res2 := sc.Dialog.ChooseSnippet(snips)
 	if err != nil {
 		return err
 	}
@@ -484,7 +483,7 @@ func (sc *Snippets) getSnippet(uri string) (*types.Snippet, error) {
 		}
 		return nil, err
 	}
-	return sc.SnippetChooser(list.Items), nil
+	return sc.ChooseSnippet(list.Items), nil
 }
 
 func (sc *Snippets) renameSnippet(uri string, newSnipName string) (*types.Snippet, *types.SnipName, error) {

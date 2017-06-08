@@ -17,7 +17,7 @@ type Dialog interface {
 
 	FormField(field vwrite.Handler, mask bool) (*DialogResponse, error)
 
-	SnippetChooser(s []*types.Snippet) *types.Snippet
+	ChooseSnippet(s []*types.Snippet) *types.Snippet
 }
 
 // Dialogue Response carries the users input back to the calling code.
@@ -48,8 +48,8 @@ func (d *StdDialog) Modal(handler vwrite.Handler, autoYes bool) *DialogResponse 
 	return r
 }
 
-// SnippetChooser is similar to MultiChoice but returns immediately if there is only one snippet
-func (d *StdDialog) SnippetChooser(s []*types.Snippet) *types.Snippet {
+// ChooseSnippet is similar to MultiChoice but returns immediately if there is only one snippet
+func (d *StdDialog) ChooseSnippet(s []*types.Snippet) *types.Snippet {
 	if len(s) == 1 {
 		return s[0]
 	} else if len(s) > 1 {

@@ -10,6 +10,9 @@ import (
 	"google.golang.org/grpc"
 	"os"
 	"testing"
+	"reflect"
+	rt "runtime"
+	"strings"
 )
 
 var (
@@ -17,7 +20,7 @@ var (
 	runner        runtime.Runner
 	ed            runtime.Editor
 	dlg           out.Dialog
-	writer        vwrite.Writer
+	writer        *fakeWWriter
 	cxf           cli.ContextFunc
 	prefs         *out.Prefs
 	rootPrinter   cli.RootPrinter
@@ -28,9 +31,9 @@ func TestMain(m *testing.M) {
 
 	snippetClient = &fakeSnipClient{called: map[string]interface{}{}}
 	runner = &fakeRunner{}
-	dlg = &fakeDialogue{}
+	dlg = &fakeDialogue{called: map[string]interface{}{}}
 	ed = &fakeEditor{}
-	writer = &fakeWWriter{}
+	writer = &fakeWWriter{called: map[string]interface{}{}}
 	cxf = func() context.Context {
 		return context.Background()
 	}
@@ -46,15 +49,26 @@ func TestMain(m *testing.M) {
 }
 
 type fakeWWriter struct {
+	called map[string]interface{}
 }
 
-func (*fakeWWriter) Write(p vwrite.Handler) {
-
+func (fc *fakeWWriter) Write(p vwrite.Handler) {
+	fc.called["Write"] = p
 }
 
-func (*fakeWWriter) EWrite(p vwrite.Handler) error {
+func (fc *fakeWWriter) EWrite(p vwrite.Handler) error {
+	tn := rt.FuncForPC(reflect.ValueOf(p).Pointer()).Name()
+	prefix := "github.com/kwk-super-snippets/cli/src/"
+	fc.called["EWrite"] = strings.Split(strings.Replace(tn, prefix, "", -1), ".")[1]
 	return nil
 }
+
+func (fc *fakeWWriter) PopCalled(name string) interface{} {
+	c := fc.called[name]
+	delete(fc.called, name)
+	return c
+}
+
 
 type fakeEditor struct {
 }
@@ -68,17 +82,22 @@ func (*fakeEditor) Close(s *types.Snippet) (uint, error) {
 }
 
 type fakeDialogue struct {
+	called map[string]interface{}
 }
 
-func (*fakeDialogue) SnippetChooser(s []*types.Snippet) *types.Snippet {
+func (fc *fakeDialogue) ChooseSnippet(s []*types.Snippet) *types.Snippet {
+	fc.called["ChooseSnippet"] = s
+	if len(s) == 0 {
+		return nil
+	}
+	return s[0]
+}
+
+func (fc *fakeDialogue) Modal(handler vwrite.Handler, autoYes bool) *out.DialogResponse {
 	panic("implement me")
 }
 
-func (*fakeDialogue) Modal(handler vwrite.Handler, autoYes bool) *out.DialogResponse {
-	panic("implement me")
-}
-
-func (*fakeDialogue) FormField(field vwrite.Handler, mask bool) (*out.DialogResponse, error) {
+func (fc *fakeDialogue) FormField(field vwrite.Handler, mask bool) (*out.DialogResponse, error) {
 	panic("implement me")
 }
 
@@ -133,7 +152,12 @@ func (fc *fakeSnipClient) UnTag(ctx context.Context, in *types.UnTagRequest, opt
 }
 
 func (fc *fakeSnipClient) Get(ctx context.Context, in *types.GetRequest, opts ...grpc.CallOption) (*types.ListResponse, error) {
-	panic("implement me")
+	fc.called["Get"] = in
+	return &types.ListResponse{Items:[]*types.Snippet{
+		{
+			Alias: types.NewAlias("", "pouch1", "snippet1", "txt"),
+		},
+	}}, nil
 }
 
 func (fc *fakeSnipClient) List(ctx context.Context, in *types.ListRequest, opts ...grpc.CallOption) (*types.ListResponse, error) {
