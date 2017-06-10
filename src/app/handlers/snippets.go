@@ -97,7 +97,10 @@ func (sc *Snippets) Create(args []string, pipe bool) error {
 	if err != nil {
 		return err
 	}
-	sc.List("", types.PouchRoot) // TASK: should be root printer
+	err = sc.List("", types.PouchRoot) // TASK: should be root printer
+	if err != nil {
+		return err
+	}
 	return sc.EWrite(out.SnippetCreated(res.Snippet))
 }
 
@@ -183,26 +186,20 @@ func (sc *Snippets) ViewListOrRun(uri string, forceView bool, args ...string) er
 		return sc.rootPrinter(rr)
 	}
 	if a.Ext == "" && rr.IsPouch(a.Name) {
-		p := rr.GetPouch(a.Name)
-		if p.Type == types.PouchType_Virtual {
-			fmt.Println("List virtual.")
-		} else {
-			sc.List(a.Username, a.Name)
-		}
+		sc.List(a.Username, a.Name)
 		return nil
 	}
-	if err != nil {
-		return err
-	}
-
 	// GET SNIPPET
 	list, err := sc.client.Get(sc.cxf(), &types.GetRequest{Alias: a})
 	if err != nil {
-		return sc.suggest(uri, sc.runner.Run)
+		if errs.HasCode(err, errs.CodeNotFound) {
+			return sc.suggest(uri, sc.runner.Run)
+		}
+		return err
 	}
 	s := sc.ChooseSnippet(list.Items)
 	if s == nil {
-		return out.LogErrM("Snippet not found", errs.NotFound)
+		return nil
 	}
 	if forceView || sc.prefs.RequireRunKeyword {
 		out.Debug("RUN KEYWORD REQUIRED, VIEWING.")

@@ -3,34 +3,33 @@ package handlers
 import (
 	"github.com/kwk-super-snippets/cli/src/cli"
 	"github.com/kwk-super-snippets/cli/src/out"
-	"github.com/kwk-super-snippets/cli/src/runtime"
 	"github.com/kwk-super-snippets/types"
 	"github.com/kwk-super-snippets/types/vwrite"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"os"
-	"testing"
 	"reflect"
 	rt "runtime"
 	"strings"
+	"testing"
 )
 
 var (
 	snippetClient *fakeSnipClient
-	runner        runtime.Runner
-	ed            runtime.Editor
-	dlg           out.Dialog
+	runner        *fakeRunner
+	ed            *fakeEditor
+	dlg           *fakeDialogue
 	writer        *fakeWWriter
 	cxf           cli.ContextFunc
 	prefs         *out.Prefs
-	rootPrinter   cli.RootPrinter
 	snippets      *Snippets
+	rootCalled    *types.RootResponse
 )
 
 func TestMain(m *testing.M) {
 
-	snippetClient = &fakeSnipClient{called: map[string]interface{}{}}
-	runner = &fakeRunner{}
+	snippetClient = &fakeSnipClient{returns: map[string]response{}, called: map[string]interface{}{}}
+	runner = &fakeRunner{called: map[string]interface{}{}}
 	dlg = &fakeDialogue{called: map[string]interface{}{}}
 	ed = &fakeEditor{}
 	writer = &fakeWWriter{called: map[string]interface{}{}}
@@ -38,12 +37,13 @@ func TestMain(m *testing.M) {
 		return context.Background()
 	}
 	prefs = &out.Prefs{}
-	rootPrinter = func(rr *types.RootResponse) error {
+
+	rootPrinter := func(rr *types.RootResponse) error {
+		rootCalled = rr
 		return nil
 	}
 
 	snippets = NewSnippets(prefs, snippetClient, runner, ed, writer, cxf, rootPrinter, dlg)
-
 	code := m.Run()
 	os.Exit(code)
 }
@@ -68,7 +68,6 @@ func (fc *fakeWWriter) PopCalled(name string) interface{} {
 	delete(fc.called, name)
 	return c
 }
-
 
 type fakeEditor struct {
 }
@@ -102,14 +101,28 @@ func (fc *fakeDialogue) FormField(field vwrite.Handler, mask bool) (*out.DialogR
 }
 
 type fakeRunner struct {
+	called map[string]interface{}
 }
 
-func (*fakeRunner) Run(s *types.Snippet, args []string) error {
-	panic("implement me")
+func (fc *fakeRunner) PopCalled(name string) interface{} {
+	c := fc.called[name]
+	delete(fc.called, name)
+	return c
+}
+
+func (fc *fakeRunner) Run(s *types.Snippet, args []string) error {
+	fc.called["Run"] = s.Alias.URI()
+	return nil
+}
+
+type response struct {
+	err error
+	val interface{}
 }
 
 type fakeSnipClient struct {
-	called map[string]interface{}
+	called  map[string]interface{}
+	returns map[string]response
 }
 
 func (fc *fakeSnipClient) PopCalled(name string) interface{} {
@@ -153,15 +166,16 @@ func (fc *fakeSnipClient) UnTag(ctx context.Context, in *types.UnTagRequest, opt
 
 func (fc *fakeSnipClient) Get(ctx context.Context, in *types.GetRequest, opts ...grpc.CallOption) (*types.ListResponse, error) {
 	fc.called["Get"] = in
-	return &types.ListResponse{Items:[]*types.Snippet{
-		{
-			Alias: types.NewAlias("", "pouch1", "snippet1", "txt"),
-		},
-	}}, nil
+	res, ok := fc.returns["Get"]
+	if ok {
+		return res.val.(*types.ListResponse), res.err
+	}
+	return nil, nil
 }
 
 func (fc *fakeSnipClient) List(ctx context.Context, in *types.ListRequest, opts ...grpc.CallOption) (*types.ListResponse, error) {
-	panic("implement me")
+	fc.called["List"] = in
+	return &types.ListResponse{Username: "username1", Pouch: &types.Pouch{Name: "pouch1"}}, nil
 }
 
 func (fc *fakeSnipClient) Delete(ctx context.Context, in *types.DeleteRequest, opts ...grpc.CallOption) (*types.DeleteResponse, error) {
@@ -169,7 +183,12 @@ func (fc *fakeSnipClient) Delete(ctx context.Context, in *types.DeleteRequest, o
 }
 
 func (fc *fakeSnipClient) GetRoot(ctx context.Context, in *types.RootRequest, opts ...grpc.CallOption) (*types.RootResponse, error) {
-	return &types.RootResponse{}, nil
+	fc.called["GetRoot"] = in
+	res, ok := fc.returns["GetRoot"]
+	if ok {
+		return res.val.(*types.RootResponse), res.err
+	}
+	return nil, nil
 }
 
 func (fc *fakeSnipClient) CreatePouch(ctx context.Context, in *types.CreatePouchRequest, opts ...grpc.CallOption) (*types.CreatePouchResponse, error) {
@@ -194,9 +213,11 @@ func (fc *fakeSnipClient) Alpha(ctx context.Context, in *types.AlphaRequest, opt
 }
 
 func (fc *fakeSnipClient) TypeAhead(ctx context.Context, in *types.TypeAheadRequest, opts ...grpc.CallOption) (*types.TypeAheadResponse, error) {
-	panic("implement me")
+	fc.called["TypeAhead"] = in
+	return &types.TypeAheadResponse{}, nil
 }
 
 func (fc *fakeSnipClient) LogUse(ctx context.Context, in *types.UseContext, opts ...grpc.CallOption) (*types.LogUseResponse, error) {
-	panic("implement me")
+	fc.called["LogUse"] = in
+	return &types.LogUseResponse{}, nil
 }

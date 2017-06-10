@@ -7,6 +7,19 @@ import (
 	"testing"
 )
 
+var snippet1 = response{val: &types.ListResponse{Items: []*types.Snippet{
+	{
+		Alias: types.NewAlias("", "pouch1", "snippet1", "txt"),
+	},
+}}}
+
+var johnnyRoot = response{val: &types.RootResponse{
+	Username: "johnny",
+	Pouches: []*types.Pouch{
+		{Name: "pouch1"},
+	},
+}}
+
 func TestSnippets_Create(t *testing.T) {
 	var cases = []struct {
 		args    []string
@@ -53,29 +66,39 @@ func TestSnippets_Search(t *testing.T) {
 }
 
 func TestSnippets_ViewListOrRun(t *testing.T) {
-	var cases = []struct {
-		uri  string
-		args []string
-		view bool
-		code errs.ErrCode
-		handler string
-	}{
-		{uri : "hello", args: []string{}, view: true, code: 0, handler : "SnippetView" },
-	}
-	for _, c := range cases {
-		err := snippets.ViewListOrRun(c.uri, c.view, c.args...)
-		if err != nil {
-			if !errs.HasCode(err, c.code) {
-				t.Errorf( "Case: %+v %+v", err, c)
-			}
-			snippetClient.PopCalled("Get")
-			continue
-		}
-		uri := snippetClient.PopCalled("Get").(*types.GetRequest).Alias.URI()
-		assert.Equal(t, c.uri, uri, "Case: %+v", c)
-		handler := writer.PopCalled("EWrite")
-		assert.Equal(t, c.handler, handler, "Case: %+v", c)
-	}
+
+	t.Log("VIEW a snippet")
+	snippetClient.returns["GetRoot"] = johnnyRoot
+	snippetClient.returns["Get"] = snippet1
+	err := snippets.ViewListOrRun("name1", true)
+	assert.Nil(t, err)
+	handler := writer.PopCalled("EWrite")
+	assert.Equal(t, "SnippetView", handler)
+	uri := snippetClient.PopCalled("Get").(*types.GetRequest).Alias.URI()
+	assert.Equal(t, "name1", uri)
+
+	t.Log("RUN a snippet")
+	err = snippets.ViewListOrRun("name1", false, "y", "z")
+	assert.Nil(t, err)
+	uri = runner.PopCalled("Run").(string)
+	assert.Equal(t, "pouch1/snippet1.txt", uri)
+
+	t.Log("LIST a pouch")
+	err = snippets.ViewListOrRun("pouch1", true)
+	assert.Nil(t, err)
+	lreq := snippetClient.PopCalled("List").(*types.ListRequest)
+	assert.Equal(t, "pouch1", lreq.Pouch)
+
+	t.Log("LIST root")
+	err = snippets.ViewListOrRun("/johnny", true)
+	assert.Nil(t, err)
+	assert.Equal(t, "johnny", rootCalled.Username)
+	rootCalled = nil
+
+	t.Log("SUGGEST when no snippet matches")
+	snippetClient.returns["Get"] = response{val: &types.ListResponse{}, err: errs.NotFound}
+	err = snippets.ViewListOrRun("non-matching", true)
+	assert.True(t, errs.HasCode(err, errs.CodeNotFound))
 }
 
 //username := "richard"
