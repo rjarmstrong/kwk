@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "types";
+option java_outer_classname = "Users";
+import "snippets.proto";
+
+package types;
+
+service Users {
+    rpc SignIn (SignInRequest) returns (SignInResponse) {}
+    rpc SignUp (SignUpRequest) returns (SignUpResponse) {}
+    rpc ResetPassword (ResetRequest) returns (ResetResponse) {}
+    rpc ChangePassword (ChangeRequest) returns (ChangeResponse) {}
+    rpc List (ListUsersRequest) returns(ListUsersResponse) {}
+}
+
+message ResetRequest {
+    string email = 1;
+}
+
+message SignInResponse {
+    User user = 1;
+    string accessToken = 2;
+    RootResponse root = 3;
+}
+
+message SignUpResponse {
+    User user = 1;
+    string accessToken = 2;
+    RootResponse root = 3;
+}
+
+message ResetResponse {
+    bool success = 1;
+    int64 attempts = 2;
+    bool locked = 3;
+}
+
+message ChangeRequest {
+    string username = 1;
+    string email = 2;
+    string resetToken = 3;
+    string existingPassword = 4;
+    string newPassword = 5;
+}
+
+message ChangeResponse {
+    bool success = 1;
+    int64 attempts = 2;
+    bool locked = 3;
+}
+
+message SignUpRequest {
+    string username = 1;
+    string email = 2;
+    string password = 3;
+    string inviteCode = 4;
+}
+
+message SignInRequest {
+    string username = 1;
+    string password = 2;
+    string email = 3;
+    string key = 4;
+    bool privateView = 5; // clients should assume that this is false, unless there is a prefs file on local machine.
+}
+
+message ListUsersRequest {
+    int64 since = 1;
+    int64 size = 2;
+}
+
+message ListUsersResponse {
+    repeated User items = 1;
+    int64 total = 2;
+    int64 since = 3;
+    int64 size = 4;
+}
+
+message User {
+    string id = 1;
+    string username = 2;
+    string email = 3;
+    int64 snipCount =4;
+    int64 runCount = 5;
+    int64 created = 6;
+    int64 clonedCount = 7;
+}
