@@ -166,7 +166,8 @@ func getEditArgs(env *yaml.MapSlice, ext string) ([]string, error) {
 
 func execEdit(a *types.Alias, app string, arg []string, opts EditOptions) error {
 	out.Debug("EXEC EDIT: %s %s %s", a.URI(), app, strings.Join(arg, " "))
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(opts.CommandTimeout)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(opts.CommandTimeout)*time.Second)
+	defer cancel()
 	c := exec.CommandContext(ctx, app, arg...)
 	c.Stdin = os.Stdin
 	var stderr bytes.Buffer

@@ -104,7 +104,8 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 exec realArgs are args that were passed to the snippet, and not the derived args which are passed to the runner.
 */
 func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...string) error {
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(r.prefs.CommandTimeout)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(r.prefs.CommandTimeout)*time.Second)
+	defer cancel()
 	c := exec.CommandContext(ctx, runner, arg...)
 	c.Stdin = os.Stdin
 	stdout, err := c.StdoutPipe()

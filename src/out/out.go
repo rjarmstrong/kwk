@@ -31,7 +31,7 @@ func Dashboard(prefs *Prefs, cli *types.AppInfo, rr *types.RootResponse, u *type
 
 func SignedOut() vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprintln(w, "<Signed out dash goes here>  \n\nkwk signin | kwk signup\n")
+		fmt.Fprint(w, "<Signed out dash goes here>  \n\nkwk signin | kwk signup\n\n")
 	})
 }
 

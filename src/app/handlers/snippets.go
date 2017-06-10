@@ -247,7 +247,6 @@ func (sc *Snippets) Move(args []string) error {
 		}
 		sc.List("", snip.Pouch())
 		return sc.EWrite(out.SnippetRenamed(original.String(), snip.String()))
-		return nil
 	}
 	as, source, err := types.ParseMany(args[0 : len(args)-1])
 	if err != nil {
@@ -277,7 +276,6 @@ func (sc *Snippets) Cat(uri string) error {
 		if errs.HasCode(err, errs.CodeNotFound) {
 			return sc.suggest(uri, func(s *types.Snippet, args []string) error {
 				return sc.EWrite(out.SnippetCat(s))
-				return nil
 			})
 		}
 		return nil
