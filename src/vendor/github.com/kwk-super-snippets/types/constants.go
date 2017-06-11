@@ -10,7 +10,9 @@ const (
 	PouchSettings = "settings"
 	PouchRoot     = ""
 
-	TokenHeaderName = "x-kwk-access-token"
+	TokenHeaderName  = "x-kwk-access-token"
+	Prefs            = "prefs:"
+	PrefsPrivateView = Prefs + "private_view"
 
 	OsDarwin  = `darwin`
 	OsLinux   = `linux`

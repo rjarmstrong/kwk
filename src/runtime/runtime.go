@@ -40,7 +40,7 @@ func (cs *Runtime) resolveEnv(env *yaml.MapSlice) {
 	content, err := cs.resolveDoc(envAlias, func() (string, error) { return defaultEnvString, nil }, types.Role_Environment)
 	err = yaml.Unmarshal([]byte(content), env)
 	if err != nil {
-		cs.Handle(errs.New(errs.CodeInvalidConfigSection, fmt.Sprintf("Invalid kwk *env.yml detected. `kwk edit env` to fix. %s", err)))
+		cs.Handle(errs.New(errs.CodeInvalidArgument, fmt.Sprintf("Invalid kwk *env.yml detected. `kwk edit env` to fix. %s", err)))
 		*env = *DefaultEnv()
 	}
 	//out.Debug("ENV: %+v", *env)
@@ -62,7 +62,7 @@ func (cs *Runtime) resolvePrefs(prefs *out.Prefs) {
 	}
 	err = parse(content)
 	if err != nil {
-		cs.Handle(errs.New(errs.CodeInvalidConfigSection,
+		cs.Handle(errs.New(errs.CodeInvalidArgument,
 			fmt.Sprintf("Invalid kwk *prefs.yml detected. `kwk edit prefs` to fix. %s", err)))
 		*prefs = *DefaultPrefs()
 	}

@@ -44,7 +44,7 @@ func NewCLI(r io.Reader, wr io.Writer, i types.AppInfo) *KwkCLI {
 	srw := store.NewSnippetReadWriter(f)
 
 	// API
-	rpc, err := rpc.GetRpc(principal, &i, cfg.APIHost, cfg.TestMode)
+	rpc, err := rpc.GetRpc(principal, prefs, &i, cfg.APIHost, cfg.TestMode)
 	if err != nil {
 		eh.Handle(errs.ApiDown)
 		return nil
@@ -67,7 +67,7 @@ func NewCLI(r io.Reader, wr io.Writer, i types.AppInfo) *KwkCLI {
 	// LEVEL
 	setProcessLevel()
 	if node != nil && node.Level > 0 {
-		eh.Handle(routes.RunNode(node, snippets))
+		eh.Handle(routes.RunNode(*principal, prefs, node, snippets))
 		return nil
 	}
 

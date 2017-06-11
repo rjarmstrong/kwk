@@ -55,16 +55,6 @@ func errHandler(e error) vwrite.Handler {
 	})
 }
 
-var overrides = map[errs.ErrCode]string{
-	errs.CodeInvalidPassword: "Password must have one upper, one lower and one numeric",
-	errs.CodeInvalidUsername: "Username must be bl",
-	errs.CodeEmailTaken:      "That email has been taken",
-}
-
-func getMessageOverride(code errs.ErrCode) string {
-	return overrides[code]
-}
-
 var NotAuthenticated = Warn(vwrite.HandlerFunc(func(w io.Writer) {
 	fmt.Fprintln(w, "Please login to continue: kwk login")
 }))
@@ -82,26 +72,10 @@ func notFound(name string) vwrite.Handler {
 	}))
 }
 
-func VersionMissing(uri string) vwrite.Handler {
-	return Warn(vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprintf(w, "The uri: %s called does not have a version, you need to specify it as a query string e.g.: '?v=3'.\n", uri)
-	}))
-}
-
-func NotFoundInApp(callerUri string, uri string) vwrite.Handler {
-	return Warn(vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprintf(w, "The uri: %s called by %s couldn't be found.\n", uri, callerUri)
-	}))
-}
-
 func internalError(err error) vwrite.Handler {
 	return Fatal(vwrite.HandlerFunc(func(w io.Writer) {
 		ce, ok := err.(*errs.Error)
 		if ok {
-			o := getMessageOverride(ce.Code)
-			if o != "" {
-				ce.Message = o
-			}
 			fmt.Fprintln(w, ce.Message, ce.Code)
 			return
 		}

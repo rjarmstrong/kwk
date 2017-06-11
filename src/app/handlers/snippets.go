@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/kwk-super-snippets/cli/src/cli"
 	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/cli/src/runtime"
@@ -51,25 +50,24 @@ func (sc *Snippets) Search(username string, args ...string) error {
 	return sc.EWrite(out.AlphaSearchResult(sc.prefs, res))
 }
 
-func (sc *Snippets) RunNode(node *runtime.ProcessNode, uri string, args []string) error {
+// RunNode is a call to run a snippet from within an app (i.e. as a new process)
+func (sc *Snippets) RunNode(pr cli.UserWithToken, prefs *out.Prefs, node *runtime.ProcessNode, uri string, args []string) error {
 	out.Debug("RUN:%s %s", uri, args)
 	a, err := types.ParseAlias(uri)
 	if err != nil {
 		return err
 	}
-	list, err := sc.client.Get(sc.cxf(), &types.GetRequest{Alias: a})
+	list, err := sc.client.Get(sc.cxf(), &types.GetRequest{Alias: a, Suggest: false})
 	if err != nil {
-		if errs.HasCode(err, errs.CodeNotFound) {
-			return sc.EWrite(out.NotFoundInApp(node.URI, uri))
-		}
 		return err
 	}
-	s := sc.ChooseSnippet(list.Items)
-	if s == nil {
-		return sc.EWrite(out.NotFoundInApp(node.URI, uri))
+	if len(list.Items) > 1 {
+		return sc.EWrite(out.SnippetAmbiguous(node.URI, uri))
 	}
-	//TASK: If username is not the current user or 'kwk' then prompt before executing.
-	return sc.runner.Run(s, args)
+	if !prefs.RunAllSnippets && list.Items[0].Username() != pr.User.Username {
+		return sc.EWrite(out.RunAllSnippetsNotTrue(node.URI, uri))
+	}
+	return sc.runner.Run(list.Items[0], args)
 }
 
 // Run a snippet
@@ -97,7 +95,7 @@ func (sc *Snippets) Create(args []string, pipe bool) error {
 	if err != nil {
 		return err
 	}
-	err = sc.List("", types.PouchRoot) // TASK: should be root printer
+	err = sc.EWrite(out.SnippetList(sc.prefs, res.List))
 	if err != nil {
 		return err
 	}
@@ -149,21 +147,6 @@ func (sc *Snippets) Describe(uri string, description string) error {
 	if err != nil {
 		return err
 	}
-	if description == "" {
-		// TASK: Needs testing and structural review
-		return sc.suggest(uri, func(s *types.Snippet, args []string) error {
-			res, err := sc.FormField(
-				out.FreeText(fmt.Sprintf("Enter new description for %s: ", s.Alias.FileName())), false)
-			if err != nil {
-				return err
-			}
-			out.Debug("Form result: %+v", res.Value)
-			return sc.Describe(s.Alias.FileName(), res.Value.(string))
-		})
-	}
-	if err != nil {
-		return err
-	}
 	alias, err := sc.client.Update(sc.cxf(), &types.UpdateRequest{Alias: a, Description: description})
 	if err != nil {
 		return err
@@ -172,7 +155,6 @@ func (sc *Snippets) Describe(uri string, description string) error {
 }
 
 func (sc *Snippets) ViewListOrRun(uri string, forceView bool, args ...string) error {
-	// TASK: refactor into parts
 	a, err := types.ParseAlias(uri)
 	if err != nil {
 		return err
@@ -189,20 +171,8 @@ func (sc *Snippets) ViewListOrRun(uri string, forceView bool, args ...string) er
 		sc.List(a.Username, a.Name)
 		return nil
 	}
-	// GET SNIPPET
-	list, err := sc.client.Get(sc.cxf(), &types.GetRequest{Alias: a})
-	if err != nil {
-		if errs.HasCode(err, errs.CodeNotFound) {
-			return sc.suggest(uri, sc.runner.Run)
-		}
-		return err
-	}
-	s := sc.ChooseSnippet(list.Items)
-	if s == nil {
-		return nil
-	}
+	s, err := sc.getSnippet(uri)
 	if forceView || sc.prefs.RequireRunKeyword {
-		out.Debug("RUN KEYWORD REQUIRED, VIEWING.")
 		return sc.EWrite(out.SnippetView(sc.prefs, s))
 	}
 	return sc.runner.Run(s, args)
@@ -227,6 +197,7 @@ func (sc *Snippets) Move(args []string) error {
 	if len(args) < 2 {
 		return errs.TwoArgumentsReqForMove
 	}
+	// Task: Make lighter weight
 	root, err := sc.client.GetRoot(sc.cxf(), &types.RootRequest{PrivateView: sc.prefs.PrivateView})
 	if err != nil {
 		return err
@@ -263,33 +234,18 @@ func (sc *Snippets) Move(args []string) error {
 
 // Cat
 func (sc *Snippets) Cat(uri string) error {
-	// Task: requires testing
-	a, err := types.ParseAlias(uri)
+	snippet, err := sc.getSnippet(uri)
 	if err != nil {
 		return err
 	}
-	if !a.IsSnippet() {
-		return errs.SnippetNameRequired
-	}
-	list, err := sc.client.Get(sc.cxf(), &types.GetRequest{Alias: a})
-	if err != nil {
-		if errs.HasCode(err, errs.CodeNotFound) {
-			return sc.suggest(uri, func(s *types.Snippet, args []string) error {
-				return sc.EWrite(out.SnippetCat(s))
-			})
-		}
-		return nil
-	}
-	snippet := sc.Dialog.ChooseSnippet(list.Items)
 	if snippet != nil {
-		return sc.EWrite(out.SnippetCat(list.Items[0]))
+		return sc.EWrite(out.SnippetCat(snippet))
 	}
 	return errs.NotFound
 }
 
 // Patch
 func (sc *Snippets) Patch(uri string, target string, patch string) error {
-	// TASK: Requires suggest
 	a, err := types.ParseAlias(uri)
 	if err != nil {
 		return err
@@ -303,7 +259,6 @@ func (sc *Snippets) Patch(uri string, target string, patch string) error {
 
 // Clone
 func (sc *Snippets) Clone(uri string, newFullName string) error {
-	// TASK: Requires suggest, but could be another users alias we are cloning
 	a, err := types.ParseAlias(uri)
 	if err != nil {
 		return err
@@ -316,13 +271,15 @@ func (sc *Snippets) Clone(uri string, newFullName string) error {
 	if err != nil {
 		return err
 	}
-	sc.EWrite(out.SnippetList(sc.prefs, res.List))
+	err = sc.EWrite(out.SnippetList(sc.prefs, res.List))
+	if err != nil {
+		return err
+	}
 	return sc.EWrite(out.SnippetClonedAs(res.Snippet.Alias.URI()))
 }
 
 // Tag
 func (sc *Snippets) Tag(uri string, tags ...string) error {
-	// TASK: Requires suggest
 	a, err := types.ParseAlias(uri)
 	if err != nil {
 		return err
@@ -336,7 +293,6 @@ func (sc *Snippets) Tag(uri string, tags ...string) error {
 
 // Untag
 func (sc *Snippets) UnTag(uri string, tags ...string) error {
-	// TASK: Requires suggest
 	a, err := types.ParseAlias(uri)
 	if err != nil {
 		return err
@@ -350,7 +306,6 @@ func (sc *Snippets) UnTag(uri string, tags ...string) error {
 
 // Dump writes out all snippets as one long list
 func (sc *Snippets) Dump(username string) error {
-	// TASK: Nil error
 	list, err := sc.client.List(sc.cxf(), &types.ListRequest{Username: username, PrivateView: sc.prefs.PrivateView})
 	if err != nil {
 		return err
@@ -411,12 +366,8 @@ func (sc *Snippets) List(username string, pouch string) error {
 	if err != nil {
 		return err
 	}
-	return sc.listSnippets(list)
-}
-
-func (sc *Snippets) listSnippets(l *types.ListResponse) error {
-	a := types.NewAlias(l.Username, l.Pouch.Name, "", "")
-	_, err := sc.client.LogUse(sc.cxf(),
+	a := types.NewAlias(list.Username, list.Pouch.Name, "", "")
+	_, err = sc.client.LogUse(sc.cxf(),
 		&types.UseContext{
 			Alias:  a,
 			Type:   types.UseType_View,
@@ -426,36 +377,7 @@ func (sc *Snippets) listSnippets(l *types.ListResponse) error {
 	if err != nil {
 		return err
 	}
-	return sc.EWrite(out.SnippetList(sc.prefs, l))
-}
-
-func (sc *Snippets) suggest(term string, onSelect func(s *types.Snippet, args []string) error) error {
-	res, err := sc.client.TypeAhead(sc.cxf(), &types.TypeAheadRequest{Term: term})
-	if err != nil {
-		return err
-	}
-	if len(res.Results) == 0 {
-		return errs.NotFound
-	}
-	if len(res.Results) == 1 {
-		mres := sc.Modal(out.FreeText(fmt.Sprintf("Did you mean %s", res.Results[0].Snippet.Alias.URI())), false)
-		if mres.Ok {
-			onSelect(res.Results[0].Snippet, nil)
-		}
-		return nil
-	}
-	snips := []*types.Snippet{}
-	for _, v := range res.Results {
-		snips = append(snips, v.Snippet)
-	}
-	res2 := sc.Dialog.ChooseSnippet(snips)
-	if err != nil {
-		return err
-	}
-	if res2 != nil {
-		return onSelect(res2, nil)
-	}
-	return nil
+	return sc.EWrite(out.SnippetList(sc.prefs, list))
 }
 
 func (sc *Snippets) getSnippet(uri string) (*types.Snippet, error) {
@@ -463,26 +385,18 @@ func (sc *Snippets) getSnippet(uri string) (*types.Snippet, error) {
 	if err != nil {
 		return nil, err
 	}
-	list, err := sc.client.Get(sc.cxf(), &types.GetRequest{Alias: a})
-	if err != nil {
-		if errs.HasCode(err, errs.CodeNotFound) {
-			var snippet types.Snippet
-			sc.suggest(uri, func(s *types.Snippet, args []string) error {
-				snippet = *s
-				return nil
-			})
-			if &snippet != nil {
-				return &snippet, nil
-			}
-			return nil, errs.NotFound
+	res, err := sc.client.Get(sc.cxf(), &types.GetRequest{Alias: a, Suggest: true})
+	if res.Suggested && len(res.Items) == 1 {
+		mres := sc.Modal(out.DidYouMean(res.Items[0].Alias.URI()), false)
+		if mres.Ok {
+			return res.Items[0], nil
 		}
-		return nil, err
+		return nil, nil
 	}
-	return sc.ChooseSnippet(list.Items), nil
+	return sc.ChooseSnippet(res.Items), nil
 }
 
 func (sc *Snippets) renameSnippet(uri string, newSnipName string) (*types.Snippet, *types.SnipName, error) {
-	// TASK: Throws nil panic, possibly needs suggest and or disambiguation
 	a, err := types.ParseAlias(uri)
 	if err != nil {
 		return nil, nil, err
@@ -509,6 +423,9 @@ func (sc *Snippets) deleteSnippet(args []string) error {
 	if err != nil {
 		return err
 	}
-	sc.EWrite(out.SnippetList(sc.prefs, res.List))
+	err = sc.EWrite(out.SnippetList(sc.prefs, res.List))
+	if err != nil {
+		return err
+	}
 	return sc.EWrite(out.SnippetsDeleted(sn))
 }

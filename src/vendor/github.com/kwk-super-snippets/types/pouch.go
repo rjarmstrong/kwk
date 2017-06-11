@@ -7,8 +7,8 @@ import (
 
 func NewBlankPouch() *Pouch {
 	return &Pouch{
-		SharedWith: &SharedWith{Usernames: map[string]bool{}},
-		Stats:      &PouchStats{},
+		SharedWith: &SharedWith{Usernames:map[string]bool{}},
+		Stats: &PouchStats{},
 	}
 }
 
@@ -18,8 +18,8 @@ func NewPouch(username string, name string, mkPrivate bool, personal bool) *Pouc
 		Username:    username,
 		Name:        name,
 		MakePrivate: mkPrivate,
-		Created:     time.Now().Unix(),
-		Updated:     time.Now().Unix(),
+		Created:    time.Now().Unix(),
+		Updated:    time.Now().Unix(),
 	}
 }
 

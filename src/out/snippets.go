@@ -82,6 +82,24 @@ func UnTag(uri string, tags []string) vwrite.Handler {
 	}))
 }
 
+func SnippetAmbiguous(callerUri string, uri string) vwrite.Handler {
+	return Warn(vwrite.HandlerFunc(func(w io.Writer) {
+		fmt.Fprintf(w, "The uri %s called from app %s is ambiguous, please provide the username, pouch, name and extension.", uri, callerUri)
+	}))
+}
+
+func DidYouMean(uri string) vwrite.Handler {
+	return Info(vwrite.HandlerFunc(func(w io.Writer) {
+		fmt.Fprintf(w, "Did you mean %s ?", uri)
+	}))
+}
+
+func RunAllSnippetsNotTrue(callerUri string, uri string) vwrite.Handler {
+	return Warn(vwrite.HandlerFunc(func(w io.Writer) {
+		fmt.Fprintf(w, "You have not enabled 'runallsnippets' in prefs and the usersname for uri %s called from app %s is not yours. Either change the uri or enable runallsnippets.", uri, callerUri)
+	}))
+}
+
 func SnippetRenamed(originalUri string, newUri string) vwrite.Handler {
 	return Success(vwrite.HandlerFunc(func(w io.Writer) {
 		fmt.Fprintf(w, "%s renamed to %s", originalUri, newUri)

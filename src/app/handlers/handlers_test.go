@@ -27,7 +27,6 @@ var (
 )
 
 func TestMain(m *testing.M) {
-
 	snippetClient = &fakeSnipClient{returns: map[string]response{}, called: map[string]interface{}{}}
 	runner = &fakeRunner{called: map[string]interface{}{}}
 	dlg = &fakeDialogue{called: map[string]interface{}{}}
@@ -57,9 +56,8 @@ func (fc *fakeWWriter) Write(p vwrite.Handler) {
 }
 
 func (fc *fakeWWriter) EWrite(p vwrite.Handler) error {
-	tn := rt.FuncForPC(reflect.ValueOf(p).Pointer()).Name()
-	prefix := "github.com/kwk-super-snippets/cli/src/"
-	fc.called["EWrite"] = strings.Split(strings.Replace(tn, prefix, "", -1), ".")[1]
+	funcName := getFuncName(p)
+	fc.called["EWrite"] = funcName
 	return nil
 }
 
@@ -84,6 +82,12 @@ type fakeDialogue struct {
 	called map[string]interface{}
 }
 
+func (fc *fakeDialogue) PopCalled(name string) interface{} {
+	c := fc.called[name]
+	delete(fc.called, name)
+	return c
+}
+
 func (fc *fakeDialogue) ChooseSnippet(s []*types.Snippet) *types.Snippet {
 	fc.called["ChooseSnippet"] = s
 	if len(s) == 0 {
@@ -93,7 +97,8 @@ func (fc *fakeDialogue) ChooseSnippet(s []*types.Snippet) *types.Snippet {
 }
 
 func (fc *fakeDialogue) Modal(handler vwrite.Handler, autoYes bool) *out.DialogResponse {
-	panic("implement me")
+	fc.called["Modal"] = getFuncName(handler)
+	return &out.DialogResponse{Ok: true}
 }
 
 func (fc *fakeDialogue) FormField(field vwrite.Handler, mask bool) (*out.DialogResponse, error) {
@@ -220,4 +225,12 @@ func (fc *fakeSnipClient) TypeAhead(ctx context.Context, in *types.TypeAheadRequ
 func (fc *fakeSnipClient) LogUse(ctx context.Context, in *types.UseContext, opts ...grpc.CallOption) (*types.LogUseResponse, error) {
 	fc.called["LogUse"] = in
 	return &types.LogUseResponse{}, nil
+}
+
+// getFuncName gets the function name of the values pointer value of the vwrite.Handler
+func getFuncName(p vwrite.Handler) string {
+	tn := rt.FuncForPC(reflect.ValueOf(p).Pointer()).Name()
+	prefix := "github.com/kwk-super-snippets/cli/src/"
+	funcName := strings.Split(strings.Replace(tn, prefix, "", -1), ".")[1]
+	return funcName
 }

@@ -123,7 +123,8 @@ func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...s
 	// KEEP TRACK OF PROCESS GRAPH
 	node, err := getCurrentNode(*a, runner, snipArgs, c)
 	if node.Level > types.MaxProcessLevel {
-		return errs.New(errs.CodeErrTooDeep, "Maximum levels in an app is %d. Not executing: %s", types.MaxProcessLevel, node.URI)
+		return errs.New(errs.CodeInvalidArgument,
+			"Maximum levels in an app is %d. Not executing: %s", types.MaxProcessLevel, node.URI)
 	}
 	if err != nil {
 		return err
@@ -159,7 +160,7 @@ func (r *runner) exec(a *types.Alias, snipArgs []string, runner string, arg ...s
 		}
 		out.Debug("RUNNER:%s", desc)
 		r.logUse(a, stderr.String(), node, types.UseStatus_Fail)
-		return errs.New(errs.CodeRunnerExit, desc)
+		return errs.New(errs.CodeInvalidArgument, desc)
 	}
 	if err != nil {
 		exErr, ok := err.(*exec.ExitError)
@@ -213,25 +214,25 @@ func replaceVariables(cliArgs []string, filePath string, s *types.Snippet) {
 //TODO: Optimise this and add flag to disable it
 func scanVulnerabilities(snip string, ext string) error {
 	if strings.Contains(snip, "rm -rf") || strings.Contains(snip, "rm ") {
-		return errs.New(errs.CodeSnippetVulnerable, "kwk constraint: Shell scripts cannot contain 'rm '.")
+		return errs.New(errs.CodeInvalidArgument, "kwk constraint: Shell scripts cannot contain 'rm '.")
 	}
 	if strings.Contains(snip, ":(){") || strings.Contains(snip, "./$0|./$0&") {
-		return errs.New(errs.CodeSnippetVulnerable, "kwk constraint: Fork bomb detected.")
+		return errs.New(errs.CodeInvalidArgument, "kwk constraint: Fork bomb detected.")
 	}
 	if strings.Contains(snip, "fork") {
-		return errs.New(errs.CodeSnippetVulnerable, "kwk constraint: 'fork' not allowed in script.")
+		return errs.New(errs.CodeInvalidArgument, "kwk constraint: 'fork' not allowed in script.")
 	}
 	if strings.Contains(snip, "/dev/sd") {
-		return errs.New(errs.CodeSnippetVulnerable, "kwk constraint: '/dev/sd' is not allowed in scripts.")
+		return errs.New(errs.CodeInvalidArgument, "kwk constraint: '/dev/sd' is not allowed in scripts.")
 	}
 	if strings.Contains(snip, "/dev/null") {
-		return errs.New(errs.CodeSnippetVulnerable, "kwk constraint: '/dev/null' is not allowed in scripts.")
+		return errs.New(errs.CodeInvalidArgument, "kwk constraint: '/dev/null' is not allowed in scripts.")
 	}
 	if strings.Contains(snip, "| sh") || strings.Contains(snip, "| bash") {
-		return errs.New(errs.CodeSnippetVulnerable, "kwk constraint: piping directly into terminal not allowed in scripts.")
+		return errs.New(errs.CodeInvalidArgument, "kwk constraint: piping directly into terminal not allowed in scripts.")
 	}
 	if strings.Contains(snip, "nohup") {
-		return errs.New(errs.CodeSnippetVulnerable, "kwk constraint: 'nohup' command is not allowed.")
+		return errs.New(errs.CodeInvalidArgument, "kwk constraint: 'nohup' command is not allowed.")
 	}
 	if (ext == "sh" || ext == "js") && strings.Contains(snip, "eval") {
 		m := "kwk constraint: 'eval' command is not allowed."
@@ -239,7 +240,7 @@ func scanVulnerabilities(snip string, ext string) error {
 			m += "  Tip: try using '($VAR)' instead of 'eval $VAR' to execute commands.\n"
 			m += "  See: /richard/cli/basheval.url\n"
 		}
-		return errs.New(errs.CodeSnippetVulnerable, m)
+		return errs.New(errs.CodeInvalidArgument, m)
 	}
 	return nil
 }
