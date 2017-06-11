@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/kwk-super-snippets/cli/src",
+	"ImportPath": "github.com/rjarmstrong/kwk/src",
 	"GoVersion": "go1.8",
 	"GodepVersion": "v79",
 	"Packages": [
@@ -50,26 +50,6 @@
 			"Rev": "ce9fd1f6ce32afaa38b51feea32320fc8875e8e4"
 		},
 		{
-			"ImportPath": "github.com/rjarmstrong/kwk-types",
-			"Rev": "6a08aea5bafa873c4a2cca1e647a54330271b53b"
-		},
-		{
-			"ImportPath": "github.com/rjarmstrong/kwk-types/age",
-			"Rev": "6a08aea5bafa873c4a2cca1e647a54330271b53b"
-		},
-		{
-			"ImportPath": "github.com/rjarmstrong/kwk-types/errs",
-			"Rev": "6a08aea5bafa873c4a2cca1e647a54330271b53b"
-		},
-		{
-			"ImportPath": "github.com/rjarmstrong/kwk-types/valid",
-			"Rev": "6a08aea5bafa873c4a2cca1e647a54330271b53b"
-		},
-		{
-			"ImportPath": "github.com/rjarmstrong/kwk-types/vwrite",
-			"Rev": "6a08aea5bafa873c4a2cca1e647a54330271b53b"
-		},
-		{
 			"ImportPath": "github.com/lunixbochs/vtclean",
 			"Rev": "4428d67a89b36ecae7998e983e5814d0d9c45a04"
 		},
@@ -82,6 +62,26 @@
 			"ImportPath": "github.com/pmezard/go-difflib/difflib",
 			"Comment": "v1.0.0",
 			"Rev": "792786c7400a136282c1664665ae0a8db921c6c2"
+		},
+		{
+			"ImportPath": "github.com/rjarmstrong/kwk-types",
+			"Rev": "23bb13239ca431b84dcdbcd50aa17c2433557869"
+		},
+		{
+			"ImportPath": "github.com/rjarmstrong/kwk-types/age",
+			"Rev": "23bb13239ca431b84dcdbcd50aa17c2433557869"
+		},
+		{
+			"ImportPath": "github.com/rjarmstrong/kwk-types/errs",
+			"Rev": "23bb13239ca431b84dcdbcd50aa17c2433557869"
+		},
+		{
+			"ImportPath": "github.com/rjarmstrong/kwk-types/valid",
+			"Rev": "23bb13239ca431b84dcdbcd50aa17c2433557869"
+		},
+		{
+			"ImportPath": "github.com/rjarmstrong/kwk-types/vwrite",
+			"Rev": "23bb13239ca431b84dcdbcd50aa17c2433557869"
 		},
 		{
 			"ImportPath": "github.com/rjarmstrong/tablewriter",

@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"github.com/kwk-super-snippets/cli/src/cli"
-	"github.com/kwk-super-snippets/cli/src/out"
-	"github.com/kwk-super-snippets/cli/src/runtime"
+	"github.com/rjarmstrong/kwk/src/cli"
+	"github.com/rjarmstrong/kwk/src/out"
+	"github.com/rjarmstrong/kwk/src/runtime"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk-types/age"
 	"github.com/rjarmstrong/kwk-types/errs"

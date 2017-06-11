@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"github.com/kwk-super-snippets/cli/src/cli"
-	"github.com/kwk-super-snippets/cli/src/runtime"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk-types/errs"
+	"github.com/rjarmstrong/kwk/src/cli"
+	"github.com/rjarmstrong/kwk/src/runtime"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -103,7 +103,7 @@ func TestSnippets_ViewListOrRun(t *testing.T) {
 	err = snippets.ViewListOrRun("name1", false, "y", "z")
 	assert.Nil(t, err)
 	uri = runner.PopCalled("Run").(string)
-	assert.Equal(t, "pouch1/snippet1.txt", uri)
+	assert.Equal(t, "/richard/pouch1/snippet1.txt", uri)
 
 	t.Log("LIST a pouch")
 	err = snippets.ViewListOrRun("pouch1", true)
@@ -141,7 +141,7 @@ func TestSnippets_Run(t *testing.T) {
 	err := snippets.Run("name1", []string{})
 	assert.Nil(t, err)
 	uri := runner.PopCalled("Run")
-	assert.Equal(t, "pouch1/snippet1.txt", uri)
+	assert.Equal(t, "/richard/pouch1/snippet1.txt", uri)
 }
 
 func TestSnippets_RunNode(t *testing.T) {

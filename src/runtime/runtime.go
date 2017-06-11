@@ -2,8 +2,8 @@ package runtime
 
 import (
 	"fmt"
-	"github.com/kwk-super-snippets/cli/src/out"
-	"github.com/kwk-super-snippets/cli/src/store"
+	"github.com/rjarmstrong/kwk/src/out"
+	"github.com/rjarmstrong/kwk/src/store"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk-types/errs"
 	"gopkg.in/yaml.v2"

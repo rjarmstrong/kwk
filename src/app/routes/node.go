@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"github.com/kwk-super-snippets/cli/src/app/handlers"
-	"github.com/kwk-super-snippets/cli/src/cli"
-	"github.com/kwk-super-snippets/cli/src/out"
-	"github.com/kwk-super-snippets/cli/src/runtime"
+	"github.com/rjarmstrong/kwk/src/app/handlers"
+	"github.com/rjarmstrong/kwk/src/cli"
+	"github.com/rjarmstrong/kwk/src/out"
+	"github.com/rjarmstrong/kwk/src/runtime"
 	"github.com/rjarmstrong/kwk-types/errs"
 	"os"
 	"strings"

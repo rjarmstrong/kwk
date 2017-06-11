@@ -3,8 +3,8 @@ package app
 import (
 	"encoding/json"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/kwk-super-snippets/cli/src/cli"
-	"github.com/kwk-super-snippets/cli/src/out"
+	"github.com/rjarmstrong/kwk/src/cli"
+	"github.com/rjarmstrong/kwk/src/out"
 	"log"
 )
 

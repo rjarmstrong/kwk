@@ -3,7 +3,7 @@ package runtime
 import (
 	"crypto/sha256"
 	"fmt"
-	"github.com/kwk-super-snippets/cli/src/out"
+	"github.com/rjarmstrong/kwk/src/out"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"

@@ -2,8 +2,8 @@ package routes
 
 import (
 	"fmt"
-	"github.com/kwk-super-snippets/cli/src/app/handlers"
-	"github.com/kwk-super-snippets/cli/src/style"
+	"github.com/rjarmstrong/kwk/src/app/handlers"
+	"github.com/rjarmstrong/kwk/src/style"
 	"github.com/urfave/cli"
 )
 

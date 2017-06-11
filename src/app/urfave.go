@@ -1,10 +1,10 @@
 package app
 
 import (
-	"github.com/kwk-super-snippets/cli/src/app/handlers"
-	"github.com/kwk-super-snippets/cli/src/app/routes"
-	"github.com/kwk-super-snippets/cli/src/out"
-	"github.com/kwk-super-snippets/cli/src/runtime"
+	"github.com/rjarmstrong/kwk/src/app/handlers"
+	"github.com/rjarmstrong/kwk/src/app/routes"
+	"github.com/rjarmstrong/kwk/src/out"
+	"github.com/rjarmstrong/kwk/src/runtime"
 	"github.com/rjarmstrong/kwk-types/errs"
 	"github.com/rjarmstrong/kwk-types/vwrite"
 	urf "github.com/urfave/cli"

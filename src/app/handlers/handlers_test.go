@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/kwk-super-snippets/cli/src/cli"
-	"github.com/kwk-super-snippets/cli/src/out"
+	"github.com/rjarmstrong/kwk/src/cli"
+	"github.com/rjarmstrong/kwk/src/out"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk-types/vwrite"
 	"golang.org/x/net/context"
@@ -230,7 +230,7 @@ func (fc *fakeSnipClient) LogUse(ctx context.Context, in *types.UseContext, opts
 // getFuncName gets the function name of the values pointer value of the vwrite.Handler
 func getFuncName(p vwrite.Handler) string {
 	tn := rt.FuncForPC(reflect.ValueOf(p).Pointer()).Name()
-	prefix := "github.com/kwk-super-snippets/cli/src/"
+	prefix := "github.com/rjarmstrong/kwk/src/"
 	funcName := strings.Split(strings.Replace(tn, prefix, "", -1), ".")[1]
 	return funcName
 }

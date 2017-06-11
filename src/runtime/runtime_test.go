@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"github.com/kwk-super-snippets/cli/src/out"
+	"github.com/rjarmstrong/kwk/src/out"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk-types/errs"
 	"github.com/stretchr/testify/assert"

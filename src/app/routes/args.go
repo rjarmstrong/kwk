@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"github.com/kwk-super-snippets/cli/src/out"
-	"github.com/kwk-super-snippets/cli/src/style"
+	"github.com/rjarmstrong/kwk/src/out"
+	"github.com/rjarmstrong/kwk/src/style"
 	"github.com/urfave/cli"
 	"os"
 )

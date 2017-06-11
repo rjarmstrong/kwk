@@ -35,8 +35,8 @@ runners:
     compile: ["scalac", "-d", "$DIR", "$FULL_NAME"]
     run: ["scala", "$NAME"]
   cs: #c sharp (dotnet core) Under development
-    compile: ["dotnet", "restore", "/Volumes/development/go/src/github.com/kwk-super-snippets/cli/src/dotnet/project.json"]
-    run: ["dotnet", "run", "--project", "/Volumes/development/go/src/github.com/kwk-super-snippets/cli/src/dotnet/project.json", "$FULL_NAME",]
+    compile: ["dotnet", "restore", "/Volumes/development/go/src/github.com/rjarmstrong/kwk/src/dotnet/project.json"]
+    run: ["dotnet", "run", "--project", "/Volumes/development/go/src/github.com/rjarmstrong/kwk/src/dotnet/project.json", "$FULL_NAME",]
   go: #golang
     run: ["go", "run", "$FULL_NAME"]
   rs: #rust

@@ -3,8 +3,8 @@ package updater
 import (
 	"bytes"
 	gu "github.com/inconshreveable/go-update"
-	"github.com/kwk-super-snippets/cli/src/out"
-	"github.com/kwk-super-snippets/cli/src/store"
+	"github.com/rjarmstrong/kwk/src/out"
+	"github.com/rjarmstrong/kwk/src/store"
 	"io"
 	"os"
 	"os/exec"

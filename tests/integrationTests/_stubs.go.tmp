@@ -2,11 +2,11 @@ package integration
 
 import (
 	"github.com/smartystreets/goconvey/web/server/system"
-	"github.com/kwk-super-snippets/cli/src/snippets"
-	"github.com/kwk-super-snippets/cli/src/ui/tmpl"
-	"github.com/kwk-super-snippets/cli/src/ui/dlg"
-	"github.com/kwk-super-snippets/cli/src/app"
-	"github.com/kwk-super-snippets/cli/src/setup"
+	"github.com/rjarmstrong/kwk/src/snippets"
+	"github.com/rjarmstrong/kwk/src/ui/tmpl"
+	"github.com/rjarmstrong/kwk/src/ui/dlg"
+	"github.com/rjarmstrong/kwk/src/app"
+	"github.com/rjarmstrong/kwk/src/setup"
 	"google.golang.org/grpc"
 	"strings"
 	"os/exec"

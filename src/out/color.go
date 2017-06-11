@@ -1,7 +1,7 @@
 package out
 
 import (
-	"github.com/kwk-super-snippets/cli/src/style"
+	"github.com/rjarmstrong/kwk/src/style"
 	"github.com/rjarmstrong/kwk-types"
 )
 

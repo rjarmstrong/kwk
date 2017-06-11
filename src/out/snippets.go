@@ -2,7 +2,7 @@ package out
 
 import (
 	"fmt"
-	"github.com/kwk-super-snippets/cli/src/style"
+	"github.com/rjarmstrong/kwk/src/style"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk-types/vwrite"
 	"io"

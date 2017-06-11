@@ -2,7 +2,7 @@ package rpc
 
 import (
 	"bytes"
-	"github.com/kwk-super-snippets/cli/src/cli"
+	"github.com/rjarmstrong/kwk/src/cli"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/stretchr/testify/assert"
 	"os"
