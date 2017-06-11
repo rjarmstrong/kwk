@@ -1,3 +1,5 @@
+# rjarmstrong/goaws
+
 FROM golang:1.8.1
 
 RUN apt-get update; apt-get install tree -y; apt-get install zip -y
