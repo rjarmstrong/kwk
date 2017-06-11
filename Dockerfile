@@ -6,9 +6,9 @@ RUN curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.
     && unzip awscli-bundle.zip \
     && ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
 
-RUN mkdir -p $GOPATH/src/github.com/kwk-super-snippets/cli && mkdir -p /builds
+RUN mkdir -p $GOPATH/src/github.com/rjarmstrong/kwk && mkdir -p /builds
 
-WORKDIR $GOPATH/src/github.com/kwk-super-snippets/cli
+WORKDIR $GOPATH/src/github.com/rjarmstrong/kwk
 
 VOLUME /builds
 
