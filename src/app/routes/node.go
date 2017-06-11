@@ -5,7 +5,7 @@ import (
 	"github.com/kwk-super-snippets/cli/src/cli"
 	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/cli/src/runtime"
-	"github.com/kwk-super-snippets/types/errs"
+	"github.com/rjarmstrong/kwk-types/errs"
 	"os"
 	"strings"
 )

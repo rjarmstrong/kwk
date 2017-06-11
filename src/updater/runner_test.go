@@ -3,7 +3,7 @@ package updater
 import (
 	"errors"
 	gu "github.com/inconshreveable/go-update"
-	"github.com/kwk-super-snippets/types/errs"
+	"github.com/rjarmstrong/kwk-types/errs"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"io/ioutil"

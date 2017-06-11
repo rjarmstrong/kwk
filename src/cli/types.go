@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/kwk-super-snippets/types"
+	"github.com/rjarmstrong/kwk-types"
 	"golang.org/x/net/context"
 )
 

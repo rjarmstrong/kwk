@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/kwk-super-snippets/cli/src/out"
-	"github.com/kwk-super-snippets/types"
+	"github.com/rjarmstrong/kwk-types"
 )
 
 func (sc *Snippets) CreatePouch(name string) error {

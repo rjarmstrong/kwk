@@ -3,8 +3,8 @@ package routes
 import (
 	"fmt"
 	"github.com/kwk-super-snippets/cli/src/app/handlers"
-	"github.com/kwk-super-snippets/types"
-	"github.com/kwk-super-snippets/types/errs"
+	"github.com/rjarmstrong/kwk-types"
+	"github.com/rjarmstrong/kwk-types/errs"
 	"github.com/urfave/cli"
 	"strings"
 )

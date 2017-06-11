@@ -8,7 +8,7 @@ import (
 	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/cli/src/store"
 	"github.com/kwk-super-snippets/cli/src/updater"
-	"github.com/kwk-super-snippets/types"
+	"github.com/rjarmstrong/kwk-types"
 	"os"
 	"runtime/pprof"
 	"strconv"

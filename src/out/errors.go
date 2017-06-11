@@ -2,8 +2,8 @@ package out
 
 import (
 	"fmt"
-	"github.com/kwk-super-snippets/types/errs"
-	"github.com/kwk-super-snippets/types/vwrite"
+	"github.com/rjarmstrong/kwk-types/errs"
+	"github.com/rjarmstrong/kwk-types/vwrite"
 	"io"
 	"os"
 )

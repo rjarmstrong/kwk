@@ -2,8 +2,8 @@ package tests
 
 import (
 	"bytes"
-	"github.com/kwk-super-snippets/cli/src/vendor/github.com/kwk-super-snippets/types"
-	"github.com/kwk-super-snippets/cli/src/vendor/github.com/kwk-super-snippets/types/vwrite"
+	"github.com/kwk-super-snippets/cli/src/vendor/github.com/rjarmstrong/kwk-types"
+	"github.com/kwk-super-snippets/cli/src/vendor/github.com/rjarmstrong/kwk-types/vwrite"
 	"reflect"
 	"runtime/debug"
 	"testing"

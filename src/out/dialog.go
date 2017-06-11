@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/howeyc/gopass"
-	"github.com/kwk-super-snippets/types"
-	"github.com/kwk-super-snippets/types/vwrite"
+	"github.com/rjarmstrong/kwk-types"
+	"github.com/rjarmstrong/kwk-types/vwrite"
 	"github.com/siddontang/go/num"
 	"io"
 )

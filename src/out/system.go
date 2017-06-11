@@ -3,7 +3,7 @@ package out
 import (
 	"fmt"
 	"github.com/kwk-super-snippets/cli/src/style"
-	"github.com/kwk-super-snippets/types"
+	"github.com/rjarmstrong/kwk-types"
 	"time"
 )
 

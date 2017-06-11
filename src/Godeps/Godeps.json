@@ -50,23 +50,23 @@
 			"Rev": "ce9fd1f6ce32afaa38b51feea32320fc8875e8e4"
 		},
 		{
-			"ImportPath": "github.com/kwk-super-snippets/types",
+			"ImportPath": "github.com/rjarmstrong/kwk-types",
 			"Rev": "6a08aea5bafa873c4a2cca1e647a54330271b53b"
 		},
 		{
-			"ImportPath": "github.com/kwk-super-snippets/types/age",
+			"ImportPath": "github.com/rjarmstrong/kwk-types/age",
 			"Rev": "6a08aea5bafa873c4a2cca1e647a54330271b53b"
 		},
 		{
-			"ImportPath": "github.com/kwk-super-snippets/types/errs",
+			"ImportPath": "github.com/rjarmstrong/kwk-types/errs",
 			"Rev": "6a08aea5bafa873c4a2cca1e647a54330271b53b"
 		},
 		{
-			"ImportPath": "github.com/kwk-super-snippets/types/valid",
+			"ImportPath": "github.com/rjarmstrong/kwk-types/valid",
 			"Rev": "6a08aea5bafa873c4a2cca1e647a54330271b53b"
 		},
 		{
-			"ImportPath": "github.com/kwk-super-snippets/types/vwrite",
+			"ImportPath": "github.com/rjarmstrong/kwk-types/vwrite",
 			"Rev": "6a08aea5bafa873c4a2cca1e647a54330271b53b"
 		},
 		{

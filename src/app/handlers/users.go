@@ -4,9 +4,9 @@ import (
 	"github.com/kwk-super-snippets/cli/src/cli"
 	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/cli/src/store"
-	"github.com/kwk-super-snippets/types"
-	"github.com/kwk-super-snippets/types/errs"
-	"github.com/kwk-super-snippets/types/vwrite"
+	"github.com/rjarmstrong/kwk-types"
+	"github.com/rjarmstrong/kwk-types/errs"
+	"github.com/rjarmstrong/kwk-types/vwrite"
 )
 
 const userDocName = "user"

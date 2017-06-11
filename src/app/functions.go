@@ -4,8 +4,8 @@ import (
 	"github.com/kwk-super-snippets/cli/src/cli"
 	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/cli/src/runtime"
-	"github.com/kwk-super-snippets/types"
-	"github.com/kwk-super-snippets/types/vwrite"
+	"github.com/rjarmstrong/kwk-types"
+	"github.com/rjarmstrong/kwk-types/vwrite"
 )
 
 func rootPrinter(prefs *out.Prefs, writer vwrite.Writer, user *types.User) cli.RootPrinter {

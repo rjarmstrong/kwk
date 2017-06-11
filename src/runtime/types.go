@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/kwk-super-snippets/cli/src/out"
-	"github.com/kwk-super-snippets/types"
+	"github.com/rjarmstrong/kwk-types"
 	"gopkg.in/yaml.v2"
 	"log"
 	"os"

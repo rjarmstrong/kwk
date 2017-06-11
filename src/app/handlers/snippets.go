@@ -4,10 +4,10 @@ import (
 	"github.com/kwk-super-snippets/cli/src/cli"
 	"github.com/kwk-super-snippets/cli/src/out"
 	"github.com/kwk-super-snippets/cli/src/runtime"
-	"github.com/kwk-super-snippets/types"
-	"github.com/kwk-super-snippets/types/age"
-	"github.com/kwk-super-snippets/types/errs"
-	"github.com/kwk-super-snippets/types/vwrite"
+	"github.com/rjarmstrong/kwk-types"
+	"github.com/rjarmstrong/kwk-types/age"
+	"github.com/rjarmstrong/kwk-types/errs"
+	"github.com/rjarmstrong/kwk-types/vwrite"
 	"sort"
 	"strings"
 	"time"
@@ -39,46 +39,6 @@ func NewSnippets(p *out.Prefs, s types.SnippetsClient, r runtime.Runner,
 	}
 }
 
-// Search for snippets
-func (sc *Snippets) Search(username string, args ...string) error {
-	term := strings.Join(args, " ")
-	req := &types.AlphaRequest{Term: term, PrivateView: sc.prefs.PrivateView, Username: username}
-	res, err := sc.client.Alpha(sc.cxf(), req)
-	if err != nil {
-		return err
-	}
-	return sc.EWrite(out.AlphaSearchResult(sc.prefs, res))
-}
-
-// RunNode is a call to run a snippet from within an app (i.e. as a new process)
-func (sc *Snippets) RunNode(pr cli.UserWithToken, prefs *out.Prefs, node *runtime.ProcessNode, uri string, args []string) error {
-	out.Debug("RUN:%s %s", uri, args)
-	a, err := types.ParseAlias(uri)
-	if err != nil {
-		return err
-	}
-	list, err := sc.client.Get(sc.cxf(), &types.GetRequest{Alias: a, Suggest: false})
-	if err != nil {
-		return err
-	}
-	if len(list.Items) > 1 {
-		return sc.EWrite(out.SnippetAmbiguous(node.URI, uri))
-	}
-	if !prefs.RunAllSnippets && list.Items[0].Username() != pr.User.Username {
-		return sc.EWrite(out.RunAllSnippetsNotTrue(node.URI, uri))
-	}
-	return sc.runner.Run(list.Items[0], args)
-}
-
-// Run a snippet
-func (sc *Snippets) Run(uri string, args []string) error {
-	snippet, err := sc.getSnippet(uri)
-	if err != nil {
-		return err
-	}
-	return sc.runner.Run(snippet, args)
-}
-
 // Create a new Snippet
 func (sc *Snippets) Create(args []string, pipe bool) error {
 	content, alias, err := resolveCreateArgs(args)
@@ -100,6 +60,82 @@ func (sc *Snippets) Create(args []string, pipe bool) error {
 		return err
 	}
 	return sc.EWrite(out.SnippetCreated(res.Snippet))
+}
+
+// Search for snippets
+func (sc *Snippets) Search(username string, args ...string) error {
+	term := strings.Join(args, " ")
+	req := &types.AlphaRequest{Term: term, PrivateView: sc.prefs.PrivateView, Username: username}
+	res, err := sc.client.Alpha(sc.cxf(), req)
+	if err != nil {
+		return err
+	}
+	return sc.EWrite(out.AlphaSearchResult(sc.prefs, res))
+}
+
+func (sc *Snippets) ViewListOrRun(uri string, forceView bool, args ...string) error {
+	a, err := types.ParseAlias(uri)
+	if err != nil {
+		return err
+	}
+	// TASK: Heavy handed, cache preferable
+	rr, err := sc.client.GetRoot(sc.cxf(), &types.RootRequest{Username: a.Username, PrivateView: sc.prefs.PrivateView})
+	if err != nil {
+		return err
+	}
+	if a.IsUsername() {
+		return sc.rootPrinter(rr)
+	}
+	if a.Ext == "" && rr.IsPouch(a.Name) {
+		sc.List(a.Username, a.Name)
+		return nil
+	}
+	s, err := sc.getSnippet(uri)
+	if forceView || sc.prefs.RequireRunKeyword {
+		return sc.EWrite(out.SnippetView(sc.prefs, s))
+	}
+	return sc.runner.Run(s, args)
+}
+
+// Cat
+func (sc *Snippets) Cat(uri string) error {
+	snippet, err := sc.getSnippet(uri)
+	if err != nil {
+		return err
+	}
+	if snippet != nil {
+		return sc.EWrite(out.SnippetCat(snippet))
+	}
+	return errs.NotFound
+}
+
+// Run a snippet
+func (sc *Snippets) Run(uri string, args []string) error {
+	snippet, err := sc.getSnippet(uri)
+	if err != nil {
+		return err
+	}
+	return sc.runner.Run(snippet, args)
+}
+
+// RunNode is a call to run a snippet from within an app (i.e. as a new process)
+func (sc *Snippets) RunNode(pr cli.UserWithToken, prefs *out.Prefs, node *runtime.ProcessNode, uri string, args []string) error {
+	out.Debug("RUN:%s %s", uri, args)
+	a, err := types.ParseAlias(uri)
+	if err != nil {
+		return err
+	}
+	list, err := sc.client.Get(sc.cxf(), &types.GetRequest{Alias: a, Suggest: false})
+	if err != nil {
+		return err
+	}
+	if len(list.Items) > 1 {
+		return sc.EWrite(out.SnippetAmbiguous(node.URI, uri))
+	}
+	if !prefs.RunAllSnippets && list.Items[0].Username() != pr.User.Username {
+		return sc.EWrite(out.RunAllSnippetsNotTrue(node.URI, uri))
+	}
+	return sc.runner.Run(list.Items[0], args)
 }
 
 // Edit Snippet
@@ -154,30 +190,6 @@ func (sc *Snippets) Describe(uri string, description string) error {
 	return sc.EWrite(out.SnippetDescriptionUpdated(alias.String(), description))
 }
 
-func (sc *Snippets) ViewListOrRun(uri string, forceView bool, args ...string) error {
-	a, err := types.ParseAlias(uri)
-	if err != nil {
-		return err
-	}
-	// TASK: Heavy handed, cache preferable
-	rr, err := sc.client.GetRoot(sc.cxf(), &types.RootRequest{Username: a.Username, PrivateView: sc.prefs.PrivateView})
-	if err != nil {
-		return err
-	}
-	if a.IsUsername() {
-		return sc.rootPrinter(rr)
-	}
-	if a.Ext == "" && rr.IsPouch(a.Name) {
-		sc.List(a.Username, a.Name)
-		return nil
-	}
-	s, err := sc.getSnippet(uri)
-	if forceView || sc.prefs.RequireRunKeyword {
-		return sc.EWrite(out.SnippetView(sc.prefs, s))
-	}
-	return sc.runner.Run(s, args)
-}
-
 // Delete
 func (sc *Snippets) Delete(args []string) error {
 	// TASK: Use a lighter-weight method to get all pouches
@@ -230,18 +242,6 @@ func (sc *Snippets) Move(args []string) error {
 	}
 	sc.List("", last)
 	return sc.EWrite(out.SnippetsMoved(as, p.Pouch))
-}
-
-// Cat
-func (sc *Snippets) Cat(uri string) error {
-	snippet, err := sc.getSnippet(uri)
-	if err != nil {
-		return err
-	}
-	if snippet != nil {
-		return sc.EWrite(out.SnippetCat(snippet))
-	}
-	return errs.NotFound
 }
 
 // Patch

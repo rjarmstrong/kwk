@@ -3,7 +3,7 @@ package style
 import (
 	"bytes"
 	"fmt"
-	"github.com/kwk-super-snippets/types"
+	"github.com/rjarmstrong/kwk-types"
 	"strings"
 )
 

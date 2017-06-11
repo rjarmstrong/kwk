@@ -3,8 +3,8 @@ package handlers
 import (
 	"github.com/kwk-super-snippets/cli/src/cli"
 	"github.com/kwk-super-snippets/cli/src/out"
-	"github.com/kwk-super-snippets/types"
-	"github.com/kwk-super-snippets/types/vwrite"
+	"github.com/rjarmstrong/kwk-types"
+	"github.com/rjarmstrong/kwk-types/vwrite"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"os"
@@ -27,7 +27,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	snippetClient = &fakeSnipClient{returns: map[string]response{}, called: map[string]interface{}{}}
+	snippetClient = &fakeSnipClient{returnsFor: map[string]response{}, called: map[string]interface{}{}}
 	runner = &fakeRunner{called: map[string]interface{}{}}
 	dlg = &fakeDialogue{called: map[string]interface{}{}}
 	ed = &fakeEditor{}
@@ -126,8 +126,8 @@ type response struct {
 }
 
 type fakeSnipClient struct {
-	called  map[string]interface{}
-	returns map[string]response
+	called     map[string]interface{}
+	returnsFor map[string]response
 }
 
 func (fc *fakeSnipClient) PopCalled(name string) interface{} {
@@ -171,7 +171,7 @@ func (fc *fakeSnipClient) UnTag(ctx context.Context, in *types.UnTagRequest, opt
 
 func (fc *fakeSnipClient) Get(ctx context.Context, in *types.GetRequest, opts ...grpc.CallOption) (*types.ListResponse, error) {
 	fc.called["Get"] = in
-	res, ok := fc.returns["Get"]
+	res, ok := fc.returnsFor["Get"]
 	if ok {
 		return res.val.(*types.ListResponse), res.err
 	}
@@ -189,7 +189,7 @@ func (fc *fakeSnipClient) Delete(ctx context.Context, in *types.DeleteRequest, o
 
 func (fc *fakeSnipClient) GetRoot(ctx context.Context, in *types.RootRequest, opts ...grpc.CallOption) (*types.RootResponse, error) {
 	fc.called["GetRoot"] = in
-	res, ok := fc.returns["GetRoot"]
+	res, ok := fc.returnsFor["GetRoot"]
 	if ok {
 		return res.val.(*types.RootResponse), res.err
 	}

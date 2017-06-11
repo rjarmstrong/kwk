@@ -1,8 +1,10 @@
 package handlers
 
 import (
-	"github.com/kwk-super-snippets/types"
-	"github.com/kwk-super-snippets/types/errs"
+	"github.com/kwk-super-snippets/cli/src/cli"
+	"github.com/kwk-super-snippets/cli/src/runtime"
+	"github.com/rjarmstrong/kwk-types"
+	"github.com/rjarmstrong/kwk-types/errs"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -11,7 +13,7 @@ var snippet1 = response{val: &types.ListResponse{
 	Suggested: false,
 	Items: []*types.Snippet{
 		{
-			Alias: types.NewAlias("", "pouch1", "snippet1", "txt"),
+			Alias: types.NewAlias("richard", "pouch1", "snippet1", "txt"),
 		},
 	}}}
 
@@ -19,7 +21,17 @@ var snippet1Suggested = response{val: &types.ListResponse{
 	Suggested: true,
 	Items: []*types.Snippet{
 		{
-			Alias: types.NewAlias("", "pouch1", "snippet1", "txt"),
+			Alias: types.NewAlias("richard", "pouch1", "snippet1", "txt"),
+		},
+	}}}
+
+var snippet1Ambiguous = response{val: &types.ListResponse{
+	Suggested: false,
+	Items: []*types.Snippet{
+		{
+			Alias: types.NewAlias("richard", "pouch1", "snippet1", "txt"),
+		}, {
+			Alias: types.NewAlias("richard", "pouch1", "snippet1", "go"),
 		},
 	}}}
 
@@ -78,8 +90,8 @@ func TestSnippets_Search(t *testing.T) {
 func TestSnippets_ViewListOrRun(t *testing.T) {
 
 	t.Log("VIEW a snippet")
-	snippetClient.returns["GetRoot"] = johnnyRoot
-	snippetClient.returns["Get"] = snippet1
+	snippetClient.returnsFor["GetRoot"] = johnnyRoot
+	snippetClient.returnsFor["Get"] = snippet1
 	err := snippets.ViewListOrRun("name1", true)
 	assert.Nil(t, err)
 	handler := writer.PopCalled("EWrite")
@@ -108,14 +120,14 @@ func TestSnippets_ViewListOrRun(t *testing.T) {
 
 func TestSnippets_Cat(t *testing.T) {
 	t.Log("EXACT MATCH")
-	snippetClient.returns["Get"] = snippet1
+	snippetClient.returnsFor["Get"] = snippet1
 	err := snippets.Cat("name1")
 	assert.Nil(t, err)
 	handler := writer.PopCalled("EWrite")
 	assert.Equal(t, "SnippetCat", handler)
 
 	t.Log("SUGGEST")
-	snippetClient.returns["Get"] = snippet1Suggested
+	snippetClient.returnsFor["Get"] = snippet1Suggested
 	err = snippets.Cat("name1")
 	assert.Nil(t, err)
 	funcName := dlg.PopCalled("Modal")
@@ -124,6 +136,22 @@ func TestSnippets_Cat(t *testing.T) {
 	assert.Equal(t, "SnippetCat", handler)
 }
 
-//func TestSnippets_Run(t *testing.T) {
-//	snippets.Run()
-//}
+func TestSnippets_Run(t *testing.T) {
+	snippetClient.returnsFor["Get"] = snippet1
+	err := snippets.Run("name1", []string{})
+	assert.Nil(t, err)
+	uri := runner.PopCalled("Run")
+	assert.Equal(t, "pouch1/snippet1.txt", uri)
+}
+
+func TestSnippets_RunNode(t *testing.T) {
+	t.Log("AMBIGUOUS")
+	snippetClient.returnsFor["Get"] = snippet1Ambiguous
+	err := snippets.RunNode(cli.UserWithToken{}, prefs, &runtime.ProcessNode{}, "name1", []string{})
+	assert.Nil(t, err)
+	funcName := writer.PopCalled("EWrite")
+	assert.Equal(t, "Warn", funcName)
+
+	t.Log("NOT RUN ALL")
+
+}

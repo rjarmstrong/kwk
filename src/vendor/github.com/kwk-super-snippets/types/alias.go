@@ -2,8 +2,8 @@ package types
 
 import (
 	"fmt"
-	"github.com/kwk-super-snippets/types/errs"
-	"github.com/kwk-super-snippets/types/valid"
+	"github.com/rjarmstrong/kwk-types/errs"
+	"github.com/rjarmstrong/kwk-types/valid"
 	"net/url"
 	"strconv"
 	"strings"
