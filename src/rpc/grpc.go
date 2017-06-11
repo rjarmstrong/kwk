@@ -67,10 +67,12 @@ type Rpc struct {
 	*grpc.ClientConn
 	pr      *cli.UserWithToken
 	cliInfo *types.AppInfo
+	prefs   *out.Prefs
 }
 
-func GetRpc(pr *cli.UserWithToken, cliInfo *types.AppInfo, serverAddress string, trustAllCerts bool) (*Rpc, error) {
-	rpc := &Rpc{pr: pr, cliInfo: cliInfo}
+func GetRpc(pr *cli.UserWithToken, prefs *out.Prefs, cliInfo *types.AppInfo,
+	serverAddress string, trustAllCerts bool) (*Rpc, error) {
+	rpc := &Rpc{pr: pr, cliInfo: cliInfo, prefs: prefs}
 
 	var opts []grpc.DialOption
 
@@ -112,6 +114,8 @@ func (rp *Rpc) Cxf() context.Context {
 		ctx := metadata.NewContext(
 			context.Background(),
 			metadata.Pairs(
+				"prefs_private_view",
+				fmt.Sprintf("%t", rp.prefs.PrivateView),
 				types.TokenHeaderName,
 				rp.pr.AccessToken,
 				"host", hostname,
