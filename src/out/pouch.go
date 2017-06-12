@@ -92,9 +92,8 @@ func insertGridLine(b *bytes.Buffer) {
 func pouchIcon(pch *types.Pouch, isLast bool) string {
 	if pch.MakePrivate {
 		return colorPouch(isLast, pch.LastUse, pch.Stats.Red, style.IconPrivatePouch)
-	} else {
-		return colorPouch(isLast, pch.LastUse, pch.Stats.Red, style.IconPouch)
 	}
+	return colorPouch(isLast, pch.LastUse, pch.Stats.Red, style.IconPouch)
 }
 
 func colorPouch(lastPouch bool, lastUsed int64, reddy int64, icon string) string {

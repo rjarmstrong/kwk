@@ -7,10 +7,13 @@ import (
 	"os"
 )
 
+// FirstIs returns true if the first command line argument is the given string.
 func FirstIs(name string) bool {
 	return len(os.Args) > 1 && os.Args[1] == name
 }
 
+// ReplaceArg iterates through all the command line arguments and replaces full
+// matches with the replacement.
 func ReplaceArg(match string, replacement string) {
 	for i, v := range os.Args {
 		if match == v {
@@ -19,6 +22,7 @@ func ReplaceArg(match string, replacement string) {
 	}
 }
 
+// SetupFlags extracts global flags and assigns them to preferences.
 func SetupFlags(prefs *out.Prefs, ap *cli.App) *cli.App {
 	ap.Flags = []cli.Flag{
 		cli.BoolFlag{

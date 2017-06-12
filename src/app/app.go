@@ -40,7 +40,7 @@ func NewCLI(r io.Reader, wr io.Writer, i types.AppInfo) *KwkCLI {
 	w := vwrite.New(wr)
 	d := out.NewDialog(w, r)
 	f := store.NewDiskFile()
-	doc := store.NewJson(f, cfg.DocPath)
+	doc := store.NewJson(f, cli.DocPath)
 	srw := store.NewSnippetReadWriter(f)
 
 	// API

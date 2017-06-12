@@ -27,17 +27,20 @@ func SpawnUpdate() {
 	exe(cmd, Command)
 }
 
+// Runner is responsible for holding the state of an update process.
 type Runner interface {
+	// Run starts the update process.
 	Run() error
 }
 
-func New(version string, repo BinRepo, a Applier, rb Rollbacker, doc store.Doc) Runner {
-	return &runner{doc: doc, currentVersion: version, BinRepo: repo, Applier: a, Rollbacker: rb, UpdateHiatusSecs: 60 * 5}
+// New creates a new update runner.
+func New(version string, repo BinRepo, a applier, rb rollbacker, doc store.Doc) Runner {
+	return &runner{doc: doc, currentVersion: version, BinRepo: repo, applier: a, rollbacker: rb, UpdateHiatusSecs: 60 * 5}
 }
 
-type Applier func(update io.Reader, opts gu.Options) error
+type applier func(update io.Reader, opts gu.Options) error
 
-type Rollbacker func(err error) error
+type rollbacker func(err error) error
 
 type Record struct {
 	LastUpdate int64
@@ -46,8 +49,8 @@ type Record struct {
 type runner struct {
 	doc store.Doc
 	BinRepo
-	Applier
-	Rollbacker
+	applier
+	rollbacker
 	currentVersion string
 	store.Doc
 	UpdateHiatusSecs int64
@@ -76,10 +79,10 @@ func (r *runner) Run() error {
 	}
 	defer latest.Close() //TODO: Currently NOOP, should be real closer
 	out.Debug("UPDATER: Applying update.")
-	err = r.Applier(latest, gu.Options{})
+	err = r.applier(latest, gu.Options{})
 	if err != nil {
 		out.LogErrM("UPDATER: Couldn't apply update.", err)
-		err = r.Rollbacker(err)
+		err = r.rollbacker(err)
 		r.CleanUp()
 		r.recordUpdate()
 		return err

@@ -1,7 +1,6 @@
 package runtime
 
 import (
-	"errors"
 	"fmt"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk/src/out"
@@ -11,7 +10,6 @@ import (
 	"strings"
 )
 
-// TASK: These probably bet in cli package
 type SnippetPatcher func(req *types.PatchRequest) (*types.PatchResponse, error)
 type SnippetGetter func(req *types.GetRequest) (*types.ListResponse, error)
 type SnippetMaker func(req *types.CreateRequest) error
@@ -32,6 +30,8 @@ func newRuntimeAlias(username, name string, ext string, uniquePerMachine bool) *
 	}
 }
 
+// DefaultPrefs are the initial preferences (or fallback) preferences which are used for the main
+// user defined prefs for kwk.
 func DefaultPrefs() *out.Prefs {
 	return &out.Prefs{
 		PrivateView:       true,
@@ -56,6 +56,7 @@ func getPrefsAsString(prefs out.Prefs) string {
 	return string(b)
 }
 
+// DefaultEnv gets a yaml struct of the current snippet runtime configuration for running and editing.
 func DefaultEnv() *yaml.MapSlice {
 	env := &yaml.MapSlice{}
 	err := yaml.Unmarshal([]byte(defaultEnvString), env)
@@ -65,10 +66,11 @@ func DefaultEnv() *yaml.MapSlice {
 	return env
 }
 
+// GetSection gets the named subsection of a yaml slice.
 func GetSection(yml *yaml.MapSlice, name string) (*yaml.MapSlice, error) {
 	rs, _ := getSubSection(yml, name)
 	if rs == nil {
-		return nil, errors.New(fmt.Sprintf("No %s section in given .yml", name))
+		return nil, fmt.Errorf("No %s section in given .yml", name)
 	}
 	return &rs, nil
 }
@@ -104,6 +106,7 @@ func getSubSection(yml *yaml.MapSlice, name string) (yaml.MapSlice, []string) {
 	return sub, bottom
 }
 
+// PrefsFile is the go representation of the yaml preferences which are saved to local disk.
 type PrefsFile struct {
 	KwkPrefs string
 	Options  out.Prefs

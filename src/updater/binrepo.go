@@ -16,6 +16,7 @@ import (
 
 const workFolder = "./update_work"
 
+// BinRepo is a client to interact with a remote binary store.
 type BinRepo interface {
 	// LatestInfo gets information about the latest build.
 	GetLatestInfo() (*ReleaseInfo, error)
@@ -25,6 +26,7 @@ type BinRepo interface {
 	CleanUp()
 }
 
+// ReleaseInfo is information about the software release.
 type ReleaseInfo struct {
 	Version string `json:"version"`
 	Build   string `json:"build"`

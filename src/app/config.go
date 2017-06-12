@@ -8,6 +8,7 @@ import (
 	"log"
 )
 
+// GetConfig loads the environment variables into AppConfig
 func GetConfig() *cli.AppConfig {
 	err := envconfig.Process("KWK", cfg)
 	if err != nil {

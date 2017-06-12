@@ -10,8 +10,9 @@ import (
 	"github.com/rjarmstrong/kwk/src/out"
 )
 
-const PROCESS_NODE = "PROCESS_NODE"
+const processNodeEnvName = "PROCESS_NODE"
 
+// ProcessNode stores all the metadata about the currently running snippet and its process.
 type ProcessNode struct {
 	URI     string       `msg:"ali" json:"uri"`
 	Level   int64        `msg:"l" json:"lvl"`
@@ -27,6 +28,7 @@ var nodes = []*ProcessNode{}
 
 var emptyCaller = &ProcessNode{URI: "-"}
 
+// NewProcessNode creates a new instance of a ProcessNode. Used immediately before execution.
 func NewProcessNode(a types.Alias, runner string, args []string, caller *ProcessNode) *ProcessNode {
 	//printTree(os.Getpid(), args)
 	exe, _ := os.Executable()
@@ -42,6 +44,7 @@ func NewProcessNode(a types.Alias, runner string, args []string, caller *Process
 	return n
 }
 
+// Complete captures the pid to store it in the ProcessNode.
 func (node *ProcessNode) Complete(pid int) {
 	node.Pid = pid
 	out.Debug("NODE: %s", node.URI)
@@ -68,13 +71,14 @@ func getCurrentNode(a types.Alias, runner string, args []string, c *exec.Cmd) (*
 	}
 	node := NewProcessNode(a, runner, args, caller)
 	b, _ := json.Marshal(node)
-	nodeString := fmt.Sprintf("%s=%s", PROCESS_NODE, b)
+	nodeString := fmt.Sprintf("%s=%s", processNodeEnvName, b)
 	c.Env = append(os.Environ(), nodeString)
 	return node, nil
 }
 
+// GetCallerNode get the parent process metadata for the currently executing Snippet.
 func GetCallerNode() (*ProcessNode, error) {
-	callerString, ok := os.LookupEnv(PROCESS_NODE)
+	callerString, ok := os.LookupEnv(processNodeEnvName)
 	var caller *ProcessNode
 	if ok && callerString != "" {
 		caller = &ProcessNode{}

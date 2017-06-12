@@ -7,17 +7,20 @@ import (
 	"strings"
 )
 
-var PrintAnsi bool //Prints ansi escape sequences for debugging purposes.
+// PrintAnsi is a setting to allow printing of ansi escape sequences for debugging purposes.
+var PrintAnsi bool
 
 // FStart starts an ansi escape sequence, should be terminated with style.End
 func FStart(c types.AnsiCode, in interface{}) string {
 	return fmt.Sprintf("\033[%dm%v", c, in)
 }
 
+// Fmt16 formats the input with 16 color terminal colors.
 func Fmt16(c types.AnsiCode, in interface{}) string {
 	return fmtColor(c, in, "")
 }
 
+// Fmt256 formats the input with 256 color terminal colors.
 func Fmt256(c types.AnsiCode, in interface{}) string {
 	return fmtColor(c, in, "38;5;")
 }
@@ -28,9 +31,7 @@ func FmtFgBg(in string, fg types.AnsiCode, bg types.AnsiCode) string {
 	return r
 }
 
-/*
- Creates a text box constrained by width (number of runes) and number of lines.
-*/
+// FBox creates a text box constrained by width (number of runes) and number of lines.
 func FBox(in string, wrapAt int, lines int) string {
 	in = strings.Replace(in, "\n", "  ", -1)
 	in = strings.TrimSpace(in)
@@ -57,9 +58,7 @@ func FBox(in string, wrapAt int, lines int) string {
 	return strings.TrimSpace(b.String())
 }
 
-/*
- Squeeze pushes text into a given width truncating the middle.
-*/
+// Squeeze pushes text into a given width truncating the middle.
 func Squeeze(text string) string {
 	if len(text) >= 40 {
 		text = text[0:10] + "..." + text[len(text)-30:]

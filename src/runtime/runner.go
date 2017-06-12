@@ -21,7 +21,9 @@ import (
 	"time"
 )
 
+// Runner is responsible for the execution of snippets as native processes.
 type Runner interface {
+	// Run executes the given snippet with optional command line arguments.
 	Run(s *types.Snippet, args []string) error
 }
 
@@ -33,6 +35,7 @@ type runner struct {
 	ul    UseLogger
 }
 
+// NewRunner creates a Runner with the current configuration settings.
 func NewRunner(prefs *out.Prefs, env *yaml.MapSlice, w vwrite.Writer, f store.SnippetReadWriter, ul UseLogger) Runner {
 	return &runner{prefs: prefs, env: env, file: f, w: w, ul: ul}
 }
@@ -76,26 +79,24 @@ func (r *runner) Run(s *types.Snippet, args []string) error {
 				return err
 			}
 		}
-	} else {
-		if len(interp) > 1 && interp[0] == "echo" && interp[1] == "$SNIP" {
-			err := r.w.EWrite(out.NotExecutable(s))
-			r.logUse(s.Alias, "", NewProcessNode(*s.Alias, "", args, nil), types.UseStatus_Success)
-			return err
-		}
-		if s.Ext() == "sh" || s.Ext() == "bash" {
-			// Set unofficial safe-mode
-			s.Content = "set -euo pipefail;\n\n" + s.Content
-		}
-		for i, v := range interp {
-			interp[i] = strings.Replace(v, "$SNIP", s.Content, -1)
-		}
-		interp = append(interp, args...)
-		//fmt.Println(runner)
+	}
+	if len(interp) > 1 && interp[0] == "echo" && interp[1] == "$SNIP" {
+		err := r.w.EWrite(out.NotExecutable(s))
+		r.logUse(s.Alias, "", NewProcessNode(*s.Alias, "", args, nil), types.UseStatus_Success)
+		return err
+	}
+	if s.Ext() == "sh" || s.Ext() == "bash" {
+		// Set unofficial safe-mode
+		s.Content = "set -euo pipefail;\n\n" + s.Content
+	}
+	for i, v := range interp {
+		interp[i] = strings.Replace(v, "$SNIP", s.Content, -1)
+	}
+	interp = append(interp, args...)
 
-		err := r.exec(s.Alias, args, interp[0], interp[1:]...)
-		if err != nil {
-			return err
-		}
+	err = r.exec(s.Alias, args, interp[0], interp[1:]...)
+	if err != nil {
+		return err
 	}
 	return nil
 }

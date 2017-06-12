@@ -17,7 +17,7 @@ var mainMarkers = map[string]string{
 	"go": "func main() {",
 }
 
-type CodeLine struct {
+type codeLine struct {
 	Margin string
 	Body   string
 }
@@ -271,12 +271,12 @@ func printSnippets(w io.Writer, prefs *Prefs, pouchName string, list []*types.Sn
 			status.WriteString(t)
 		}
 		//col3
-		snip := FCodeview(v, 60, lines, (i+1)%2 == 0, prefs.ExpandedRows)
+		snip := fCodeview(v, 60, lines, (i+1)%2 == 0, prefs.ExpandedRows)
 		if prefs.RowSpaces {
 			snip = snip + "\n"
 		}
 		if len(v.Preview) >= 10 {
-			snip = snip + "\n\n" + style.Margin + style.Fmt256(style.ColorMonthGrey, Fpreview(v.Preview, prefs, 120, 1))
+			snip = snip + "\n\n" + style.Margin + style.Fmt256(style.ColorMonthGrey, fPreview(v.Preview, prefs, 120, 1))
 		}
 
 		tbl.Append([]string{

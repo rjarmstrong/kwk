@@ -17,10 +17,10 @@ func printSnippetView(w io.Writer, prefs *Prefs, s *types.Snippet) {
 	fmt.Fprint(w, strings.Repeat(" ", 4))
 	fmt.Fprint(w, snippetIcon(s))
 	fmt.Fprint(w, "  ")
-	fmt.Fprint(w, FSnippetType(s))
+	fmt.Fprint(w, fSnippetType(s))
 	fmt.Fprint(w, "\n")
 	fmt.Fprint(w, style.TwoLines)
-	fmt.Fprint(w, FCodeview(s, 100, 0, false, prefs.ExpandedRows))
+	fmt.Fprint(w, fCodeview(s, 100, 0, false, prefs.ExpandedRows))
 	fmt.Fprint(w, "\n\n")
 
 	tbl := tablewriter.NewWriter(w)
@@ -33,7 +33,7 @@ func printSnippetView(w io.Writer, prefs *Prefs, s *types.Snippet) {
 	tbl.SetAutoFormatHeaders(false)
 	tbl.SetHeaderLine(false)
 	tbl.SetColWidth(20)
-	tbl.Append([]string{style.Fmt256(colors.RecentPouch, FSnippetType(s)+" Details:"), "", "", ""})
+	tbl.Append([]string{style.Fmt256(colors.RecentPouch, fSnippetType(s)+" Details:"), "", "", ""})
 
 	var lastRun string
 	if s.Stats.Runs < 1 {
@@ -73,19 +73,19 @@ func printSnippetView(w io.Writer, prefs *Prefs, s *types.Snippet) {
 		style.Fmt16(style.Subdued, "Supported OS:"),
 		style.FBox(strings.Join(oss, ", "), 50, 5)})
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued, "Description:"), style.FBox(FEmpty(s.Description), 50, 3), "", ""})
+		style.Fmt16(style.Subdued, "Description:"), style.FBox(fEmpty(s.Description), 50, 3), "", ""})
 
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued, "Preview:"), Fpreview(s.Preview, prefs, 50, 1), "", ""})
+		style.Fmt16(style.Subdued, "Preview:"), fPreview(s.Preview, prefs, 50, 1), "", ""})
 
 	var tags []string
 	for k := range s.Tags.Names {
 		tags = append(tags, k)
 	}
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued, "Tags:"), FTags(tags), "", ""})
+		style.Fmt16(style.Subdued, "Tags:"), fTags(tags), "", ""})
 	tbl.Append([]string{
-		style.Fmt16(style.Subdued, "sha256:"), FVerified(s)})
+		style.Fmt16(style.Subdued, "sha256:"), fVerified(s)})
 	tbl.Append([]string{
 		style.Fmt16(style.Subdued, "Updated:"), fmt.Sprintf("%s - %s", formatTime(s.Updated), fmt.Sprintf("v%d", s.Version())),
 	})
@@ -102,7 +102,7 @@ func printSnippetView(w io.Writer, prefs *Prefs, s *types.Snippet) {
 	fmt.Fprint(w, "\n")
 }
 
-func FSnippetType(s *types.Snippet) string {
+func fSnippetType(s *types.Snippet) string {
 	if s.IsApp() {
 		return "App"
 	} else if s.Ext() == "url" {
@@ -111,7 +111,7 @@ func FSnippetType(s *types.Snippet) string {
 		return "Snippet"
 	}
 }
-func FVerified(s *types.Snippet) string {
+func fVerified(s *types.Snippet) string {
 	var buff bytes.Buffer
 	if s.VerifyChecksum() {
 		buff.WriteString(style.Fmt256(style.ColorYesGreen, style.IconTick+" "))
@@ -119,12 +119,12 @@ func FVerified(s *types.Snippet) string {
 		buff.WriteString("...")
 	} else {
 		buff.WriteString(" " + style.IconCross + "  Invalid Checksum: ")
-		buff.WriteString(FEmpty(s.Checksum))
+		buff.WriteString(fEmpty(s.Checksum))
 	}
 	return buff.String()
 }
 
-func FCodeview(s *types.Snippet, width int, lines int, odd bool, alwaysExpandRows bool) string {
+func fCodeview(s *types.Snippet, width int, lines int, odd bool, alwaysExpandRows bool) string {
 	if s.Content == "" {
 		s.Content = "<empty>"
 	}
@@ -132,10 +132,10 @@ func FCodeview(s *types.Snippet, width int, lines int, odd bool, alwaysExpandRow
 	//if s.Ext == "url" {
 	//	return uri(s.Snip)
 	//}
-	code := []CodeLine{}
+	code := []codeLine{}
 	// Add line numbers and pad
 	for i, v := range chunks {
-		code = append(code, CodeLine{
+		code = append(code, codeLine{
 			Margin: style.FStart(style.Subdued, fmt.Sprintf("%3d ", i+1)),
 			Body:   fmt.Sprintf("    %s", strings.Replace(v, "\t", "  ", -1)),
 		})
@@ -146,7 +146,7 @@ func FCodeview(s *types.Snippet, width int, lines int, odd bool, alwaysExpandRow
 	// Add to  starting from most important line
 	marker := mainMarkers[s.Ext()]
 	if marker != "" {
-		var clipped []CodeLine
+		var clipped []codeLine
 		var startPreview int
 		for i, v := range code {
 			if strings.Contains(v.Body, marker) {
@@ -164,7 +164,7 @@ func FCodeview(s *types.Snippet, width int, lines int, odd bool, alwaysExpandRow
 	crop := len(code) >= lines && lines != 0
 
 	// crop width
-	var codeview []CodeLine
+	var codeview []codeLine
 	if crop {
 		codeview = code[0:lines]
 	} else {
@@ -180,7 +180,7 @@ func FCodeview(s *types.Snippet, width int, lines int, odd bool, alwaysExpandRow
 
 	// Add page tear and last line
 	if alwaysExpandRows && crop && lines < len(code) {
-		codeview = append(codeview, CodeLine{
+		codeview = append(codeview, codeLine{
 			style.FStart(style.Subdued, "----"),
 			style.FStart(style.Subdued, strings.Repeat("-", width)+"|"),
 		})
@@ -208,14 +208,14 @@ func FCodeview(s *types.Snippet, width int, lines int, odd bool, alwaysExpandRow
 	return buff.String()
 }
 
-func FTags(tags []string) string {
+func fTags(tags []string) string {
 	if len(tags) == 0 {
-		return FEmpty("")
+		return fEmpty("")
 	}
 	return strings.Join(tags, ", ")
 }
 
-func FEmpty(in string) string {
+func fEmpty(in string) string {
 	if in == "" {
 		return style.Fmt16(style.Subdued, "<none>")
 	}

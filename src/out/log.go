@@ -9,6 +9,7 @@ import (
 	"runtime/debug"
 )
 
+// DebugEnabled is a setting allowing turning Debug to stdout on and off.
 var DebugEnabled bool
 
 var fileOut = &lumberjack.Logger{
@@ -18,9 +19,14 @@ var fileOut = &lumberjack.Logger{
 	MaxAge:     5, //days})
 }
 var fileLogger = log.New(fileOut, "KWK: ", log.Ldate|log.Lmicroseconds|log.Lshortfile)
+
+// ErrorLogger formats errors for printing to stdout when DebugEnabled, or to main.log when not.
 var ErrorLogger = log.New(os.Stderr, "KWK:ERR: ", log.Ldate|log.Lmicroseconds|log.Lshortfile)
+
+// DebugLogger formats debug output to stdout when DebugEnabled.
 var DebugLogger = log.New(os.Stdout, "KWK: ", log.Ldate|log.Lmicroseconds|log.Lshortfile)
 
+// Debug used to log all non-errors.
 func Debug(format string, in ...interface{}) {
 	if !DebugEnabled {
 		return
@@ -41,6 +47,7 @@ func LogErrM(message string, err error) error {
 	return err
 }
 
+// LogErr logs errors as is.
 func LogErr(err error) error {
 	fileLogger.Println(err)
 	fileLogger.Output(2, string(debug.Stack()))

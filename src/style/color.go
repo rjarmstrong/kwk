@@ -11,6 +11,7 @@ const (
 	WhiteBg types.AnsiCode = 7
 
 	// 16 COLORS
+
 	Black     types.AnsiCode = 30
 	Red       types.AnsiCode = 31
 	Green     types.AnsiCode = 32
@@ -32,6 +33,7 @@ const (
 	White97      types.AnsiCode = 97
 
 	// 256 COLORS
+
 	LightBlue104 types.AnsiCode = 104
 	Black0       types.AnsiCode = 0
 	Black231     types.AnsiCode = 231
@@ -73,11 +75,11 @@ const (
 
 	Warning          = "\xE2\x9A\xA0"
 	Fire             = "\xF0\x9F\x94\xA5"
-	IconApp          = "✿" //✱ ▚ ❖  ꌳ ⧓ ⧗ 〓 ⁘ ꌳ ⁑⁘ ⁙ ѧꊞ ▚ 囙"
-	IconSnippet      = "✦" //◆"
-	IconView         = "❍" // 274d
-	IconTick         = "✓" // 2713
-	IconCross        = "✘" // 2718
+	IconApp          = "✿" // ✱ ▚ ❖  ꌳ ⧓ ⧗ 〓 ⁘ ꌳ ⁑⁘ ⁙ ѧꊞ ▚ 囙"
+	IconSnippet      = "✦" // ◆"
+	IconView         = "❍"
+	IconTick         = "✓"
+	IconCross        = "✘"
 	IconPrivatePouch = "◤"
 	IconBroke        = "▦"
 	Info             = "Ⓘ"
@@ -94,6 +96,6 @@ const (
 	ColorOldGrey        types.AnsiCode = 242
 	ColorDimStat        types.AnsiCode = 238
 	ColorYesGreen       types.AnsiCode = 119
-
-	// 🔰 👝 🔒 🔸 ⚡ ✓ ⇨ ᗜ 🔑 ● 🌎 ◯ ⚡ ☰ 💫 📦 ▻ ▸ ► ▷ ◦ ▲ ⚙ ⿳ ▣ ⬤ ⬜ 👁 👀
 )
+
+// 🔰 👝 🔒 🔸 ⚡ ✓ ⇨ ᗜ 🔑 ● 🌎 ◯ ⚡ ☰ 💫 📦 ▻ ▸ ► ▷ ◦ ▲ ⚙ ⿳ ▣ ⬤ ⬜ 👁 👀

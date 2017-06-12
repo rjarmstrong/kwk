@@ -1,4 +1,4 @@
-package tests
+package _wip
 
 import (
 	. "github.com/smartystreets/goconvey/convey"

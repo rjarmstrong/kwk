@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+// DefaultRoute - given no matching routes an attempt to run a snippet, view a snippet or list a pouch will be made.
+// Considered to be core UX functionality and not just a fallback.
 func DefaultRoute(info *types.AppInfo, snippets *handlers.Snippets, eh errs.Handler) func(*cli.Context, string) {
 	return func(c *cli.Context, firstArg string) {
 		i := c.Args().Get(1)

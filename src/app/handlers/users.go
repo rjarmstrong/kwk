@@ -42,13 +42,11 @@ func (c *Users) SignUp() error {
 	// TASK: Add dynamic 'exists' checks
 	res, _ := c.FormField(out.UserEmailField, false)
 	email := res.Value.(string)
-	res, _ = c.FormField(out.UserUsernameField, false)
+	res, _ = c.FormField(out.UserChooseUsername, false)
 	username := res.Value.(string)
 	// TASK: Add client side validation check
-	res, _ = c.FormField(out.UserPasswordField, true)
+	res, _ = c.FormField(out.UserChoosePassword, true)
 	password := res.Value.(string)
-	//res, _ = c.FormField(out.UserInviteTokenField, false)
-	//inviteCode := res.Value.(string)
 
 	req := &types.SignUpRequest{Email: email, Username: username, Password: password}
 	u, err := c.client.SignUp(c.cxf(), req)

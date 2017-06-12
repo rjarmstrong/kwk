@@ -3,22 +3,29 @@ package store
 import "encoding/json"
 
 /*
-DocStore is a simplified file system interface, the idea is that you can read and write to the native file system with json or whichever format you like.
+Doc is a simplified file system interface, the idea is that you can read and write to the native
+file system with json or whichever format you like.
 */
 type Doc interface {
-	Upsert(fullKey string, data interface{}) error
-	Get(fullKey string, value interface{}, fresherThan int64) error
-	Delete(fullKey string) error
+	// Upsert creates/updates a document giving it a name based on the provided uri.
+	Upsert(uri string, data interface{}) error
+	// Get unmarshalls the document so long as it hasn't been touched since 'fresherThan' -
+	// 0 = since the epoch.
+	Get(uri string, value interface{}, fresherThan int64) error
+	// Deletes the document from the underlying store with the given uri.
+	Delete(uri string) error
+	// Removes all files in the ~/.kwk directory.
 	DeleteAll() error
 }
 
-// FileSettings is an abstraction over the file system which
+// Json is an abstraction over the file system which
 // marshals json to and from a specific location.
 type Json struct {
 	DirectoryName string
 	File
 }
 
+// NewJson creates an instance of Doc pointing to a ~/.kwk subdirectory using the given File system.
 func NewJson(f File, subDirName string) Doc {
 	return &Json{DirectoryName: subDirName, File: f}
 }

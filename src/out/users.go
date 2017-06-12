@@ -11,7 +11,7 @@ var UserChooseUsername = vwrite.HandlerFunc(func(w io.Writer) {
 	fmt.Fprint(w, "Choose a memorable username: ")
 })
 
-var UserChooseAPassword = vwrite.HandlerFunc(func(w io.Writer) {
+var UserChoosePassword = vwrite.HandlerFunc(func(w io.Writer) {
 	fmt.Fprint(w, "And enter a password (1 num, 1 cap, 8 chars): ")
 })
 

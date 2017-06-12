@@ -70,7 +70,7 @@ func multiChoice(w io.Writer, in interface{}) {
 	fmt.Fprint(w, style.Margin+style.Fmt256(style.ColorPouchCyan, "Please select a snippet: "))
 }
 
-func Fpreview(in string, prefs *Prefs, wrapAt int, lines int) string {
+func fPreview(in string, prefs *Prefs, wrapAt int, lines int) string {
 	if prefs.DisablePreview {
 		return ""
 	}

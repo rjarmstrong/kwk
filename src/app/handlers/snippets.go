@@ -89,6 +89,9 @@ func (sc *Snippets) ViewListOrRun(uri string, forceView bool, args ...string) er
 		return nil
 	}
 	s, err := sc.getSnippet(uri)
+	if err != nil {
+		return err
+	}
 	if forceView || sc.prefs.RequireRunKeyword {
 		return sc.EWrite(out.SnippetView(sc.prefs, s))
 	}
@@ -201,7 +204,7 @@ func (sc *Snippets) Delete(args []string) error {
 	return sc.deleteSnippet(args)
 }
 
-// Move behaves like mv on the cli, it either moves the snippets into a target pouch (last arg) or renames
+// Mv behaves like mv on the cli, it either moves the snippets into a target pouch (last arg) or renames
 // a pouch or snippet.
 func (sc *Snippets) Mv(args []string) error {
 	if len(args) < 2 {
@@ -263,7 +266,7 @@ func (sc *Snippets) Tag(uri string, tags ...string) error {
 	return sc.EWrite(out.Tagged(alias.String(), tags))
 }
 
-// Untag
+// UnTag
 func (sc *Snippets) UnTag(uri string, tags ...string) error {
 	a, err := types.ParseAlias(uri)
 	if err != nil {
@@ -276,6 +279,7 @@ func (sc *Snippets) UnTag(uri string, tags ...string) error {
 	return sc.EWrite(out.UnTagged(alias.String(), tags))
 }
 
+// List
 func (sc *Snippets) List(username string, pouch string) error {
 	if pouch == "" {
 		r, err := sc.client.GetRoot(sc.cxf(),
@@ -373,6 +377,9 @@ func (sc *Snippets) renameSnippet(uri string, newSnipName string) error {
 		return err
 	}
 	res, err := sc.client.Rename(sc.cxf(), &types.RenameRequest{Alias: a, NewName: sn})
+	if err != nil {
+		return err
+	}
 	return sc.EWrite(out.SnippetRenamed(res.List, sc.prefs, res.Original.FileName(), res.Snippet.Alias.URI()))
 }
 

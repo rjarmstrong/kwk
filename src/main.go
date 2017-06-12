@@ -47,7 +47,7 @@ func main() {
 func runUpdate(cfg *cli.AppConfig, info types.AppInfo) {
 	out.DebugEnabled = false
 	f := store.NewDiskFile()
-	jsn := store.NewJson(f, cfg.DocPath)
+	jsn := store.NewJson(f, cli.DocPath)
 	up := updater.New(info.String(), &updater.S3Repo{}, gu.Apply, gu.RollbackError, jsn)
 	err := up.Run()
 	if err != nil {

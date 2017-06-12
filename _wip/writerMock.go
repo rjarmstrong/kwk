@@ -1,4 +1,4 @@
-package tests
+package _wip
 
 type WriterMock struct {
 	RenderCalledWith    []interface{}

@@ -14,13 +14,13 @@ import (
 type Dialog interface {
 	// Modal creates a yes/no prompt with a given template and data.
 	Modal(handler vwrite.Handler, autoYes bool) *DialogResponse
-
+	// FormField is a one-line field to take user input.
 	FormField(field vwrite.Handler, mask bool) (*DialogResponse, error)
-
+	// ChooseSnippet - given multiple snippets is the equivalent of a combo-box.
 	ChooseSnippet(s []*types.Snippet) *types.Snippet
 }
 
-// Dialogue Response carries the users input back to the calling code.
+// DialogResponse carries the users input back to the calling code.
 type DialogResponse struct {
 	Ok    bool
 	Value interface{}
@@ -30,7 +30,7 @@ func NewDialog(w vwrite.Writer, r io.Reader) *StdDialog {
 	return &StdDialog{Writer: w, reader: bufio.NewReader(r)}
 }
 
-// StdDialogue is the default dialogue type.
+// StdDialog is the default dialogue type.
 type StdDialog struct {
 	vwrite.Writer
 	reader *bufio.Reader
