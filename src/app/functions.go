@@ -1,11 +1,11 @@
 package app
 
 import (
+	"github.com/rjarmstrong/kwk-types"
+	"github.com/rjarmstrong/kwk-types/vwrite"
 	"github.com/rjarmstrong/kwk/src/cli"
 	"github.com/rjarmstrong/kwk/src/out"
 	"github.com/rjarmstrong/kwk/src/runtime"
-	"github.com/rjarmstrong/kwk-types"
-	"github.com/rjarmstrong/kwk-types/vwrite"
 )
 
 func rootPrinter(prefs *out.Prefs, writer vwrite.Writer, user *types.User) cli.RootPrinter {

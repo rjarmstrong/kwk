@@ -2,8 +2,8 @@ package rpc
 
 import (
 	"bytes"
-	"github.com/rjarmstrong/kwk/src/cli"
 	"github.com/rjarmstrong/kwk-types"
+	"github.com/rjarmstrong/kwk/src/cli"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"os/exec"

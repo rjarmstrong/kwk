@@ -6,8 +6,8 @@ import (
 	"os"
 	"os/exec"
 	//"github.com/mitchellh/go-ps"
-	"github.com/rjarmstrong/kwk/src/out"
 	"github.com/rjarmstrong/kwk-types"
+	"github.com/rjarmstrong/kwk/src/out"
 )
 
 const PROCESS_NODE = "PROCESS_NODE"

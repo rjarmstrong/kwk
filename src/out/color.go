@@ -1,8 +1,8 @@
 package out
 
 import (
-	"github.com/rjarmstrong/kwk/src/style"
 	"github.com/rjarmstrong/kwk-types"
+	"github.com/rjarmstrong/kwk/src/style"
 )
 
 func SetColors(c Colors) {

@@ -3,10 +3,10 @@ package out
 
 import (
 	"fmt"
-	"github.com/rjarmstrong/kwk/src/style"
+	"github.com/lunixbochs/vtclean"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk-types/vwrite"
-	"github.com/lunixbochs/vtclean"
+	"github.com/rjarmstrong/kwk/src/style"
 	"io"
 	"text/tabwriter"
 	"time"

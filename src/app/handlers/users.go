@@ -1,12 +1,12 @@
 package handlers
 
 import (
-	"github.com/rjarmstrong/kwk/src/cli"
-	"github.com/rjarmstrong/kwk/src/out"
-	"github.com/rjarmstrong/kwk/src/store"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk-types/errs"
 	"github.com/rjarmstrong/kwk-types/vwrite"
+	"github.com/rjarmstrong/kwk/src/cli"
+	"github.com/rjarmstrong/kwk/src/out"
+	"github.com/rjarmstrong/kwk/src/store"
 )
 
 const userDocName = "user"

@@ -3,8 +3,8 @@ package out
 import (
 	"bytes"
 	"fmt"
-	"github.com/rjarmstrong/kwk/src/style"
 	"github.com/rjarmstrong/kwk-types"
+	"github.com/rjarmstrong/kwk/src/style"
 	"github.com/rjarmstrong/tablewriter"
 	"io"
 	"strings"

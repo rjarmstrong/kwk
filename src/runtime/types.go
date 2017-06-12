@@ -3,8 +3,8 @@ package runtime
 import (
 	"errors"
 	"fmt"
-	"github.com/rjarmstrong/kwk/src/out"
 	"github.com/rjarmstrong/kwk-types"
+	"github.com/rjarmstrong/kwk/src/out"
 	"gopkg.in/yaml.v2"
 	"log"
 	"os"

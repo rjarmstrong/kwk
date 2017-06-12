@@ -2,6 +2,9 @@ package app
 
 import (
 	"fmt"
+	"github.com/rjarmstrong/kwk-types"
+	"github.com/rjarmstrong/kwk-types/errs"
+	"github.com/rjarmstrong/kwk-types/vwrite"
 	"github.com/rjarmstrong/kwk/src/app/handlers"
 	"github.com/rjarmstrong/kwk/src/app/routes"
 	"github.com/rjarmstrong/kwk/src/cli"
@@ -9,9 +12,6 @@ import (
 	"github.com/rjarmstrong/kwk/src/rpc"
 	"github.com/rjarmstrong/kwk/src/runtime"
 	"github.com/rjarmstrong/kwk/src/store"
-	"github.com/rjarmstrong/kwk-types"
-	"github.com/rjarmstrong/kwk-types/errs"
-	"github.com/rjarmstrong/kwk-types/vwrite"
 	urf "github.com/urfave/cli"
 	"io"
 	"strings"

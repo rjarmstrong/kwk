@@ -3,8 +3,8 @@ package out
 import (
 	"bytes"
 	"fmt"
-	"github.com/rjarmstrong/kwk/src/style"
 	"github.com/rjarmstrong/kwk-types"
+	"github.com/rjarmstrong/kwk/src/style"
 	"github.com/rjarmstrong/tablewriter"
 	"golang.org/x/text/unicode/norm"
 	"io"

@@ -2,13 +2,13 @@ package main
 
 import (
 	gu "github.com/inconshreveable/go-update"
+	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk/src/app"
 	"github.com/rjarmstrong/kwk/src/app/routes"
 	"github.com/rjarmstrong/kwk/src/cli"
 	"github.com/rjarmstrong/kwk/src/out"
 	"github.com/rjarmstrong/kwk/src/store"
 	"github.com/rjarmstrong/kwk/src/updater"
-	"github.com/rjarmstrong/kwk-types"
 	"os"
 	"runtime/pprof"
 	"strconv"

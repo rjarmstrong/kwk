@@ -2,10 +2,10 @@ package runtime
 
 import (
 	"fmt"
-	"github.com/rjarmstrong/kwk/src/out"
-	"github.com/rjarmstrong/kwk/src/store"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk-types/errs"
+	"github.com/rjarmstrong/kwk/src/out"
+	"github.com/rjarmstrong/kwk/src/store"
 	"gopkg.in/yaml.v2"
 )
 

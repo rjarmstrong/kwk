@@ -2,8 +2,8 @@ package store
 
 import (
 	"github.com/kennygrant/sanitize"
-	"github.com/rjarmstrong/kwk/src/out"
 	"github.com/rjarmstrong/kwk-types/errs"
+	"github.com/rjarmstrong/kwk/src/out"
 	"io/ioutil"
 	"log"
 	"os"

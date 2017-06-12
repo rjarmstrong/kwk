@@ -2,9 +2,9 @@ package out
 
 import (
 	"fmt"
-	"github.com/rjarmstrong/kwk/src/style"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk-types/vwrite"
+	"github.com/rjarmstrong/kwk/src/style"
 	"io"
 	"strings"
 )

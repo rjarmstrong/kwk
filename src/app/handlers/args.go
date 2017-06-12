@@ -3,9 +3,9 @@ package handlers
 import (
 	"bufio"
 	"bytes"
-	"github.com/rjarmstrong/kwk/src/out"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk-types/errs"
+	"github.com/rjarmstrong/kwk/src/out"
 	"os"
 )
 

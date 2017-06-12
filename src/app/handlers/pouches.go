@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/rjarmstrong/kwk/src/out"
 	"github.com/rjarmstrong/kwk-types"
+	"github.com/rjarmstrong/kwk/src/out"
 )
 
 func (sc *Snippets) CreatePouch(name string) error {
