@@ -205,3 +205,33 @@ func TestSnippets_Edit(t *testing.T) {
 	assert.Equal(t, "SnippetEdited", funcName)
 
 }
+
+func TestSnippets_Describe(t *testing.T) {
+	snippetClient.returnsFor["Update"] = response{val: &types.UpdateResponse{}}
+	err := snippets.Describe("snippet1", "This is a description")
+	assert.Nil(t, err)
+	funcName := writer.PopCalled("EWrite")
+	assert.Equal(t, "SnippetDescriptionUpdated", funcName)
+}
+
+func TestSnippets_Delete(t *testing.T) {
+	t.Log("DELETE SNIPPET")
+	snippetClient.returnsFor["GetRoot"] = johnnyRoot
+	snippetClient.returnsFor["Delete"] = response{val: &types.DeleteResponse{}}
+	err := snippets.Delete([]string{"snippet1"})
+	assert.Nil(t, err)
+	funcName := writer.PopCalled("EWrite")
+	assert.Equal(t, "SnippetsDeleted", funcName)
+
+	t.Log("DELETE POUCH")
+	snippetClient.returnsFor["GetRoot"] = johnnyRoot
+	snippetClient.returnsFor["Delete"] = response{val: &types.DeleteResponse{}}
+	err = snippets.Delete([]string{"pouch1"})
+	assert.Nil(t, err)
+	funcName = writer.PopCalled("EWrite")
+	assert.Equal(t, "PouchDeleted", funcName)
+}
+
+func TestSnippets_Move(t *testing.T) {
+
+}

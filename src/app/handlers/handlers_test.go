@@ -160,7 +160,8 @@ func (fc *fakeSnipClient) Create(ctx context.Context, in *types.CreateRequest, o
 }
 
 func (fc *fakeSnipClient) Update(ctx context.Context, in *types.UpdateRequest, opts ...grpc.CallOption) (*types.UpdateResponse, error) {
-	panic("implement me")
+	fc.called["Update"] = in
+	return &types.UpdateResponse{}, nil
 }
 
 func (fc *fakeSnipClient) Move(ctx context.Context, in *types.MoveRequest, opts ...grpc.CallOption) (*types.MoveResponse, error) {
@@ -202,7 +203,8 @@ func (fc *fakeSnipClient) List(ctx context.Context, in *types.ListRequest, opts 
 }
 
 func (fc *fakeSnipClient) Delete(ctx context.Context, in *types.DeleteRequest, opts ...grpc.CallOption) (*types.DeleteResponse, error) {
-	panic("implement me")
+	fc.called["Delete"] = in
+	return &types.DeleteResponse{}, nil
 }
 
 func (fc *fakeSnipClient) GetRoot(ctx context.Context, in *types.RootRequest, opts ...grpc.CallOption) (*types.RootResponse, error) {
@@ -227,7 +229,8 @@ func (fc *fakeSnipClient) MakePouchPrivate(ctx context.Context, in *types.MakePr
 }
 
 func (fc *fakeSnipClient) DeletePouch(ctx context.Context, in *types.DeletePouchRequest, opts ...grpc.CallOption) (*types.DeletePouchResponse, error) {
-	panic("implement me")
+	fc.called["DeletePouch"] = in
+	return &types.DeletePouchResponse{}, nil
 }
 
 func (fc *fakeSnipClient) Alpha(ctx context.Context, in *types.AlphaRequest, opts ...grpc.CallOption) (*types.AlphaResponse, error) {
