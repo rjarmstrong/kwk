@@ -31,9 +31,11 @@ var UserInviteTokenField = vwrite.HandlerFunc(func(w io.Writer) {
 	fmt.Fprint(w, "Your kwk invite code:  ")
 })
 
-var UserPasswordChanged = vwrite.HandlerFunc(func(w io.Writer) {
-	fmt.Fprintln(w, "Your password has been changed for next login.")
-})
+func UserPasswordChanged() vwrite.Handler {
+	return vwrite.HandlerFunc(func(w io.Writer) {
+		fmt.Fprintln(w, "Your password has been changed for next login.")
+	})
+}
 
 func UserProfile(u *types.User) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
@@ -46,9 +48,11 @@ func UserSignedIn(username string) vwrite.Handler {
 	})
 }
 
-var UserSignedOut = vwrite.HandlerFunc(func(w io.Writer) {
-	fmt.Fprintln(w, "You are now signed out.")
-})
+func UserSignedOut() vwrite.Handler {
+	return vwrite.HandlerFunc(func(w io.Writer) {
+		fmt.Fprintln(w, "You are now signed out.")
+	})
+}
 
 func UserSignedUp(username string) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {

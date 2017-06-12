@@ -37,14 +37,13 @@ func NewUsers(pr *cli.UserWithToken, uc types.UsersClient, doc store.Doc, w vwri
 	}
 }
 
+// TASK: Add client side validation check
 // SignUp
 func (c *Users) SignUp() error {
-	// TASK: Add dynamic 'exists' checks
 	res, _ := c.FormField(out.UserEmailField, false)
 	email := res.Value.(string)
 	res, _ = c.FormField(out.UserChooseUsername, false)
 	username := res.Value.(string)
-	// TASK: Add client side validation check
 	res, _ = c.FormField(out.UserChoosePassword, true)
 	password := res.Value.(string)
 
@@ -53,27 +52,22 @@ func (c *Users) SignUp() error {
 	if err != nil {
 		return err
 	}
-	if len(u.AccessToken) > 50 {
-		err := c.doc.Upsert(userDocName, cli.UserWithToken{AccessToken: u.AccessToken, User: *u.User})
-		if err != nil {
-			return err
-		}
-		c.EWrite(out.UserSignedUp(u.User.Username))
+	err = c.doc.Upsert(userDocName, cli.UserWithToken{AccessToken: u.AccessToken, User: *u.User})
+	if err != nil {
+		return err
 	}
-	return nil
+	return c.EWrite(out.UserSignedUp(u.User.Username))
 }
 
 // LogIn
-func (c *Users) LogIn(username string, password string) error {
+func (c *Users) SignIn(username string) error {
 	if username == "" {
 		res, _ := c.FormField(out.UserUsernameField, false)
 		username = res.Value.(string)
 
 	}
-	if password == "" {
-		res, _ := c.FormField(out.UserPasswordField, true)
-		password = res.Value.(string)
-	}
+	res, _ := c.FormField(out.UserPasswordField, true)
+	password := res.Value.(string)
 	ures, err := c.client.SignIn(c.cxf(),
 		&types.SignInRequest{Username: username, Password: password, PrivateView: c.prefs.PrivateView})
 	if err != nil {
@@ -82,51 +76,44 @@ func (c *Users) LogIn(username string, password string) error {
 	c.pr.User = *ures.User
 	c.pr.AccessToken = ures.AccessToken
 
-	if len(ures.AccessToken) > 50 {
-		err := c.doc.Upsert(userDocName, cli.UserWithToken{AccessToken: ures.AccessToken, User: *ures.User})
-		if err != nil {
-			return err
-		}
-		c.Write(out.UserSignedIn(ures.User.Username))
-		// TASK: RootPrinter should be in UserSignedIn
-		return c.rootPrinter(ures.Root)
+	err = c.doc.Upsert(userDocName, cli.UserWithToken{AccessToken: ures.AccessToken, User: *ures.User})
+	if err != nil {
+		return err
 	}
-	return nil
+	c.Write(out.UserSignedIn(ures.User.Username))
+	return c.rootPrinter(ures.Root)
 }
 
 // LogOut
-func (c *Users) LogOut() error {
+func (c *Users) SignOut() error {
 	err := c.doc.DeleteAll()
 	if err != nil {
 		return err
 	}
-	return c.EWrite(out.UserSignedOut)
+	return c.EWrite(out.UserSignedOut())
 }
 
+// TASK: Client side validation
 // ChangePassword
 func (c *Users) ChangePassword() error {
 	p := &types.ChangeRequest{}
 	res, _ := c.Dialog.FormField(out.FreeText("Please provide an email or username: "), false)
 	p.Username = res.Value.(string)
-
 	res, _ = c.FormField(out.FreeText("Current password: "), true)
 	p.ExistingPassword = res.Value.(string)
-	// TASK: Client side validation
 	res, _ = c.FormField(out.FreeText("New password: "), true)
 	p.NewPassword = res.Value.(string)
 	_, err := c.client.ChangePassword(c.cxf(), p)
 	if err != nil {
 		return err
 	}
-	return c.EWrite(out.UserPasswordChanged)
+	return c.EWrite(out.UserPasswordChanged())
 }
 
-// ResetPassword
-func (c *Users) ResetPassword(email string) error {
-	if email == "" {
-		res, _ := c.FormField(out.FreeText("Enter your email to reset your password:  "), false)
-		email = res.Value.(string)
-	}
+// ForgotPassword
+func (c *Users) ForgotPassword() error {
+	res, _ := c.FormField(out.FreeText("Enter your email to reset your password:  "), false)
+	email := res.Value.(string)
 	req := &types.ResetRequest{Email: email}
 	_, err := c.client.ResetPassword(c.cxf(), req)
 	if err != nil {
@@ -137,7 +124,7 @@ func (c *Users) ResetPassword(email string) error {
 
 // Profile
 func (c *Users) Profile() error {
-	if c.pr == nil {
+	if !c.pr.HasAccessToken() {
 		return errs.NotAuthenticated
 	}
 	return c.EWrite(out.UserProfile(&c.pr.User))

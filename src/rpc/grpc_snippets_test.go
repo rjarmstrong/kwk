@@ -22,7 +22,7 @@ func Test_Grpc(t *testing.T) {
 	pr := &cli.UserWithToken{}
 	info := &types.AppInfo{}
 
-	cc, err := GetRpc(pr, info, "localhost:8000", true)
+	cc, err := GetApi(pr, info, "localhost:8000", true)
 	assert.Equal(t, nil, err)
 	uc := types.NewUsersClient(cc)
 

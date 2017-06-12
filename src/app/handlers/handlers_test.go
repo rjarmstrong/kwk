@@ -16,22 +16,30 @@ import (
 
 var (
 	snippetClient   *fakeSnipClient
+	usersClient     *fakeUsersClient
 	runner          *fakeRunner
 	ed              *fakeEditor
 	dlg             *fakeDialogue
 	writer          *fakeWWriter
+	doc             *fakeDoc
 	cxf             cli.ContextFunc
 	prefs           *out.Prefs
 	snippets        *Snippets
+	users           *Users
 	rootPrintCalled *types.RootResponse
+	pr              *cli.UserWithToken
 )
 
 func TestMain(m *testing.M) {
 	snippetClient = &fakeSnipClient{returnsFor: map[string]response{}, called: map[string]interface{}{}}
+	usersClient = &fakeUsersClient{returnsFor: map[string]response{}, called: map[string]interface{}{}}
 	runner = &fakeRunner{called: map[string]interface{}{}}
 	dlg = &fakeDialogue{called: map[string]interface{}{}, returnsFor: map[string]response{}}
 	ed = &fakeEditor{returnsFor: map[string]response{}, called: map[string]interface{}{}}
 	writer = &fakeWWriter{called: map[string]interface{}{}}
+	doc = &fakeDoc{called: map[string]interface{}{}}
+	pr = &cli.UserWithToken{AccessToken: "sometoken"}
+
 	cxf = func() context.Context {
 		return context.Background()
 	}
@@ -43,8 +51,97 @@ func TestMain(m *testing.M) {
 	}
 
 	snippets = NewSnippets(prefs, snippetClient, runner, ed, writer, cxf, rootPrinter, dlg)
+	users = NewUsers(pr, usersClient, doc, writer, dlg, cxf, prefs, rootPrinter)
 	code := m.Run()
 	os.Exit(code)
+}
+
+type fakeUsersClient struct {
+	returnsFor map[string]response
+	called     map[string]interface{}
+}
+
+func (fc *fakeUsersClient) PopCalled(name string) interface{} {
+	c := fc.called[name]
+	delete(fc.called, name)
+	return c
+}
+
+func (fc *fakeUsersClient) SignIn(ctx context.Context, in *types.SignInRequest, opts ...grpc.CallOption) (*types.SignInResponse, error) {
+	fc.called["SignIn"] = in
+	res, ok := fc.returnsFor["SignIn"]
+	if ok && res.val != nil {
+		return res.val.(*types.SignInResponse), res.err
+	}
+	return &types.SignInResponse{}, nil
+}
+
+func (fc *fakeUsersClient) SignUp(ctx context.Context, in *types.SignUpRequest, opts ...grpc.CallOption) (*types.SignUpResponse, error) {
+	fc.called["SignUp"] = in
+	res, ok := fc.returnsFor["SignUp"]
+	if ok && res.val != nil {
+		return res.val.(*types.SignUpResponse), res.err
+	}
+	return &types.SignUpResponse{}, nil
+}
+
+func (fc *fakeUsersClient) ResetPassword(
+	ctx context.Context, in *types.ResetRequest, opts ...grpc.CallOption) (*types.ResetResponse, error) {
+
+	fc.called["ResetPassword"] = in
+	res, ok := fc.returnsFor["ResetPassword"]
+	if ok && res.val != nil {
+		return res.val.(*types.ResetResponse), res.err
+	}
+	return &types.ResetResponse{}, nil
+}
+
+func (fc *fakeUsersClient) ChangePassword(ctx context.Context, in *types.ChangeRequest, opts ...grpc.CallOption) (*types.ChangeResponse, error) {
+	fc.called["ChangePassword"] = in
+	res, ok := fc.returnsFor["ChangePassword"]
+	if ok && res.val != nil {
+		return res.val.(*types.ChangeResponse), res.err
+	}
+	return &types.ChangeResponse{}, nil
+}
+
+func (fc *fakeUsersClient) List(ctx context.Context, in *types.ListUsersRequest, opts ...grpc.CallOption) (*types.ListUsersResponse, error) {
+	fc.called["List"] = in
+	res, ok := fc.returnsFor["List"]
+	if ok && res.val != nil {
+		return res.val.(*types.ListUsersResponse), res.err
+	}
+	return &types.ListUsersResponse{}, nil
+}
+
+type fakeDoc struct {
+	called map[string]interface{}
+}
+
+func (fc *fakeDoc) PopCalled(name string) interface{} {
+	c := fc.called[name]
+	delete(fc.called, name)
+	return c
+}
+
+func (fc *fakeDoc) Upsert(uri string, data interface{}) error {
+	fc.called["Upsert"] = uri
+	return nil
+}
+
+func (fc *fakeDoc) Get(uri string, value interface{}, fresherThan int64) error {
+	fc.called["Get"] = uri
+	return nil
+}
+
+func (fc *fakeDoc) Delete(uri string) error {
+	fc.called["Delete"] = uri
+	return nil
+}
+
+func (fc *fakeDoc) DeleteAll() error {
+	fc.called["DeleteAll"] = true
+	return nil
 }
 
 type fakeWWriter struct {
@@ -120,8 +217,13 @@ func (fc *fakeDialogue) Modal(handler vwrite.Handler, autoYes bool) *out.DialogR
 	return &out.DialogResponse{Ok: true}
 }
 
-func (fc *fakeDialogue) FormField(field vwrite.Handler, mask bool) (*out.DialogResponse, error) {
-	panic("implement me")
+func (fc *fakeDialogue) FormField(handler vwrite.Handler, mask bool) (*out.DialogResponse, error) {
+	fc.called["FormField"] = getFuncName(handler)
+	res, ok := fc.returnsFor["FormField"]
+	if ok && res.val != nil {
+		return res.val.(*out.DialogResponse), nil
+	}
+	return &out.DialogResponse{Ok: true}, nil
 }
 
 type fakeRunner struct {

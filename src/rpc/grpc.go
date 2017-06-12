@@ -70,7 +70,7 @@ type Rpc struct {
 	prefs   *out.Prefs
 }
 
-func GetRpc(pr *cli.UserWithToken, prefs *out.Prefs, cliInfo *types.AppInfo,
+func GetApi(pr *cli.UserWithToken, prefs *out.Prefs, cliInfo *types.AppInfo,
 	serverAddress string, trustAllCerts bool) (*Rpc, error) {
 	rpc := &Rpc{pr: pr, cliInfo: cliInfo, prefs: prefs}
 

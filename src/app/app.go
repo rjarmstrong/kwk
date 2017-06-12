@@ -44,24 +44,24 @@ func NewCLI(r io.Reader, wr io.Writer, i types.AppInfo) *KwkCLI {
 	srw := store.NewSnippetReadWriter(f)
 
 	// API
-	rpc, err := rpc.GetRpc(principal, prefs, &i, cfg.APIHost, cfg.TestMode)
+	api, err := rpc.GetApi(principal, prefs, &i, cfg.APIHost, cfg.TestMode)
 	if err != nil {
 		eh.Handle(errs.ApiDown)
 		return nil
 	}
-	sc := types.NewSnippetsClient(rpc.ClientConn)
-	uc := types.NewUsersClient(rpc.ClientConn)
+	sc := types.NewSnippetsClient(api.ClientConn)
+	uc := types.NewUsersClient(api.ClientConn)
 
 	// SERVICES
 	rp := rootPrinter(prefs, w, &principal.User)
-	users := handlers.NewUsers(principal, uc, doc, w, d, rpc.Cxf, prefs, rp)
-	runner := runtime.NewRunner(prefs, env, w, srw, useLogger(rpc.Cxf, sc))
-	editor := runtime.NewEditor(env, prefs, snippetPatcher(rpc.Cxf, sc), srw)
-	snippets := handlers.NewSnippets(prefs, sc, runner, editor, w, rpc.Cxf, rp, d)
+	users := handlers.NewUsers(principal, uc, doc, w, d, api.Cxf, prefs, rp)
+	runner := runtime.NewRunner(prefs, env, w, srw, useLogger(api.Cxf, sc))
+	editor := runtime.NewEditor(env, prefs, snippetPatcher(api.Cxf, sc), srw)
+	snippets := handlers.NewSnippets(prefs, sc, runner, editor, w, api.Cxf, rp, d)
 
 	// RUNTIME
 	users.LoadPrincipal(principal)
-	runtime.Configure(env, prefs, principal.User.Username, snippetGetter(rpc.Cxf, sc), snippetMaker(rpc.Cxf, sc), srw, eh)
+	runtime.Configure(env, prefs, principal.User.Username, snippetGetter(api.Cxf, sc), snippetMaker(api.Cxf, sc), srw, eh)
 	out.Debug("PREFS: %+v", prefs)
 
 	// LEVEL
@@ -72,7 +72,7 @@ func NewCLI(r io.Reader, wr io.Writer, i types.AppInfo) *KwkCLI {
 	}
 
 	return &KwkCLI{
-		uf:      createUrfaveApp(users, snippets, eh, rootGetter(rpc.Cxf, sc), w),
+		uf:      createUrfaveApp(users, snippets, eh, rootGetter(api.Cxf, sc), w),
 		Handler: eh,
 	}
 }
