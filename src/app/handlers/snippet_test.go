@@ -43,6 +43,8 @@ var johnnyRoot = response{val: &types.RootResponse{
 }}
 
 func TestSnippets_Create(t *testing.T) {
+	snippetClient.returnsFor["Create"] = response{val: &types.CreateResponse{Snippet: types.NewBlankSnippet()}}
+
 	var cases = []struct {
 		args    []string
 		pipe    bool
@@ -159,5 +161,47 @@ func TestSnippets_RunNode(t *testing.T) {
 	assert.Nil(t, err)
 	funcName = writer.PopCalled("EWrite")
 	assert.Equal(t, "RunAllSnippetsNotTrue", funcName)
+
+	t.Log("RUN NODE")
+	snippetClient.returnsFor["Get"] = snippet1
+	prefs.RunAllSnippets = true
+	err = snippets.RunNode(cli.UserWithToken{}, prefs, &runtime.ProcessNode{}, "name1", []string{})
+	assert.Nil(t, err)
+	uri := runner.PopCalled("Run")
+	assert.Equal(t, "/richard/pouch1/snippet1.txt", uri)
+}
+
+func TestSnippets_Edit(t *testing.T) {
+	t.Log("CREATE NEW if not found")
+	snippetClient.returnsFor["Get"] = response{err: errs.NotFound}
+	snippetClient.returnsFor["Create"] = response{val: &types.CreateResponse{Snippet: types.NewBlankSnippet()}}
+	err := snippets.Edit("new-snippet1")
+	assert.Nil(t, err)
+	funcName := dlg.PopCalled("Modal")
+	assert.Equal(t, "SnippetEditNewPrompt", funcName)
+
+	t.Log("EDIT but no changes")
+	snippetClient.returnsFor["Get"] = snippet1
+	err = snippets.Edit("new-snippet1")
+	assert.Nil(t, err)
+	uri := ed.PopCalled("Invoke")
+	assert.Equal(t, "/richard/pouch1/snippet1.txt", uri)
+	uri = ed.PopCalled("Close")
+	assert.Equal(t, "/richard/pouch1/snippet1.txt", uri)
+	funcName = writer.PopCalled("EWrite")
+	assert.Equal(t, "SnippetNoChanges", funcName)
+
+	t.Log("EDIT with changes")
+	snippetClient.returnsFor["Get"] = snippet1
+	ed.returnsFor["Close"] = response{val: uint(5)}
+
+	err = snippets.Edit("new-snippet1")
+	assert.Nil(t, err)
+	uri = ed.PopCalled("Invoke")
+	assert.Equal(t, "/richard/pouch1/snippet1.txt", uri)
+	uri = ed.PopCalled("Close")
+	assert.Equal(t, "/richard/pouch1/snippet1.txt", uri)
+	funcName = writer.PopCalled("EWrite")
+	assert.Equal(t, "SnippetEdited", funcName)
 
 }

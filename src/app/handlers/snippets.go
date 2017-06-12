@@ -1,13 +1,13 @@
 package handlers
 
 import (
-	"github.com/rjarmstrong/kwk/src/cli"
-	"github.com/rjarmstrong/kwk/src/out"
-	"github.com/rjarmstrong/kwk/src/runtime"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk-types/age"
 	"github.com/rjarmstrong/kwk-types/errs"
 	"github.com/rjarmstrong/kwk-types/vwrite"
+	"github.com/rjarmstrong/kwk/src/cli"
+	"github.com/rjarmstrong/kwk/src/out"
+	"github.com/rjarmstrong/kwk/src/runtime"
 	"sort"
 	"strings"
 	"time"
@@ -386,6 +386,9 @@ func (sc *Snippets) getSnippet(uri string) (*types.Snippet, error) {
 		return nil, err
 	}
 	res, err := sc.client.Get(sc.cxf(), &types.GetRequest{Alias: a, Suggest: true})
+	if err != nil {
+		return nil, err
+	}
 	if res.Suggested && len(res.Items) == 1 {
 		mres := sc.Modal(out.DidYouMean(res.Items[0].Alias.URI()), false)
 		if mres.Ok {
