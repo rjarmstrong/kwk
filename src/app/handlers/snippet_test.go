@@ -131,7 +131,7 @@ func TestSnippets_Cat(t *testing.T) {
 	err = snippets.Cat("name1")
 	assert.Nil(t, err)
 	funcName := dlg.PopCalled("Modal")
-	assert.Equal(t, "Info", funcName)
+	assert.Equal(t, "DidYouMean", funcName)
 	handler = writer.PopCalled("EWrite")
 	assert.Equal(t, "SnippetCat", handler)
 }
@@ -150,8 +150,14 @@ func TestSnippets_RunNode(t *testing.T) {
 	err := snippets.RunNode(cli.UserWithToken{}, prefs, &runtime.ProcessNode{}, "name1", []string{})
 	assert.Nil(t, err)
 	funcName := writer.PopCalled("EWrite")
-	assert.Equal(t, "Warn", funcName)
+	assert.Equal(t, "SnippetAmbiguous", funcName)
 
-	t.Log("NOT RUN ALL")
+	t.Log("NOT RUN IF RunAllSnippets false and is another username")
+	snippetClient.returnsFor["Get"] = snippet1
+	prefs.RunAllSnippets = false
+	err = snippets.RunNode(cli.UserWithToken{}, prefs, &runtime.ProcessNode{}, "name1", []string{})
+	assert.Nil(t, err)
+	funcName = writer.PopCalled("EWrite")
+	assert.Equal(t, "RunAllSnippetsNotTrue", funcName)
 
 }

@@ -27,79 +27,86 @@ func errHandler(e error) vwrite.Handler {
 		}
 		LogErr(e)
 		ce, ok := e.(*errs.Error)
+		h := internalError(e)
 		if ok {
 			switch ce.Code {
 			case errs.CodeInvalidArgument:
-				invalidArgument(ce).Write(w)
+				h = invalidArgument(ce)
 			case errs.CodeNotAuthenticated:
-				NotAuthenticated.Write(w)
+				h = NotAuthenticated()
 			case errs.CodeNotFound:
-				notFound("").Write(w)
+				h = notFound("")
 			case errs.CodeAlreadyExists:
-				ItemExists.Write(w)
+				h = ItemExists()
 			case errs.CodePermissionDenied:
-				notPermitted.Write(w)
-				return
+				h = notPermitted()
 			case errs.CodeNotImplemented:
-				notImplemented.Write(w)
-				return
+				h = notImplemented()
 			case errs.CodeNotAvailable:
-				notAvailable.Write(w)
+				h = notAvailable()
 			default:
-				internalError(ce).Write(w)
+				h = internalError(ce)
 			}
-			return
 		}
-		internalError(e).Write(w)
-
+		h.Write(w)
 	})
 }
 
-var NotAuthenticated = Warn(vwrite.HandlerFunc(func(w io.Writer) {
-	fmt.Fprintln(w, "Please login to continue: kwk login")
-}))
+func NotAuthenticated() vwrite.Handler {
+	return vwrite.HandlerFunc(func(w io.Writer) {
+		Warn(w, "Please login to continue: kwk login")
+	})
+}
 
-var ItemExists = Warn(vwrite.HandlerFunc(func(w io.Writer) {
-	fmt.Fprintln(w, "An item with that identifier already exists.")
-}))
+func ItemExists() vwrite.Handler {
+	return vwrite.HandlerFunc(func(w io.Writer) {
+		Warn(w, "An item with that identifier already exists.")
+	})
+}
 
 func notFound(name string) vwrite.Handler {
-	return Warn(vwrite.HandlerFunc(func(w io.Writer) {
+	return vwrite.HandlerFunc(func(w io.Writer) {
 		if name == "" {
 			name = "Resource"
 		}
-		fmt.Fprintf(w, "%s couldn't be found.\n", name)
-	}))
+		Warn(w, "%s couldn't be found.\n", name)
+	})
 }
 
 func internalError(err error) vwrite.Handler {
-	return Fatal(vwrite.HandlerFunc(func(w io.Writer) {
+	return vwrite.HandlerFunc(func(w io.Writer) {
 		ce, ok := err.(*errs.Error)
 		if ok {
 			fmt.Fprintln(w, ce.Message, ce.Code)
 			return
 		}
 		LogErr(err)
-		fmt.Fprintln(w, "Something broke. \n- To report type: kwk upload-errors \n"+
+		Fatal(w, "Something broke. \n- To report type: kwk upload-errors \n"+
 			"- You can also try to upgrade: npm update kwkcli -g\n")
 		os.Exit(1)
-	}))
+	})
 }
 
-var notImplemented = Warn(vwrite.HandlerFunc(func(w io.Writer) {
-	fmt.Fprintln(w, "Your CLI may be out of date. Please run: kwk update")
-}))
+func notImplemented() vwrite.Handler {
+	return vwrite.HandlerFunc(func(w io.Writer) {
+		Warn(w, "Your CLI may be out of date. Please run: kwk update")
+	})
+}
 
-var notPermitted = Warn(vwrite.HandlerFunc(func(w io.Writer) {
-	fmt.Fprintln(w, "Permission denied.")
-}))
+func notPermitted() vwrite.Handler {
+	return vwrite.HandlerFunc(func(w io.Writer) {
+		Warn(w, "Permission denied.")
+	})
+}
 
-var notAvailable = Fatal(vwrite.HandlerFunc(func(w io.Writer) {
-	fmt.Fprintf(w, "Kwk is DOWN! Please try again in a bit.\n\n\n")
-}))
+func notAvailable() vwrite.Handler {
+	return vwrite.HandlerFunc(func(w io.Writer) {
+		Warn(w, "Kwk is DOWN! Please try again in a bit.\n\n\n")
+	})
+}
 
 func invalidArgument(err *errs.Error) vwrite.Handler {
-	return Warn(vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprintf(w, "%s.\n", err.Message)
-	}))
+	return vwrite.HandlerFunc(func(w io.Writer) {
+		Warn(w, "%s.\n", err.Message)
+	})
 }
