@@ -2,9 +2,9 @@ package routes
 
 import (
 	"fmt"
-	"github.com/rjarmstrong/kwk/src/app/handlers"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk-types/errs"
+	"github.com/rjarmstrong/kwk/src/app/handlers"
 	"github.com/urfave/cli"
 	"strings"
 )
@@ -13,7 +13,7 @@ func DefaultRoute(info *types.AppInfo, snippets *handlers.Snippets, eh errs.Hand
 	return func(c *cli.Context, firstArg string) {
 		i := c.Args().Get(1)
 		if strings.HasPrefix(firstArg, "@") {
-			snippets.GetEra(firstArg)
+			snippets.ListByHandle(firstArg)
 			return
 		}
 		var err error

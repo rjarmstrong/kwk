@@ -2,13 +2,11 @@ package handlers
 
 import (
 	"github.com/rjarmstrong/kwk-types"
-	"github.com/rjarmstrong/kwk-types/age"
 	"github.com/rjarmstrong/kwk-types/errs"
 	"github.com/rjarmstrong/kwk-types/vwrite"
 	"github.com/rjarmstrong/kwk/src/cli"
 	"github.com/rjarmstrong/kwk/src/out"
 	"github.com/rjarmstrong/kwk/src/runtime"
-	"sort"
 	"strings"
 	"time"
 )
@@ -309,48 +307,19 @@ func (sc *Snippets) List(username string, pouch string) error {
 
 // Dump writes out all snippets as one long list
 func (sc *Snippets) Dump(username string) error {
-	list, err := sc.client.List(sc.cxf(), &types.ListRequest{Username: username, PrivateView: sc.prefs.PrivateView})
+	list, err := sc.client.List(sc.cxf(), &types.ListRequest{Limit: 1000, Username: username, PrivateView: sc.prefs.PrivateView})
 	if err != nil {
 		return err
 	}
 	return sc.EWrite(out.SnippetList(sc.prefs, list))
 }
 
-// GetEra lists snippets by special filters: @today @week @month @old
-func (sc *Snippets) GetEra(virtualPouch string) error {
-	// Task: Not working!!
-	list, err := sc.client.List(sc.cxf(), &types.ListRequest{PrivateView: sc.prefs.PrivateView})
+// ListByHandle lists snippets by handle filters: @today @week @month @old
+func (sc *Snippets) ListByHandle(handle string) error {
+	list, err := sc.client.List(sc.cxf(), &types.ListRequest{PrivateView: sc.prefs.PrivateView, Category: handle})
 	if err != nil {
 		return err
 	}
-	era := []*types.Snippet{}
-	var since, latest int64
-	sod := age.StartOfDay(time.Now()).Unix()
-	isoYear, isoWeek := time.Now().ISOWeek()
-	fdw := age.FirstDayOfISOWeek(isoYear, isoWeek, time.Local).Unix()
-	som := age.StartOfMonth(time.Now()).Unix()
-	if virtualPouch == "@today" {
-		since = sod
-		latest = time.Now().Unix()
-	} else if virtualPouch == "@week" {
-		since = fdw
-		latest = sod
-	} else if virtualPouch == "@month" {
-		since = som
-		latest = fdw
-	} else if virtualPouch == "@old" {
-		since = 0
-		latest = som
-	}
-	for _, v := range list.Items {
-		if v.RunStatusTime > since && v.RunStatusTime < latest {
-			era = append(era, v)
-		}
-	}
-	sort.Slice(era, func(i, j int) bool {
-		return era[i].RunStatusTime < era[j].RunStatusTime
-	})
-	list.Items = era
 	return sc.EWrite(out.SnippetList(sc.prefs, list))
 }
 
@@ -415,7 +384,7 @@ func (sc *Snippets) deleteSnippet(args []string) error {
 	}
 	r := sc.Modal(out.SnippetCheckDelete(sn), sc.prefs.AutoYes)
 	if !r.Ok {
-		sc.EWrite(out.SnippetsNotDeleted(sn))
+		return sc.EWrite(out.SnippetsNotDeleted(sn))
 	}
 	res, err := sc.client.Delete(sc.cxf(), &types.DeleteRequest{Pouch: pouch, Names: sn})
 	if err != nil {

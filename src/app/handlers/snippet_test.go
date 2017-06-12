@@ -4,6 +4,7 @@ import (
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk-types/errs"
 	"github.com/rjarmstrong/kwk/src/cli"
+	"github.com/rjarmstrong/kwk/src/out"
 	"github.com/rjarmstrong/kwk/src/runtime"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -116,8 +117,8 @@ func TestSnippets_ViewListOrRun(t *testing.T) {
 	t.Log("LIST root")
 	err = snippets.ViewListOrRun("/johnny", true)
 	assert.Nil(t, err)
-	assert.Equal(t, "johnny", rootCalled.Username)
-	rootCalled = nil
+	assert.Equal(t, "johnny", rootPrintCalled.Username)
+	rootPrintCalled = nil
 }
 
 func TestSnippets_Cat(t *testing.T) {
@@ -223,6 +224,16 @@ func TestSnippets_Delete(t *testing.T) {
 	funcName := writer.PopCalled("EWrite")
 	assert.Equal(t, "SnippetsDeleted", funcName)
 
+	t.Log("OPT NOT TO DELETE SNIPPET")
+	snippetClient.returnsFor["GetRoot"] = johnnyRoot
+	snippetClient.returnsFor["Delete"] = response{val: &types.DeleteResponse{}}
+	dlg.returnsFor["Modal"] = response{val: &out.DialogResponse{Ok: false}}
+	err = snippets.Delete([]string{"snippet1"})
+	assert.Nil(t, err)
+	funcName = writer.PopCalled("EWrite")
+	assert.Equal(t, "SnippetsNotDeleted", funcName)
+	dlg.returnsFor["Modal"] = response{val: &out.DialogResponse{Ok: true}}
+
 	t.Log("DELETE POUCH")
 	snippetClient.returnsFor["GetRoot"] = johnnyRoot
 	snippetClient.returnsFor["Delete"] = response{val: &types.DeleteResponse{}}
@@ -251,8 +262,8 @@ func TestSnippets_Move(t *testing.T) {
 	}}
 	err = snippets.Mv([]string{"pouch1", "new-pouch-name1"})
 	assert.Nil(t, err)
-	assert.Equal(t, "johnny", rootCalled.Username)
-	rootCalled = nil
+	assert.Equal(t, "johnny", rootPrintCalled.Username)
+	rootPrintCalled = nil
 
 	t.Log("MOVE SNIPPETS")
 	snippetClient.returnsFor["GetRoot"] = johnnyRoot
@@ -302,4 +313,27 @@ func TestSnippets_UnTag(t *testing.T) {
 	assert.Nil(t, err)
 	funcName := writer.PopCalled("EWrite")
 	assert.Equal(t, "UnTagged", funcName)
+}
+
+func TestSnippets_List(t *testing.T) {
+	snippetClient.returnsFor["GetRoot"] = johnnyRoot
+	err := snippets.List("richard", "")
+	assert.Nil(t, err)
+	assert.Equal(t, "johnny", rootPrintCalled.Username)
+	rootPrintCalled = nil
+}
+
+func TestSnippets_Dump(t *testing.T) {
+	snippetClient.returnsFor["List"] = response{val: &types.ListResponse{}}
+	err := snippets.Dump("richard")
+	assert.Nil(t, err)
+	funcName := writer.PopCalled("EWrite")
+	assert.Equal(t, "SnippetList", funcName)
+}
+
+func TestSnippets_ListByHandle(t *testing.T) {
+	err := snippets.ListByHandle("@today")
+	assert.Nil(t, err)
+	funcName := writer.PopCalled("EWrite")
+	assert.Equal(t, "SnippetList", funcName)
 }

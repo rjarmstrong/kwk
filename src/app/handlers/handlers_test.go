@@ -15,21 +15,21 @@ import (
 )
 
 var (
-	snippetClient *fakeSnipClient
-	runner        *fakeRunner
-	ed            *fakeEditor
-	dlg           *fakeDialogue
-	writer        *fakeWWriter
-	cxf           cli.ContextFunc
-	prefs         *out.Prefs
-	snippets      *Snippets
-	rootCalled    *types.RootResponse
+	snippetClient   *fakeSnipClient
+	runner          *fakeRunner
+	ed              *fakeEditor
+	dlg             *fakeDialogue
+	writer          *fakeWWriter
+	cxf             cli.ContextFunc
+	prefs           *out.Prefs
+	snippets        *Snippets
+	rootPrintCalled *types.RootResponse
 )
 
 func TestMain(m *testing.M) {
 	snippetClient = &fakeSnipClient{returnsFor: map[string]response{}, called: map[string]interface{}{}}
 	runner = &fakeRunner{called: map[string]interface{}{}}
-	dlg = &fakeDialogue{called: map[string]interface{}{}}
+	dlg = &fakeDialogue{called: map[string]interface{}{}, returnsFor: map[string]response{}}
 	ed = &fakeEditor{returnsFor: map[string]response{}, called: map[string]interface{}{}}
 	writer = &fakeWWriter{called: map[string]interface{}{}}
 	cxf = func() context.Context {
@@ -38,7 +38,7 @@ func TestMain(m *testing.M) {
 	prefs = &out.Prefs{}
 
 	rootPrinter := func(rr *types.RootResponse) error {
-		rootCalled = rr
+		rootPrintCalled = rr
 		return nil
 	}
 
@@ -93,7 +93,8 @@ func (fc *fakeEditor) Close(s *types.Snippet) (uint, error) {
 }
 
 type fakeDialogue struct {
-	called map[string]interface{}
+	returnsFor map[string]response
+	called     map[string]interface{}
 }
 
 func (fc *fakeDialogue) PopCalled(name string) interface{} {
@@ -112,6 +113,10 @@ func (fc *fakeDialogue) ChooseSnippet(s []*types.Snippet) *types.Snippet {
 
 func (fc *fakeDialogue) Modal(handler vwrite.Handler, autoYes bool) *out.DialogResponse {
 	fc.called["Modal"] = getFuncName(handler)
+	res, ok := fc.returnsFor["Modal"]
+	if ok && res.val != nil {
+		return res.val.(*out.DialogResponse)
+	}
 	return &out.DialogResponse{Ok: true}
 }
 
