@@ -103,7 +103,7 @@ func Snippets(pr kwkCli.UserWithToken, prefs *out.Prefs, s *handlers.Snippets) [
 			Name:     "mv",
 			Usage:    spc + "Move snippets between pouches",
 			Action: func(c *cli.Context) error {
-				return s.Move(c.Args())
+				return s.Mv(c.Args())
 
 			},
 		},

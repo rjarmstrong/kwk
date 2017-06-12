@@ -25,7 +25,7 @@ func Pouches(prefs *out.Prefs, s *handlers.Snippets) []cli.Command {
 			Name:     "mv",
 			Usage:    spc + "Rename a pouch",
 			Action: func(c *cli.Context) error {
-				return s.Move(c.Args())
+				return s.Mv(c.Args())
 
 			},
 		},

@@ -165,27 +165,41 @@ func (fc *fakeSnipClient) Update(ctx context.Context, in *types.UpdateRequest, o
 }
 
 func (fc *fakeSnipClient) Move(ctx context.Context, in *types.MoveRequest, opts ...grpc.CallOption) (*types.MoveResponse, error) {
-	panic("implement me")
+	fc.called["Move"] = in
+	return &types.MoveResponse{}, nil
 }
 
 func (fc *fakeSnipClient) Rename(ctx context.Context, in *types.RenameRequest, opts ...grpc.CallOption) (*types.RenameResponse, error) {
-	panic("implement me")
+	fc.called["Rename"] = in
+	res, ok := fc.returnsFor["Rename"]
+	if ok && res.val != nil {
+		return res.val.(*types.RenameResponse), res.err
+	}
+	return &types.RenameResponse{}, nil
 }
 
 func (fc *fakeSnipClient) Patch(ctx context.Context, in *types.PatchRequest, opts ...grpc.CallOption) (*types.PatchResponse, error) {
-	panic("implement me")
+	fc.called["Patch"] = in
+	return &types.PatchResponse{}, nil
 }
 
 func (fc *fakeSnipClient) Clone(ctx context.Context, in *types.CloneRequest, opts ...grpc.CallOption) (*types.CloneResponse, error) {
-	panic("implement me")
+	fc.called["Clone"] = in
+	res, ok := fc.returnsFor["Clone"]
+	if ok && res.val != nil {
+		return res.val.(*types.CloneResponse), res.err
+	}
+	return &types.CloneResponse{}, nil
 }
 
 func (fc *fakeSnipClient) Tag(ctx context.Context, in *types.TagRequest, opts ...grpc.CallOption) (*types.TagResponse, error) {
-	panic("implement me")
+	fc.called["Tag"] = in
+	return &types.TagResponse{}, nil
 }
 
 func (fc *fakeSnipClient) UnTag(ctx context.Context, in *types.UnTagRequest, opts ...grpc.CallOption) (*types.UnTagResponse, error) {
-	panic("implement me")
+	fc.called["UnTag"] = in
+	return &types.UnTagResponse{}, nil
 }
 
 func (fc *fakeSnipClient) Get(ctx context.Context, in *types.GetRequest, opts ...grpc.CallOption) (*types.ListResponse, error) {
@@ -217,15 +231,22 @@ func (fc *fakeSnipClient) GetRoot(ctx context.Context, in *types.RootRequest, op
 }
 
 func (fc *fakeSnipClient) CreatePouch(ctx context.Context, in *types.CreatePouchRequest, opts ...grpc.CallOption) (*types.CreatePouchResponse, error) {
-	panic("implement me")
+	fc.called["CreatePouch"] = in
+	return &types.CreatePouchResponse{}, nil
 }
 
 func (fc *fakeSnipClient) RenamePouch(ctx context.Context, in *types.RenamePouchRequest, opts ...grpc.CallOption) (*types.RenamePouchResponse, error) {
-	panic("implement me")
+	fc.called["RenamePouch"] = in
+	res, ok := fc.returnsFor["RenamePouch"]
+	if ok && res.val != nil {
+		return res.val.(*types.RenamePouchResponse), res.err
+	}
+	return nil, res.err
 }
 
 func (fc *fakeSnipClient) MakePouchPrivate(ctx context.Context, in *types.MakePrivateRequest, opts ...grpc.CallOption) (*types.MakePrivateResponse, error) {
-	panic("implement me")
+	fc.called["MakePouchPrivate"] = in
+	return &types.MakePrivateResponse{}, nil
 }
 
 func (fc *fakeSnipClient) DeletePouch(ctx context.Context, in *types.DeletePouchRequest, opts ...grpc.CallOption) (*types.DeletePouchResponse, error) {

@@ -65,23 +65,23 @@
 		},
 		{
 			"ImportPath": "github.com/rjarmstrong/kwk-types",
-			"Rev": "23bb13239ca431b84dcdbcd50aa17c2433557869"
+			"Rev": "8fb541e42a4f6e3db739871c6f5744e0964fb711"
 		},
 		{
 			"ImportPath": "github.com/rjarmstrong/kwk-types/age",
-			"Rev": "23bb13239ca431b84dcdbcd50aa17c2433557869"
+			"Rev": "8fb541e42a4f6e3db739871c6f5744e0964fb711"
 		},
 		{
 			"ImportPath": "github.com/rjarmstrong/kwk-types/errs",
-			"Rev": "23bb13239ca431b84dcdbcd50aa17c2433557869"
+			"Rev": "8fb541e42a4f6e3db739871c6f5744e0964fb711"
 		},
 		{
 			"ImportPath": "github.com/rjarmstrong/kwk-types/valid",
-			"Rev": "23bb13239ca431b84dcdbcd50aa17c2433557869"
+			"Rev": "8fb541e42a4f6e3db739871c6f5744e0964fb711"
 		},
 		{
 			"ImportPath": "github.com/rjarmstrong/kwk-types/vwrite",
-			"Rev": "23bb13239ca431b84dcdbcd50aa17c2433557869"
+			"Rev": "8fb541e42a4f6e3db739871c6f5744e0964fb711"
 		},
 		{
 			"ImportPath": "github.com/rjarmstrong/tablewriter",

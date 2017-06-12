@@ -15,8 +15,9 @@ func SnippetDescriptionUpdated(uri string, desc string) vwrite.Handler {
 	})
 }
 
-func SnippetClonedAs(newName string) vwrite.Handler {
+func SnippetClonedAs(list *types.ListResponse, prefs *Prefs, newName string) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
+		printPouchSnippets(w, prefs, list)
 		Success(w, "Cloned as %s\n\n", newName)
 	})
 }
@@ -76,7 +77,7 @@ func Tagged(uri string, tags []string) vwrite.Handler {
 	})
 }
 
-func UnTag(uri string, tags []string) vwrite.Handler {
+func UnTagged(uri string, tags []string) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
 		Success(w, "Tags: %s removed from %s\n", strings.Join(tags, ", "), uri)
 	})
@@ -100,8 +101,9 @@ func RunAllSnippetsNotTrue(callerUri string, uri string) vwrite.Handler {
 	})
 }
 
-func SnippetRenamed(originalUri string, newUri string) vwrite.Handler {
+func SnippetRenamed(list *types.ListResponse, prefs *Prefs, originalUri string, newUri string) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
+		printPouchSnippets(w, prefs, list)
 		Success(w, "%s renamed to %s", originalUri, newUri)
 	})
 }
@@ -135,16 +137,11 @@ func SnippetsNotDeleted(snipNames []*types.SnipName) vwrite.Handler {
 	})
 }
 
-func SnippetsMoved(snipNames []*types.SnipName, pouch string) vwrite.Handler {
+func SnippetsMoved(list *types.ListResponse, prefs *Prefs, snipNames []*types.SnipName, pouch string) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
+		printPouchSnippets(w, prefs, list)
 		printSnipNames(w, snipNames)
 		Info(w, " moved to pouch %s\n", pouch)
-	})
-}
-
-func SnippetPouchCreatePrompt() vwrite.Handler {
-	return vwrite.HandlerFunc(func(w io.Writer) {
-		Info(w, "Would you like to create the snippet in a new pouch? [y/n] ")
 	})
 }
 

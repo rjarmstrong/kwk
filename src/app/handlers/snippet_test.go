@@ -233,5 +233,73 @@ func TestSnippets_Delete(t *testing.T) {
 }
 
 func TestSnippets_Move(t *testing.T) {
+	t.Log("RENAME SNIPPET")
+	snippetClient.returnsFor["GetRoot"] = johnnyRoot
+	snippetClient.returnsFor["Rename"] = response{val: &types.RenameResponse{
+		Snippet:  types.NewBlankSnippet(),
+		Original: &types.SnipName{Name: "snippet1", Ext: "txt"},
+	}}
+	err := snippets.Mv([]string{"snippet1", "newname-snippet1"})
+	assert.Nil(t, err)
+	funcName := writer.PopCalled("EWrite")
+	assert.Equal(t, "SnippetRenamed", funcName)
 
+	t.Log("RENAME POUCH")
+	snippetClient.returnsFor["GetRoot"] = johnnyRoot
+	snippetClient.returnsFor["RenamePouch"] = response{val: &types.RenamePouchResponse{
+		Root: johnnyRoot.val.(*types.RootResponse),
+	}}
+	err = snippets.Mv([]string{"pouch1", "new-pouch-name1"})
+	assert.Nil(t, err)
+	assert.Equal(t, "johnny", rootCalled.Username)
+	rootCalled = nil
+
+	t.Log("MOVE SNIPPETS")
+	snippetClient.returnsFor["GetRoot"] = johnnyRoot
+	snippetClient.returnsFor["Move"] = response{val: &types.MoveResponse{
+		List: &types.ListResponse{},
+	}}
+	err = snippets.Mv([]string{"snippet1", "snippet2", "pouch2"})
+	assert.Nil(t, err)
+	funcName = writer.PopCalled("EWrite")
+	assert.Equal(t, "SnippetsMoved", funcName)
+
+	t.Log("TOO FEW ARGS")
+	err = snippets.Mv([]string{"snippet1"})
+	assert.EqualError(t, err, "Two arguments are required for the move command.")
+}
+
+func TestSnippets_Patch(t *testing.T) {
+	snippetClient.returnsFor["Patch"] = response{val: &types.PatchResponse{}}
+	err := snippets.Patch("snippet1", "the quick brown", "the kwk brown")
+	assert.Nil(t, err)
+	funcName := writer.PopCalled("EWrite")
+	assert.Equal(t, "SnippetPatched", funcName)
+}
+
+func TestSnippets_Clone(t *testing.T) {
+	snippetClient.returnsFor["Clone"] = response{val: &types.CloneResponse{
+		Snippet: types.NewBlankSnippet(),
+		List:    &types.ListResponse{},
+	}}
+	err := snippets.Clone("snippet1", "snippetCloned1")
+	assert.Nil(t, err)
+	funcName := writer.PopCalled("EWrite")
+	assert.Equal(t, "SnippetClonedAs", funcName)
+}
+
+func TestSnippets_Tag(t *testing.T) {
+	snippetClient.returnsFor["Tag"] = response{val: &types.TagResponse{}}
+	err := snippets.Tag("snippet1", "tag1", "tag2")
+	assert.Nil(t, err)
+	funcName := writer.PopCalled("EWrite")
+	assert.Equal(t, "Tagged", funcName)
+}
+
+func TestSnippets_UnTag(t *testing.T) {
+	snippetClient.returnsFor["UnTag"] = response{val: &types.UnTagResponse{}}
+	err := snippets.UnTag("snippet1", "tag1", "tag2")
+	assert.Nil(t, err)
+	funcName := writer.PopCalled("EWrite")
+	assert.Equal(t, "UnTagged", funcName)
 }

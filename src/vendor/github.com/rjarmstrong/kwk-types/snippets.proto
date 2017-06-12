@@ -197,6 +197,7 @@ message RenameRequest {
 message RenameResponse {
     Snippet snippet = 1;
     SnipName original = 2;
+    ListResponse list = 3;
 }
 
 message PatchRequest {
