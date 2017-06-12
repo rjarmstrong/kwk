@@ -91,7 +91,7 @@ func SnippetAmbiguous(callerUri string, uri string) vwrite.Handler {
 
 func DidYouMean(uri string) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		Info(w, "Did you mean %s ?", uri)
+		Info(w, "Did you mean %s ? y/n ", uri)
 	})
 }
 

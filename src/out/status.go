@@ -7,21 +7,17 @@ import (
 )
 
 func Fatal(w io.Writer, format string, args ...interface{}) {
-	styl := append([]interface{}{style.Margin, style.Fire}, args)
-	fmt.Fprintf(w, "%s%s"+format, styl)
+	fmt.Fprintf(w, "%s%s  %s", style.Margin, style.Fire, fmt.Sprintf(format, args...))
 }
 
 func Warn(w io.Writer, format string, args ...interface{}) {
-	styl := append([]interface{}{style.Margin, style.Warning}, args)
-	fmt.Fprintf(w, "%s%s"+format, styl)
+	fmt.Fprintf(w, "\n%s%s  %s", style.Margin, style.Fmt256(style.ColorBrightRed, style.Warning), fmt.Sprintf(format, args...))
 }
 
 func Success(w io.Writer, format string, args ...interface{}) {
-	styl := append([]interface{}{style.Margin, style.IconTick}, args)
-	fmt.Fprintf(w, "%s%s"+format, styl)
+	fmt.Fprintf(w, "%s%s  %s", style.Margin, style.IconTick, fmt.Sprintf(format, args...))
 }
 
 func Info(w io.Writer, format string, args ...interface{}) {
-	styl := append([]interface{}{style.Margin, style.Info}, args)
-	fmt.Fprintf(w, "%s%s"+format, styl)
+	fmt.Fprintf(w, "\n%s%s  %s", style.Margin, style.Fmt256(style.ColorPouchCyan, style.Info), fmt.Sprintf(format, args...))
 }
