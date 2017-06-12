@@ -14,19 +14,6 @@ func (sc *Snippets) CreatePouch(name string) error {
 	return sc.EWrite(out.PouchCreated(name))
 }
 
-func (sc *Snippets) deletePouch(pouch string) error {
-	res := sc.Dialog.Modal(out.PouchCheckDelete(pouch), false)
-	if !res.Ok {
-		return sc.EWrite(out.PouchNotDeleted(pouch))
-	}
-	dres, err := sc.client.DeletePouch(sc.cxf(), &types.DeletePouchRequest{Name: pouch})
-	if err != nil {
-		return err
-	}
-	sc.rootPrinter(dres.Root)
-	return sc.EWrite(out.PouchDeleted(pouch))
-}
-
 func (sc *Snippets) Lock(pouch string) error {
 	_, err := sc.client.MakePouchPrivate(sc.cxf(), &types.MakePrivateRequest{Name: pouch, MakePrivate: true})
 	if err != nil {
@@ -45,4 +32,17 @@ func (sc *Snippets) UnLock(pouch string) error {
 		return sc.EWrite(out.PouchUnLocked(pouch))
 	}
 	return sc.EWrite(out.PouchNotUnLocked(pouch))
+}
+
+func (sc *Snippets) deletePouch(pouch string) error {
+	res := sc.Dialog.Modal(out.PouchCheckDelete(pouch), false)
+	if !res.Ok {
+		return sc.EWrite(out.PouchNotDeleted(pouch))
+	}
+	dres, err := sc.client.DeletePouch(sc.cxf(), &types.DeletePouchRequest{Name: pouch})
+	if err != nil {
+		return err
+	}
+	sc.rootPrinter(dres.Root)
+	return sc.EWrite(out.PouchDeleted(pouch))
 }
