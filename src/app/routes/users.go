@@ -24,7 +24,7 @@ func Users(a *handlers.Users) []cli.Command {
 			Usage:    "Login to kwk using username and password",
 			Aliases:  []string{"signin"},
 			Action: func(c *cli.Context) error {
-				return a.SignIn(c.Args().Get(0), c.Args().Get(1))
+				return a.SignIn(c.Args().Get(0))
 			},
 		},
 		{
@@ -49,7 +49,7 @@ func Users(a *handlers.Users) []cli.Command {
 			Name:     "forgot-pass",
 			Usage:    "Send a password reset code to the given email address",
 			Action: func(c *cli.Context) error {
-				return a.ForgotPassword(c.Args().First())
+				return a.ForgotPassword()
 			},
 		},
 		{
