@@ -27,13 +27,13 @@ type SnippetReadWriter interface {
 }
 
 func NewDiskFile() File {
-	return &DiskFile{}
+	return &diskFile{}
 }
 
-type DiskFile struct {
+type diskFile struct {
 }
 
-func (s *DiskFile) Write(subDirName string, suffixPath string, content string, incHoldingDir bool) (filePath string, err error) {
+func (s *diskFile) Write(subDirName string, suffixPath string, content string, incHoldingDir bool) (filePath string, err error) {
 	if suffixPath == "" {
 		return "", errs.New(errs.CodeInternalError, "file.*Write: No suffixPath provided.")
 	}
@@ -43,27 +43,24 @@ func (s *DiskFile) Write(subDirName string, suffixPath string, content string, i
 	return fp, err
 }
 
-func (s *DiskFile) Read(subDirName string, suffixPath string, incHoldingDir bool, after int64) (string, error) {
+func (s *diskFile) Read(subDirName string, suffixPath string, incHoldingDir bool, after int64) (string, error) {
 	fp := s.getFilePath(subDirName, suffixPath, incHoldingDir)
 	out.Debug("READ: %s", fp)
-	if fi, err := os.Stat(fp); err != nil {
+	fi, err := os.Stat(fp)
+	if err != nil {
 		if os.IsNotExist(err) {
 			return "", errs.FileNotFound
-		} else {
-			return "", err
 		}
-	} else {
-		if after == 0 || after < int64(fi.ModTime().Unix()) {
-			bts, err := ioutil.ReadFile(fp)
-			return string(bts), err
-		} else {
-			return "", errs.FileExpired
-		}
-
+		return "", err
 	}
+	if after == 0 || after < int64(fi.ModTime().Unix()) {
+		bts, err := ioutil.ReadFile(fp)
+		return string(bts), err
+	}
+	return "", errs.FileExpired
 }
 
-func (s *DiskFile) RmDir(subDirName string, suffixPath string) error {
+func (s *diskFile) RmDir(subDirName string, suffixPath string) error {
 	fp := s.getFilePath(subDirName, suffixPath, true)
 	parts := strings.Split(fp, "/")
 	// Path will (probably) never be less than 3 segments so not checking length
@@ -72,11 +69,11 @@ func (s *DiskFile) RmDir(subDirName string, suffixPath string) error {
 	return os.RemoveAll(dp)
 }
 
-func (s *DiskFile) DeleteAll() error {
+func (s *diskFile) DeleteAll() error {
 	return os.RemoveAll(out.KwkPath())
 }
 
-func (s *DiskFile) Delete(directoryName string, fileName string) error {
+func (s *diskFile) Delete(directoryName string, fileName string) error {
 	dirPath, err := s.getSubDir(directoryName)
 	if err != nil {
 		return err
@@ -86,7 +83,7 @@ func (s *DiskFile) Delete(directoryName string, fileName string) error {
 	return os.RemoveAll(fp)
 }
 
-func (s *DiskFile) upsertDirectory(dir string) error {
+func (s *diskFile) upsertDirectory(dir string) error {
 	if err := os.MkdirAll(dir, out.StandardFilePermission); err != nil {
 		if os.IsExist(err) {
 			return nil
@@ -97,7 +94,7 @@ func (s *DiskFile) upsertDirectory(dir string) error {
 }
 
 // getSubDir gets the directory immediately below the root (~/.kwk/<sub dir>)
-func (s *DiskFile) getSubDir(directoryName string) (string, error) {
+func (s *diskFile) getSubDir(directoryName string) (string, error) {
 	dir := path.Join(out.KwkPath(), directoryName)
 	out.Debug("DIR: %s", dir)
 	err := s.upsertDirectory(dir)
@@ -105,7 +102,7 @@ func (s *DiskFile) getSubDir(directoryName string) (string, error) {
 }
 
 // getHoldingDirectory gets the directory which holds the file, creates it if it doesn't exist.
-func (s *DiskFile) getHoldingDirectory(subDirName string, fileName string) string {
+func (s *diskFile) getHoldingDirectory(subDirName string, fileName string) string {
 	hd := strings.Replace(fileName, ".", "_", -1)
 	dirPath := path.Join(out.KwkPath(), subDirName, hd)
 	if e := s.upsertDirectory(dirPath); e != nil {
@@ -117,7 +114,7 @@ func (s *DiskFile) getHoldingDirectory(subDirName string, fileName string) strin
 }
 
 // getFilePath gets the file path of the actual document.
-func (s *DiskFile) getFilePath(subDirName string, suffixPath string, incHoldingDir bool) string {
+func (s *diskFile) getFilePath(subDirName string, suffixPath string, incHoldingDir bool) string {
 	sn := sanitize.Name(suffixPath)
 	if incHoldingDir {
 		hd := s.getHoldingDirectory(subDirName, sn)
@@ -128,5 +125,4 @@ func (s *DiskFile) getFilePath(subDirName string, suffixPath string, incHoldingD
 		log.Fatal(err)
 	}
 	return path.Join(out.KwkPath(), subDirName, sn)
-
 }
