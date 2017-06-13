@@ -4,27 +4,28 @@ import (
 	"fmt"
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk-types/vwrite"
+	"github.com/rjarmstrong/kwk/src/style"
 	"io"
 )
 
 var UserChooseUsername = vwrite.HandlerFunc(func(w io.Writer) {
-	fmt.Fprint(w, "Choose a memorable username: ")
+	Prompt(w, "Choose a memorable username: ")
 })
 
 var UserChoosePassword = vwrite.HandlerFunc(func(w io.Writer) {
-	fmt.Fprint(w, "And enter a password (1 num, 1 cap, 8 chars): ")
+	Prompt(w, "And enter a password (1 num, 1 cap, 8 chars): ")
 })
 
 var UserUsernameField = vwrite.HandlerFunc(func(w io.Writer) {
-	fmt.Fprint(w, "Your kwk Username: ")
+	Prompt(w, "Your kwk Username: ")
 })
 
 var UserPasswordField = vwrite.HandlerFunc(func(w io.Writer) {
-	fmt.Fprint(w, "Your Password: ")
+	Prompt(w, "Your Password: ")
 })
 
 var UserEmailField = vwrite.HandlerFunc(func(w io.Writer) {
-	fmt.Fprint(w, "Whats your email?: ")
+	Prompt(w, "Whats your email?: ")
 })
 
 var UserInviteTokenField = vwrite.HandlerFunc(func(w io.Writer) {
@@ -44,7 +45,7 @@ func UserProfile(u *types.User) vwrite.Handler {
 }
 func UserSignedIn(username string) vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprintf(w, "Welcome back, %s!\n", username)
+		fmt.Fprintf(w, "\n%sWelcome back, %s!\n", style.Margin, username)
 	})
 }
 

@@ -83,6 +83,7 @@ const (
 	IconPrivatePouch = "◤"
 	IconBroke        = "▦"
 	Info             = "Ⓘ"
+	Prompt           = "▎"
 	IconAccount      = "◉"
 
 	ColorBrightRed      types.AnsiCode = 196
