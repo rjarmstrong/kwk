@@ -3,10 +3,13 @@ package handlers
 import (
 	"github.com/rjarmstrong/kwk-types"
 	"github.com/rjarmstrong/kwk-types/errs"
+	"github.com/rjarmstrong/kwk-types/valid"
 	"github.com/rjarmstrong/kwk-types/vwrite"
 	"github.com/rjarmstrong/kwk/src/cli"
 	"github.com/rjarmstrong/kwk/src/out"
 	"github.com/rjarmstrong/kwk/src/store"
+	"github.com/rjarmstrong/kwk/src/style"
+	"os"
 )
 
 const userDocName = "user"
@@ -42,9 +45,16 @@ func NewUsers(pr *cli.UserWithToken, uc types.UsersClient, doc store.Doc, w vwri
 func (c *Users) SignUp() error {
 	res, _ := c.FormField(out.UserEmailField, false)
 	email := res.Value.(string)
+	if !valid.Test(email, valid.RgxEmail) {
+		// check email
+		out.Warn(os.Stdout, "Invalid email")
+		res, _ = c.FormField(out.UserEmailField, false)
+		email = res.Value.(string)
+	}
 	res, _ = c.FormField(out.UserChooseUsername, false)
 	username := res.Value.(string)
 	res, _ = c.FormField(out.UserChoosePassword, true)
+	c.Write(out.FreeText(style.Margin))
 	password := res.Value.(string)
 
 	req := &types.SignUpRequest{Email: email, Username: username, Password: password}
@@ -64,10 +74,11 @@ func (c *Users) SignIn(username string) error {
 	if username == "" {
 		res, _ := c.FormField(out.UserUsernameField, false)
 		username = res.Value.(string)
-
 	}
 	res, _ := c.FormField(out.UserPasswordField, true)
+	c.Write(out.FreeText(style.Margin))
 	password := res.Value.(string)
+
 	ures, err := c.client.SignIn(c.cxf(),
 		&types.SignInRequest{Username: username, Password: password, PrivateView: c.prefs.PrivateView})
 	if err != nil {
