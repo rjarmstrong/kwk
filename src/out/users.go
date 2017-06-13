@@ -50,7 +50,8 @@ func UserSignedIn(username string) vwrite.Handler {
 
 func UserSignedOut() vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprintln(w, "You are now signed out.")
+		Info(w, "You are now signed out.")
+		SignedOut().Write(w)
 	})
 }
 

@@ -31,7 +31,19 @@ func Dashboard(prefs *Prefs, cli *types.AppInfo, rr *types.RootResponse, u *type
 
 func SignedOut() vwrite.Handler {
 	return vwrite.HandlerFunc(func(w io.Writer) {
-		fmt.Fprint(w, "<Signed out dash goes here>  \n\nkwk signin | kwk signup\n\n")
+		fmt.Fprint(w, "\n")
+		fmt.Fprintf(w, "%s %s  ◥     ◤  %s\n",
+			style.Margin,
+			style.Fmt256(style.ColorPouchCyan, "◤"),
+			style.Fmt256(style.ColorMonthGrey, "◤"))
+
+		fmt.Fprintf(w, "%s ◣    %s ◢    ◣\n", style.Margin, style.Fmt256(style.ColorBrightRed, "◣"))
+		fmt.Fprint(w, "\n")
+		fmt.Fprintf(w, "%s %s\n", style.Margin, "super snippets")
+		fmt.Fprint(w, "\n")
+		fmt.Fprintf(w, "%skwk signup    To get started with kwk\n", style.Margin)
+		fmt.Fprintf(w, "%skwk signin    For existing users\n", style.Margin)
+		fmt.Fprint(w, "\n")
 	})
 }
 

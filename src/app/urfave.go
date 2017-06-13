@@ -35,6 +35,7 @@ func createUrfaveApp(u *handlers.Users, s *handlers.Snippets, eh errs.Handler, r
 			w.Write(out.FreeText("     @today                 List snippets used today\n"))
 			w.Write(out.FreeText("     @week                  List snippets used this week\n"))
 			w.Write(out.FreeText("\n"))
+			w.Write(out.FreeText("\n"))
 			return nil
 		},
 	})

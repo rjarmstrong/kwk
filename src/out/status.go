@@ -19,5 +19,5 @@ func Success(w io.Writer, format string, args ...interface{}) {
 }
 
 func Info(w io.Writer, format string, args ...interface{}) {
-	fmt.Fprintf(w, "\n%s%s  %s", style.Margin, style.Fmt256(style.ColorPouchCyan, style.Info), fmt.Sprintf(format, args...))
+	fmt.Fprintf(w, "\n%s%s  %s\n", style.Margin, style.Fmt256(style.ColorPouchCyan, style.Info), fmt.Sprintf(format, args...))
 }
