@@ -63,7 +63,7 @@ func TestSnippets_Create(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		err := snippets.Create(c.args, c.pipe)
+		err := snippets.Create(c.args, c.pipe, false)
 		if err != nil {
 			assert.True(t, errs.HasCode(err, c.code), "Case: %+v %+v", err.(*errs.Error).Code, c)
 			snippetClient.PopCalled("Create")

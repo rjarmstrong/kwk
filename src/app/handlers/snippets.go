@@ -38,7 +38,7 @@ func NewSnippets(p *out.Prefs, s types.SnippetsClient, r runtime.Runner,
 }
 
 // Create a new Snippet
-func (sc *Snippets) Create(args []string, pipe bool) error {
+func (sc *Snippets) Create(args []string, pipe bool, editIfEmpty bool) error {
 	content, alias, err := resolveCreateArgs(args)
 	if err != nil {
 		return err
@@ -52,6 +52,9 @@ func (sc *Snippets) Create(args []string, pipe bool) error {
 	res, err := sc.client.Create(sc.cxf(), &types.CreateRequest{Content: content, Alias: alias, Role: types.Role_Standard})
 	if err != nil {
 		return err
+	}
+	if editIfEmpty && content == "" {
+		sc.Edit(res.Snippet.Alias.URI())
 	}
 	err = sc.EWrite(out.SnippetList(sc.prefs, res.List))
 	if err != nil {

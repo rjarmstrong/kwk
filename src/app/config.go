@@ -15,7 +15,7 @@ func GetConfig() *cli.AppConfig {
 		log.Fatal(err.Error())
 	}
 	out.DebugEnabled = cfg.Debug
-	if cfg.TestMode && cfg.APIHost != cli.DefaultApiHost {
+	if cfg.TestMode && cfg.APIHost == cli.DefaultApiHost {
 		cfg.APIHost = cli.DefaultTestApiHost
 	}
 	b, _ := json.MarshalIndent(cfg, "", "  ")

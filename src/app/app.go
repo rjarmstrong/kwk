@@ -43,9 +43,9 @@ func NewCLI(r io.Reader, wr io.Writer, i types.AppInfo) *KwkCLI {
 	doc := store.NewJson(f, cli.DocPath)
 	srw := store.NewSnippetReadWriter(f)
 
-	// API
 	api, err := rpc.GetApi(principal, prefs, &i, cfg.APIHost, cfg.TestMode)
 	if err != nil {
+		out.LogErr(err)
 		eh.Handle(errs.ApiDown)
 		return nil
 	}

@@ -23,10 +23,13 @@ func Snippets(pr kwkCli.UserWithToken, prefs *out.Prefs, s *handlers.Snippets) [
 					Name:  "pipe, p",
 					Usage: "Pipe output creates content of new snippet",
 				},
+				cli.BoolFlag{
+					Name: "edit, e",
+				},
 			},
 			Action: func(c *cli.Context) error {
 				pipe := c.Bool("pipe")
-				return s.Create(c.Args(), pipe)
+				return s.Create(c.Args(), pipe, true)
 			},
 		},
 		{

@@ -80,7 +80,7 @@ func GetApi(pr *cli.UserWithToken, prefs *out.Prefs, cliInfo *types.AppInfo,
 	pool.AppendCertsFromPEM([]byte(cert))
 	creds := credentials.NewTLS(&tls.Config{
 		RootCAs:                     pool,
-		InsecureSkipVerify:          trustAllCerts,
+		InsecureSkipVerify:          true, //trustAllCerts,
 		ClientSessionCache:          tls.NewLRUClientSessionCache(-1),
 		PreferServerCipherSuites:    true,
 		DynamicRecordSizingDisabled: false,
@@ -98,7 +98,7 @@ func GetApi(pr *cli.UserWithToken, prefs *out.Prefs, cliInfo *types.AppInfo,
 	grpclog.SetLogger(lg)
 	//grpc.EnableTracing = false
 	out.Debug("API: %s", serverAddress)
-	conn, err := grpc.Dial("localhost:8000", opts...)
+	conn, err := grpc.Dial(serverAddress, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -135,10 +135,10 @@ var noAuthMethods = map[string]bool{
 
 func (rp *Rpc) interceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 	out.Debug("GRPC: %s", method)
-	if !rp.pr.HasAccessToken() && !noAuthMethods[method] {
-		out.Debug("AUTH: No token in request.")
-		return errs.NotAuthenticated
-	}
+	//if !rp.pr.HasAccessToken() && !noAuthMethods[method] {
+	//	out.Debug("AUTH: No token in request.")
+	//	return errs.NotAuthenticated
+	//}
 	out.Debug("CTX: %+v", ctx)
 	out.Debug("OPTS: %+v", opts)
 	err := invoker(ctx, method, req, reply, cc, opts...)
@@ -209,7 +209,7 @@ func (logger) Printf(format string, args ...interface{}) {
 		fmt.Print(".")
 		attempts++
 	}
-	out.Debug(format, args)
+	out.Debug(format, args...)
 }
 
 func (logger) Println(args ...interface{}) {
