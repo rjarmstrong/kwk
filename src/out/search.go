@@ -58,7 +58,11 @@ func AlphaSearchResult(prefs *Prefs, res *types.AlphaResponse) vwrite.Handler {
 				v.Highlights = map[string]string{}
 			}
 			if v.Highlights["content"] == "" {
-				v.Highlights["content"] = v.Snippet.Content
+				if len(v.Snippet.Content) > 50 {
+					v.Highlights["content"] = v.Snippet.Content[:50] + "\n..."
+				} else {
+					v.Highlights["content"] = v.Snippet.Content
+				}
 			}
 			lines := highlightsToLines(v.Highlights)
 
