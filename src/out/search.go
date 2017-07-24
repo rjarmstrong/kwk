@@ -69,20 +69,20 @@ func AlphaSearchResult(prefs *Prefs, res *types.AlphaResponse) vwrite.Handler {
 			for _, line := range lines {
 				fmt.Fprint(w, style.Margin)
 				fmt.Fprint(w, subdued)
-				fmt.Fprint(w, pad(7, line.Key).String())
-				fmt.Fprint(w, " |  ")
-				fmt.Fprint(w, strings.Replace(strings.Replace(line.Line, "<em>", hltStart, -1), "</em>", style.End+subdued, -1))
+				fmt.Fprint(w, "|  ")
+				fmt.Fprint(w, strings.Replace(strings.Replace(line.Line,
+					"<em>", hltStart, -1), "</em>", style.End+subdued, -1))
 				fmt.Fprint(w, "\n")
 			}
 			fmt.Fprint(w, style.End)
 			if len(v.Related) > 0 {
 				fmt.Fprintf(w, "%s%dm", style.Start255Fg, style.Grey241)
 				fmt.Fprint(w, style.Margin)
-				fmt.Fprint(w, "~ ")
+				fmt.Fprint(w, style.IconRelated)
 				for _, v2 := range v.Related {
 					fmt.Fprintf(w, " %s ", v2.Name)
 				}
-				fmt.Fprintf(w, style.End)
+				fmt.Fprint(w, style.End)
 			}
 			fmt.Fprint(w, "\n")
 		}

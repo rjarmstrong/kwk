@@ -20,7 +20,7 @@ func printSnippetView(w io.Writer, prefs *Prefs, s *types.Snippet) {
 	fmt.Fprint(w, fSnippetType(s))
 	fmt.Fprint(w, "\n")
 	fmt.Fprint(w, style.TwoLines)
-	fmt.Fprint(w, fCodeview(s, 100, 0, false, prefs.ExpandedRows))
+	fmt.Fprint(w, fCodeview(s.Content, s.Ext(), 100, 0, false, prefs.ExpandedRows))
 	fmt.Fprint(w, "\n\n")
 
 	tbl := tablewriter.NewWriter(w)
@@ -124,11 +124,11 @@ func fVerified(s *types.Snippet) string {
 	return buff.String()
 }
 
-func fCodeview(s *types.Snippet, width int, lines int, odd bool, alwaysExpandRows bool) string {
-	if s.Content == "" {
-		s.Content = "<empty>"
+func fCodeview(content string, ext string, width int, lines int, odd bool, alwaysExpandRows bool) string {
+	if content == "" {
+		content = "<empty>"
 	}
-	chunks := strings.Split(s.Content, "\n")
+	chunks := strings.Split(content, "\n")
 	//if s.Ext == "url" {
 	//	return uri(s.Snip)
 	//}
@@ -143,8 +143,8 @@ func fCodeview(s *types.Snippet, width int, lines int, odd bool, alwaysExpandRow
 
 	lastLine := code[len(chunks)-1]
 
-	// Add to  starting from most important line
-	marker := mainMarkers[s.Ext()]
+	// Add to starting from most important line
+	marker := mainMarkers[ext]
 	if marker != "" {
 		var clipped []codeLine
 		var startPreview int

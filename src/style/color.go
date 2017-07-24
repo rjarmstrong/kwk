@@ -85,6 +85,7 @@ const (
 	Info             = "Ⓘ"
 	Prompt           = "▎"
 	IconAccount      = "◉"
+	IconRelated      = "≈"
 
 	ColorBrightRed      types.AnsiCode = 196
 	ColorPouchCyan      types.AnsiCode = 122

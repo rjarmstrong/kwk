@@ -271,7 +271,7 @@ func printSnippets(w io.Writer, prefs *Prefs, pouchName string, list []*types.Sn
 			status.WriteString(t)
 		}
 		//col3
-		snip := fCodeview(v, 60, lines, (i+1)%2 == 0, prefs.ExpandedRows)
+		snip := fCodeview(v.Content, v.Ext(), 60, lines, (i+1)%2 == 0, prefs.ExpandedRows)
 		if prefs.RowSpaces {
 			snip = snip + "\n"
 		}
