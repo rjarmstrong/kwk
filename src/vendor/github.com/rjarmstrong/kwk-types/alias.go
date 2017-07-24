@@ -80,6 +80,10 @@ func NewSnipName(name string, extension string) SnipName {
 	return SnipName{Name: name, Ext: extension}
 }
 
+func (m *Alias) RelativeName() string {
+	return fmt.Sprintf("%s/%s", m.Pouch, m.FileName())
+}
+
 func (m *Alias) FileName() string {
 	if m.Ext == "" {
 		return m.Name

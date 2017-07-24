@@ -75,8 +75,25 @@ func AlphaSearchResult(prefs *Prefs, res *types.AlphaResponse) vwrite.Handler {
 				fmt.Fprint(w, "\n")
 			}
 			fmt.Fprint(w, style.End)
+			if len(v.Related) > 0 {
+				fmt.Fprintf(w, "%s%dm", style.Start255Fg, style.Grey241)
+				fmt.Fprint(w, style.Margin)
+				fmt.Fprint(w, "~ ")
+				for _, v2 := range v.Related {
+					fmt.Fprintf(w, " %s ", v2.Name)
+				}
+				fmt.Fprintf(w, style.End)
+			}
+			fmt.Fprint(w, "\n")
 		}
 		fmt.Fprint(w, "\n")
+
+		if len(res.Pouches) > 0 {
+			fmt.Fprint(w, "Matching pouches:\n")
+			for _, v := range res.Pouches {
+				fmt.Fprintf(w, "%s\n", v)
+			}
+		}
 	})
 }
 

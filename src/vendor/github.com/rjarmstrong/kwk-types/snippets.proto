@@ -82,6 +82,7 @@ message AlphaResponse {
     int64 took = 3;
     string term = 4;
     string fallbackTitle = 5;
+    repeated string pouches = 6;
 }
 
 message TypeAheadRequest {
@@ -102,7 +103,13 @@ message TypeAheadItem {
 
 message AlphaItem {
     Snippet snippet = 1;
+    repeated Relation related = 3;
     map<string, string> highlights = 2;
+}
+
+message Relation {
+    string Name = 1;
+    string Reason = 2;
 }
 
 message CreatePouchRequest {
@@ -350,6 +357,7 @@ message Snippet {
     string attribution = 25;
     string pouchId = 27;
     bool latest = 28;
+    repeated Relation related = 29;
 }
 
 message Tags {

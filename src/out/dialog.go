@@ -65,7 +65,7 @@ func (d *StdDialog) multiChoice(question vwrite.Handler, list []*types.Snippet) 
 		if i%3 == 0 {
 			d.Writer.Write(FreeText("\n"))
 		}
-		d.Writer.Write(FreeText(fmt.Sprintf("%d)  %s    ", i+1, v.Alias.URI())))
+		d.Writer.Write(FreeText(fmt.Sprintf("%d)  %s    ", i+1, v.Alias.RelativeName())))
 	}
 	d.Writer.Write(FreeText("\n"))
 	input, _, err := d.reader.ReadLine()
