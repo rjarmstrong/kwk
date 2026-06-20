@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Faq-rsses on kwk</title>
+    <link>https://kwk-cli.github.io/docs/faq/index.xml</link>
+    <description>Recent content in Faq-rsses on kwk</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright 2017</copyright>
+    <lastBuildDate>Tue, 08 Mar 2016 21:07:13 +0100</lastBuildDate>
+    <atom:link href="https://kwk-cli.github.io/docs/faq/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>FAQ</title>
+      <link>https://kwk-cli.github.io/docs/faq/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/faq/</guid>
+      <description>
+
+&lt;h2 id=&#34;is-this-free-software&#34;&gt;Is this free software?&lt;/h2&gt;
+
+&lt;p&gt;Yes kwk is free for basic accounts and will always be. We will need to introduce paid accounts to help pay for hosting and development.&lt;/p&gt;
+
+&lt;h2 id=&#34;where-are-my-snippets-stored&#34;&gt;Where are my snippets stored?&lt;/h2&gt;
+
+&lt;p&gt;They are replicated in near real-time in three secure data centers around the world. Edited snippets may still be in your kwk local cache, to remove this run &lt;code&gt;rm -fr ~/.kwk&lt;/code&gt; (You will need to sign-in again).&lt;/p&gt;
+
+&lt;h2 id=&#34;what-security-do-you-have-in-place&#34;&gt;What security do you have in place?&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;SHA256 checksums are used for all snippets and are validated prior to executing snippets and when viewing snippets.&lt;/li&gt;
+&lt;li&gt;Our server always chooses the transport cipher so we can upgrade it at any time. TLS 1.2 is always used.&lt;/li&gt;
+&lt;li&gt;With our auto-update feature you will have the latest version of kwk.&lt;/li&gt;
+&lt;li&gt;End-to-end encryption is coming soon.&lt;/li&gt;
+&lt;li&gt;Other user&amp;rsquo;s snippets cannot be run (except for /kwk/&amp;hellip; ), you first need to clone them.&lt;/li&gt;
+&lt;li&gt;sudo still applies when you run snippets.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;where-is-the-auto-completion-for-commands&#34;&gt;Where is the auto completion for commands?&lt;/h2&gt;
+
+&lt;p&gt;There is none, we may add this in future but for the time being we felt it was better to focus on using intuitive commands and minimizing keystrokes.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;HINT: Another cool way to save time is that many commands don&amp;rsquo;t need a specific order
+&lt;code&gt;kwk r hello&lt;/code&gt; and &lt;code&gt;kwk hello r&lt;/code&gt; are equivalent. Meaning you don&amp;rsquo;t have to back track your cursor after hitting the up arrow.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;when-will-you-have-windows-support&#34;&gt;When will you have Windows support?&lt;/h2&gt;
+
+&lt;p&gt;Soon, we do have some work already done and it is high priority. We also currently don&amp;rsquo;t support running dotnet core scripts since it has very specific folder structure requirements to compile and run.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-colors-don-t-look-great-on-my-terminal&#34;&gt;The colors don&amp;rsquo;t look great on my terminal?&lt;/h2&gt;
+
+&lt;p&gt;That&amp;rsquo;s not good at all! Please be a sport and &lt;a href=&#34;https://github.com/kwk-cli/kwk-cli-issues/issues&#34; target=&#34;_blank&#34;&gt;log an issue&lt;/a&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Note: The current theme is designed for dark terminals with 256 colors.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;my-script-is-showing-an-error-when-running-but-the-code-is-valid&#34;&gt;My script is showing an error when running but the code is valid?&lt;/h2&gt;
+
+&lt;p&gt;Scripts can only run if the correct runtime is installed! Please ensure the version of the runtime is correct too.&lt;/p&gt;
+
+&lt;h2 id=&#34;can-i-contribute&#34;&gt;Can I Contribute?&lt;/h2&gt;
+
+&lt;p&gt;We are working at making parts of the CLI open source, until then please contribute &lt;a href=&#34;https://github.com/kwk-cli/kwk-cli-issues/issues&#34; target=&#34;_blank&#34;&gt;on the issue log&lt;/a&gt; or posting to our Twitter account.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

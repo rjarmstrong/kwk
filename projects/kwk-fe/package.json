@@ -1,0 +1,47 @@
+{
+  "name": "your-app",
+  "description": "Description",
+  "author": "Your Name",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "scripts": {
+    "start": "LOGGY_STACKS=1; brunch watch --server",
+    "dev": "brunch build",
+    "prod": "brunch build --production",
+    "test": "jest"
+  },
+  "dependencies": {
+    "axios": "^0.16.2",
+    "bulma": "^0.5.1",
+    "codemirror": "^5.29.0",
+    "feather-icons": "^3.2.2",
+    "inferno": "4.0.0-6",
+    "inferno-component": "^3.10.1",
+    "inferno-create-element": "4.0.0-6",
+    "inferno-motion": "^2.0.0",
+    "inferno-router": "4.0.0-6",
+    "lodash": "^4.17.4",
+    "lodash.range": "^3.2.0",
+    "protobufjs": "^6.8.4",
+    "util-deprecate": "^1.0.2"
+  },
+  "devDependencies": {
+    "auto-reload-brunch": "^2.7.1",
+    "babel-brunch": "^6.1.1",
+    "babel-plugin-inferno": "4.0.0-21",
+    "babel-plugin-module-resolver": "^3.0.0",
+    "babel-plugin-syntax-jsx": "^6.18.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "brunch": "^2.10.9",
+    "clean-css-brunch": "^2.10.0",
+    "css-brunch": "^2.10.0",
+    "javascript-brunch": "^2.10.0",
+    "jest": "^21.0.2",
+    "sass-brunch": "^2.10.4",
+    "uglify-js-brunch": "^2.10.0"
+  }
+}

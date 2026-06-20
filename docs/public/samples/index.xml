@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Samples-rsses on kwk</title>
+    <link>https://kwk-cli.github.io/docs/samples/index.xml</link>
+    <description>Recent content in Samples-rsses on kwk</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright 2017</copyright>
+    <lastBuildDate>Tue, 08 Mar 2016 21:07:13 +0100</lastBuildDate>
+    <atom:link href="https://kwk-cli.github.io/docs/samples/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Samples</title>
+      <link>https://kwk-cli.github.io/docs/samples/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/samples/</guid>
+      <description>&lt;p&gt;The following samples can be found by typing: &lt;code&gt;kwk kwk/examples&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Simple:
+Deleting multiple snippets
+Hello Worlds
+git&lt;/p&gt;
+
+&lt;p&gt;Piping:
+DevOps/Monitoring e.g. docker stats&lt;/p&gt;
+
+&lt;p&gt;Templating:
+- JsonFormatting&lt;br /&gt;
+- News&lt;/p&gt;
+
+&lt;p&gt;Apps:
+- Charting Weather
+- Multi-language&lt;/p&gt;
+
+&lt;p&gt;Lookup
+Time
+Paths&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

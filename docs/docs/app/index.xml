@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>App-rsses on kwk</title>
+    <link>https://kwk-cli.github.io/docs/app/index.xml</link>
+    <description>Recent content in App-rsses on kwk</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright 2017</copyright>
+    <lastBuildDate>Tue, 08 Mar 2016 21:07:13 +0100</lastBuildDate>
+    <atom:link href="https://kwk-cli.github.io/docs/app/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>App Commands &amp; Settings</title>
+      <link>https://kwk-cli.github.io/docs/app/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/app/</guid>
+      <description>
+
+&lt;h2 id=&#34;your-environment&#34;&gt;Your Environment&lt;/h2&gt;
+
+&lt;p&gt;kwk relies on your local environment since it needs to have the appropriate runtimes installed (e.g. node js, ruby etc) to execute snippets and it needs editors to edit the snippets.&lt;/p&gt;
+
+&lt;p&gt;Normally you don&amp;rsquo;t need to install anything since kwk has been purposefully designed to work &lt;em&gt;around your environment&lt;/em&gt;, that being said you may want to run some snippets in languages you don&amp;rsquo;t normally use so you&amp;rsquo;ll need to go to their website to grab the installers.&lt;/p&gt;
+
+&lt;h2 id=&#34;tweaking-editors-and-runtimes&#34;&gt;Tweaking Editors and Runtimes&lt;/h2&gt;
+
+&lt;p&gt;For each machine you have kwk installed on you can configure the environment to behave in certain ways. e.g. For a build server you may want to edit snippets with &lt;a href=&#34;http://www.vim.org/download.php&#34; target=&#34;_blank&#34;&gt;Vim&lt;/a&gt;, for your work computer &lt;a href=&#34;https://www.jetbrains.com/webstorm/&#34; target=&#34;_blank&#34;&gt;Webstorm&lt;/a&gt; and your home computer &lt;a href=&#34;https://www.sublimetext.com/&#34;&gt;Sublime&lt;/a&gt;. But that&amp;rsquo;s not all! You can also specify certain file types be edited with certain editors. Explore the &lt;code&gt;env&lt;/code&gt; file for details:&lt;/p&gt;
+
+&lt;h3 id=&#34;snippet-editors&#34;&gt;Snippet Editors&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk edit env
+
+&amp;gt;&amp;gt;&amp;gt;
+
+kwkenv: &amp;quot;1&amp;quot;
+editors:
+#  Specify one app for each file type to edit.
+  sh: [vim]
+  go: [gogland]
+  py: [vscode]
+  url: [textedit]
+  default: [&amp;quot;textedit&amp;quot;]
+apps:
+  webstorm: [&amp;quot;open&amp;quot;, &amp;quot;-a&amp;quot;, &amp;quot;webstorm&amp;quot;, &amp;quot;$DIR&amp;quot;]
+  textedit: [&amp;quot;open&amp;quot;, &amp;quot;-e&amp;quot;, &amp;quot;$FULL_NAME&amp;quot;]
+  vscode: [&amp;quot;open&amp;quot;, &amp;quot;-a&amp;quot;, &amp;quot;Visual Studio Code&amp;quot;, &amp;quot;$DIR&amp;quot;]
+  vim: [&amp;quot;vi&amp;quot;, &amp;quot;$FULL_NAME&amp;quot; ]
+  emacs: [&amp;quot;emacs&amp;quot;, &amp;quot;$FULL_NAME&amp;quot; ]
+  nano: [&amp;quot;nano&amp;quot;, &amp;quot;$FULL_NAME&amp;quot; ]
+  default: [&amp;quot;open&amp;quot;, &amp;quot;-t&amp;quot;, &amp;quot;$FULL_NAME&amp;quot;]
+  ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;snippet-runners&#34;&gt;Snippet Runners&lt;/h3&gt;
+
+&lt;p&gt;kwk automatically creates configurations for Linux, Mac and Windows - however you can edit these if you need to run a non-default command for any particular file extension.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;runners:
+  sh: [&amp;quot;/bin/bash&amp;quot;, &amp;quot;-c&amp;quot;, &amp;quot;$SNIP&amp;quot;]
+  url: [&amp;quot;open&amp;quot;, &amp;quot;$SNIP&amp;quot;]
+  url-covert: [&amp;quot;/Applications/Google Chrome.app/Contents/MacOS/Google Chrome&amp;quot;, &amp;quot;--incognito&amp;quot;, &amp;quot;$SNIP&amp;quot;]
+  js: [&amp;quot;node&amp;quot;, &amp;quot;-e&amp;quot;, &amp;quot;$SNIP&amp;quot;] #nodejs
+  py: [&amp;quot;python&amp;quot;, &amp;quot;-c&amp;quot;, &amp;quot;$SNIP&amp;quot;] #python
+  php: [&amp;quot;php&amp;quot;, &amp;quot;-r&amp;quot;, &amp;quot;$SNIP&amp;quot;] #php
+  scpt: [&amp;quot;osascript&amp;quot;, &amp;quot;-e&amp;quot;, &amp;quot;$SNIP&amp;quot;] #applescript
+  applescript: [&amp;quot;osascript&amp;quot;, &amp;quot;-e&amp;quot;, &amp;quot;$SNIP&amp;quot;] #applescript
+  rb: [&amp;quot;ruby&amp;quot;, &amp;quot;-e&amp;quot;, &amp;quot;$SNIP&amp;quot;] #ruby
+  pl: [&amp;quot;perl&amp;quot;, &amp;quot;-E&amp;quot;, &amp;quot;$SNIP&amp;quot; ] #perl
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;preferences&#34;&gt;Preferences&lt;/h2&gt;
+
+&lt;p&gt;Preferences in kwk are local in that a default preference file is installed on the host computer which you can edit. For any new installation on kwk, whether reinstalling on the same machine or a new one, the last edited preferences will be installed.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk edit prefs
+
+&amp;gt;&amp;gt;&amp;gt;
+
+kwkprefs: v1
+preferences:
+  covert: false     # By default always open bookmarks in covert mode
+  listall: true     # List all pouches in the root including locked
+  debug: false      # Print detailed command output
+  regulateupdates: true # When false will get updates as soon as they are available
+  slimlines: 3      # When listing the number of snippet lines to show
+  expandedlines: 15 # When expanding the number of snippet lines to show
+  alwaysexpandlists: false # Always expand lines when listing
+  ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;on-screen-help&#34;&gt;On screen help&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk help [&amp;lt;command&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;force-update-kwk-and-check-version&#34;&gt;Force update kwk and check version&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk update
+
+kwk version 
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

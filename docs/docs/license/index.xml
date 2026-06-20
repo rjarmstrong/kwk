@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>License-rsses on kwk</title>
+    <link>https://kwk-cli.github.io/docs/license/index.xml</link>
+    <description>Recent content in License-rsses on kwk</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright 2017</copyright>
+    <lastBuildDate>Tue, 08 Mar 2016 21:07:13 +0100</lastBuildDate>
+    <atom:link href="https://kwk-cli.github.io/docs/license/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>License</title>
+      <link>https://kwk-cli.github.io/docs/license/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/license/</guid>
+      <description>&lt;p&gt;Copyright © 2017 Gimanzo richard.armstrong@gimanzo.com&lt;/p&gt;
+
+&lt;p&gt;Content and concepts included within this website which pertain to kwk-cli Snippet manager are the copyright of Gimanzo.&lt;/p&gt;
+
+&lt;p&gt;Material Docs Supplied with the following copyright:&lt;/p&gt;
+
+&lt;p&gt;Copyright © 2016 Digitalcraftsman digitalcraftsman@protonmail.com
+Copyright © 2016 Martin Donath martin.donath@squidfunk.com
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

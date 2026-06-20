@@ -1,0 +1,64 @@
+.article h1 { font-size: 38px }
+
+.article code {
+    background: #000;
+    border-radius: 4px;
+    padding: 19px;
+    font-size: 1.6rem;
+}
+
+.palette-primary-cyan .article code {
+    color: #30e2ec;
+}
+
+.palette-primary-cyan .footer, .palette-primary-cyan .header {
+    background: #000000;
+}
+
+.admonition {
+    background: #1d878d;
+    color: #fff;
+}
+
+.article h2 {
+    font-size: 24px;
+}
+
+.article h3, .article h4 {
+    font-size:16px
+}
+
+.article ol, .article p, .article ul {
+    margin: 1em 0px 1.2em;
+}
+
+.article p>code {
+    white-space: nowrap;
+    padding: 2px 9px;
+    margin: 0 4px;
+    font-size: 1em;
+}
+
+.drawer {
+    width: 262px;
+    font-size: 15px;
+    line-height: 1em;
+}
+
+.project .logo img {
+    background: #fff;
+    border-radius: 3px;
+    width: 80px;
+    height: 80px;
+}
+
+.mascot {
+    position: relative;
+}
+
+.mascot img {
+    position: absolute;
+    top: -230px;
+    left: 280px;
+    width: 250px;
+}

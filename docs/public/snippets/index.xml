@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Snippets-rsses on kwk</title>
+    <link>https://kwk-cli.github.io/docs/snippets/index.xml</link>
+    <description>Recent content in Snippets-rsses on kwk</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright 2017</copyright>
+    <lastBuildDate>Tue, 08 Mar 2016 21:07:13 +0100</lastBuildDate>
+    <atom:link href="https://kwk-cli.github.io/docs/snippets/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Snippets</title>
+      <link>https://kwk-cli.github.io/docs/snippets/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/snippets/</guid>
+      <description>
+
+&lt;h2 id=&#34;store-anything&#34;&gt;Store anything&lt;/h2&gt;
+
+&lt;p&gt;Snippets are often thought of as code but kwk can be used to store any small piece of information provided its no longer than 2000 *normal characters (about 100 lines), just pick a file extension which is suitable e.g. &lt;strong&gt;.json&lt;/strong&gt; for some JSON or &lt;strong&gt;.rb&lt;/strong&gt; for a ruby file.&lt;/p&gt;
+
+&lt;p&gt;URLs are well suited to be stored as snippets, in fact we have some great features for URLs  including running with covert mode, meta data previews, auto url detection and by default all you need to do to open a url is type &lt;code&gt;kwk my-bookmark&lt;/code&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;** Use &amp;lsquo;.url&amp;rsquo; as an extension for URLs&lt;br /&gt;
+*  Normal characters being UTF-8 non-combined characters e.g. é can be 2 characters.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;creating-snippets&#34;&gt;Creating Snippets&lt;/h2&gt;
+
+&lt;p&gt;A snippet is just a UTF-8 string so creating one is easy with the &lt;code&gt;new&lt;/code&gt; or &lt;code&gt;edit&lt;/code&gt; command:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk new &amp;quot;console.log(&#39;hello&#39;);&amp;quot; hello.js
+
+# kwk new [snippet] [&amp;lt;name&amp;gt;[.&amp;lt;ext&amp;gt;]]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note: &lt;em&gt;If you add a file extension to the name the order of arguments above does not matter. Also you don&amp;rsquo;t need to provide an extension it will be given a .txt extension by default and if no name is given a random animal name will be used.&lt;/em&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Snippet names are lowercase (they will be lowered automatically)&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;create-and-edit-in-one-step&#34;&gt;Create and edit in one step:&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk edit get-weather.py
+
+# kwk edit &amp;lt;name&amp;gt;.[&amp;lt;ext&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;create-a-snippet-from-a-local-file&#34;&gt;Create a snippet from a local file:&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;cat ./list-open-ports.sh | kwk new open-ports.sh
+
+# cat &amp;lt;file&amp;gt; | kwk new [&amp;lt;name&amp;gt;.&amp;lt;ext&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;multi-line-create-with-a-here-doc&#34;&gt;Multi-line create with a here-doc:&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk new &amp;lt;name&amp;gt;.&amp;lt;ext&amp;gt; &amp;lt;&amp;lt;eof
+&amp;gt; package main
+&amp;gt; 
+&amp;gt; import &amp;quot;fmt&amp;quot;
+&amp;gt; 
+&amp;gt; func main() {
+&amp;gt; 	fmt.Println(&amp;quot;Hello, world&amp;quot;)
+&amp;gt; }
+&amp;gt; eof
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;div class=&#34;admonition note&#34;&gt;
+&lt;p class=&#34;admonition-title&#34;&gt;Newbie Tip:&lt;/p&gt;
+&lt;p&gt;Heredocs are really easy to use.  Just type: &amp;lsquo;&amp;lt;&amp;lt;&amp;rsquo; followed by any string you like to use as a terminator (in the example above it is &amp;lsquo;eof&amp;rsquo;). Type or paste in multiple lines after this and then finish up by typing the terminator &amp;lsquo;eof&amp;rsquo; again.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&#34;running-snippets&#34;&gt;Running Snippets&lt;/h2&gt;
+
+&lt;p&gt;By default most snippets will execute only when you use the &lt;code&gt;run&lt;/code&gt; command - the exception is web bookmarks which will run immediately. To modify which extensions need the run command edit the prefs file: &lt;code&gt;kwk edit prefs&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk run killPort3000
+
+# kwk [run|r] &amp;lt;name&amp;gt;[&amp;lt;.ext&amp;gt;] [args...]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Note: that in most cases bash arguments will resolve starting from $0 instead of $1 since the env.yml file uses the -c option to run snippets. The reason can be found in the bash manual:&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&amp;ldquo;If arguments remain after option processing, and neither the -c nor the -s option has been supplied, the first argument is assumed to be the name of a file  containing  shell
+        commands.&amp;rdquo;&lt;/p&gt;
+
+&lt;h2 id=&#34;viewing-snippets&#34;&gt;Viewing Snippets&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk hello.js
+# or
+kwk view hello.js
+
+# kwk [view] &amp;lt;name&amp;gt;[.ext]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;get-the-raw-snippet&#34;&gt;Get the raw snippet&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk raw hello.js
+
+# kwk raw|cat &amp;lt;name&amp;gt;[.ext]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;editing-snippets&#34;&gt;Editing Snippets&lt;/h2&gt;
+
+&lt;p&gt;For each machine you use kwk on you can change which editors are used for which file extensions. Use &lt;code&gt;kwk edit env&lt;/code&gt; to change the mappings and add new editors.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk edit hello.js
+
+# kwk edit &amp;lt;name&amp;gt;[.ext]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;Note:&lt;/em&gt;  When editing a snippet, kwk will watch for changes to a temporary file on the local disk, if your editor has &lt;strong&gt;auto-save enabled&lt;/strong&gt; you may need to disable it or type &lt;code&gt;kwk edit &amp;lt;name&amp;gt;[.&amp;lt;ext&amp;gt;]&lt;/code&gt; in the cli again after you&amp;rsquo;ve finished your changes so that your changes are actually saved, we are working on a more elegant fix for this.&lt;/p&gt;
+
+&lt;h3 id=&#34;patching&#34;&gt;Patching&lt;/h3&gt;
+
+&lt;p&gt;For the most part you would use the &lt;code&gt;edit&lt;/code&gt; command, however, &lt;code&gt;patch&lt;/code&gt; can be useful if you want to update a snippet programatically, such as setting a version number.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk patch build.json &amp;quot;^(\d+\.)?(\d+\.)?(\*|\d+)$&amp;quot; &amp;quot;2.3.10&amp;quot;
+
+# kwk patch &amp;lt;name&amp;gt;[.ext] &amp;lt;regex&amp;gt; &amp;lt;replacement&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;descriptions&#34;&gt;Descriptions&lt;/h2&gt;
+
+&lt;p&gt;If you are like most dev&amp;rsquo;s then remembering what a snippet does can be difficult, add a short description for list views to be more helpful.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk describe hello.js &amp;quot;A script which says hello&amp;quot;
+
+# kwk describe &amp;lt;name&amp;gt;[.ext] &amp;lt;description&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;cloning-snippets&#34;&gt;Cloning Snippets&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk clone /rjarmstrong/pretty-json.go slick-json.go
+
+# kwk clone [username/][pouch/]&amp;lt;name&amp;gt;[.ext] [new name][.&amp;lt;ext&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;tagging&#34;&gt;Tagging&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk tag hello.js javascript hello-world sample
+
+# kwk tag &amp;lt;name&amp;gt;[.ext] tag ...
+# kwk untag &amp;lt;name&amp;gt;[.ext] tag ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;moving-snippets&#34;&gt;Moving Snippets&lt;/h2&gt;
+
+&lt;p&gt;You can move multiple snippets between pouches provided &lt;strong&gt;the full relative path is  given&lt;/strong&gt; (except snippets in the root pouch can be referenced by name alone).&lt;br /&gt;
+&amp;gt; Note: if the target pouch does not exist then you may end up renaming the file just like on unix systems.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk mv hello.js hello.go hello
+
+# Moves snippets from the root to pouch &#39;hello&#39;
+
+
+kwk mv playground/hello.rs playground/hello.php hello
+
+# Moves snippets from pouch &#39;playground&#39; to &#39;hello&#39;
+
+# kwk mv &amp;lt;pouch&amp;gt;/&amp;lt;name&amp;gt;.&amp;lt;ext&amp;gt; ... &amp;lt;new pouch&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;renaming-snippets&#34;&gt;Renaming Snippets&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk mv hello.js hello-world
+
+# kwk mv &amp;lt;name&amp;gt;[.&amp;lt;ext&amp;gt;] &amp;lt;newname&amp;gt;[.&amp;lt;ext&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Note: If you don&amp;rsquo;t provide an extension for the new name its possible that you may move the snippet into a pouch if one exists with that same name.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;deleting-snippets&#34;&gt;Deleting Snippets&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk rm hello.js hello.go
+
+# kwk rm &amp;lt;name&amp;gt;.&amp;lt;ext&amp;gt; ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;flags&#34;&gt;Flags&lt;/h2&gt;
+
+&lt;pre&gt;
+-y --auto-yes     Automatically enter &#39;yes&#39; for prompts.  
+-n --naked        When listing don&#39;t add styles   
+-c --covert       When running a url, open it in covert mode  
+-d --debug        Print output of debug  
+-a --all          List all pouches including private  
+-g --global       When searching include other peoples snippets
+&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

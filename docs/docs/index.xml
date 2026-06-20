@@ -1,0 +1,720 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>kwk</title>
+    <link>https://kwk-cli.github.io/docs/index.xml</link>
+    <description>Recent content on kwk</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright 2017</copyright>
+    <lastBuildDate>Tue, 08 Mar 2016 21:07:13 +0100</lastBuildDate>
+    <atom:link href="https://kwk-cli.github.io/docs/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Accounts</title>
+      <link>https://kwk-cli.github.io/docs/accounts/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/accounts/</guid>
+      <description>
+
+&lt;div class=&#34;admonition note&#34;&gt;
+&lt;p class=&#34;admonition-title&#34;&gt;Early Access&lt;/p&gt;
+&lt;p&gt;Email invites@kwk.co if you would like to join the alpha team, please provide a short description about why you are interested in using kwk.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&#34;basic-account-commands&#34;&gt;Basic account commands&lt;/h2&gt;
+
+&lt;p&gt;Follow on screen instructions.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk signup
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk signin
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk signout
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;reset-password&#34;&gt;Reset password&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk reset-password
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;change-password-after-a-reset-or-with-existing-password&#34;&gt;Change password (after a reset or with existing password)&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk change-password
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>App Commands &amp; Settings</title>
+      <link>https://kwk-cli.github.io/docs/app/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/app/</guid>
+      <description>
+
+&lt;h2 id=&#34;your-environment&#34;&gt;Your Environment&lt;/h2&gt;
+
+&lt;p&gt;kwk relies on your local environment since it needs to have the appropriate runtimes installed (e.g. node js, ruby etc) to execute snippets and it needs editors to edit the snippets.&lt;/p&gt;
+
+&lt;p&gt;Normally you don&amp;rsquo;t need to install anything since kwk has been purposefully designed to work &lt;em&gt;around your environment&lt;/em&gt;, that being said you may want to run some snippets in languages you don&amp;rsquo;t normally use so you&amp;rsquo;ll need to go to their website to grab the installers.&lt;/p&gt;
+
+&lt;h2 id=&#34;tweaking-editors-and-runtimes&#34;&gt;Tweaking Editors and Runtimes&lt;/h2&gt;
+
+&lt;p&gt;For each machine you have kwk installed on you can configure the environment to behave in certain ways. e.g. For a build server you may want to edit snippets with &lt;a href=&#34;http://www.vim.org/download.php&#34; target=&#34;_blank&#34;&gt;Vim&lt;/a&gt;, for your work computer &lt;a href=&#34;https://www.jetbrains.com/webstorm/&#34; target=&#34;_blank&#34;&gt;Webstorm&lt;/a&gt; and your home computer &lt;a href=&#34;https://www.sublimetext.com/&#34;&gt;Sublime&lt;/a&gt;. But that&amp;rsquo;s not all! You can also specify certain file types be edited with certain editors. Explore the &lt;code&gt;env&lt;/code&gt; file for details:&lt;/p&gt;
+
+&lt;h3 id=&#34;snippet-editors&#34;&gt;Snippet Editors&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk edit env
+
+&amp;gt;&amp;gt;&amp;gt;
+
+kwkenv: &amp;quot;1&amp;quot;
+editors:
+#  Specify one app for each file type to edit.
+  sh: [vim]
+  go: [gogland]
+  py: [vscode]
+  url: [textedit]
+  default: [&amp;quot;textedit&amp;quot;]
+apps:
+  webstorm: [&amp;quot;open&amp;quot;, &amp;quot;-a&amp;quot;, &amp;quot;webstorm&amp;quot;, &amp;quot;$DIR&amp;quot;]
+  textedit: [&amp;quot;open&amp;quot;, &amp;quot;-e&amp;quot;, &amp;quot;$FULL_NAME&amp;quot;]
+  vscode: [&amp;quot;open&amp;quot;, &amp;quot;-a&amp;quot;, &amp;quot;Visual Studio Code&amp;quot;, &amp;quot;$DIR&amp;quot;]
+  vim: [&amp;quot;vi&amp;quot;, &amp;quot;$FULL_NAME&amp;quot; ]
+  emacs: [&amp;quot;emacs&amp;quot;, &amp;quot;$FULL_NAME&amp;quot; ]
+  nano: [&amp;quot;nano&amp;quot;, &amp;quot;$FULL_NAME&amp;quot; ]
+  default: [&amp;quot;open&amp;quot;, &amp;quot;-t&amp;quot;, &amp;quot;$FULL_NAME&amp;quot;]
+  ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;snippet-runners&#34;&gt;Snippet Runners&lt;/h3&gt;
+
+&lt;p&gt;kwk automatically creates configurations for Linux, Mac and Windows - however you can edit these if you need to run a non-default command for any particular file extension.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;runners:
+  sh: [&amp;quot;/bin/bash&amp;quot;, &amp;quot;-c&amp;quot;, &amp;quot;$SNIP&amp;quot;]
+  url: [&amp;quot;open&amp;quot;, &amp;quot;$SNIP&amp;quot;]
+  url-covert: [&amp;quot;/Applications/Google Chrome.app/Contents/MacOS/Google Chrome&amp;quot;, &amp;quot;--incognito&amp;quot;, &amp;quot;$SNIP&amp;quot;]
+  js: [&amp;quot;node&amp;quot;, &amp;quot;-e&amp;quot;, &amp;quot;$SNIP&amp;quot;] #nodejs
+  py: [&amp;quot;python&amp;quot;, &amp;quot;-c&amp;quot;, &amp;quot;$SNIP&amp;quot;] #python
+  php: [&amp;quot;php&amp;quot;, &amp;quot;-r&amp;quot;, &amp;quot;$SNIP&amp;quot;] #php
+  scpt: [&amp;quot;osascript&amp;quot;, &amp;quot;-e&amp;quot;, &amp;quot;$SNIP&amp;quot;] #applescript
+  applescript: [&amp;quot;osascript&amp;quot;, &amp;quot;-e&amp;quot;, &amp;quot;$SNIP&amp;quot;] #applescript
+  rb: [&amp;quot;ruby&amp;quot;, &amp;quot;-e&amp;quot;, &amp;quot;$SNIP&amp;quot;] #ruby
+  pl: [&amp;quot;perl&amp;quot;, &amp;quot;-E&amp;quot;, &amp;quot;$SNIP&amp;quot; ] #perl
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;preferences&#34;&gt;Preferences&lt;/h2&gt;
+
+&lt;p&gt;Preferences in kwk are local in that a default preference file is installed on the host computer which you can edit. For any new installation on kwk, whether reinstalling on the same machine or a new one, the last edited preferences will be installed.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk edit prefs
+
+&amp;gt;&amp;gt;&amp;gt;
+
+kwkprefs: v1
+preferences:
+  covert: false     # By default always open bookmarks in covert mode
+  listall: true     # List all pouches in the root including locked
+  debug: false      # Print detailed command output
+  regulateupdates: true # When false will get updates as soon as they are available
+  slimlines: 3      # When listing the number of snippet lines to show
+  expandedlines: 15 # When expanding the number of snippet lines to show
+  alwaysexpandlists: false # Always expand lines when listing
+  ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;on-screen-help&#34;&gt;On screen help&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk help [&amp;lt;command&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;force-update-kwk-and-check-version&#34;&gt;Force update kwk and check version&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk update
+
+kwk version 
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>FAQ</title>
+      <link>https://kwk-cli.github.io/docs/faq/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/faq/</guid>
+      <description>
+
+&lt;h2 id=&#34;is-this-free-software&#34;&gt;Is this free software?&lt;/h2&gt;
+
+&lt;p&gt;Yes kwk is free for basic accounts and will always be. We will need to introduce paid accounts to help pay for hosting and development.&lt;/p&gt;
+
+&lt;h2 id=&#34;where-are-my-snippets-stored&#34;&gt;Where are my snippets stored?&lt;/h2&gt;
+
+&lt;p&gt;They are replicated in near real-time in three secure data centers around the world. Edited snippets may still be in your kwk local cache, to remove this run &lt;code&gt;rm -fr ~/.kwk&lt;/code&gt; (You will need to sign-in again).&lt;/p&gt;
+
+&lt;h2 id=&#34;what-security-do-you-have-in-place&#34;&gt;What security do you have in place?&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;SHA256 checksums are used for all snippets and are validated prior to executing snippets and when viewing snippets.&lt;/li&gt;
+&lt;li&gt;Our server always chooses the transport cipher so we can upgrade it at any time. TLS 1.2 is always used.&lt;/li&gt;
+&lt;li&gt;With our auto-update feature you will have the latest version of kwk.&lt;/li&gt;
+&lt;li&gt;End-to-end encryption is coming soon.&lt;/li&gt;
+&lt;li&gt;Other user&amp;rsquo;s snippets cannot be run (except for /kwk/&amp;hellip; ), you first need to clone them.&lt;/li&gt;
+&lt;li&gt;sudo still applies when you run snippets.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;where-is-the-auto-completion-for-commands&#34;&gt;Where is the auto completion for commands?&lt;/h2&gt;
+
+&lt;p&gt;There is none, we may add this in future but for the time being we felt it was better to focus on using intuitive commands and minimizing keystrokes.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;HINT: Another cool way to save time is that many commands don&amp;rsquo;t need a specific order
+&lt;code&gt;kwk r hello&lt;/code&gt; and &lt;code&gt;kwk hello r&lt;/code&gt; are equivalent. Meaning you don&amp;rsquo;t have to back track your cursor after hitting the up arrow.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;when-will-you-have-windows-support&#34;&gt;When will you have Windows support?&lt;/h2&gt;
+
+&lt;p&gt;Soon, we do have some work already done and it is high priority. We also currently don&amp;rsquo;t support running dotnet core scripts since it has very specific folder structure requirements to compile and run.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-colors-don-t-look-great-on-my-terminal&#34;&gt;The colors don&amp;rsquo;t look great on my terminal?&lt;/h2&gt;
+
+&lt;p&gt;That&amp;rsquo;s not good at all! Please be a sport and &lt;a href=&#34;https://github.com/kwk-cli/kwk-cli-issues/issues&#34; target=&#34;_blank&#34;&gt;log an issue&lt;/a&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Note: The current theme is designed for dark terminals with 256 colors.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;my-script-is-showing-an-error-when-running-but-the-code-is-valid&#34;&gt;My script is showing an error when running but the code is valid?&lt;/h2&gt;
+
+&lt;p&gt;Scripts can only run if the correct runtime is installed! Please ensure the version of the runtime is correct too.&lt;/p&gt;
+
+&lt;h2 id=&#34;can-i-contribute&#34;&gt;Can I Contribute?&lt;/h2&gt;
+
+&lt;p&gt;We are working at making parts of the CLI open source, until then please contribute &lt;a href=&#34;https://github.com/kwk-cli/kwk-cli-issues/issues&#34; target=&#34;_blank&#34;&gt;on the issue log&lt;/a&gt; or posting to our Twitter account.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Finding Snippets</title>
+      <link>https://kwk-cli.github.io/docs/navigating/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/navigating/</guid>
+      <description>
+
+&lt;h2 id=&#34;saving-keystrokes&#34;&gt;Saving Keystrokes&lt;/h2&gt;
+
+&lt;p&gt;kwk has been designed specifically to save keystrokes. That&amp;rsquo;s why when typing snippet names we often try to guess which snippet you intended to use.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;# Whew!
+kwk view /cjones/apps/hello.js
+
+# Better
+kwk view hello.js
+
+# Even Better
+kwk view hello
+
+# Best!
+kwk hello
+
+# Use Suggest if you can&#39;t remember the name
+kwk hel
+
+
+# kwk [view] [/&amp;lt;username&amp;gt;/][pouch/]&amp;lt;name&amp;gt;[.&amp;lt;ext&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Note: The &lt;code&gt;view&lt;/code&gt; command is optional. You can configure the default command for different file extensions by typing &lt;code&gt;kwk edit env&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;listing-made-easy&#34;&gt;Listing made easy&lt;/h2&gt;
+
+&lt;p&gt;No need to keep typing &amp;lsquo;ls&amp;rsquo; to list things, we actually removed that after realising how many times we typed it, so now you can list all your pouches or snippets with zero or one words, either &lt;code&gt;kwk&lt;/code&gt; or &lt;code&gt;kwk &amp;lt;pouch name&amp;gt;&lt;/code&gt; is enough.&lt;/p&gt;
+
+&lt;h2 id=&#34;show-your-homepage&#34;&gt;Show your Homepage&lt;/h2&gt;
+
+&lt;p&gt;Includes your pouches and unsorted snippets:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;look-inside-a-pouch&#34;&gt;Look inside a Pouch&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk apps
+
+# kwk &amp;lt;pouch name&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;searching&#34;&gt;Searching&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk find worl
+
+# kwk find [-g] &amp;lt;term&amp;gt;
+# -g/--global = search everybody&#39;s public snippets.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;expanding-lists&#34;&gt;Expanding Lists&lt;/h2&gt;
+
+&lt;p&gt;To show more details in list, number of lines to expand can be changed by calling &lt;code&gt;kwk edit prefs&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk expand apps
+
+# kwk expand [&amp;lt;pouch name&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;suggesting&#34;&gt;Suggesting&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk hell #RETURN
+&amp;gt; hello.js|
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;enchilada&#34;&gt;Enchilada&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;Only use this if you really need to list all your snippets&lt;/strong&gt;. Might be slower and lots of screen use.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk enchilada
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;community&#34;&gt;Community&lt;/h2&gt;
+
+&lt;p&gt;If you use a forward slash &lt;code&gt;/&lt;/code&gt; in front of anything kwk will interpret it as a Username, thus you can browse other peoples public snippets.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk /alice/hawaii-trip
+# Lists alice&#39;s hawaii pouch
+
+kwk /alice/hawaii-trip/budget.txt
+# Shows the details of the vacation budget
+
+kwk /alice/hawaii-trip/hibiscus.url
+# Opens the url for Hibiscus hotel
+
+kwk run /alice/hawaii-trip/local-news.py
+# Runs alice&#39;s news feed for Hawaii
+
+# kwk /&amp;lt;username/[pouch name]/[snippet name]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;popular-snippets&#34;&gt;Popular Snippets&lt;/h2&gt;
+
+&lt;p&gt;Show Alice&amp;rsquo;s most recently used snippets&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk /alice pop
+
+# kwk [/&amp;lt;username&amp;gt;] popular|pop
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;sharing-snippets&#34;&gt;Sharing Snippets&lt;/h2&gt;
+
+&lt;p&gt;At the moment snippets are only shared by email.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk share hello.js alice
+
+# kwk share &amp;lt;name&amp;gt;.&amp;lt;ext&amp;gt; &amp;lt;email&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;stale-snippets&#34;&gt;Stale Snippets&lt;/h2&gt;
+
+&lt;p&gt;To help you clean up use this command to show snippets which haven&amp;rsquo;t been used much or recently.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk stale
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Get started</title>
+      <link>https://kwk-cli.github.io/docs/getting-started/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/getting-started/</guid>
+      <description>
+
+&lt;h2 id=&#34;install&#34;&gt;Install&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;npm install -g kwkcli
+
+# then
+
+kwk signup
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;or if you prefer to install without npm:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;curl  https://s3.amazonaws.com/kwk-cli/latest/bin/kwk-linux-amd64.tar.gz -o
+// check checksum
+// unzip
+// symlink to /usr/local/bin
+
+kwk signup
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;hello-world&#34;&gt;Hello world&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk new &amp;quot;echo &#39;Hello, world!&#39;&amp;quot; hello.sh
+
+# Creates a snippet
+
+kwk run hello
+
+# Executes it and prints: Hello, world!
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>License</title>
+      <link>https://kwk-cli.github.io/docs/license/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/license/</guid>
+      <description>&lt;p&gt;Copyright © 2017 Gimanzo richard.armstrong@gimanzo.com&lt;/p&gt;
+
+&lt;p&gt;Content and concepts included within this website which pertain to kwk-cli Snippet manager are the copyright of Gimanzo.&lt;/p&gt;
+
+&lt;p&gt;Material Docs Supplied with the following copyright:&lt;/p&gt;
+
+&lt;p&gt;Copyright © 2016 Digitalcraftsman digitalcraftsman@protonmail.com
+Copyright © 2016 Martin Donath martin.donath@squidfunk.com
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Organise with Pouches</title>
+      <link>https://kwk-cli.github.io/docs/pouches/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/pouches/</guid>
+      <description>
+
+&lt;h2 id=&#34;stopping-the-mess&#34;&gt;Stopping the mess&lt;/h2&gt;
+
+&lt;p&gt;Pouches make categorizing snippets easy and provide a way to make a group of snippets private. Pouches have at most 24 snippets.&lt;/p&gt;
+
+&lt;h3 id=&#34;create-a-pouch&#34;&gt;Create a pouch&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk mkdir big-project
+# kwk mkdir &amp;lt;pouch name&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;view-a-pouch&#34;&gt;View a pouch&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk big-project
+# kwk &amp;lt;pouch name&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;delete-a-pouch&#34;&gt;Delete a pouch&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk rm &amp;lt;pouch name&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;make-a-pouch-private&#34;&gt;Make a pouch private&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk lock &amp;lt;pouch name&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;make-a-pouch-public&#34;&gt;Make a pouch public&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk unlock &amp;lt;pouch name&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;rename-a-pouch&#34;&gt;Rename a pouch&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk mv &amp;lt;pouch name&amp;gt; &amp;lt;new pouch name&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;delete-a-pouch-1&#34;&gt;Delete a pouch&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk rm &amp;lt;pouch name&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Road map</title>
+      <link>https://kwk-cli.github.io/docs/roadmap/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/roadmap/</guid>
+      <description>
+
+&lt;h2 id=&#34;website&#34;&gt;Website&lt;/h2&gt;
+
+&lt;p&gt;We have a prototype of this and should be available mid 2017, when available your kwk cli will automatically be integrated.&lt;/p&gt;
+
+&lt;h2 id=&#34;mobile-apps&#34;&gt;Mobile Apps&lt;/h2&gt;
+
+&lt;p&gt;Please vote for the development of mobile apps &lt;a href=&#34;https://github.com/kwk-cli/kwk-cli-issues/issues/1&#34; target=&#34;_blank&#34;&gt;on this issue&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Samples</title>
+      <link>https://kwk-cli.github.io/docs/samples/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/samples/</guid>
+      <description>&lt;p&gt;The following samples can be found by typing: &lt;code&gt;kwk kwk/examples&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Charting Weather&lt;br /&gt;
+Deleting multiple snippets&lt;br /&gt;
+News&lt;br /&gt;
+JsonFormatting&lt;br /&gt;
+Multi-language&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Snippets</title>
+      <link>https://kwk-cli.github.io/docs/snippets/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/snippets/</guid>
+      <description>
+
+&lt;h2 id=&#34;store-anything&#34;&gt;Store anything&lt;/h2&gt;
+
+&lt;p&gt;Snippets are often thought of as code but kwk can be used to store any small piece of information provided its no longer than 2000 *normal characters (about 100 lines), just pick a file extension which is suitable e.g. &lt;strong&gt;.json&lt;/strong&gt; for some JSON or &lt;strong&gt;.rb&lt;/strong&gt; for a ruby file.&lt;/p&gt;
+
+&lt;p&gt;URLs are well suited to be stored as snippets, in fact we have some great features for URLs  including running with covert mode, meta data previews, auto url detection and by default all you need to do to open a url is type &lt;code&gt;kwk my-bookmark&lt;/code&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;** Use &amp;lsquo;.url&amp;rsquo; as an extension for URLs&lt;br /&gt;
+*  Normal characters being UTF-8 non-combined characters e.g. é can be 2 characters.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;creating-snippets&#34;&gt;Creating Snippets&lt;/h2&gt;
+
+&lt;p&gt;A snippet is just a UTF-8 string so creating one is easy with the &lt;code&gt;new&lt;/code&gt; or &lt;code&gt;edit&lt;/code&gt; command:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk new &amp;quot;console.log(&#39;hello&#39;);&amp;quot; hello.js
+
+# kwk new [snippet] [&amp;lt;name&amp;gt;[.&amp;lt;ext&amp;gt;]]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note: &lt;em&gt;If you add a file extension to the name the order of arguments above does not matter. Also you don&amp;rsquo;t need to provide an extension it will be given a .txt extension by default and if no name is given a random animal name will be used.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;create-and-edit-in-one-step&#34;&gt;Create and edit in one step:&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk edit get-weather.py
+
+# kwk edit &amp;lt;name&amp;gt;.[&amp;lt;ext&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;create-a-snippet-from-a-local-file&#34;&gt;Create a snippet from a local file:&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;cat ./list-open-ports.sh | kwk new open-ports.sh
+
+# cat &amp;lt;file&amp;gt; | kwk new [&amp;lt;name&amp;gt;.&amp;lt;ext&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;multi-line-create-with-a-here-doc&#34;&gt;Multi-line create with a here-doc:&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk new &amp;lt;name&amp;gt;.&amp;lt;ext&amp;gt; &amp;lt;&amp;lt;eof
+&amp;gt; package main
+&amp;gt; 
+&amp;gt; import &amp;quot;fmt&amp;quot;
+&amp;gt; 
+&amp;gt; func main() {
+&amp;gt; 	fmt.Println(&amp;quot;Hello, world&amp;quot;)
+&amp;gt; }
+&amp;gt; eof
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;div class=&#34;admonition note&#34;&gt;
+&lt;p class=&#34;admonition-title&#34;&gt;Newbie Tip:&lt;/p&gt;
+&lt;p&gt;Heredocs are really easy to use.  Just type: &amp;lsquo;&amp;lt;&amp;lt;&amp;rsquo; followed by any string you like to use as a terminator (in the example above it is &amp;lsquo;eof&amp;rsquo;). Type or paste in multiple lines after this and then finish up by typing the terminator &amp;lsquo;eof&amp;rsquo; again.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&#34;running-snippets&#34;&gt;Running Snippets&lt;/h2&gt;
+
+&lt;p&gt;By default most snippets will execute only when you use the &lt;code&gt;run&lt;/code&gt; command - the exception is web bookmarks which will run immediately. To modify which extensions need the run command edit the prefs file: &lt;code&gt;kwk edit prefs&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk run killPort3000
+
+# kwk [run|r] &amp;lt;name&amp;gt;[&amp;lt;.ext&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;viewing-snippets&#34;&gt;Viewing Snippets&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk hello.js
+# or
+kwk view hello.js
+
+# kwk [view] &amp;lt;name&amp;gt;[.ext]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;get-the-raw-snippet&#34;&gt;Get the raw snippet&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk raw hello.js
+
+# kwk raw|cat &amp;lt;name&amp;gt;[.ext]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;editing-snippets&#34;&gt;Editing Snippets&lt;/h2&gt;
+
+&lt;p&gt;For each machine you use kwk on you can change which editors are used for which file extensions. Use &lt;code&gt;kwk edit env&lt;/code&gt; to change the mappings and add new editors.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk edit hello.js
+
+# kwk edit &amp;lt;name&amp;gt;[.ext]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;Note:&lt;/em&gt;  When editing a snippet, kwk will watch for changes to a temporary file on the local disk, if your editor has &lt;strong&gt;auto-save enabled&lt;/strong&gt; you may need to disable it or type &lt;code&gt;kwk edit &amp;lt;name&amp;gt;[.&amp;lt;ext&amp;gt;]&lt;/code&gt; in the cli again after you&amp;rsquo;ve finished your changes so that your changes are actually saved, we are working on a more elegant fix for this.&lt;/p&gt;
+
+&lt;h3 id=&#34;patching&#34;&gt;Patching&lt;/h3&gt;
+
+&lt;p&gt;For the most part you would use the &lt;code&gt;edit&lt;/code&gt; command, however, &lt;code&gt;patch&lt;/code&gt; can be useful if you want to update a snippet programatically, such as setting a version number.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk patch build.json &amp;quot;^(\d+\.)?(\d+\.)?(\*|\d+)$&amp;quot; &amp;quot;2.3.10&amp;quot;
+
+# kwk patch &amp;lt;name&amp;gt;[.ext] &amp;lt;regex&amp;gt; &amp;lt;replacement&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;descriptions&#34;&gt;Descriptions&lt;/h2&gt;
+
+&lt;p&gt;If you are like most dev&amp;rsquo;s then remembering what a snippet does can be difficult, add a short description for list views to be more helpful.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk describe hello.js &amp;quot;A script which says hello&amp;quot;
+
+# kwk describe &amp;lt;name&amp;gt;[.ext] &amp;lt;description&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;cloning-snippets&#34;&gt;Cloning Snippets&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk clone /rjarmstrong/pretty-json.go slick-json.go
+
+# kwk clone [username/][pouch/]&amp;lt;name&amp;gt;[.ext] [new name][.&amp;lt;ext&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;tagging&#34;&gt;Tagging&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk tag hello.js javascript hello-world sample
+
+# kwk tag &amp;lt;name&amp;gt;[.ext] tag ...
+# kwk untag &amp;lt;name&amp;gt;[.ext] tag ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;moving-snippets&#34;&gt;Moving Snippets&lt;/h2&gt;
+
+&lt;p&gt;You can move multiple snippets between pouches provided &lt;strong&gt;the full relative path is  given&lt;/strong&gt; (except snippets in the root pouch can be referenced by name alone).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk mv hello.js hello.go hello
+
+# Moves snippets from the root to pouch &#39;hello&#39;
+
+
+kwk mv playground/hello.rs playground/hello.php hello
+
+# Moves snippets from pouch &#39;playground&#39; to &#39;hello&#39;
+
+# kwk mv &amp;lt;pouch&amp;gt;/&amp;lt;name&amp;gt;.&amp;lt;ext&amp;gt; ... &amp;lt;new pouch&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;renaming-snippets&#34;&gt;Renaming Snippets&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk mv hello.js hello-world
+
+# kwk mv &amp;lt;name&amp;gt;[.&amp;lt;ext&amp;gt;] &amp;lt;newname&amp;gt;[.&amp;lt;ext&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;deleting-snippets&#34;&gt;Deleting Snippets&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk rm hello.js hello.go
+
+# kwk rm &amp;lt;name&amp;gt;.&amp;lt;ext&amp;gt; ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;flags&#34;&gt;Flags&lt;/h2&gt;
+
+&lt;pre&gt;
+-y --auto-yes     Automatically enter &#39;yes&#39; for prompts.  
+-n --naked        When listing don&#39;t add styles   
+-c --covert       When running a url, open it in covert mode  
+-d --debug        Print output of debug  
+-a --all          List all pouches including private  
+-g --global       When searching include other peoples snippets
+&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>kwk super snippets</title>
+      <link>https://kwk-cli.github.io/docs/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/</guid>
+      <description>
+
+&lt;h2 id=&#34;whats-in-the-box&#34;&gt;Whats in the box?&lt;/h2&gt;
+
+&lt;div class=&#34;mascot&#34;&gt;
+&lt;img src=&#34;flying_gopher.png&#34; width=&#34;300&#34; alt=&#34;Screenshot&#34;/&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&#34;a-ui-for-the-command-line-which-actually-makes-your-snippets-discoverable-and-easy-to-maintain&#34;&gt;A UI for the command line which actually makes your snippets discoverable and easy to maintain.&lt;/h3&gt;
+
+&lt;p&gt;[image of pouch list]&lt;/p&gt;
+
+&lt;h3 id=&#34;snippet-names-are-unique-and-smartly-addressable-to-save-you-keystrokes&#34;&gt;Snippet names are unique and smartly addressable to save you keystrokes.&lt;/h3&gt;
+
+&lt;p&gt;[gif running without extension and pouch]&lt;/p&gt;
+
+&lt;h3 id=&#34;executable-snippets-for-virtually-any-code-data-or-info&#34;&gt;Executable snippets for virtually any code, data or info.&lt;/h3&gt;
+
+&lt;p&gt;[show a list of code animals]&lt;/p&gt;
+
+&lt;h3 id=&#34;organise-your-snippets-by-project-or-subject-in-pouches&#34;&gt;Organise your snippets by project or subject in pouches.&lt;/h3&gt;
+
+&lt;p&gt;[show a list of pouches]&lt;/p&gt;
+
+&lt;h3 id=&#34;search-globally-or-just-your-snippets&#34;&gt;Search globally or just your snippets&lt;/h3&gt;
+
+&lt;p&gt;[show search results]&lt;/p&gt;
+
+&lt;h3 id=&#34;create-apps-by-composing-multiple-snippets-even-in-different-languages&#34;&gt;Create &amp;lsquo;apps&amp;rsquo; by composing multiple snippets, even in different languages.&lt;/h3&gt;
+
+&lt;p&gt;[show the details of an app with multiple languages]&lt;/p&gt;
+
+&lt;h3 id=&#34;create-snippets-on-the-commandline-and-edit-with-your-favorite-editor&#34;&gt;Create snippets on the commandline and edit with your favorite editor.&lt;/h3&gt;
+
+&lt;p&gt;[show snippet open in web-storm]&lt;/p&gt;
+
+&lt;h3 id=&#34;auto-updating&#34;&gt;Auto-updating&lt;/h3&gt;
+
+&lt;p&gt;[show update notification]&lt;/p&gt;
+
+&lt;h3 id=&#34;globally-redundant&#34;&gt;Globally redundant&lt;/h3&gt;
+
+&lt;p&gt;[list data centers]&lt;/p&gt;
+
+&lt;h3 id=&#34;public-open-source-snippets-and-private&#34;&gt;Public &amp;lsquo;open source&amp;rsquo; snippets and Private&lt;/h3&gt;
+
+&lt;p&gt;[show gif of locking]&lt;/p&gt;
+
+&lt;h3 id=&#34;built-with-go&#34;&gt;Built with go&lt;/h3&gt;
+
+&lt;p&gt;kwk has been built with go from top to bottom.&lt;/p&gt;
+
+&lt;p&gt;&lt;img width=&#34;60&#34; src=&#34;gopher.png&#34; alt=&#34;built with go&#34;/&gt;&lt;/p&gt;
+
+&lt;!--
+&lt;p&gt;kwk was built because I felt that there was no snippet manager which really solved my needs. I felt snippets should not be limited to code since, as a developer , there are so many little pieces of information that I needed to store. Also I felt it was very annoying to have to open a browser and find a link, I wanted to get the snippet quickly.&lt;/p&gt;
+
+&lt;p&gt;Since the introduction of git by Linus Torvalds and the rise of nodejs into the mainstream the command line has become more friendly to the average developer who has benefited from what was reserved for the arcane world of hardcore linux developers. Thats why I felt that the time had come to build a snippet manager designed specifically for the command line but targeted at all developers.&lt;/p&gt;--&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

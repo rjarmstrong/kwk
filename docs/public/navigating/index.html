@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+  
+  
+  
+  
+   <html class="no-js"> 
+
+  <head lang="en-us">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=10" />
+    <title>Finding Snippets - kwk</title>
+    <meta name="generator" content="Hugo 0.17" />
+
+    
+    <meta name="description" content="A visual snippet manager for the CLI.">
+    
+    <link rel="canonical" href="https://kwk-cli.github.io/docs/navigating/">
+    
+    <meta name="author" content="Gimanzo">
+    
+
+    <meta property="og:url" content="https://kwk-cli.github.io/docs/navigating/">
+    <meta property="og:title" content="kwk">
+    <meta property="og:image" content="https://kwk-cli.github.io/docs/images/logo.png">
+    <meta name="apple-mobile-web-app-title" content="kwk">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="shortcut icon" type="image/x-icon" href="https://kwk-cli.github.io/docs/favicon.png">
+    <link rel="icon" type="image/x-icon" href="https://kwk-cli.github.io/docs/favicon.png">
+
+    <style>
+      @font-face {
+        font-family: 'Icon';
+        src: url('https://kwk-cli.github.io/docs/fonts/icon.eot');
+        src: url('https://kwk-cli.github.io/docs/fonts/icon.eot')
+               format('embedded-opentype'),
+             url('https://kwk-cli.github.io/docs/fonts/icon.woff')
+               format('woff'),
+             url('https://kwk-cli.github.io/docs/fonts/icon.ttf')
+               format('truetype'),
+             url('https://kwk-cli.github.io/docs/fonts/icon.svg')
+               format('svg');
+        font-weight: normal;
+        font-style: normal;
+      }
+    </style>
+
+    <link rel="stylesheet" href="https://kwk-cli.github.io/docs/stylesheets/application.css">
+    <link rel="stylesheet" href="https://kwk-cli.github.io/docs/stylesheets/temporary.css">
+    <link rel="stylesheet" href="https://kwk-cli.github.io/docs/stylesheets/palettes.css">
+    <link rel="stylesheet" href="https://kwk-cli.github.io/docs/tomorrow.css">
+
+    
+    
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,700|Roboto&#43;Mono">
+    <style>
+      body, input {
+        font-family: 'Roboto', Helvetica, Arial, sans-serif;
+      }
+      pre, code {
+        font-family: 'Roboto Mono', 'Courier New', 'Courier', monospace;
+      }
+    </style>
+
+    
+    <link rel="stylesheet" href="https://kwk-cli.github.io/docs/tweaks.css">
+    
+    <script src="https://kwk-cli.github.io/docs/javascripts/modernizr.js"></script>
+
+    
+
+  </head>
+  <body class="palette-primary-cyan palette-accent-cyan">
+
+
+
+
+<div class="backdrop">
+	<div class="backdrop-paper"></div>
+</div>
+
+<input class="toggle" type="checkbox" id="toggle-drawer">
+<input class="toggle" type="checkbox" id="toggle-search">
+<label class="toggle-button overlay" for="toggle-drawer"></label>
+
+<header class="header">
+	<nav aria-label="Header">
+  <div class="bar default">
+    <div class="button button-menu" role="button" aria-label="Menu">
+      <label class="toggle-button icon icon-menu" for="toggle-drawer">
+        <span></span>
+      </label>
+    </div>
+    <div class="stretch">
+      <div class="title">
+        Finding Snippets
+      </div>
+    </div>
+
+    
+
+    
+    <div class="button button-github" role="button" aria-label="GitHub">
+      <a href="https://github.com/kwk-cli" title="@kwk-cli on GitHub" target="_blank" class="toggle-button icon icon-github"></a>
+    </div>
+    
+    
+        
+  </div>
+  <div class="bar search">
+    <div class="button button-close" role="button" aria-label="Close">
+      <label class="toggle-button icon icon-back" for="toggle-search"></label>
+    </div>
+    <div class="stretch">
+      <div class="field">
+        <input class="query" type="text" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck>
+      </div>
+    </div>
+    <div class="button button-reset" role="button" aria-label="Search">
+      <button class="toggle-button icon icon-close" id="reset-search"></button>
+    </div>
+  </div>
+</nav>
+</header>
+
+<main class="main">
+	<div class="drawer">
+		<nav aria-label="Navigation">
+  <a href="https://kwk-cli.github.io/docs/" class="project">
+    <div class="banner">
+      
+        <div class="logo">
+          <img src="https://kwk-cli.github.io/docs/images/logo.png">
+        </div>
+      
+      <div class="name">
+        <strong>kwk <span class="version">1.2.20</span></strong>
+        
+      </div>
+    </div>
+  </a>
+
+  <div class="scrollable">
+    <div class="wrapper">
+      
+
+      <div class="toc">
+        
+        <ul>
+          
+
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="kwk" href="https://kwk-cli.github.io/docs/">
+	
+	kwk
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Get started" href="https://kwk-cli.github.io/docs/getting-started/">
+	
+	Get started
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Snippets" href="https://kwk-cli.github.io/docs/snippets/">
+	
+	Snippets
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Pouches" href="https://kwk-cli.github.io/docs/pouches/">
+	
+	Pouches
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a class="current" title="Finding Snippets" href="https://kwk-cli.github.io/docs/navigating/">
+	
+	Finding Snippets
+</a>
+
+
+<ul id="scrollspy">
+</ul>
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Creating Apps" href="https://kwk-cli.github.io/docs/apps/">
+	
+	Creating Apps
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Signup &amp; Account" href="https://kwk-cli.github.io/docs/accounts/">
+	
+	Signup &amp; Account
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="App commands and settings" href="https://kwk-cli.github.io/docs/app/">
+	
+	App commands and settings
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="kwk in action" href="https://kwk-cli.github.io/docs/samples/">
+	
+	kwk in action
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="FAQ" href="https://kwk-cli.github.io/docs/faq/">
+	
+	FAQ
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Roadmap" href="https://kwk-cli.github.io/docs/roadmap/">
+	
+	Roadmap
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="License" href="https://kwk-cli.github.io/docs/license/">
+	
+	License
+</a>
+
+
+
+  
+</li>
+
+
+        </ul>
+        
+
+        
+        <hr>
+        <span class="section">The author</span>
+        
+        <ul>
+          
+
+          
+          <li>
+            <a href="https://github.com/kwk-cli" target="_blank" title="@kwk-cli on GitHub">
+              @kwk-cli on GitHub
+            </a>
+          </li>
+          
+
+          
+          <li>
+            <a href="mailto:cli@kwk.co" title="Email of cli@kwk.co">
+              Contact via email
+            </a>
+          </li>
+          
+        </ul>
+        
+      </div>
+    </div>
+  </div>
+</nav>
+
+	</div>
+
+	<article class="article">
+		<div class="wrapper">
+			<h1>Finding Snippets </h1>
+
+			
+
+<h2 id="saving-keystrokes">Saving Keystrokes</h2>
+
+<p>kwk has been designed specifically to save keystrokes. That&rsquo;s why when typing snippet names we often try to guess which snippet you intended to use.</p>
+
+<pre><code class="language-sh"># Whew!
+kwk view /cjones/apps/hello.js
+
+# Better
+kwk view hello.js
+
+# Even Better
+kwk view hello
+
+# Best!
+kwk hello
+
+# Use Suggest if you can't remember the name
+kwk hel
+
+
+# kwk [view] [/&lt;username&gt;/][pouch/]&lt;name&gt;[.&lt;ext&gt;]
+</code></pre>
+
+<blockquote>
+<p>Note: The <code>view</code> command is optional. You can configure the default command for different file extensions by typing <code>kwk edit env</code></p>
+</blockquote>
+
+<h2 id="canonical-snippet-names">Canonical Snippet names</h2>
+
+<blockquote>
+<p>&ldquo;If it ends with a slash, it&rsquo;s a directory. If not, it&rsquo;s a file.&rdquo;
+<a href="http://stackoverflow.com/questions/980255/should-a-directory-path-variable-end-with-a-trailing-slash" target="_blank">Dave Sherohman</a></p>
+</blockquote>
+
+<p>The kwk version is: &ldquo;If it ends with a slash, it&rsquo;s a username or pouch. If not, it&rsquo;s a snippet.&rdquo;</p>
+
+<h2 id="listing-made-easy">Listing made easy</h2>
+
+<p>No need to keep typing &lsquo;ls&rsquo; to list things, we actually removed that after realising how many times we typed it, so now you can list all your pouches or snippets with zero or one words, either <code>kwk</code> or <code>kwk &lt;pouch name&gt;</code> is enough.</p>
+
+<h2 id="show-your-homepage">Show your Homepage</h2>
+
+<p>Includes your pouches and unsorted snippets:</p>
+
+<pre><code class="language-sh">kwk 
+</code></pre>
+
+<h2 id="look-inside-a-pouch">Look inside a Pouch</h2>
+
+<pre><code class="language-sh">kwk apps
+
+# kwk &lt;pouch name&gt; 
+</code></pre>
+
+<h2 id="searching">Searching</h2>
+
+<pre><code class="language-sh">kwk find worl
+
+# kwk find [-g] &lt;term&gt;
+# -g/--global = search everybody's public snippets.
+</code></pre>
+
+<h2 id="expanding-lists">Expanding Lists</h2>
+
+<p>To show more details in list, number of lines to expand can be changed by calling <code>kwk edit prefs</code>.</p>
+
+<pre><code class="language-sh">kwk expand apps
+
+# kwk expand [&lt;pouch name&gt;]
+</code></pre>
+
+<h2 id="suggesting">Suggesting</h2>
+
+<pre><code class="language-sh">kwk hell #RETURN
+&gt; hello.js|
+</code></pre>
+
+<h2 id="enchilada">Enchilada</h2>
+
+<p><strong>Only use this if you really need to list all your snippets</strong>. Might be slower and lots of screen use.</p>
+
+<pre><code class="language-sh">kwk enchilada
+</code></pre>
+
+<h2 id="special-lists">Special lists</h2>
+
+<p>To list snippets that have been run recently:</p>
+
+<pre><code class="language-bash">kwk @today
+kwk @week
+kwk @month
+kwk @old
+</code></pre>
+
+<h2 id="community">Community</h2>
+
+<p>If you use a forward slash <code>/</code> in front of anything kwk will interpret it as a Username, thus you can browse other peoples public snippets.</p>
+
+<pre><code class="language-sh">kwk /alice/hawaii-trip
+# Lists alice's hawaii pouch
+
+kwk /alice/hawaii-trip/budget.txt
+# Shows the details of the vacation budget
+
+kwk /alice/hawaii-trip/hibiscus.url
+# Opens the url for Hibiscus hotel
+
+kwk run /alice/hawaii-trip/local-news.py
+# Runs alice's news feed for Hawaii
+
+# kwk /&lt;username/[pouch name]/[snippet name]
+</code></pre>
+
+<h2 id="popular-snippets">Popular Snippets</h2>
+
+<p>Show Alice&rsquo;s most recently used snippets</p>
+
+<pre><code class="language-sh">kwk /alice pop
+
+# kwk [/&lt;username&gt;] popular|pop
+</code></pre>
+
+<h2 id="sharing-snippets">Sharing Snippets</h2>
+
+<p>At the moment snippets are only shared by email.</p>
+
+<pre><code class="language-sh">kwk share hello.js alice
+
+# kwk share &lt;name&gt;.&lt;ext&gt; &lt;email&gt;
+</code></pre>
+
+<h2 id="stale-snippets">Stale Snippets</h2>
+
+<p>To help you clean up use this command to show snippets which haven&rsquo;t been used much or recently.</p>
+
+<pre><code class="language-sh">kwk stale
+</code></pre>
+
+
+			<aside class="copyright" role="note">
+				
+				&copy; 2017 Copyright 2017 &ndash;
+				
+				Documentation built with
+				<a href="https://www.gohugo.io" target="_blank">Hugo</a>
+				using the
+				<a href="http://github.com/digitalcraftsman/hugo-material-docs" target="_blank">Material</a> theme.
+			</aside>
+
+			<footer class="footer">
+				
+
+<nav class="pagination" aria-label="Footer">
+  <div class="previous">
+  
+      <a href="https://kwk-cli.github.io/docs/faq/" title="FAQ">
+        <span class="direction">
+          Previous
+        </span>
+        <div class="page">
+          <div class="button button-previous" role="button" aria-label="Previous">
+            <i class="icon icon-back"></i>
+          </div>
+          <div class="stretch">
+            <div class="title">
+              FAQ
+            </div>
+          </div>
+        </div>
+      </a>
+  
+  </div>
+
+  <div class="next">
+  
+      <a href="https://kwk-cli.github.io/docs/getting-started/" title="Get started">
+        <span class="direction">
+          Next
+        </span>
+        <div class="page">
+          <div class="stretch">
+            <div class="title">
+              Get started
+            </div>
+          </div>
+          <div class="button button-next" role="button" aria-label="Next">
+            <i class="icon icon-forward"></i>
+          </div>
+        </div>
+      </a>
+  
+  </div>
+</nav>
+
+
+
+
+
+			</footer>
+		</div>
+	</article>
+
+	<div class="results" role="status" aria-live="polite">
+		<div class="scrollable">
+			<div class="wrapper">
+				<div class="meta"></div>
+				<div class="list"></div>
+			</div>
+		</div>
+	</div>
+</main>
+
+    <script>
+    
+      var base_url = '';
+      var repo_id  = '';
+    
+    </script>
+
+    <script src="https://kwk-cli.github.io/docs/javascripts/application.js"></script>
+    
+
+    <script>
+      /* Add headers to scrollspy */
+      var headers   = document.getElementsByTagName("h2");
+      var scrollspy = document.getElementById('scrollspy');
+
+      if(scrollspy) {
+        if(headers.length > 0) {
+          for(var i = 0; i < headers.length; i++) {
+            var li = document.createElement("li");
+            li.setAttribute("class", "anchor");
+
+            var a  = document.createElement("a");
+            a.setAttribute("href", "#" + headers[i].id);
+            a.setAttribute("title", headers[i].innerHTML);
+            a.innerHTML = headers[i].innerHTML;
+
+            li.appendChild(a)
+            scrollspy.appendChild(li);
+          }
+        } else {
+          scrollspy.parentElement.removeChild(scrollspy)
+        }
+
+
+        /* Add permanent link next to the headers */
+        var headers = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+
+        for(var i = 0; i < headers.length; i++) {
+            var a = document.createElement("a");
+            a.setAttribute("class", "headerlink");
+            a.setAttribute("href", "#" + headers[i].id);
+            a.setAttribute("title", "Permanent link")
+            a.innerHTML = "#";
+            headers[i].appendChild(a);
+        }
+      }
+    </script>
+
+    
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+  </body>
+</html>
+

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Apps-rsses on kwk</title>
+    <link>https://kwk-cli.github.io/docs/apps/index.xml</link>
+    <description>Recent content in Apps-rsses on kwk</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright 2017</copyright>
+    <lastBuildDate>Tue, 08 Mar 2016 21:07:13 +0100</lastBuildDate>
+    <atom:link href="https://kwk-cli.github.io/docs/apps/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Creating Apps</title>
+      <link>https://kwk-cli.github.io/docs/apps/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/apps/</guid>
+      <description>
+
+&lt;h2 id=&#34;embedding-snippets&#34;&gt;Embedding Snippets&lt;/h2&gt;
+
+&lt;p&gt;kwk &amp;lsquo;run&amp;rsquo; commands can be embedded in snippets and so this opens up a whole world of opportunity to create interesting apps. Snippet references can also be dynamically passed to apps e.g.&lt;code&gt;/richard/apps/countdown.sh 3 &#39;kwk tmap&#39;&lt;/code&gt; will countdown and run tmap after 3 seconds.&lt;/p&gt;
+
+&lt;p&gt;Caveats:
+1. Apps only allow 3 levels.
+2. When referencing a snippet it should be an absolute name e.g. &lt;code&gt;kwk run /richard/examples/hello.js&lt;/code&gt;.
+3. Apps should have the shell .sh extension, although it is of course possible to invoke the shell from your favorite programming language.
+4. There are several restrictions in .sh files e.g. you can&amp;rsquo;t use the &amp;lsquo;rm&amp;rsquo; command.
+5. .sh file are run in pseudo-safe mode but you can use &amp;lsquo;eval&amp;rsquo; to dynamically run other kwk commands (see /kwk/apps/countdown.sh )&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

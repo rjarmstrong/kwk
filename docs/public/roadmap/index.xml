@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Roadmap-rsses on kwk</title>
+    <link>https://kwk-cli.github.io/docs/roadmap/index.xml</link>
+    <description>Recent content in Roadmap-rsses on kwk</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright 2017</copyright>
+    <lastBuildDate>Tue, 08 Mar 2016 21:07:13 +0100</lastBuildDate>
+    <atom:link href="https://kwk-cli.github.io/docs/roadmap/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Road map</title>
+      <link>https://kwk-cli.github.io/docs/roadmap/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/roadmap/</guid>
+      <description>
+
+&lt;h2 id=&#34;website&#34;&gt;Website&lt;/h2&gt;
+
+&lt;p&gt;We have a prototype of this and should be available mid 2017, when available your kwk cli will automatically be integrated.&lt;/p&gt;
+
+&lt;h2 id=&#34;mobile-apps&#34;&gt;Mobile Apps&lt;/h2&gt;
+
+&lt;p&gt;Please vote for the development of mobile apps &lt;a href=&#34;https://github.com/kwk-cli/kwk-cli-issues/issues/1&#34; target=&#34;_blank&#34;&gt;on this issue&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

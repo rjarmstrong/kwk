@@ -1,0 +1,709 @@
+/* Bulma imports */
+@import "bulma";
+
+/* Idealy, only modules that are used should be imported. The root directory for import
+is defined in brunch-config. More on https://bulma.io/documentation/overview/modular/
+Example:
+@import "sass/utilities/_all"; - this file is a must
+@import "sass/grid/columns"; - only import the columns module
+*/
+
+/*.highlight .bd-copy, .highlight .bd-expand {*/
+    /*background: none;*/
+    /*border: none;*/
+    /*color: #4a4a4a;*/
+    /*cursor: pointer;*/
+    /*font-size: 0.625rem;*/
+    /*outline: none;*/
+    /*padding-bottom: 0;*/
+    /*padding-top: 0;*/
+    /*position: absolute;*/
+    /*right: 0.25rem;*/
+    /*top: 0.25rem;*/
+/*}*/
+
+.drop-down {
+    position: absolute;
+    top: 61px;
+    left: 41px;
+    background: #191d1b;
+    color: white;
+    z-index: 1000;
+    width: 870px;
+    /* height: 402px; */
+    display: block;
+    border: solid 1px rgba(115, 206, 176, 0.3);
+    padding: 11px;
+    box-shadow: 9px 8px 3px rgba(0, 0, 0, 0.55);
+}
+
+.drop-down .item {
+    padding: 6px 15px 16px;
+    display: inline-block;
+    border: 1px solid rgba(123, 250, 208, 0);
+}
+
+.drop-down .item.selected {
+    background: rgb(53, 86, 76);
+    border: 1px solid rgba(123, 250, 208, 0.25);
+    color: white;
+}
+
+.item.selected .header {
+    text-shadow: -1px 1px 3px rgba(0, 0, 0, 0.42);
+}
+
+.prvw .highlight {
+    background : rgba(29, 146, 163, 0.72);
+}
+
+.item.pouch .header .highlight {
+    background: none;
+}
+
+.pouch .prvw {
+    box-shadow: 3px 3px rgba(75, 103, 94, 0.17);
+    background-color: rgb(0, 0, 0) !important;
+    border: 1px solid #498471;
+    color: rgb(181, 181, 181);
+    font-family: inherit;
+    font-weight: 300;
+    font-size: 10px;
+}
+
+.item .header .highlight {
+    /* background: rgba(29, 146, 163, 0.72); */
+    color: #88fdd7;
+}
+
+html {
+    font-size: 14px;
+    background: black;
+    border-left: 2px solid #27483d;
+    border-right: 2px solid #27483d;
+    border-bottom: 2px solid #27483d;
+    height: 100%;
+}
+
+body {
+    color: white;
+    height:100%;
+}
+
+.struct {
+    height: 100%;
+}
+
+a {
+    color: white;
+}
+
+a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+h1 small {
+    color: #8a8a8a;
+    font-size: 1rem;
+}
+
+.root .columns:not(:last-child) {
+    margin-bottom: 0;
+}
+
+.root a:hover .pch-icon{
+    background: #88fcd7;
+    color: black;
+}
+
+.root a:hover {
+    text-decoration: none;
+}
+
+.pouch {
+    padding: 3px 15px;
+    min-width: 87px;
+    letter-spacing: 1px;
+}
+
+.root .pouch {
+    padding: 0 15px;
+    min-width: 87px;
+    letter-spacing: 1px;
+    font-size: 1.1rem;
+}
+
+.pouch .subdued {
+    color: #4b4c4c;
+}
+
+.pch-icon {
+    width: 11px;
+    height: 14px;
+    display: inline-block;
+    background: #8a8a8a;
+    margin: 0 8px -2px 0px;
+}
+
+.pch-icon.pvt {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 14px 11px 0 0;
+    border-color: #8a8a8a transparent transparent transparent;
+    background: none;
+}
+
+.root .pch-icon {
+    width: 21px;
+    height: 23px;
+    margin: 0 8px -2px 0;
+}
+
+.root .pch-icon {
+    border-width: 23px 20px 0 0;
+}
+
+.pch-icon.last {
+    background: #88fcd7;
+}
+
+.pch-icon.red {
+    background: #88fcd7;
+}
+
+.pch-header {
+    margin: 5px 5px 5px 14px;
+    font-size: 11px;
+    color: #8a8a8a;
+}
+
+
+.snp-icon {
+    width: 11px;
+    height: 14px;
+    display: inline-block;
+    margin: 0 8px -2px 0px;
+}
+
+.snp-wrpr {
+    min-width: 150px;
+    position: relative;
+}
+
+.snippet-item {
+    cursor: pointer;
+    padding: 5px;
+    /*display: inline-block;*/
+    width: 100%;
+    text-align: left;
+    letter-spacing: 1px;
+    margin: 0 30px 0 0;
+}
+
+.snp-context {
+    position: absolute; top: 50px; left: 50px;
+}
+
+.draft {
+    color: #96966a;
+    font-size: 10px;
+}
+
+.snippet-item.selected, .pouch.selected {
+    background: #232323;
+}
+
+.count {
+    position: absolute;
+    bottom: -2px;
+    right: 2px;
+    font-size: 0.7em;
+    color: #ffffff;
+}
+
+.results-header {
+    height: 61px;
+    font-size: 13px;
+}
+
+.results-title {
+    margin: 0 3px 12px;
+    position: relative;
+}
+
+.results-title .text {
+    font-weight: 400;
+    font-size: 16px;
+    letter-spacing: 2.5px;
+    margin: 0 0 0 10px;
+}
+
+.results em {
+    color: #88fcd7;
+    font-weight: 600;
+    font-style: normal;
+}
+
+
+.item {
+    margin: 0 0 10px 0;
+}
+
+.highlight pre {
+    background: #272727;
+    padding: 16px;
+    color: #bdbdbd;
+    border-radius: 1px;
+}
+
+.search-box {
+    position: relative;
+    margin: 17px 27px;
+    width: 320px;
+}
+
+.yellow {
+    color: yellow;
+}
+
+.orange {
+    color: orange;
+}
+
+
+
+.prefix {
+    color: #585858;
+}
+
+.search-box input {
+    -webkit-tap-highlight-color: transparent;
+    font-size: 1.2em;
+    font-family: "DDG_ProximaNova","DDG_ProximaNova_UI_0","DDG_ProximaNova_UI_1","DDG_ProximaNova_UI_2","DDG_ProximaNova_UI_3","DDG_ProximaNova_UI_4","DDG_ProximaNova_UI_5","DDG_ProximaNova_UI_6","Proxima Nova","Helvetica Neue","Helvetica","Segoe UI","Nimbus Sans L","Liberation Sans","Open Sans",FreeSans,Arial,sans-serif;
+    font-weight: normal;
+    color: white;
+    display: block;
+    width: 100%;
+    background: black;
+    outline: none;
+    border: none;
+    border-bottom: 1px solid #757171;
+    padding: 13px 18px;
+    height: 2.54545em;
+    z-index: 1;
+    position: relative;
+    top: -4px;
+}
+
+span.prompt {
+    position: absolute;
+    top: -10px;
+    left: -12px;
+    color: #ffffff;
+    z-index: 10;
+    font-size: 36px;
+    font-family: monospace;
+}
+
+.subdued {
+    color: #8c8a8a;
+}
+
+.stats {
+    margin: 0px;
+    font-size: 0.7em;
+    color: #5d5b5b;
+}
+
+.hide {
+    display: none;
+}
+
+.scroll {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/*background: #8e8e8e;
+color: black;
+*/
+
+/* BULMA override */
+.section.main {
+    padding: 0;
+}
+
+.label, .navbar-item {
+ color: white;
+}
+
+.navbar-item, .navbar-link {
+    color: #c7c7c7;
+}
+
+.navbar {
+    background: black;
+}
+
+strong {
+    color: white;
+}
+
+.navbar-dropdown {
+    background-color: #7b7b7b;
+    border-top:1px solid #636161;
+}
+
+a.navbar-item:hover, a.navbar-item.is-active, .navbar-link:hover, .navbar-link.is-active {
+    background-color: black;
+    color: #f3f1f1;
+}
+
+.navbar-item.has-dropdown:hover .navbar-link, .navbar-item.has-dropdown.is-active .navbar-link {
+    background-color: #7b7b7b;
+    color: white;
+}
+
+.button {
+    color: white;
+    border-radius: 1px;
+    border-color: #444;
+    background: black;
+}
+
+.button.is-static {
+    background-color: black;
+    color: white;
+    border-color: #353535;
+}
+
+.button:hover {
+    color:white;
+}
+
+.modal-background {
+    background-color: rgba(10, 10, 10, 0.99);
+}
+
+.footer {
+    background-color: black;
+}
+
+.prvw {
+    font-family: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"', monospace;
+    font-size: 12px;
+    line-height: 21px;
+    background-color: #c1c1bc !important;
+    color: #020202;
+    width: 250px;
+    height: 110px;
+    text-overflow: clip;
+    overflow: hidden;
+    padding: 7px 10px;
+    display: block;
+    border: 1px solid #293330;
+    margin-top: 5px;
+    box-shadow: inset -4px -3px 2px rgba(91, 117, 109, 0.5);
+}
+
+.prvw:hover {
+    border: 1px solid cyan;
+}
+
+/* CODE MIRROR */
+/*
+    Name:       dracula
+    Author:     Michael Kaminsky (http://github.com/mkaminsky11)
+    Original dracula color scheme by Zeno Rocha (https://github.com/zenorocha/dracula-theme)
+*/
+
+.cm-s-dracula.CodeMirror {
+    height: 100%;
+    min-width: 500px;
+    width: 800px;
+}
+
+
+.cm-s-dracula.CodeMirror, .cm-s-dracula .CodeMirror-gutters {
+    font-family: 'Hack,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"', monospace;
+    font-size: 14px;
+    line-height: 21px;
+    background-color: #c1c1bc !important;
+    color: #020202;
+}
+.cm-s-dracula.CodeMirror pre {
+    padding-left:7px;
+    font-weight: 200;
+    letter-spacing: 1px;
+    font-family: Menlo, monospace;
+}
+.cm-s-dracula .CodeMirror-gutters { color: #282a36; }
+.cm-s-dracula .CodeMirror-cursor {
+    border-left: solid 2px #293331;
+    height: 50px;
+}
+.cm-s-dracula .CodeMirror-linenumber {
+    color: rgba(49, 43, 43, 0.3);
+    background: #262d2b;
+    color: #6b8079;
+    line-height: 21px;
+    padding: 0 12px 0 5px;
+    margin-right: 3px;
+    border-right: 1px solid #3ca0a5;
+}
+
+.cm-s-dracula .CodeMirror-code > div:nth-child(1) > div > div {
+    margin-top: -10px;
+    padding-top: 10px;
+}
+/* makes the gutter height span over wrapped lines */
+.cm-s-dracula .CodeMirror-code > div > div > div {
+    height: 1000px;
+}
+
+.cm-s-dracula .CodeMirror-lines {
+    padding: 10px 0 50px;
+    font-family: menlo, monospace;
+    font-size: 13px;
+    font-weight: lighter;
+}
+.cm-s-dracula .CodeMirror-selected { background: rgba(29, 146, 163, 0.72); }
+.cm-s-dracula .CodeMirror-line::selection, .cm-s-dracula .CodeMirror-line > span::selection, .cm-s-dracula .CodeMirror-line > span > span::selection { background: rgba(255, 255, 255, 0.10); }
+.cm-s-dracula .CodeMirror-line::-moz-selection, .cm-s-dracula .CodeMirror-line > span::-moz-selection, .cm-s-dracula .CodeMirror-line > span > span::-moz-selection { background: rgba(255, 255, 255, 0.10); }
+.cm-s-dracula span.cm-comment { color: #6272a4; }
+.cm-s-dracula span.cm-string, .cm-s-dracula span.cm-string-2 {
+    color: #f1fa8c;
+}
+.cm-s-dracula span.cm-code, .cm-s-dracula span.cm-code-2 {
+    color: #000000;
+    border: 1px solid #9c9898;
+    border-radius: 6px;
+    background: #9cada7;
+    padding: 3px;
+}
+.cm-s-dracula span.cm-hide {
+    color: #f870fa;
+    display: none;
+}
+.cm-s-dracula span.cm-number { color: #bd93f9; }
+.cm-s-dracula span.cm-variable { color: #50fa7b; }
+.cm-s-dracula span.cm-variable-2 {
+    color: #000000;
+    font-weight: bolder;
+}
+.cm-s-dracula span.cm-def { color: #50fa7b; }
+.cm-s-dracula span.cm-operator { color: #ff79c6; }
+.cm-s-dracula span.cm-keyword { color: #ff79c6; }
+.cm-s-dracula span.cm-atom { color: #bd93f9; }
+.cm-s-dracula span.cm-meta { color: #f8f8f2; }
+.cm-s-dracula span.cm-tag { color: #ff79c6; }
+.cm-s-dracula span.cm-attribute { color: #50fa7b; }
+.cm-s-dracula span.cm-qualifier { color: #50fa7b; }
+.cm-s-dracula span.cm-property { color: #66d9ef; }
+.cm-s-dracula span.cm-builtin { color: #50fa7b; }
+.cm-s-dracula span.cm-variable-3, .cm-s-dracula span.cm-type { color: #ffb86c; }
+
+.cm-s-dracula .CodeMirror-activeline-background { background: rgba(255,255,255,0.1); }
+.cm-s-dracula .CodeMirror-matchingbracket { text-decoration: underline; color: white !important; }
+
+/* from code  github */
+.snippet {
+    overflow: visible;
+    font-family: "Interface, SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 14px;
+    color: #e4f1ff;
+    word-wrap: normal;
+    white-space: pre;
+    position: relative;
+    padding-right: 10px;
+    padding-left: 16px;
+    line-height: 21px;
+    vertical-align: top;
+    background: #292727;
+}
+
+.line-numbers.top, .snippet.top {
+    padding-top:7px;
+}
+
+.line-numbers.bottom, .snippet.bottom {
+    padding-bottom:7px;
+}
+
+.drag-over {
+    border: 1px solid orange;
+}
+
+.editable {
+    /*border-bottom: 1px dashed #598e7d;*/
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+.drg {
+    display: none;
+    cursor: pointer;
+    z-index: 100;
+    font-size: 13px;
+    width: 25px;
+    height: 25px;
+    background: #353535;
+    border: 1px solid #232323;
+    color: #c1bebe;
+    padding: 3px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.drg:hover {
+    background: #96afa7;
+    color: black;
+}
+
+.uri {
+    font-size: 1.1rem;
+    display: inline-block;
+    letter-spacing: 1px;
+}
+
+.uri-highlight {
+    color : #88fcd7
+}
+
+.divider {
+    /*border-bottom: 1px solid rgba(95, 93, 93, 0.41);*/
+    text-align: right;
+}
+
+.editor-chrome {
+    height:500px;
+    width:800px;
+    margin-right: 42px;
+    margin-top: 8px;
+}
+
+.button {
+    border: none;
+    background: none;
+    color: #90afa6;
+}
+
+.button:hover {
+    background: #3e3d3d;
+}
+
+.button:active, .button.is-active {
+    -webkit-box-shadow: inset 0 1px 2px rgba(10, 10, 10, 0.2);
+    box-shadow: inset 0 1px 2px rgba(10, 10, 10, 0.2);
+    color: #bbbbbb;
+}
+
+.button:focus, .button.is-focused {
+    color: #bbbbbb;
+}
+
+.editor .title {
+    letter-spacing: 1px;
+    background: #1b1d1c;
+    line-height: 1;
+    margin: 0;
+    color: #efefef;
+    display: block;
+    height: 29px;
+    padding: 5px 24px;
+    font-size: 15px;
+    font-weight: normal;
+    float: left;
+}
+
+.editor {
+    width: 100%;
+    /*box-shadow: -2px -1px 0px 2px rgba(104, 142, 142, 0.16);*/
+    border-top: 1px solid rgba(211, 255, 241, 0.37);
+    border-left: 1px solid rgba(175, 239, 218, 0.42);
+}
+
+.editor .button {
+    border: none;
+    color: #545454;
+}
+
+.editor-footer {
+    background: #262d2b;
+    height: 26px;
+    margin-top: -26px;
+    z-index: 100;
+    position: relative;
+    padding: 0 50px 0 8px;
+    font-size: 10px;
+    margin-right: -1px;
+    border-top: 1px solid #446b5e;
+    border-bottom: 1px solid #313332;
+}
+
+/*
+SCROLL BAR
+ */
+
+/* Turn on a 13x13 scrollbar */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 13px;
+}
+
+::-webkit-scrollbar-button:vertical,
+::-webkit-scrollbar-button:start:decrement,
+::-webkit-scrollbar-button:end:increment,
+::-webkit-scrollbar-button:vertical:start:increment,
+::-webkit-scrollbar-button:vertical:end:decrement,
+::-webkit-scrollbar-button:vertical:increment,
+::-webkit-scrollbar-track:vertical
+{
+    display: none;
+}
+
+
+/* Top area above thumb and below up button */
+::-webkit-scrollbar-track-piece:vertical:start {
+    background-color: rgba(48, 53, 51, 0.97);
+}
+
+/* Track below and above */
+::-webkit-scrollbar-track-piece {
+    background-color: rgba(48, 53, 51, 0.97);
+}
+
+/* The thumb itself */
+::-webkit-scrollbar-thumb:vertical {
+    height: 30px;
+    background-color: rgba(157, 146, 130, 0.62);
+}
+
+.no-select {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* bulma overrides */
+
+.title {
+    color: #ffffff;
+}
+
+.subtitle {
+    color: #88fdd7;
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.title:not(.is-spaced) + .subtitle {
+    margin-top: 0;
+}

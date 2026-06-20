@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Navigating-rsses on kwk</title>
+    <link>https://kwk-cli.github.io/docs/navigating/index.xml</link>
+    <description>Recent content in Navigating-rsses on kwk</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright 2017</copyright>
+    <lastBuildDate>Tue, 08 Mar 2016 21:07:13 +0100</lastBuildDate>
+    <atom:link href="https://kwk-cli.github.io/docs/navigating/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Finding Snippets</title>
+      <link>https://kwk-cli.github.io/docs/navigating/</link>
+      <pubDate>Tue, 08 Mar 2016 21:07:13 +0100</pubDate>
+      
+      <guid>https://kwk-cli.github.io/docs/navigating/</guid>
+      <description>
+
+&lt;h2 id=&#34;saving-keystrokes&#34;&gt;Saving Keystrokes&lt;/h2&gt;
+
+&lt;p&gt;kwk has been designed specifically to save keystrokes. That&amp;rsquo;s why when typing snippet names we often try to guess which snippet you intended to use.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;# Whew!
+kwk view /cjones/apps/hello.js
+
+# Better
+kwk view hello.js
+
+# Even Better
+kwk view hello
+
+# Best!
+kwk hello
+
+# Use Suggest if you can&#39;t remember the name
+kwk hel
+
+
+# kwk [view] [/&amp;lt;username&amp;gt;/][pouch/]&amp;lt;name&amp;gt;[.&amp;lt;ext&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Note: The &lt;code&gt;view&lt;/code&gt; command is optional. You can configure the default command for different file extensions by typing &lt;code&gt;kwk edit env&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;listing-made-easy&#34;&gt;Listing made easy&lt;/h2&gt;
+
+&lt;p&gt;No need to keep typing &amp;lsquo;ls&amp;rsquo; to list things, we actually removed that after realising how many times we typed it, so now you can list all your pouches or snippets with zero or one words, either &lt;code&gt;kwk&lt;/code&gt; or &lt;code&gt;kwk &amp;lt;pouch name&amp;gt;&lt;/code&gt; is enough.&lt;/p&gt;
+
+&lt;h2 id=&#34;show-your-homepage&#34;&gt;Show your Homepage&lt;/h2&gt;
+
+&lt;p&gt;Includes your pouches and unsorted snippets:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;look-inside-a-pouch&#34;&gt;Look inside a Pouch&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk apps
+
+# kwk &amp;lt;pouch name&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;searching&#34;&gt;Searching&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk find worl
+
+# kwk find [-g] &amp;lt;term&amp;gt;
+# -g/--global = search everybody&#39;s public snippets.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;expanding-lists&#34;&gt;Expanding Lists&lt;/h2&gt;
+
+&lt;p&gt;To show more details in list, number of lines to expand can be changed by calling &lt;code&gt;kwk edit prefs&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk expand apps
+
+# kwk expand [&amp;lt;pouch name&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;suggesting&#34;&gt;Suggesting&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk hell #RETURN
+&amp;gt; hello.js|
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;enchilada&#34;&gt;Enchilada&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;Only use this if you really need to list all your snippets&lt;/strong&gt;. Might be slower and lots of screen use.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk enchilada
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;community&#34;&gt;Community&lt;/h2&gt;
+
+&lt;p&gt;If you use a forward slash &lt;code&gt;/&lt;/code&gt; in front of anything kwk will interpret it as a Username, thus you can browse other peoples public snippets.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk /alice/hawaii-trip
+# Lists alice&#39;s hawaii pouch
+
+kwk /alice/hawaii-trip/budget.txt
+# Shows the details of the vacation budget
+
+kwk /alice/hawaii-trip/hibiscus.url
+# Opens the url for Hibiscus hotel
+
+kwk run /alice/hawaii-trip/local-news.py
+# Runs alice&#39;s news feed for Hawaii
+
+# kwk /&amp;lt;username/[pouch name]/[snippet name]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;popular-snippets&#34;&gt;Popular Snippets&lt;/h2&gt;
+
+&lt;p&gt;Show Alice&amp;rsquo;s most recently used snippets&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk /alice pop
+
+# kwk [/&amp;lt;username&amp;gt;] popular|pop
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;sharing-snippets&#34;&gt;Sharing Snippets&lt;/h2&gt;
+
+&lt;p&gt;At the moment snippets are only shared by email.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk share hello.js alice
+
+# kwk share &amp;lt;name&amp;gt;.&amp;lt;ext&amp;gt; &amp;lt;email&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;stale-snippets&#34;&gt;Stale Snippets&lt;/h2&gt;
+
+&lt;p&gt;To help you clean up use this command to show snippets which haven&amp;rsquo;t been used much or recently.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;kwk stale
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

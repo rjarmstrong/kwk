@@ -1,0 +1,19 @@
+{
+  "name": "kwkweb",
+  "version": "1.0.0",
+  "description": "**kwk web**",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/sharingmachine/kwkweb.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/sharingmachine/kwkweb#readme",
+  "dependencies": {
+    "material-ui": "^0.19.0"
+  }
+}
